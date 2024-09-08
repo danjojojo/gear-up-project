@@ -1,0 +1,33 @@
+.upper-nav {
+    background-color: #f8f9fa;
+    border-bottom: 1px solid #dee2e6;
+    flex: 1;
+    height: 70px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    .user-profile {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+
+
+        .title{
+            font-size: 16px;
+        }
+
+        .username{
+            font-size: 12px;
+        }
+
+        .logout {
+            font-size: 12px;
+            border-radius: 15px;
+            padding: 5px;
+            width: 100px;
+            margin-left: 15px;
+
+        }
+    }
+}
