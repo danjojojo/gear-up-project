@@ -16,7 +16,10 @@ const AdminRoutes = () => (
                 <Route path=":recordType" element={<Pages.Records />} />
             </Route>
             <Route path="waitlist" element={<Pages.Waitlist />} />
-            <Route path="bike-builder-upgrader" element={<Pages.BikeBuilderUpgrader />} />
+            <Route path="bike-builder-upgrader">
+                <Route index element={<Pages.BikeBuilderUpgrader />} />
+                <Route path=":partType" element={<Pages.BikeBuilderUpgrader />} />
+            </Route>
             <Route path="orders" element={<Pages.Orders />} />
         </Route>
     </Routes>

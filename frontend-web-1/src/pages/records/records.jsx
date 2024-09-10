@@ -3,6 +3,7 @@ import PageLayout from '../../components/page-layout/page-layout';
 import { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 
+
 const Records = () => {
     const [selectedRecord, setSelectedRecord] = useState('sales');
     const navigate = useNavigate();
@@ -38,11 +39,13 @@ const Records = () => {
                             </select>
                         </div>
 
+
+                        {/* SALES */}
                         {selectedRecord === 'sales' && (
                             <>
                                 <div className='middle-container mb-3'>
                                     <div className='dashboard'>
-                                        <div className='title'>Sales Dashboard</div>
+                                        <div className='title'>Dashboard</div>
                                         <div className='dashboard-containers d-flex'>
                                             <div className='s-containers'></div>
                                             <div className='s-containers'></div>
@@ -60,17 +63,20 @@ const Records = () => {
 
                                     <div className='right-container'>
                                         <div className='title'>Select a date to see records</div>
-                                        <div className='content'></div>
+                                        <div className='content'>
+
+                                        </div>
                                     </div>
                                 </div>
                             </>
                         )}
 
+                        {/* LABOR */}
                         {selectedRecord === 'labor' && (
                             <>
                                 <div className='middle-container mb-3'>
                                     <div className='dashboard'>
-                                        <div className='title'>Labor Dashboard</div>
+                                        <div className='title'>Dashboard</div>
                                         <div className='dashboard-containers d-flex'>
                                             <div className='l-containers'></div>
                                             <div className='l-containers'></div>
@@ -87,17 +93,21 @@ const Records = () => {
 
                                     <div className='right-container'>
                                         <div className='title'>Select a date to see records</div>
-                                        <div className='content'></div>
+                                        <div className='content'>
+
+                                        </div>
                                     </div>
                                 </div>
                             </>
                         )}
 
+
+                        {/* EXPENSES */}
                         {selectedRecord === 'expenses' && (
                             <>
                                 <div className='middle-container mb-3'>
                                     <div className='dashboard'>
-                                        <div className='title'>Expenses Dashboard</div>
+                                        <div className='title'>Dashboard</div>
                                         <div className='dashboard-containers d-flex'>
                                             <div className='e-containers'></div>
                                             <div className='e-containers'></div>
@@ -114,7 +124,9 @@ const Records = () => {
 
                                     <div className='right-container'>
                                         <div className='title'>Select a date to see records</div>
-                                        <div className='content'></div>
+                                        <div className='content'>
+
+                                        </div>
                                     </div>
                                 </div>
                             </>
