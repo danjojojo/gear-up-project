@@ -11,7 +11,10 @@ const StaffRoutes = () => (
             <Route path="expenses" element={<Pages.Expenses />} />
             <Route path="receipts" element={<Pages.Receipts />} />
             <Route path="waitlist" element={<Pages.Waitlist />} />
-            <Route path="bike-builder-upgrader" element={<Pages.BikeBuilderUpgrader />} />
+            <Route path="bike-builder-upgrader">
+                <Route index element={<Pages.BikeBuilderUpgrader />} />
+                <Route path=":partType" element={<Pages.BikeBuilderUpgrader />} />
+            </Route>
             <Route path="orders" element={<Pages.Orders />} />
         </Route>
     </Routes>
