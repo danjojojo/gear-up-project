@@ -31,7 +31,7 @@ const Records = () => {
             <PageLayout
                 leftContent={
                     <div className='records-container'>
-                        <div className='upper-container mb-3'>
+                        <div className='upper-container'>
                             <select className='dropdown' value={selectedRecord} onChange={handleDropdownChange}>
                                 <option value="sales">Sales</option>
                                 <option value="labor">Labor</option>
@@ -43,7 +43,7 @@ const Records = () => {
                         {/* SALES */}
                         {selectedRecord === 'sales' && (
                             <>
-                                <div className='middle-container mb-3'>
+                                <div className='middle-container'>
                                     <div className='dashboard'>
                                         <div className='title'>Dashboard</div>
                                         <div className='dashboard-containers d-flex'>
@@ -74,7 +74,7 @@ const Records = () => {
                         {/* LABOR */}
                         {selectedRecord === 'labor' && (
                             <>
-                                <div className='middle-container mb-3'>
+                                <div className='middle-container'>
                                     <div className='dashboard'>
                                         <div className='title'>Dashboard</div>
                                         <div className='dashboard-containers d-flex'>
@@ -105,7 +105,7 @@ const Records = () => {
                         {/* EXPENSES */}
                         {selectedRecord === 'expenses' && (
                             <>
-                                <div className='middle-container mb-3'>
+                                <div className='middle-container'>
                                     <div className='dashboard'>
                                         <div className='title'>Dashboard</div>
                                         <div className='dashboard-containers d-flex'>

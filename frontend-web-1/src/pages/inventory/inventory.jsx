@@ -4,6 +4,10 @@ import { useState } from 'react';
 import SearchBar from '../../components/search-bar/search-bar';
 import filter from '../../assets/icons/filter.png';
 import sort from '../../assets/icons/sort.png';
+import exit from '../../assets/icons/exit.png';
+import edit from '../../assets/icons/edit.png';
+import del from '../../assets/icons/delete.png';
+
 
 const Inventory = () => {
 
@@ -30,7 +34,9 @@ const Inventory = () => {
                         </div>
 
                         <div className='lower-container'>
+                            <div className='lower-content'>
 
+                            </div>
                         </div>
 
                     </div>
@@ -66,17 +72,36 @@ const Inventory = () => {
                             </>
                         ) : (
                             <div className='form-container'>
-                                <div className='upper-container d-flex'>
-                                    <button className='cancel-btn' onClick={() => setIsAddingItem(false)}>
-                                        Cancel
-                                    </button>
-                                </div>
+                                <div className='container-1 d-flex'>
+                                    <div className='exit-btn'>
+                                        <img src={exit} alt='Filter' className='exit-icon' onClick={() => setIsAddingItem(false)} />
+                                    </div>
 
-                                <div className='lower-container'>
-                                    <div className='form-content'>
+                                    <div className='edit-btn'>
+                                        <img src={edit} alt='Filter' className='edit-icon' />
+                                    </div>
 
+                                    <div className='del-btn'>
+                                        <img src={del} alt='Sort' className='del-icon' />
                                     </div>
                                 </div>
+
+                                <div className='container-2'>
+
+                                </div>
+
+                                <div className='container-3'>
+
+                                </div>
+
+                                <div className='container-4'>
+
+                                </div>
+
+                                <div className='container-5'>
+
+                                </div>
+
                             </div>
                         )}
                     </div>

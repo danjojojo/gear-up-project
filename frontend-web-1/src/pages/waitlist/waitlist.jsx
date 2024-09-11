@@ -27,7 +27,9 @@ const Wailtlist = () => {
                         </div>
 
                         <div className='lower-container'>
+                            <div className='lower-content'>
 
+                            </div>
                         </div>
 
                     </div>

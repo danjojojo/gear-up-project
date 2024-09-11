@@ -136,7 +136,9 @@ const BikeBuilderUpgrader = () => {
             </div>
 
             <div className='lower-container'>
-                {/* Display selected part details here */}
+                <div className='lower-content'>
+
+                </div>
             </div>
         </div>
     );
