@@ -8,7 +8,7 @@ const SearchBar = () => {
       <input 
         type="text" 
       />
-      <img fluid 
+      <img 
         src={searchIcon} 
         alt="Search Icon" 
         className="search-icon" 

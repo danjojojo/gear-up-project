@@ -21,8 +21,8 @@ const AuthProvider = ({ children }) => {
   const loginAdmin = async (email, password) => {
     try {
       const data = await login(email, password);
-      Cookies.set('token', data.token, { httpOnly: true, secure: true, sameSite: 'Strict' });
-      Cookies.set('userRole', data.role, { httpOnly: true, secure: true, sameSite: 'Strict' });
+      Cookies.set('token', data.token, { secure: true, sameSite: 'Strict' });
+      Cookies.set('userRole', data.role, {secure: true, sameSite: 'Strict' });
       setToken(data.token);
       setUserRole(data.role);
       return data;
@@ -34,8 +34,8 @@ const AuthProvider = ({ children }) => {
   const loginPOSUser = async (password) => {
     try {
       const data = await loginPOS(password);
-      Cookies.set('pos_token', data.token, { httpOnly: true, secure: true, sameSite: 'Strict' });
-      Cookies.set('userRole', data.role, { httpOnly: true, secure: true, sameSite: 'Strict' });
+      Cookies.set('pos_token', data.token, { secure: true, sameSite: 'Strict' });
+      Cookies.set('userRole', data.role, { secure: true, sameSite: 'Strict' });
       setPosToken(data.token);
       setUserRole(data.role);
       return data;
