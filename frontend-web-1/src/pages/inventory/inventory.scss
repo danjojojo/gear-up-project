@@ -131,7 +131,7 @@
                 border-radius: 20px;
 
                 .container-1 {
-                    height: 6%;
+                    height: 5%;
                     width: 100%;
 
                     .exit-btn {
@@ -174,8 +174,10 @@
                 }
 
 
-                .form-group {
-                    height: 11%;
+                .item-name,
+                .item-price {
+                    height: 8%;
+                    align-content: center;
 
                     label {
                         display: block;
@@ -201,6 +203,15 @@
                         font-size: 12px;
                         display: flex;
                         align-items: center;
+                    }
+
+                    .count-input {
+                        font-size: 12px;
+                        height: 30px !important;
+                        width: 120px;
+                        border: 1px solid #ddd;
+                        border-radius: 5px;
+                        align-self: center;
                     }
 
                     .stock-btn {
@@ -231,8 +242,7 @@
 
 
                 .category-container,
-                .soldby-container,
-                .bike-part-container {
+                .soldby-container {
                     height: 8%;
 
                     .title {
@@ -282,8 +292,63 @@
                     }
                 }
 
+                .low-stock-threshold {
+                    height: 5%;
+                    align-content: center;
+
+                    label {
+                        display: block;
+                        font-size: 12px;
+                        color: #555;
+                        margin-bottom: 5px;
+                    }
+
+                    input {
+                        width: 100%;
+                        padding: 5px;
+                        font-size: 12px;
+                        border: 1px solid #ddd;
+                        border-radius: 5px;
+                    }
+                }
+
+                .bike-part-container {
+                    height: 5%;
+
+                    .title {
+                        font-size: 12px;
+                        display: flex;
+                        align-items: center;
+                    }
+
+                    .dropdown {
+                        align-self: center;
+                        height: 30px;
+                        width: 40%;
+                        padding: 5px;
+                        font-size: 12px;
+                        background-color: #f9f9f9;
+                        border: 1px solid #ccc;
+                        border-radius: 4px;
+                        cursor: pointer;
+                        outline: none;
+                        transition: background-color 0.2s ease, border-color 0.2s ease;
+
+                        &:hover,
+                        &:focus {
+                            background-color: #fff;
+                            border-color: #888;
+                        }
+
+                        option {
+                            font-size: 14px;
+                        }
+                    }
+                }
+
+
                 .upload-container {
-                    height: 19%;
+                    height: 24%;
                 }
 
                 .submit-btn {

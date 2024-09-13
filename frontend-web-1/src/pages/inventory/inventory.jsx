@@ -12,6 +12,11 @@ import ImageUploadButton from '../../components/img-upload-button/img-upload-but
 const Inventory = () => {
     const [isAddingItem, setIsAddingItem] = useState(false);
     const [viewingItem, setViewingItem] = useState(null);
+    const [addToBikeBuilder, setAddToBikeBuilder] = useState(false); // State for "Add to Bike Builder and Upgrader"
+    const [lowStockAlert, setLowStockAlert] = useState(false); // State for "Low Stock Alert"
+    const [lowStockThreshold, setLowStockThreshold] = useState(''); // State for stock threshold
+    const [isAddingStock, setIsAddingStock] = useState(false); // To toggle between view and input
+    const [stockInput, setStockInput] = useState(0);
 
     const handleFormSubmit = (event) => {
         event.preventDefault();
@@ -32,7 +37,11 @@ const Inventory = () => {
         setViewingItem(null); // Close the item view
     };
 
-    const itemCount = 20;
+    const handleStockInputChange = (event) => {
+        setStockInput(event.target.value);
+    };
+
+    const itemCount = 10;
 
     return (
         <div className='inventory p-3'>
@@ -60,7 +69,7 @@ const Inventory = () => {
                                         className="item-container"
                                         onClick={() => handleItemClick({ name: `Item ${index}`, price: `$${index * 10}`, stock: 10 })}
                                     >
-                                        {/* No content inside the item container */}
+
                                     </div>
                                 ))}
                             </div>
@@ -85,7 +94,7 @@ const Inventory = () => {
                                         </div>
                                     </div>
 
-                                    <div className="form-group">
+                                    <div className="item-name form-group">
                                         <label htmlFor="item-name">Name</label>
                                         <input
                                             type="text"
@@ -96,7 +105,7 @@ const Inventory = () => {
                                         />
                                     </div>
 
-                                    <div className="form-group">
+                                    <div className="item-price form-group">
                                         <label htmlFor="item-price">Price</label>
                                         <input
                                             type="text"
@@ -132,23 +141,54 @@ const Inventory = () => {
                                     <div className='low-stock-container d-flex justify-content-between'>
                                         <div className='title'>Low Stock Alert</div>
                                         <div className="switch form-check form-switch">
-                                            <input className="form-check-input" type="checkbox" id="lowStock" disabled />
+                                            <input
+                                                className="form-check-input"
+                                                type="checkbox"
+                                                id="lowStock"
+                                                checked={lowStockAlert}
+                                                onChange={() => setLowStockAlert(!lowStockAlert)}
+                                            />
                                         </div>
                                     </div>
+
+                                    {lowStockAlert && (
+                                        <div className="low-stock-threshold form-group">
+                                            <input
+                                                type="text"
+                                                id="low-stock-threshold"
+                                                name="lowStockThreshold"
+                                                value={lowStockThreshold}
+                                                onChange={(e) => setLowStockThreshold(e.target.value)}
+                                                placeholder="Enter stock threshold"
+                                                required
+                                            />
+                                        </div>
+                                    )}
 
                                     <div className='bbu-container d-flex justify-content-between'>
                                         <div className='title'>Add to Bike Builder and Upgrader</div>
                                         <div className="switch form-check form-switch">
-                                            <input className="form-check-input" type="checkbox" id="addPart" disabled />
+                                            <input
+                                                className="form-check-input"
+                                                type="checkbox"
+                                                id="addPart"
+                                                checked={addToBikeBuilder}
+                                                onChange={() => setAddToBikeBuilder(!addToBikeBuilder)}
+                                            />
                                         </div>
                                     </div>
 
-                                    <div className='bike-part-container d-flex justify-content-between'>
-                                        <div className='title'>Bike Part</div>
-                                        <select className='dropdown' name="bikeParts" disabled>
-                                            <option value="frame">Frame</option>
-                                        </select>
-                                    </div>
+                                    {addToBikeBuilder && (
+                                        <div className='bike-part-container d-flex justify-content-between'>
+                                            <div className='title'>Bike Part</div>
+                                            <select className='dropdown' name="bikeParts">
+                                                <option value="frame">Frame</option>
+                                                <option value="wheel">Wheel</option>
+                                                <option value="handlebar">Handlebar</option>
+                                                {/* Add more bike parts as needed */}
+                                            </select>
+                                        </div>
+                                    )}
 
                                     <ImageUploadButton />
 
@@ -157,6 +197,7 @@ const Inventory = () => {
                                     </button>
                                 </form>
                             </div>
+
                         ) : isAddingItem ? (
                             <div className='form-container'>
                                 <form className='form-content' onSubmit={handleFormSubmit}>
@@ -166,7 +207,7 @@ const Inventory = () => {
                                         </div>
                                     </div>
 
-                                    <div className="form-group">
+                                    <div className=" item-name form-group">
                                         <label htmlFor="item-name">Name</label>
                                         <input
                                             type="text"
@@ -177,7 +218,7 @@ const Inventory = () => {
                                         />
                                     </div>
 
-                                    <div className="form-group">
+                                    <div className="item-price form-group">
                                         <label htmlFor="item-price">Price</label>
                                         <input
                                             type="text"
@@ -190,9 +231,31 @@ const Inventory = () => {
 
                                     <div className='stock-container d-flex justify-content-between'>
                                         <div className='title'>Stock Count</div>
-                                        <div className='count'>10</div>
-                                        <button className='stock-btn' type='button'>
-                                            Add Stock
+                                        {isAddingStock ? (
+                                            <input
+                                                type="number"
+                                                className="count-input"
+                                                value={stockInput}
+                                                min="0"
+                                                onChange={handleStockInputChange}
+                                            />
+                                        ) : (
+                                            <div className='count'>{stockInput}</div>
+                                        )}
+                                        <button
+                                            className='stock-btn'
+                                            type='button'
+                                            onClick={() => {
+                                                if (isAddingStock) {
+                                                    // Confirm and switch back to text view mode
+                                                    setIsAddingStock(false);
+                                                } else {
+                                                    // Switch to input mode
+                                                    setIsAddingStock(true);
+                                                }
+                                            }}
+                                        >
+                                            {isAddingStock ? 'Confirm' : 'Add Stock'}
                                         </button>
                                     </div>
 
@@ -213,23 +276,53 @@ const Inventory = () => {
                                     <div className='low-stock-container d-flex justify-content-between'>
                                         <div className='title'>Low Stock Alert</div>
                                         <div className="switch form-check form-switch">
-                                            <input className="form-check-input" type="checkbox" id="lowStock" />
+                                            <input
+                                                className="form-check-input"
+                                                type="checkbox"
+                                                id="lowStock"
+                                                checked={lowStockAlert}
+                                                onChange={() => setLowStockAlert(!lowStockAlert)}
+                                            />
                                         </div>
                                     </div>
+
+                                    {lowStockAlert && (
+                                        <div className="low-stock-threshold form-group">
+                                            <input
+                                                type="text"
+                                                id="low-stock-threshold"
+                                                name="lowStockThreshold"
+                                                value={lowStockThreshold}
+                                                onChange={(e) => setLowStockThreshold(e.target.value)}
+                                                placeholder="Enter stock threshold"
+                                                required
+                                            />
+                                        </div>
+                                    )}
 
                                     <div className='bbu-container d-flex justify-content-between'>
                                         <div className='title'>Add to Bike Builder and Upgrader</div>
                                         <div className="switch form-check form-switch">
-                                            <input className="form-check-input" type="checkbox" id="addPart" />
+                                            <input
+                                                className="form-check-input"
+                                                type="checkbox"
+                                                id="addPart"
+                                                checked={addToBikeBuilder}
+                                                onChange={() => setAddToBikeBuilder(!addToBikeBuilder)}
+                                            />
                                         </div>
                                     </div>
 
-                                    <div className='bike-part-container d-flex justify-content-between'>
-                                        <div className='title'>Bike Part</div>
-                                        <select className='dropdown' name="bikeParts">
-                                            <option value="frame">Frame</option>
-                                        </select>
-                                    </div>
+                                    {addToBikeBuilder && (
+                                        <div className='bike-part-container d-flex justify-content-between'>
+                                            <div className='title'>Bike Part</div>
+                                            <select className='dropdown' name="bikeParts">
+                                                <option value="frame">Frame</option>
+                                                <option value="wheel">Wheel</option>
+                                                <option value="handlebar">Handlebar</option>
+                                            </select>
+                                        </div>
+                                    )}
 
                                     <ImageUploadButton />
 
@@ -242,25 +335,25 @@ const Inventory = () => {
                             <>
                                 <div className='container-content'>
                                     <div className='main-content'>
-
+                                        {/* Add content or placeholder */}
                                     </div>
                                 </div>
 
                                 <div className='container-content'>
                                     <div className='main-content'>
-
+                                        {/* Add content or placeholder */}
                                     </div>
                                 </div>
 
                                 <div className='container-content'>
                                     <div className='main-content'>
-
+                                        {/* Add content or placeholder */}
                                     </div>
                                 </div>
 
                                 <div className='container-content'>
                                     <div className='main-content'>
-
+                                        {/* Add content or placeholder */}
                                     </div>
                                 </div>
                             </>
