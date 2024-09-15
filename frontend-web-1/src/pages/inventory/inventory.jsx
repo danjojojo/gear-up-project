@@ -65,8 +65,13 @@ const Inventory = () => {
         }
 
         try {
-            await addItem(itemData);
+            const result = await addItem(itemData);
             alert('Item added successfully');
+
+            if (result && result.items) {
+                setItems(result.items);
+            }
+            
             setItemName('');
             setItemPrice('');
             setStockInput('');
