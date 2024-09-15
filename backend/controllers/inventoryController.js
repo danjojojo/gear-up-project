@@ -1,6 +1,46 @@
 const pool = require('../config/db');
 require('dotenv').config();
 
+
+// Display dashboard data
+const getDashboardData = async (req, res) => {
+    try {
+        // Query to get the total number of items available
+        const totalItemsQuery = 'SELECT COUNT(*) FROM items';
+        const totalItemsResult = await pool.query(totalItemsQuery);
+        const totalItems = parseInt(totalItemsResult.rows[0].count, 10);
+
+        // Query to get the total number of low stock items
+        const lowStockItemsQuery = `
+            SELECT COUNT(*) FROM items
+            WHERE low_stock_alert = true AND stock_count <= low_stock_count`;
+        const lowStockItemsResult = await pool.query(lowStockItemsQuery);
+        const lowStockItems = parseInt(lowStockItemsResult.rows[0].count, 10);
+
+        // Query to get the total stock count
+        const stockCountsQuery = 'SELECT SUM(stock_count) FROM items';
+        const stockCountsResult = await pool.query(stockCountsQuery);
+        const stockCounts = parseInt(stockCountsResult.rows[0].sum, 10);
+
+        // Query to get the total stock value
+        const stockValueQuery = 'SELECT SUM(item_price * stock_count) FROM items';
+        const stockValueResult = await pool.query(stockValueQuery);
+        const stockValue = parseFloat(stockValueResult.rows[0].sum).toFixed(2);
+
+        res.status(200).json({
+            totalItems,
+            lowStockItems,
+            stockCounts,
+            stockValue: `₱ ${stockValue}`
+        });
+    } catch (error) {
+        console.error('Error fetching dashboard data:', error);
+        res.status(500).json({ error: 'Internal Server Error' });
+    }
+};
+
+
+
 // Add item
 const addItem = async (req, res) => {
     try {
@@ -82,4 +122,4 @@ const displayItem = async (req, res) => {
     }
 };
 
-module.exports = { addItem, displayItem };
+module.exports = { addItem, displayItem, getDashboardData };

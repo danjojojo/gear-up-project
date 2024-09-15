@@ -1,5 +1,16 @@
 import api from './api';
 
+// Display dashboard data
+export const dashboardData= async () => {
+    try {
+        const response = await api.get('/inventory/dashboard-data');
+        return response.data;
+    } catch (error) {
+        console.error('Error fetching data:', error);
+        throw error;
+    }
+};
+
 // Add item 
 export const addItem = async (itemData) => {
     try {

@@ -8,7 +8,7 @@ import exit from '../../assets/icons/exit.png';
 import edit from '../../assets/icons/edit.png';
 import del from '../../assets/icons/delete.png';
 import ImageUploadButton from '../../components/img-upload-button/img-upload-button';
-import { addItem, displayItems } from '../../services/inventoryService';
+import { addItem, displayItems, dashboardData } from '../../services/inventoryService';
 
 const Inventory = () => {
     const [isAddingItem, setIsAddingItem] = useState(false);
@@ -24,6 +24,29 @@ const Inventory = () => {
     const [bikeParts, setBikeParts] = useState('');
     const [selectedFile, setSelectedFile] = useState(null);
     const [items, setItems] = useState([]);
+
+    const [data, setData] = useState({
+        totalItems: 0,
+        lowStockItems: 0,
+        stockCounts: 0,
+        stockValue: '₱ 0'
+    });
+
+
+    // Display dashboard data
+    useEffect(() => {
+        const fetchData = async () => {
+            try {
+                const data = await dashboardData();
+                setData(data);
+            } catch (error) {
+                console.error('Error fetching data:', error);
+            }
+        };
+
+        fetchData();
+    }, []);
+
 
     // Add item
     const handleFormSubmit = async (event) => {
@@ -208,40 +231,59 @@ const Inventory = () => {
                                         </div>
                                     </div>
 
-                                    <div className="item-name form-group">
-                                        <label htmlFor="item-name">Name</label>
-                                        <input
-                                            type="text"
-                                            id="item-name"
-                                            name="itemName"
-                                            value={viewingItem.name}
-                                            readOnly
-                                        />
-                                    </div>
-
                                     <div className="item-price form-group">
                                         <label htmlFor="item-price">Price</label>
                                         <input
                                             type="text"
                                             id="item-price"
                                             name="itemPrice"
-                                            value={viewingItem.price}
-                                            readOnly
+                                            value={itemPrice}
+                                            onChange={(e) => setItemPrice(e.target.value)}
+                                            placeholder="Enter item price"
+                                            required
                                         />
                                     </div>
 
                                     <div className='stock-container d-flex justify-content-between'>
                                         <div className='title'>Stock Count</div>
-                                        <div className='count'>{viewingItem.stock}</div>
-                                        <button className='stock-btn' type='button'>
-                                            Add Stock
+                                        {isAddingStock ? (
+                                            <input
+                                                type="number"
+                                                className="count-input"
+                                                value={stockInput}
+                                                min="0"
+                                                onChange={handleStockInputChange}
+                                            />
+                                        ) : (
+                                            <div className='count'>{stockInput}</div>
+                                        )}
+                                        <button
+                                            className='stock-btn'
+                                            type='button'
+                                            onClick={() => {
+                                                if (isAddingStock) {
+                                                    // Confirm and switch back to text view mode
+                                                    setIsAddingStock(false);
+                                                } else {
+                                                    // Switch to input mode
+                                                    setIsAddingStock(true);
+                                                }
+                                            }}
+                                        >
+                                            {isAddingStock ? 'Confirm' : 'Add Stock'}
                                         </button>
                                     </div>
 
                                     <div className='category-container d-flex justify-content-between'>
                                         <div className='title'>Category</div>
-                                        <select className='dropdown' name="category" disabled>
-                                            <option value="accessories">Accessories</option>
+                                        <select
+                                            className='dropdown'
+                                            name="category"
+                                            value={category}
+                                            onChange={(e) => setCategory(e.target.value)}
+                                            required
+                                        >
+                                            <option value="Accessories">Accessories</option>
                                         </select>
                                     </div>
 
@@ -288,15 +330,20 @@ const Inventory = () => {
                                     {addToBikeBuilder && (
                                         <div className='bike-part-container d-flex justify-content-between'>
                                             <div className='title'>Bike Part</div>
-                                            <select className='dropdown' name="bikeParts">
-                                                <option value="frame">Frame</option>
-                                                <option value="wheel">Wheel</option>
-                                                <option value="handlebar">Handlebar</option>
+                                            <select
+                                                className='dropdown'
+                                                name="bikeParts"
+                                                value={bikeParts}
+                                                onChange={(e) => setBikeParts(e.target.value)}
+                                            >
+                                                <option value="Frame">Frame</option>
+                                                <option value="Wheel">Wheel</option>
+                                                <option value="Handlebar">Handlebar</option>
                                             </select>
                                         </div>
                                     )}
 
-                                    <ImageUploadButton />
+                                    <ImageUploadButton onFileSelect={handleFileSelect} />
 
                                     <button type="submit" className="submit-btn">
                                         Save
@@ -451,25 +498,29 @@ const Inventory = () => {
                             <>
                                 <div className='container-content'>
                                     <div className='main-content'>
-                                        {/* Add content or placeholder */}
+                                        <div className='number'>{data.totalItems}</div>
+                                        <div className='title'>Items Available</div>
                                     </div>
                                 </div>
 
                                 <div className='container-content'>
                                     <div className='main-content'>
-                                        {/* Add content or placeholder */}
+                                        <div className='number'>{data.lowStockItems}</div>
+                                        <div className='title'>Low Stock Items</div>
                                     </div>
                                 </div>
 
                                 <div className='container-content'>
                                     <div className='main-content'>
-                                        {/* Add content or placeholder */}
+                                        <div className='number'>{data.stockCounts}</div>
+                                        <div className='title'>Stock Counts</div>
                                     </div>
                                 </div>
 
                                 <div className='container-content'>
                                     <div className='main-content'>
-                                        {/* Add content or placeholder */}
+                                        <div className='number'>{data.stockValue}</div>
+                                        <div className='title'>Stock Value</div>
                                     </div>
                                 </div>
                             </>
