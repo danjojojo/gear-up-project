@@ -8,6 +8,7 @@ import exit from '../../assets/icons/exit.png';
 import edit from '../../assets/icons/edit.png';
 import del from '../../assets/icons/delete.png';
 import ImageUploadButton from '../../components/img-upload-button/img-upload-button';
+import { addItem } from '../../services/inventoryService';
 
 const Inventory = () => {
     const [isAddingItem, setIsAddingItem] = useState(false);
@@ -17,10 +18,53 @@ const Inventory = () => {
     const [lowStockThreshold, setLowStockThreshold] = useState(''); // State for stock threshold
     const [isAddingStock, setIsAddingStock] = useState(false); // To toggle between view and input
     const [stockInput, setStockInput] = useState(0);
+    const [itemName, setItemName] = useState('');
+    const [itemPrice, setItemPrice] = useState('');
+    const [category, setCategory] = useState('Accessories');
+    const [bikeParts, setBikeParts] = useState('');
+    const [selectedFile, setSelectedFile] = useState(null);
 
-    const handleFormSubmit = (event) => {
+    const handleFileSelect = (file) => {
+        setSelectedFile(file);
+    };
+
+    const handleFormSubmit = async (event) => {
         event.preventDefault();
-        // Handle form submission logic here
+
+        const itemData = new FormData();
+        itemData.append('itemName', itemName);
+        itemData.append('itemPrice', parseFloat(itemPrice));
+        itemData.append('stock', parseInt(stockInput, 10));
+        itemData.append('category', category);
+        itemData.append('lowStockAlert', lowStockAlert);
+        itemData.append('lowStockThreshold', lowStockAlert ? parseInt(lowStockThreshold, 10) : null);
+        itemData.append('bikeParts', addToBikeBuilder ? bikeParts : null);
+        if (selectedFile) {
+            itemData.append('itemImage', selectedFile);
+        }
+
+        for (const [key, value] of itemData.entries()) {
+            console.log(`${key}:`, value);
+        }
+
+        try {
+            await addItem(itemData);
+            alert('Item added successfully');
+
+            setItemName('');
+            setItemPrice('');
+            setStockInput('');
+            setCategory('Accessories');
+            setLowStockAlert(false);
+            setLowStockThreshold('');
+            setAddToBikeBuilder(false);
+            setBikeParts('');
+            setSelectedFile(null);
+            setIsAddingItem(false);
+
+        } catch (error) {
+            alert('An error occurred while adding the item');
+        }
     };
 
     const handleItemClick = (item) => {
@@ -80,6 +124,8 @@ const Inventory = () => {
                 rightContent={
                     <div className='inventory-containers'>
                         {viewingItem && !isAddingItem ? (
+
+                            //VIEW ITEM
                             <div className='form-container'>
                                 <form className='form-content' onSubmit={handleFormSubmit}>
                                     <div className='container-1 d-flex'>
@@ -128,13 +174,6 @@ const Inventory = () => {
                                         <div className='title'>Category</div>
                                         <select className='dropdown' name="category" disabled>
                                             <option value="accessories">Accessories</option>
-                                        </select>
-                                    </div>
-
-                                    <div className='soldby-container d-flex justify-content-between'>
-                                        <div className='title'>Sold By</div>
-                                        <select className='dropdown' name="soldBy" disabled>
-                                            <option value="piece">Piece</option>
                                         </select>
                                     </div>
 
@@ -198,6 +237,8 @@ const Inventory = () => {
                                 </form>
                             </div>
 
+
+                            // ADD ITEM
                         ) : isAddingItem ? (
                             <div className='form-container'>
                                 <form className='form-content' onSubmit={handleFormSubmit}>
@@ -213,6 +254,8 @@ const Inventory = () => {
                                             type="text"
                                             id="item-name"
                                             name="itemName"
+                                            value={itemName}
+                                            onChange={(e) => setItemName(e.target.value)}
                                             placeholder="Enter item name"
                                             required
                                         />
@@ -224,6 +267,8 @@ const Inventory = () => {
                                             type="text"
                                             id="item-price"
                                             name="itemPrice"
+                                            value={itemPrice}
+                                            onChange={(e) => setItemPrice(e.target.value)}
                                             placeholder="Enter item price"
                                             required
                                         />
@@ -261,15 +306,14 @@ const Inventory = () => {
 
                                     <div className='category-container d-flex justify-content-between'>
                                         <div className='title'>Category</div>
-                                        <select className='dropdown' name="category">
-                                            <option value="accessories">Accessories</option>
-                                        </select>
-                                    </div>
-
-                                    <div className='soldby-container d-flex justify-content-between'>
-                                        <div className='title'>Sold By</div>
-                                        <select className='dropdown' name="soldBy">
-                                            <option value="piece">Piece</option>
+                                        <select
+                                            className='dropdown'
+                                            name="category"
+                                            value={category}
+                                            onChange={(e) => setCategory(e.target.value)}
+                                            required
+                                        >
+                                            <option value="Accessories">Accessories</option>
                                         </select>
                                     </div>
 
@@ -316,15 +360,20 @@ const Inventory = () => {
                                     {addToBikeBuilder && (
                                         <div className='bike-part-container d-flex justify-content-between'>
                                             <div className='title'>Bike Part</div>
-                                            <select className='dropdown' name="bikeParts">
-                                                <option value="frame">Frame</option>
-                                                <option value="wheel">Wheel</option>
-                                                <option value="handlebar">Handlebar</option>
+                                            <select
+                                                className='dropdown'
+                                                name="bikeParts"
+                                                value={bikeParts}
+                                                onChange={(e) => setBikeParts(e.target.value)}
+                                            >
+                                                <option value="Frame">Frame</option>
+                                                <option value="Wheel">Wheel</option>
+                                                <option value="Handlebar">Handlebar</option>
                                             </select>
                                         </div>
                                     )}
 
-                                    <ImageUploadButton />
+                                    <ImageUploadButton onFileSelect={handleFileSelect} />
 
                                     <button type="submit" className="submit-btn">
                                         Add
