@@ -85,12 +85,67 @@
                     overflow-y: auto;
                     display: block;
 
+
+                    .item-container {
+                        cursor: pointer;
+                    }
+
+                    .item-container-title,
                     .item-container {
                         box-shadow: 2px 2px 10px 3px rgba(0, 0, 0, 0.1);
                         width: 100%;
                         margin-bottom: 10px;
                         height: 40px;
                         border-radius: 5px;
+
+                        .item-name {
+                            width: 20%;
+                            display: flex;
+                            align-items: center;
+                            font-size: 12px;
+                        }
+
+                        .item-category {
+                            width: 20%;
+                            display: flex;
+                            align-items: center;
+                            font-size: 12px;
+                        }
+
+                        .item-price {
+                            width: 20%;
+                            display: flex;
+                            align-items: center;
+                            font-size: 12px;
+                        }
+
+                        .item-stocks {
+                            width: 20%;
+                            display: flex;
+                            align-items: center;
+                            justify-content: center;
+                            font-size: 12px;
+                        }
+
+                        .item-stock-status {
+                            width: 20%;
+                            display: flex;
+                            font-size: 12px;
+                            align-items: center;
+                            justify-content: center;
+
+                            .status-container {
+                                font-size: 12px;
+                                padding: 5px;
+                                color: #fff;
+                                border-radius: 5px;
+                                width: 100%;
+                                display: flex;
+                                align-items: center;
+                                justify-content: center;
+                            }
+
+                        }
                     }
                 }
             }
@@ -176,7 +231,7 @@
 
                 .item-name,
                 .item-price {
-                    height: 8%;
+                    height: 12%;
                     align-content: center;
 
                     label {
@@ -241,8 +296,7 @@
                 }
 
 
-                .category-container,
-                .soldby-container {
+                .category-container {
                     height: 8%;
 
                     .title {

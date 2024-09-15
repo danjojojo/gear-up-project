@@ -1,6 +1,6 @@
 import './inventory.scss';
 import PageLayout from '../../components/page-layout/page-layout';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import SearchBar from '../../components/search-bar/search-bar';
 import filter from '../../assets/icons/filter.png';
 import sort from '../../assets/icons/sort.png';
@@ -8,26 +8,24 @@ import exit from '../../assets/icons/exit.png';
 import edit from '../../assets/icons/edit.png';
 import del from '../../assets/icons/delete.png';
 import ImageUploadButton from '../../components/img-upload-button/img-upload-button';
-import { addItem } from '../../services/inventoryService';
+import { addItem, displayItems } from '../../services/inventoryService';
 
 const Inventory = () => {
     const [isAddingItem, setIsAddingItem] = useState(false);
     const [viewingItem, setViewingItem] = useState(null);
-    const [addToBikeBuilder, setAddToBikeBuilder] = useState(false); // State for "Add to Bike Builder and Upgrader"
-    const [lowStockAlert, setLowStockAlert] = useState(false); // State for "Low Stock Alert"
-    const [lowStockThreshold, setLowStockThreshold] = useState(''); // State for stock threshold
-    const [isAddingStock, setIsAddingStock] = useState(false); // To toggle between view and input
+    const [addToBikeBuilder, setAddToBikeBuilder] = useState(false);
+    const [lowStockAlert, setLowStockAlert] = useState(false);
+    const [lowStockThreshold, setLowStockThreshold] = useState('');
+    const [isAddingStock, setIsAddingStock] = useState(false);
     const [stockInput, setStockInput] = useState(0);
     const [itemName, setItemName] = useState('');
     const [itemPrice, setItemPrice] = useState('');
     const [category, setCategory] = useState('Accessories');
     const [bikeParts, setBikeParts] = useState('');
     const [selectedFile, setSelectedFile] = useState(null);
+    const [items, setItems] = useState([]);
 
-    const handleFileSelect = (file) => {
-        setSelectedFile(file);
-    };
-
+    // Add item
     const handleFormSubmit = async (event) => {
         event.preventDefault();
 
@@ -36,21 +34,16 @@ const Inventory = () => {
         itemData.append('itemPrice', parseFloat(itemPrice));
         itemData.append('stock', parseInt(stockInput, 10));
         itemData.append('category', category);
-        itemData.append('lowStockAlert', lowStockAlert);
-        itemData.append('lowStockThreshold', lowStockAlert ? parseInt(lowStockThreshold, 10) : null);
+        itemData.append('lowStockAlert', lowStockAlert ? 'true' : 'false');
+        itemData.append('lowStockThreshold', lowStockAlert ? parseInt(lowStockThreshold, 10).toString() : null);
         itemData.append('bikeParts', addToBikeBuilder ? bikeParts : null);
         if (selectedFile) {
             itemData.append('itemImage', selectedFile);
         }
 
-        for (const [key, value] of itemData.entries()) {
-            console.log(`${key}:`, value);
-        }
-
         try {
             await addItem(itemData);
             alert('Item added successfully');
-
             setItemName('');
             setItemPrice('');
             setStockInput('');
@@ -67,9 +60,23 @@ const Inventory = () => {
         }
     };
 
-    const handleItemClick = (item) => {
-        setViewingItem(item);
-        setIsAddingItem(false); // Close the add item form
+    // Display items
+    useEffect(() => {
+        const fetchItems = async () => {
+            try {
+                const data = await displayItems();
+                setItems(data);
+            } catch (error) {
+                console.error('Error fetching items:', error);
+            }
+        };
+
+        fetchItems();
+    }, []);
+
+    const handleItemClick = () => {
+        setViewingItem(true);
+        setIsAddingItem(false);
     };
 
     const handleCloseView = () => {
@@ -85,7 +92,9 @@ const Inventory = () => {
         setStockInput(event.target.value);
     };
 
-    const itemCount = 10;
+    const handleFileSelect = (file) => {
+        setSelectedFile(file);
+    };
 
     return (
         <div className='inventory p-3'>
@@ -107,13 +116,72 @@ const Inventory = () => {
 
                         <div className='lower-container'>
                             <div className='lower-content'>
-                                {Array.from({ length: itemCount }, (_, index) => (
-                                    <div
-                                        key={index}
-                                        className="item-container"
-                                        onClick={() => handleItemClick({ name: `Item ${index}`, price: `$${index * 10}`, stock: 10 })}
-                                    >
+                                <div className="item-container-title d-flex p-4 bg-secondary ">
+                                    <div className="item-name fw-bold text-light">
+                                        Item Name
+                                    </div>
 
+                                    <div className="item-category fw-bold text-light">
+                                        Category
+                                    </div>
+
+                                    <div className="item-price fw-bold text-light">
+                                        Price
+                                    </div>
+
+                                    <div className="item-stocks fw-bold text-light">
+                                        Stock
+                                    </div>
+
+                                    <div className="item-stock-status fw-bold text-light">
+                                        Status
+                                    </div>
+                                </div>
+
+                                {items.map((item) => (
+                                    <div
+                                        key={item.item_id}
+                                        className="item-container d-flex p-4"
+                                        onClick={() => handleItemClick()}
+                                    >
+                                        <div className="item-name">
+                                            {item.item_name}
+                                        </div>
+
+                                        <div className="item-category">
+                                            {item.category_name}
+                                        </div>
+
+                                        <div className="item-price">
+                                            ₱ {item.item_price}
+                                        </div>
+
+                                        <div className="item-stocks">
+                                            {item.stock_count}
+                                        </div>
+
+                                        <div className="item-stock-status">
+                                            <div
+                                                className='status-container'
+                                                style={{
+                                                    backgroundColor: item.stock_count === 0
+                                                        ? '#DA7777'  // No stock
+                                                        : item.low_stock_alert && item.stock_count <= item.low_stock_count
+                                                            ? '#DABE77'  // Low stock
+                                                            : '#77DA87'  // In stock
+                                                }}
+                                            >
+                                                {item.low_stock_alert
+                                                    ? (item.stock_count === 0
+                                                        ? 'No stock'
+                                                        : item.stock_count <= item.low_stock_count
+                                                            ? 'Low stock'
+                                                            : 'In stock')
+                                                    : (item.stock_count === 0
+                                                        ? 'No stock'
+                                                        : 'In stock')}
+                                            </div>
+                                        </div>
                                     </div>
                                 ))}
                             </div>
@@ -122,7 +190,7 @@ const Inventory = () => {
                 }
 
                 rightContent={
-                    <div className='inventory-containers'>
+                    < div className='inventory-containers' >
                         {viewingItem && !isAddingItem ? (
 
                             //VIEW ITEM
@@ -224,7 +292,6 @@ const Inventory = () => {
                                                 <option value="frame">Frame</option>
                                                 <option value="wheel">Wheel</option>
                                                 <option value="handlebar">Handlebar</option>
-                                                {/* Add more bike parts as needed */}
                                             </select>
                                         </div>
                                     )}
@@ -407,10 +474,10 @@ const Inventory = () => {
                                 </div>
                             </>
                         )}
-                    </div>
+                    </div >
                 }
             />
-        </div>
+        </div >
     );
 };
 

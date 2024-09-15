@@ -10,3 +10,14 @@ export const addItem = async (itemData) => {
         throw error;
     }
 };
+
+// Display items
+export const displayItems = async () => {
+    try {
+        const response = await api.get('/inventory/display-item');
+        return response.data;
+    } catch (error) {
+        console.error('Error fetching items:', error);
+        throw error;
+    }
+};
