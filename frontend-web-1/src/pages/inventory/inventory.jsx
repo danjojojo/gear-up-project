@@ -7,8 +7,9 @@ import sort from '../../assets/icons/sort.png';
 import exit from '../../assets/icons/exit.png';
 import edit from '../../assets/icons/edit.png';
 import del from '../../assets/icons/delete.png';
+import cancel from '../../assets/icons/cancel.png';
 import ImageUploadButton from '../../components/img-upload-button/img-upload-button';
-import { addItem, displayItems, dashboardData } from '../../services/inventoryService';
+import { addItem, displayItems, dashboardData, getItemDetails } from '../../services/inventoryService';
 
 const Inventory = () => {
     const [isAddingItem, setIsAddingItem] = useState(false);
@@ -24,6 +25,21 @@ const Inventory = () => {
     const [bikeParts, setBikeParts] = useState('');
     const [selectedFile, setSelectedFile] = useState(null);
     const [items, setItems] = useState([]);
+    const [isEditing, setIsEditing] = useState(false);
+    const [itemImage, setItemImage] = useState(null);
+    const [originalItem, setOriginalItem] = useState(null);
+    const [selectedItem, setSelectedItem] = useState({
+        item_name: '',
+        item_price: '',
+        stock_count: 0,
+        category_name: '',
+        low_stock_alert: false,
+        low_stock_count: '',
+        add_part: false,
+        bike_parts: '',
+        item_image: ''
+    });
+
 
     const [data, setData] = useState({
         totalItems: 0,
@@ -59,6 +75,7 @@ const Inventory = () => {
         itemData.append('category', category);
         itemData.append('lowStockAlert', lowStockAlert ? 'true' : 'false');
         itemData.append('lowStockThreshold', lowStockAlert ? parseInt(lowStockThreshold, 10).toString() : null);
+        itemData.append('addToBikeBuilder', addToBikeBuilder ? 'true' : 'false');
         itemData.append('bikeParts', addToBikeBuilder ? bikeParts : null);
         if (selectedFile) {
             itemData.append('itemImage', selectedFile);
@@ -71,17 +88,8 @@ const Inventory = () => {
             if (result && result.items) {
                 setItems(result.items);
             }
-            
-            setItemName('');
-            setItemPrice('');
-            setStockInput('');
-            setCategory('Accessories');
-            setLowStockAlert(false);
-            setLowStockThreshold('');
-            setAddToBikeBuilder(false);
-            setBikeParts('');
-            setSelectedFile(null);
-            setIsAddingItem(false);
+
+            resetForm();
 
         } catch (error) {
             alert('An error occurred while adding the item');
@@ -102,9 +110,39 @@ const Inventory = () => {
         fetchItems();
     }, []);
 
-    const handleItemClick = () => {
+    const handleItemClick = async (item) => {
+        setSelectedItem(item);
         setViewingItem(true);
         setIsAddingItem(false);
+        setIsEditing(false);
+        try {
+            const itemDetails = await getItemDetails(item.item_id);
+            populateFormWithDetails(itemDetails);
+        } catch (error) {
+            console.error('Error fetching item details:', error);
+        }
+
+    };
+
+    const populateFormWithDetails = (item) => {
+        console.log('Populating form with:', item);
+
+        const imageUrl = item.item_image ? `data:image/jpeg;base64,${item.item_image}` : null;
+
+        setSelectedItem(prev => ({
+            ...prev,
+            item_name: item.item_name,
+            item_price: item.item_price,
+            stock_count: item.stock_count,
+            category_name: item.category_name,
+            low_stock_alert: item.low_stock_alert,
+            low_stock_count: item.low_stock_count || '',
+            add_part: item.add_part,
+            bike_parts: item.bike_parts || '',
+            item_image: imageUrl
+        }));
+
+        setItemImage(imageUrl);
     };
 
     const handleCloseView = () => {
@@ -112,8 +150,27 @@ const Inventory = () => {
     };
 
     const handleAddItemClick = () => {
+        resetForm();
         setIsAddingItem(true);
-        setViewingItem(null); // Close the item view
+        setViewingItem(null);
+    };
+
+    const handleEditClick = () => {
+        setOriginalItem({ ...selectedItem });
+        setIsEditing(true);
+    };
+
+    const handleCancelEdit = async () => {
+        setSelectedItem(originalItem);
+        setIsAddingStock(false);
+        setIsEditing(false);
+
+        console.log(originalItem)
+    };
+
+    const handleSaveClick = async () => {
+
+        setIsEditing(false);
     };
 
     const handleStockInputChange = (event) => {
@@ -122,6 +179,20 @@ const Inventory = () => {
 
     const handleFileSelect = (file) => {
         setSelectedFile(file);
+    };
+
+    const resetForm = () => {
+        setItemName('');
+        setItemPrice('');
+        setStockInput(0);
+        setCategory('');
+        setLowStockAlert(false);
+        setLowStockThreshold('');
+        setAddToBikeBuilder(false);
+        setBikeParts('');
+        setItemImage(null);
+        setSelectedFile(null);
+        setIsAddingItem(false);
     };
 
     return (
@@ -170,9 +241,9 @@ const Inventory = () => {
                                     <div
                                         key={item.item_id}
                                         className="item-container d-flex p-4"
-                                        onClick={() => handleItemClick()}
+                                        onClick={() => handleItemClick(item)}
                                     >
-                                        <div className="item-name">
+                                        <div className="item-name fw-bold">
                                             {item.item_name}
                                         </div>
 
@@ -219,21 +290,60 @@ const Inventory = () => {
 
                 rightContent={
                     < div className='inventory-containers' >
-                        {viewingItem && !isAddingItem ? (
 
-                            //VIEW ITEM
-                            <div className='form-container'>
-                                <form className='form-content' onSubmit={handleFormSubmit}>
+                        {/* VIEW ITEM */}
+                        {viewingItem && !isAddingItem && selectedItem ? (
+                            <div className='form-container' onSubmit={handleSaveClick}>
+                                <form className='form-content'>
                                     <div className='container-1 d-flex'>
                                         <div className='exit-btn'>
                                             <img src={exit} alt='Exit' className='exit-icon' onClick={handleCloseView} />
                                         </div>
                                         <div className='edit-btn'>
-                                            <img src={edit} alt='Edit' className='edit-icon' />
+                                            {isEditing ? (
+                                                <img
+                                                    src={cancel}
+                                                    alt='Cancel'
+                                                    className='cancel-icon'
+                                                    onClick={handleCancelEdit}
+                                                />
+                                            ) : (
+                                                <img
+                                                    src={edit}
+                                                    alt='Edit'
+                                                    className='edit-icon'
+                                                    onClick={handleEditClick}
+                                                />
+                                            )}
                                         </div>
                                         <div className='del-btn'>
                                             <img src={del} alt='Delete' className='del-icon' />
                                         </div>
+                                    </div>
+
+                                    {!isEditing ? (
+                                        itemImage && (
+                                            <div className="item-image-container">
+                                                <img src={itemImage} alt="Item" className="item-image" />
+                                            </div>
+                                        )
+                                    ) : (
+                                        <ImageUploadButton onFileSelect={handleFileSelect} />
+                                    )}
+
+
+                                    <div className="item-name form-group">
+                                        <label htmlFor="item-name">Name</label>
+                                        <input
+                                            type="text"
+                                            id="item-name"
+                                            name="itemName"
+                                            value={selectedItem.item_name || ''}
+                                            onChange={(e) => setSelectedItem(prev => ({ ...prev, item_name: e.target.value }))}
+                                            placeholder="Enter item name"
+                                            disabled={!isEditing}
+                                            required
+                                        />
                                     </div>
 
                                     <div className="item-price form-group">
@@ -242,35 +352,46 @@ const Inventory = () => {
                                             type="text"
                                             id="item-price"
                                             name="itemPrice"
-                                            value={itemPrice}
-                                            onChange={(e) => setItemPrice(e.target.value)}
+                                            value={selectedItem.item_price || ''}
+                                            onChange={(e) => setSelectedItem(prev => ({ ...prev, item_price: e.target.value }))}
                                             placeholder="Enter item price"
+                                            disabled={!isEditing}
                                             required
                                         />
                                     </div>
 
+
                                     <div className='stock-container d-flex justify-content-between'>
                                         <div className='title'>Stock Count</div>
-                                        {isAddingStock ? (
-                                            <input
-                                                type="number"
-                                                className="count-input"
-                                                value={stockInput}
-                                                min="0"
-                                                onChange={handleStockInputChange}
-                                            />
-                                        ) : (
-                                            <div className='count'>{stockInput}</div>
+
+                                        <div className='count'>
+                                            {selectedItem.stock_count}
+                                        </div>
+
+                                        {isAddingStock && (
+                                            <button
+                                                className='increment-btn'
+                                                type='button'
+                                                disabled={!isEditing}
+                                                onClick={() => {
+                                                    // Increment stock count by 1 when clicked
+                                                    setSelectedItem(prev => ({ ...prev, stock_count: parseInt(prev.stock_count, 10) + 1 }));
+                                                }}
+                                            >
+                                                +
+                                            </button>
                                         )}
+
                                         <button
                                             className='stock-btn'
                                             type='button'
+                                            disabled={!isEditing}
                                             onClick={() => {
                                                 if (isAddingStock) {
-                                                    // Confirm and switch back to text view mode
+                                                    // If currently adding stock, confirm the changes
                                                     setIsAddingStock(false);
                                                 } else {
-                                                    // Switch to input mode
+                                                    // If not in adding mode, switch to adding mode
                                                     setIsAddingStock(true);
                                                 }
                                             }}
@@ -283,11 +404,14 @@ const Inventory = () => {
                                         <div className='title'>Category</div>
                                         <select
                                             className='dropdown'
+                                            id="category-select"
                                             name="category"
-                                            value={category}
-                                            onChange={(e) => setCategory(e.target.value)}
+                                            value={selectedItem.category_name}
+                                            onChange={(e) => setSelectedItem(prev => ({ ...prev, category_name: e.target.value }))}
+                                            disabled={!isEditing}
                                             required
                                         >
+                                            <option value="">Select category</option>
                                             <option value="Accessories">Accessories</option>
                                         </select>
                                     </div>
@@ -299,21 +423,24 @@ const Inventory = () => {
                                                 className="form-check-input"
                                                 type="checkbox"
                                                 id="lowStock"
-                                                checked={lowStockAlert}
-                                                onChange={() => setLowStockAlert(!lowStockAlert)}
+                                                name="lowStockAlert"
+                                                checked={selectedItem.low_stock_alert || false}
+                                                onChange={() => setSelectedItem(prev => ({ ...prev, low_stock_alert: !prev.low_stock_alert }))}
+                                                disabled={!isEditing}
                                             />
                                         </div>
                                     </div>
 
-                                    {lowStockAlert && (
+                                    {selectedItem.low_stock_alert && (
                                         <div className="low-stock-threshold form-group">
                                             <input
                                                 type="text"
                                                 id="low-stock-threshold"
                                                 name="lowStockThreshold"
-                                                value={lowStockThreshold}
-                                                onChange={(e) => setLowStockThreshold(e.target.value)}
+                                                value={selectedItem.low_stock_count}
+                                                onChange={(e) => setSelectedItem(prev => ({ ...prev, low_stock_count: e.target.value }))}
                                                 placeholder="Enter stock threshold"
+                                                disabled={!isEditing}
                                                 required
                                             />
                                         </div>
@@ -326,21 +453,26 @@ const Inventory = () => {
                                                 className="form-check-input"
                                                 type="checkbox"
                                                 id="addPart"
-                                                checked={addToBikeBuilder}
-                                                onChange={() => setAddToBikeBuilder(!addToBikeBuilder)}
+                                                name="addPart"
+                                                checked={selectedItem.add_part || false}
+                                                onChange={() => setSelectedItem(prev => ({ ...prev, add_part: !prev.add_part }))}
+                                                disabled={!isEditing}
                                             />
                                         </div>
                                     </div>
 
-                                    {addToBikeBuilder && (
+                                    {selectedItem.add_part && (
                                         <div className='bike-part-container d-flex justify-content-between'>
                                             <div className='title'>Bike Part</div>
                                             <select
                                                 className='dropdown'
+                                                id="bike-part-select"
                                                 name="bikeParts"
-                                                value={bikeParts}
-                                                onChange={(e) => setBikeParts(e.target.value)}
+                                                value={selectedItem.bike_parts || ''}
+                                                onChange={(e) => setSelectedItem(prev => ({ ...prev, bike_parts: e.target.value }))}
+                                                disabled={!isEditing}
                                             >
+                                                <option value="">Select a part</option>
                                                 <option value="Frame">Frame</option>
                                                 <option value="Wheel">Wheel</option>
                                                 <option value="Handlebar">Handlebar</option>
@@ -348,11 +480,16 @@ const Inventory = () => {
                                         </div>
                                     )}
 
-                                    <ImageUploadButton onFileSelect={handleFileSelect} />
+                                    {isEditing && (
+                                        <div className='submit-container'>
+                                            <button type="submit" className="submit-btn">
+                                                Save
+                                            </button>
+                                        </div>
 
-                                    <button type="submit" className="submit-btn">
-                                        Save
-                                    </button>
+                                    )}
+
+
                                 </form>
                             </div>
 
@@ -367,11 +504,13 @@ const Inventory = () => {
                                         </div>
                                     </div>
 
+                                    <ImageUploadButton onFileSelect={handleFileSelect} />
+
                                     <div className=" item-name form-group">
-                                        <label htmlFor="item-name">Name</label>
+                                        <label htmlFor="item-name-add">Name</label>
                                         <input
                                             type="text"
-                                            id="item-name"
+                                            id="item-name-add"
                                             name="itemName"
                                             value={itemName}
                                             onChange={(e) => setItemName(e.target.value)}
@@ -381,10 +520,10 @@ const Inventory = () => {
                                     </div>
 
                                     <div className="item-price form-group">
-                                        <label htmlFor="item-price">Price</label>
+                                        <label htmlFor="item-price-add">Price</label>
                                         <input
                                             type="text"
-                                            id="item-price"
+                                            id="item-price-add"
                                             name="itemPrice"
                                             value={itemPrice}
                                             onChange={(e) => setItemPrice(e.target.value)}
@@ -398,6 +537,8 @@ const Inventory = () => {
                                         {isAddingStock ? (
                                             <input
                                                 type="number"
+                                                id="stock-input-add"
+                                                name="stockInput"
                                                 className="count-input"
                                                 value={stockInput}
                                                 min="0"
@@ -427,11 +568,13 @@ const Inventory = () => {
                                         <div className='title'>Category</div>
                                         <select
                                             className='dropdown'
+                                            id="category-select-add"
                                             name="category"
                                             value={category}
                                             onChange={(e) => setCategory(e.target.value)}
                                             required
                                         >
+                                            <option value="">Select category</option>
                                             <option value="Accessories">Accessories</option>
                                         </select>
                                     </div>
@@ -442,7 +585,8 @@ const Inventory = () => {
                                             <input
                                                 className="form-check-input"
                                                 type="checkbox"
-                                                id="lowStock"
+                                                id="lowStock-add"
+                                                name="lowStockAlert"
                                                 checked={lowStockAlert}
                                                 onChange={() => setLowStockAlert(!lowStockAlert)}
                                             />
@@ -453,7 +597,7 @@ const Inventory = () => {
                                         <div className="low-stock-threshold form-group">
                                             <input
                                                 type="text"
-                                                id="low-stock-threshold"
+                                                id="low-stock-threshold-add"
                                                 name="lowStockThreshold"
                                                 value={lowStockThreshold}
                                                 onChange={(e) => setLowStockThreshold(e.target.value)}
@@ -469,7 +613,8 @@ const Inventory = () => {
                                             <input
                                                 className="form-check-input"
                                                 type="checkbox"
-                                                id="addPart"
+                                                id="addPart-add"
+                                                name="addPart"
                                                 checked={addToBikeBuilder}
                                                 onChange={() => setAddToBikeBuilder(!addToBikeBuilder)}
                                             />
@@ -481,10 +626,12 @@ const Inventory = () => {
                                             <div className='title'>Bike Part</div>
                                             <select
                                                 className='dropdown'
+                                                id="bike-part-select-add"
                                                 name="bikeParts"
                                                 value={bikeParts}
                                                 onChange={(e) => setBikeParts(e.target.value)}
                                             >
+                                                <option value="">Select a part</option>
                                                 <option value="Frame">Frame</option>
                                                 <option value="Wheel">Wheel</option>
                                                 <option value="Handlebar">Handlebar</option>
@@ -492,11 +639,12 @@ const Inventory = () => {
                                         </div>
                                     )}
 
-                                    <ImageUploadButton onFileSelect={handleFileSelect} />
+                                    <div className='submit-container'>
+                                        <button type="submit" className="submit-btn">
+                                            Add
+                                        </button>
+                                    </div>
 
-                                    <button type="submit" className="submit-btn">
-                                        Add
-                                    </button>
                                 </form>
                             </div>
                         ) : (

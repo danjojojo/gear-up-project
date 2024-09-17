@@ -1,7 +1,7 @@
 import api from './api';
 
 // Display dashboard data
-export const dashboardData= async () => {
+export const dashboardData = async () => {
     try {
         const response = await api.get('/inventory/dashboard-data');
         return response.data;
@@ -29,6 +29,16 @@ export const displayItems = async () => {
         return response.data;
     } catch (error) {
         console.error('Error fetching items:', error);
+        throw error;
+    }
+};
+
+export const getItemDetails = async (itemId) => {
+    try {
+        const response = await api.get(`/inventory/item/${itemId}`);
+        return response.data;
+    } catch (error) {
+        console.error('Error fetching item details:', error);
         throw error;
     }
 };

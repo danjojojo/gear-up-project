@@ -44,7 +44,7 @@ const getDashboardData = async (req, res) => {
 // Add item
 const addItem = async (req, res) => {
     try {
-        const { itemName, itemPrice, stock, category, lowStockAlert, lowStockThreshold, bikeParts } = req.body;
+        const { itemName, itemPrice, stock, category, lowStockAlert, lowStockThreshold, addToBikeBuilder, bikeParts } = req.body;
         const itemImage = req.file ? req.file.buffer : null; // Get the file data
 
         // Validate required fields
@@ -66,14 +66,41 @@ const addItem = async (req, res) => {
         const itemLowStockAlert = lowStockAlert === 'true';
         const itemLowStockThreshold = itemLowStockAlert ? (lowStockThreshold ? parseInt(lowStockThreshold, 10) : null) : null;
 
+        // Handle add_to_bike_builder and bike_parts
+        const itemAddToBikeBuilder = addToBikeBuilder === 'true';
+        const itemBikeParts = itemAddToBikeBuilder ? bikeParts : null;
+
         // Insert item into database
-        const query = `INSERT INTO items (item_name, item_price, stock_count, category_id, low_stock_alert, low_stock_count, bike_parts, item_image) VALUES ($1, $2, $3, $4, $5, $6, $7, $8) RETURNING *`;
-        const values = [itemName, itemPrice, stock, categoryId, itemLowStockAlert, itemLowStockThreshold, bikeParts, itemImage];
+        const query = `
+            INSERT INTO items (
+                item_name,
+                item_price,
+                stock_count,
+                category_id,
+                low_stock_alert,
+                low_stock_count,
+                add_part,
+                bike_parts,
+                item_image
+            ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
+            RETURNING *`;
+
+        const values = [
+            itemName,
+            parseFloat(itemPrice),
+            parseInt(stock, 10),
+            categoryId,
+            itemLowStockAlert,
+            itemLowStockThreshold,
+            itemAddToBikeBuilder,
+            itemBikeParts,
+            itemImage
+        ];
 
         const result = await pool.query(query, values);
 
         // Fetch updated list of items
-        const itemsQuery = `SELECT * FROM items`;
+        const itemsQuery = 'SELECT * FROM items';
         const itemsResult = await pool.query(itemsQuery);
 
         res.status(201).json({ items: itemsResult.rows, newItem: result.rows[0] });
@@ -106,4 +133,40 @@ const displayItem = async (req, res) => {
     }
 };
 
-module.exports = { addItem, displayItem, getDashboardData };
+const getItemById = async (req, res) => {
+    const { id } = req.params;
+    try {
+        const query = `
+            SELECT 
+                i.item_id,
+                i.item_name, 
+                i.item_price, 
+                i.stock_count, 
+                i.low_stock_alert, 
+                i.low_stock_count,
+                c.category_name,
+                i.add_part,
+                i.bike_parts,
+                encode(i.item_image, 'base64') AS item_image
+            FROM items i
+            JOIN category c ON i.category_id = c.category_id
+            WHERE i.item_id = $1;
+        `;
+        const { rows } = await pool.query(query, [id]);
+        if (rows.length === 0) {
+            return res.status(404).json({ error: 'Item not found' });
+        }
+        res.json(rows[0]);
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+};
+
+
+
+module.exports = {
+    addItem,
+    displayItem,
+    getDashboardData,
+    getItemById
+};
