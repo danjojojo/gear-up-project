@@ -13,7 +13,9 @@ const getDashboardData = async (req, res) => {
         // Query to get the total number of low stock items
         const lowStockItemsQuery = `
             SELECT COUNT(*) FROM items
-            WHERE low_stock_alert = true AND stock_count <= low_stock_count`;
+            WHERE low_stock_alert = true 
+            AND stock_count > 0 
+            AND stock_count <= low_stock_count`;
         const lowStockItemsResult = await pool.query(lowStockItemsQuery);
         const lowStockItems = parseInt(lowStockItemsResult.rows[0].count, 10);
 
@@ -162,11 +164,72 @@ const getItemById = async (req, res) => {
     }
 };
 
+// Update item
+const updateItem = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const { itemName, itemPrice, stock, category, lowStockAlert, lowStockThreshold, addToBikeBuilder, bikeParts } = req.body;
+        const itemImage = req.file ? req.file.buffer : null;
+
+        const categoryQuery = 'SELECT category_id FROM category WHERE category_name = $1';
+        const categoryResult = await pool.query(categoryQuery, [category]);
+
+        if (categoryResult.rows.length === 0) {
+            return res.status(400).json({ error: 'Invalid category' });
+        }
+
+        const categoryId = categoryResult.rows[0].category_id;
+
+        const itemLowStockAlert = lowStockAlert === 'true';
+        const itemLowStockThreshold = itemLowStockAlert ? (lowStockThreshold ? parseInt(lowStockThreshold, 10) : null) : null;
+
+        const itemAddToBikeBuilder = addToBikeBuilder === 'true';
+        const itemBikeParts = itemAddToBikeBuilder ? bikeParts : null;
+
+        const query = `
+            UPDATE items SET
+                item_name = $1,
+                item_price = $2,
+                stock_count = $3,
+                category_id = $4,
+                low_stock_alert = $5,
+                low_stock_count = $6,
+                add_part = $7,
+                bike_parts = $8,
+                item_image = $9
+            WHERE item_id = $10
+            RETURNING *`;
+
+        const values = [
+            itemName,
+            parseFloat(itemPrice),
+            parseInt(stock, 10),
+            categoryId,
+            itemLowStockAlert,
+            itemLowStockThreshold,
+            itemAddToBikeBuilder,
+            itemBikeParts,
+            itemImage,
+            id
+        ];
+
+        const result = await pool.query(query, values);
+
+        const itemsQuery = 'SELECT * FROM items';
+        const itemsResult = await pool.query(itemsQuery);
+
+        res.status(200).json({ items: itemsResult.rows, updatedItem: result.rows[0] });
+    } catch (error) {
+        console.error('Error updating item:', error.message);
+        res.status(500).json({ error: 'Internal Server Error' });
+    }
+};
 
 
 module.exports = {
     addItem,
     displayItem,
     getDashboardData,
-    getItemById
+    getItemById,
+    updateItem
 };
