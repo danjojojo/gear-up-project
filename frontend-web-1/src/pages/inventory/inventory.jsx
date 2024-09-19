@@ -1,6 +1,6 @@
 import "./inventory.scss";
 import PageLayout from "../../components/page-layout/page-layout";
-import { useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import SearchBar from "../../components/search-bar/search-bar";
 import filter from "../../assets/icons/filter.png";
 import sort from "../../assets/icons/sort.png";
@@ -50,22 +50,23 @@ const Inventory = () => {
     const [data, setData] = useState({
         totalItems: 0,
         lowStockItems: 0,
-        stockCounts: "0",
+        stockCounts: 0,
         stockValue: "₱ 0",
     });
 
     // Fetch dashboard data
-    useEffect(() => {
-        const fetchData = async () => {
-            try {
-                const data = await dashboardData();
-                setData(data);
-            } catch (error) {
-                console.error("Error fetching data:", error);
-            }
-        };
+    const fetchDashboardData = async () => {
+        try {
+            const result = await dashboardData();
+            setData(result); // Update the dashboard data
+        } catch (error) {
+            console.error('Error fetching dashboard data:', error);
+        }
+    };
 
-        fetchData();
+    // Fetch data on component mount
+    useEffect(() => {
+        fetchDashboardData();
     }, []);
 
     // Fetch and display items
@@ -109,6 +110,7 @@ const Inventory = () => {
                 setItems(result.items);
             }
             resetForm();
+            await fetchDashboardData();
         } catch (error) {
             alert("An error occurred while adding the item");
         }
@@ -229,6 +231,7 @@ const Inventory = () => {
                 ),
             );
 
+            await fetchDashboardData();
             setIsEditing(false);
             setIsAddingStock(false);
         } catch (error) {
@@ -288,9 +291,13 @@ const Inventory = () => {
                                         Category
                                     </div>
 
-                                    <div className="item-price fw-bold text-light">Price</div>
+                                    <div className="item-price fw-bold text-light">
+                                        Price
+                                    </div>
 
-                                    <div className="item-stocks fw-bold text-light">Stock</div>
+                                    <div className="item-stocks fw-bold text-light">
+                                        Stock
+                                    </div>
 
                                     <div className="item-stock-status fw-bold text-light">
                                         Status
@@ -379,13 +386,17 @@ const Inventory = () => {
                                     </div>
 
                                     {!isEditing ? (
-                                        itemImage && (
+                                        itemImage ? (
                                             <div className="item-image-container">
                                                 <img
                                                     src={itemImage}
                                                     alt="Item"
                                                     className="item-image"
                                                 />
+                                            </div>
+                                        ) : (
+                                            <div className="no-image-container">
+                                                No image attached
                                             </div>
                                         )
                                     ) : (
@@ -596,7 +607,7 @@ const Inventory = () => {
                                                     src={exit}
                                                     alt="Exit"
                                                     className="exit-icon"
-                                                    onClick={() => setIsAddingItem(false)}
+                                                    onClick={() => { setIsAddingItem(false); setIsAddingStock(false); }}
                                                 />
                                             </div>
                                         </div>

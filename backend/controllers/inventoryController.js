@@ -8,7 +8,7 @@ const getDashboardData = async (req, res) => {
         // Query to get the total number of items available
         const totalItemsQuery = 'SELECT COUNT(*) FROM items';
         const totalItemsResult = await pool.query(totalItemsQuery);
-        const totalItems = parseInt(totalItemsResult.rows[0].count, 10);
+        const totalItems = parseInt(totalItemsResult.rows[0].count, 10) || 0;
 
         // Query to get the total number of low stock items
         const lowStockItemsQuery = `
@@ -17,23 +17,23 @@ const getDashboardData = async (req, res) => {
             AND stock_count > 0 
             AND stock_count <= low_stock_count`;
         const lowStockItemsResult = await pool.query(lowStockItemsQuery);
-        const lowStockItems = parseInt(lowStockItemsResult.rows[0].count, 10);
+        const lowStockItems = parseInt(lowStockItemsResult.rows[0].count, 10) || 0;
 
         // Query to get the total stock count
         const stockCountsQuery = 'SELECT SUM(stock_count) FROM items';
         const stockCountsResult = await pool.query(stockCountsQuery);
-        const stockCounts = parseInt(stockCountsResult.rows[0].sum, 10);
+        const stockCounts = parseInt(stockCountsResult.rows[0].sum, 10) || 0;
 
         // Query to get the total stock value
         const stockValueQuery = 'SELECT SUM(item_price * stock_count) FROM items';
         const stockValueResult = await pool.query(stockValueQuery);
-        const stockValue = parseFloat(stockValueResult.rows[0].sum).toFixed(2);
+        const stockValue = parseFloat(stockValueResult.rows[0].sum) || 0;
 
         res.status(200).json({
             totalItems,
             lowStockItems,
             stockCounts,
-            stockValue: `₱ ${stockValue}`
+            stockValue: `₱ ${stockValue.toFixed(2)}`
         });
     } catch (error) {
         console.error('Error fetching dashboard data:', error);
@@ -42,12 +42,11 @@ const getDashboardData = async (req, res) => {
 };
 
 
-
 // Add item
 const addItem = async (req, res) => {
     try {
         const { itemName, itemPrice, stock, category, lowStockAlert, lowStockThreshold, addToBikeBuilder, bikeParts } = req.body;
-        const itemImage = req.file ? req.file.buffer : null; // Get the file data
+        const itemImage = req.file ? req.file.buffer : null;
 
         // Validate required fields
         if (!itemName || !itemPrice || !stock || !category) {
@@ -83,8 +82,10 @@ const addItem = async (req, res) => {
                 low_stock_count,
                 add_part,
                 bike_parts,
-                item_image
-            ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
+                item_image,
+                date_created,
+                date_updated
+            ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)
             RETURNING *`;
 
         const values = [
@@ -96,10 +97,30 @@ const addItem = async (req, res) => {
             itemLowStockThreshold,
             itemAddToBikeBuilder,
             itemBikeParts,
-            itemImage
+            itemImage,
+            new Date(), // date_created
+            new Date()  // date_updated
         ];
 
         const result = await pool.query(query, values);
+
+        const newItem = result.rows[0];
+
+        // Insert into waitlist if add_to_bike_builder is true
+        if (itemAddToBikeBuilder) {
+            const waitlistQuery = `
+                INSERT INTO waitlist (item_id, date_created, date_updated)
+                VALUES ($1, $2, $3)
+                RETURNING *`;
+
+            const waitlistValues = [
+                newItem.item_id,
+                new Date(), // date_created
+                new Date()  // date_updated
+            ];
+
+            await pool.query(waitlistQuery, waitlistValues);
+        }
 
         // Fetch updated list of items
         const itemsQuery = 'SELECT * FROM items';
@@ -196,8 +217,9 @@ const updateItem = async (req, res) => {
                 low_stock_count = $6,
                 add_part = $7,
                 bike_parts = $8,
-                item_image = $9
-            WHERE item_id = $10
+                item_image = $9,
+                date_updated = $10
+            WHERE item_id = $11
             RETURNING *`;
 
         const values = [
@@ -210,10 +232,39 @@ const updateItem = async (req, res) => {
             itemAddToBikeBuilder,
             itemBikeParts,
             itemImage,
+            new Date(), // date_updated
             id
         ];
 
         const result = await pool.query(query, values);
+
+        const updatedItem = result.rows[0];
+
+        // Handle waitlist for updated item
+        const currentWaitlistQuery = 'SELECT * FROM waitlist WHERE item_id = $1';
+        const currentWaitlistResult = await pool.query(currentWaitlistQuery, [id]);
+
+        const isCurrentlyInWaitlist = currentWaitlistResult.rows.length > 0;
+
+        if (itemAddToBikeBuilder && !isCurrentlyInWaitlist) {
+            // Add to waitlist if not already present
+            const waitlistQuery = `
+                INSERT INTO waitlist (item_id, date_created, date_updated)
+                VALUES ($1, $2, $3)
+                RETURNING *`;
+
+            const waitlistValues = [
+                updatedItem.item_id,
+                new Date(), // date_created
+                new Date()  // date_updated
+            ];
+
+            await pool.query(waitlistQuery, waitlistValues);
+        } else if (!itemAddToBikeBuilder && isCurrentlyInWaitlist) {
+            // Remove from waitlist if toggled off
+            const deleteWaitlistQuery = 'DELETE FROM waitlist WHERE item_id = $1';
+            await pool.query(deleteWaitlistQuery, [id]);
+        }
 
         const itemsQuery = 'SELECT * FROM items';
         const itemsResult = await pool.query(itemsQuery);
