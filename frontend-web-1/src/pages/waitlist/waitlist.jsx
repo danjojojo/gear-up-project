@@ -6,8 +6,16 @@ import filter from '../../assets/icons/filter.png';
 import sort from '../../assets/icons/sort.png';
 import { getWaitlistItems } from '../../services/waitlistService';
 
+// Parts Form
+import FrameForm from './parts-form/frame-form';
+import ForkForm from './parts-form/fork-form';
+import GroupsetForm from './parts-form/groupset-form';
+import WheelsetForm from './parts-form/wheelset-form';
+import CockpitForm from './parts-form/cockpit-form';
+
 const Waitlist = () => {
     const [items, setItems] = useState([]);
+    const [selectedItem, setSelectedItem] = useState(null);
 
     // Fetch waitlist items when the component mounts
     useEffect(() => {
@@ -22,6 +30,16 @@ const Waitlist = () => {
 
         fetchItems();
     }, []);
+
+    // Handle click on an item
+    const handleItemClick = (item) => {
+        setSelectedItem(item);
+    };
+
+    // Handle closing the form
+    const handleCloseView = () => {
+        setSelectedItem(null);
+    };
 
     return (
         <div className='waitlist p-3'>
@@ -61,8 +79,9 @@ const Waitlist = () => {
                                 {items.length > 0 ? (
                                     items.map((item) => (
                                         <div
-                                            key={item.item_id} // Use item_id as key
+                                            key={item.waitlist_item_id}
                                             className="item-container d-flex p-4"
+                                            onClick={() => handleItemClick(item)} // Add click handler
                                         >
                                             <div className="item-name fw-bold">
                                                 {item.item_name}
@@ -92,9 +111,62 @@ const Waitlist = () => {
                         </div>
                     </div>
                 }
-                rightContent={<div></div>}
+                rightContent={
+                    selectedItem ? (
+                        <div className="form-container">
+
+                            {selectedItem.bike_parts === 'Frame' && (
+                                <FrameForm
+                                    itemName={selectedItem.item_name}
+                                    itemPrice={selectedItem.item_price}
+                                    onClose={handleCloseView}
+                                />
+                            )}
+
+                            {selectedItem.bike_parts === 'Fork' && (
+                                <ForkForm
+                                    itemName={selectedItem.item_name}
+                                    itemPrice={selectedItem.item_price}
+                                    onClose={handleCloseView}
+                                />
+                            )}
+
+                            {selectedItem.bike_parts === 'Groupset' && (
+                                <GroupsetForm
+                                    itemName={selectedItem.item_name}
+                                    itemPrice={selectedItem.item_price}
+                                    onClose={handleCloseView}
+                                />
+                            )}
+
+                            {selectedItem.bike_parts === 'Wheelset' && (
+                                <WheelsetForm
+                                    itemName={selectedItem.item_name}
+                                    itemPrice={selectedItem.item_price}
+                                    onClose={handleCloseView}
+                                />
+                            )}
+
+                            {selectedItem.bike_parts === 'Cockpit' && (
+                                <CockpitForm
+                                    itemName={selectedItem.item_name}
+                                    itemPrice={selectedItem.item_price}
+                                    onClose={handleCloseView}
+                                />
+                            )}
+
+
+
+
+                        </div>
+                    ) : (
+                        <div className="no-selection">
+                            Select an item to view details
+                        </div>
+                    )
+                }
             />
-        </div>
+        </div >
     );
 };
 

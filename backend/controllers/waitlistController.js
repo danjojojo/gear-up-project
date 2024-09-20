@@ -5,8 +5,9 @@ const getWaitlistItems = async (req, res) => {
     try {
         const query = `
             SELECT 
-                i.item_id,       
+                w.waitlist_item_id,       
                 i.item_name,
+                i.item_price,
                 i.bike_parts,
                 w.date_created
             FROM 
