@@ -186,8 +186,84 @@ const addFork = async (req, res) => {
     }
 };
 
+
+// Add to Groupset
+const addGroupset = async (req, res) => {
+    const {
+        waitlist_item_id,
+        item_id,
+        description,
+        chainring_speed,
+        crank_arm_length,
+        front_derailleur_speed,
+        rear_derailleur_speed,
+        cassette_type,
+        cassette_speed,
+        chain_speed,
+        bottom_bracket_type,
+        bottom_bracket_diameter,
+        brake_type,
+        axle_type,
+        weight,
+    } = req.body;
+
+    const image = req.file ? req.file.buffer : null;
+
+    try {
+        const query = `
+            INSERT INTO groupset (
+                item_id, description, chainring_speed, crank_arm_length,
+                front_derailleur_speed, rear_derailleur_speed, cassette_type,
+                cassette_speed, chain_speed, bottom_bracket_type,
+                bottom_bracket_diameter, brake_type, axle_type, weight, image, 
+                date_created, date_updated
+            ) VALUES (
+                $1, $2, $3, $4, $5, $6, $7, $8, $9, 
+                $10, $11, $12, $13, $14, $15, $16, $17
+            ) RETURNING *;
+        `;
+
+        const values = [
+            item_id,
+            description,
+            chainring_speed,
+            crank_arm_length,
+            front_derailleur_speed,
+            rear_derailleur_speed,
+            cassette_type,
+            cassette_speed,
+            chain_speed,
+            bottom_bracket_type,
+            bottom_bracket_diameter,
+            brake_type,
+            axle_type,
+            weight,
+            image,
+            new Date(),
+            new Date()
+        ];
+
+
+        const result = await pool.query(query, values);
+
+        // Update bb_bu_status in items table
+        const updateQuery = `UPDATE items SET bb_bu_status = true, add_part = false WHERE item_id = $1;`;
+        await pool.query(updateQuery, [item_id]);
+
+        // Delete the waitlist item
+        const deleteQuery = `DELETE FROM waitlist WHERE waitlist_item_id = $1;`;
+        await pool.query(deleteQuery, [waitlist_item_id]);
+
+        res.status(201).json(result.rows[0]);
+    } catch (error) {
+        console.error('Error adding groupset:', error);
+        res.status(500).json({ error: 'Internal Server Error' });
+    }
+};
+
 module.exports = {
     getWaitlistItems,
     addFrame,
-    addFork
+    addFork,
+    addGroupset
 };

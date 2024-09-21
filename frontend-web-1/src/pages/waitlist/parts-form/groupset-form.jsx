@@ -2,10 +2,26 @@ import React, { useState, useEffect } from 'react';
 import exit from "../../../assets/icons/exit.png";
 import del from "../../../assets/icons/delete.png";
 import ImageUploadButton from '../../../components/img-upload-button/img-upload-button';
+import { addGroupset } from '../../../services/waitlistService';
 
-const GroupsetForm = ({ itemName, itemPrice, onClose }) => {
+const GroupsetForm = ({ waitlistItemID, itemID, itemName, itemPrice, onClose, refreshWaitlist }) => {
+    // States management
     const [name, setName] = useState('');
     const [price, setPrice] = useState('');
+    const [description, setDescription] = useState('');
+    const [chainringSpeed, setChainringSpeed] = useState('');
+    const [crankArmLength, setCrankArmLength] = useState('');
+    const [frontDerailleurSpeed, setFrontDerailleurSpeed] = useState('');
+    const [rearDerailleurSpeed, setRearDerailleurSpeed] = useState('');
+    const [cassetteType, setCassetteType] = useState('');
+    const [cassetteSpeed, setCassetteSpeed] = useState('');
+    const [chainSpeed, setChainSpeed] = useState('');
+    const [bottomBracketType, setBottomBracketType] = useState('');
+    const [bbDiameter, setBbDiameter] = useState('');
+    const [brakeType, setBrakeType] = useState('');
+    const [axleType, setAxleType] = useState('');
+    const [weight, setWeight] = useState('');
+    const [selectedFile, setSelectedFile] = useState(null);
 
     // Populate item name and price
     useEffect(() => {
@@ -13,8 +29,66 @@ const GroupsetForm = ({ itemName, itemPrice, onClose }) => {
         setPrice(itemPrice);
     }, [itemName, itemPrice]);
 
+    // Submit part
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+
+        const formData = new FormData();
+        formData.append('waitlist_item_id', waitlistItemID);
+        formData.append('item_id', itemID);
+        formData.append('description', description);
+        formData.append('chainring_speed', chainringSpeed);
+        formData.append('crank_arm_length', crankArmLength);
+        formData.append('front_derailleur_speed', frontDerailleurSpeed);
+        formData.append('rear_derailleur_speed', rearDerailleurSpeed);
+        formData.append('cassette_type', cassetteType);
+        formData.append('cassette_speed', cassetteSpeed);
+        formData.append('chain_speed', chainSpeed);
+        formData.append('bottom_bracket_type', bottomBracketType);
+        formData.append('bottom_bracket_diameter', bbDiameter);
+        formData.append('brake_type', brakeType);
+        formData.append('axle_type', axleType);
+        formData.append('weight', weight);
+        if (selectedFile) {
+            formData.append('image', selectedFile);
+        }
+
+        console.log('Form data being sent:', [...formData]);
+
+        try {
+            await addGroupset(formData);
+            alert("Item added successfully");
+
+            // Reset Form
+            setDescription('');
+            setChainringSpeed('');
+            setCrankArmLength('');
+            setFrontDerailleurSpeed('');
+            setRearDerailleurSpeed('');
+            setCassetteType('');
+            setCassetteSpeed('');
+            setChainSpeed('');
+            setBottomBracketType('');
+            setBbDiameter('');
+            setBrakeType('');
+            setAxleType('');
+            setWeight('');
+            setSelectedFile(null);
+            onClose();
+            refreshWaitlist();
+
+        } catch (error) {
+            console.error('Failed to add item:', error);
+        }
+    };
+
+    // Select image file
+    const handleFileSelect = (file) => {
+        setSelectedFile(file);
+    };
+
     return (
-        <form className="form-content">
+        <form className="form-content" onSubmit={handleSubmit}>
             <div className="container-1 d-flex">
                 <div className="exit-btn">
                     <img
@@ -31,7 +105,7 @@ const GroupsetForm = ({ itemName, itemPrice, onClose }) => {
                 </div>
             </div>
 
-            <ImageUploadButton />
+            <ImageUploadButton onFileSelect={handleFileSelect} />
 
             <div className="item-name form-group">
                 <label htmlFor="item-name-groupset">Name</label>
@@ -63,17 +137,21 @@ const GroupsetForm = ({ itemName, itemPrice, onClose }) => {
                     type="text"
                     id="item-description-groupset"
                     name="itemDescription"
+                    value={description}
+                    onChange={(e) => setDescription(e.target.value)}
                     placeholder="Enter item description"
                     required
                 />
             </div>
 
             <div className="dropdown-container d-flex justify-content-between">
-                <div className="title">Chain Ring Speed</div>
+                <div className="title">Chainring Speed</div>
                 <select
                     className="dropdown"
-                    id="chain-ring-speed"
-                    name="chainRingSpeed"
+                    id="chainring-speed"
+                    name="chainringSpeed"
+                    value={chainringSpeed}
+                    onChange={(e) => setChainringSpeed(e.target.value)}
                     required
                 >
                     <option value="">Select Speed</option>
@@ -89,6 +167,8 @@ const GroupsetForm = ({ itemName, itemPrice, onClose }) => {
                     className="dropdown"
                     id="crank-arm-length"
                     name="crankArmLength"
+                    value={crankArmLength}
+                    onChange={(e) => setCrankArmLength(e.target.value)}
                     required
                 >
                     <option value="">Select Length</option>
@@ -105,6 +185,8 @@ const GroupsetForm = ({ itemName, itemPrice, onClose }) => {
                     className="dropdown"
                     id="front-derailleur-speed"
                     name="frontDerailleurSpeed"
+                    value={frontDerailleurSpeed}
+                    onChange={(e) => setFrontDerailleurSpeed(e.target.value)}
                     required
                 >
                     <option value="">Select Speed</option>
@@ -119,6 +201,8 @@ const GroupsetForm = ({ itemName, itemPrice, onClose }) => {
                     className="dropdown"
                     id="rear-derailleur-speed"
                     name="rearDerailleurSpeed"
+                    value={rearDerailleurSpeed}
+                    onChange={(e) => setRearDerailleurSpeed(e.target.value)}
                     required
                 >
                     <option value="">Select Speed</option>
@@ -136,6 +220,8 @@ const GroupsetForm = ({ itemName, itemPrice, onClose }) => {
                     className="dropdown"
                     id="cassette-type"
                     name="cassetteType"
+                    value={cassetteType}
+                    onChange={(e) => setCassetteType(e.target.value)}
                     required
                 >
                     <option value="">Select Type</option>
@@ -150,6 +236,8 @@ const GroupsetForm = ({ itemName, itemPrice, onClose }) => {
                     className="dropdown"
                     id="cassette-speed"
                     name="cassetteSpeed"
+                    value={cassetteSpeed}
+                    onChange={(e) => setCassetteSpeed(e.target.value)}
                     required
                 >
                     <option value="">Select Speed</option>
@@ -167,6 +255,8 @@ const GroupsetForm = ({ itemName, itemPrice, onClose }) => {
                     className="dropdown"
                     id="chain-speed"
                     name="chainrSpeed"
+                    value={chainSpeed}
+                    onChange={(e) => setChainSpeed(e.target.value)}
                     required
                 >
                     <option value="">Select Speed</option>
@@ -184,6 +274,8 @@ const GroupsetForm = ({ itemName, itemPrice, onClose }) => {
                     className="dropdown"
                     id="bottom-bracket-type"
                     name="bottomBracketType"
+                    value={bottomBracketType}
+                    onChange={(e) => setBottomBracketType(e.target.value)}
                     required
                 >
                     <option value="">Select Type</option>
@@ -201,6 +293,8 @@ const GroupsetForm = ({ itemName, itemPrice, onClose }) => {
                     className="dropdown"
                     id="bb-diameter"
                     name="bbDiameter"
+                    value={bbDiameter}
+                    onChange={(e) => setBbDiameter(e.target.value)}
                     required
                 >
                     <option value="">Select Diameter</option>
@@ -216,6 +310,8 @@ const GroupsetForm = ({ itemName, itemPrice, onClose }) => {
                     className="dropdown"
                     id="brake-type"
                     name="brakeType"
+                    value={brakeType}
+                    onChange={(e) => setBrakeType(e.target.value)}
                     required
                 >
                     <option value="">Select Type</option>
@@ -231,6 +327,8 @@ const GroupsetForm = ({ itemName, itemPrice, onClose }) => {
                     className="dropdown"
                     id="axle-type"
                     name="axleType"
+                    value={axleType}
+                    onChange={(e) => setAxleType(e.target.value)}
                     required
                 >
                     <option value="">Select Type</option>
@@ -239,23 +337,14 @@ const GroupsetForm = ({ itemName, itemPrice, onClose }) => {
                 </select>
             </div>
 
-            <div className="item-material form-group">
-                <label htmlFor="item-material-groupset">Material</label>
-                <input
-                    type="text"
-                    id="item-material-groupset"
-                    name="itemMaterial"
-                    placeholder="Enter item material"
-                    required
-                />
-            </div>
-
             <div className="item-weight form-group">
                 <label htmlFor="item-weight-groupset">Weight</label>
                 <input
                     type="text"
                     id="item-weight-groupset"
                     name="itemWeight"
+                    value={weight}
+                    onChange={(e) => setWeight(e.target.value)}
                     placeholder="Enter item weight"
                     required
                 />

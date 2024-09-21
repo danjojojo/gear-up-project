@@ -5,6 +5,7 @@ import ImageUploadButton from '../../../components/img-upload-button/img-upload-
 import { addFork } from '../../../services/waitlistService';
 
 const ForkForm = ({ waitlistItemID, itemID, itemName, itemPrice, onClose, refreshWaitlist }) => {
+    // States management
     const [name, setName] = useState('');
     const [price, setPrice] = useState('');
     const [description, setDescription] = useState('');

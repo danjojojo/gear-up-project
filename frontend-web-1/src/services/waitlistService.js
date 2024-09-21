@@ -28,7 +28,18 @@ export const addFork = async (forkData) => {
         const response = await api.post('/waitlist/add-fork', forkData);
         return response.data;
     } catch (error) {
-        console.error('Error adding frame:', error);
+        console.error('Error adding fork:', error);
+        throw error;    
+    }
+};
+
+// Add item to groupset
+export const addGroupset = async (groupsetData) => {
+    try {
+        const response = await api.post('/waitlist/add-groupset', groupsetData);
+        return response.data;
+    } catch (error) {
+        console.error('Error adding groupset:', error);
         throw error;    
     }
 };
