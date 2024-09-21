@@ -313,13 +313,9 @@ const Inventory = () => {
                                         onClick={() => handleItemClick(item)}
                                     >
                                         <div className="item-name fw-bold">{item.item_name}</div>
-
                                         <div className="item-category">{item.category_name}</div>
-
                                         <div className="item-price">₱ {item.item_price}</div>
-
                                         <div className="item-stocks">{item.stock_count}</div>
-
                                         <div className="item-stock-status">
                                             <div
                                                 className="status-container"
@@ -544,62 +540,69 @@ const Inventory = () => {
                                         </div>
                                     )}
 
-                                    {viewingItem && selectedItem.bb_bu_status && (
-                                        <div className="item-status">
-                                            Added to bike builder and upgrader
-                                        </div>
-                                    )}
+                                    {viewingItem && (
+                                        <>
+                                            {/* Check if the item is already added to Bike Builder and Upgrader */}
+                                            {selectedItem.bb_bu_status ? (
+                                                <div className="item-status">
+                                                    Added to bike builder and upgrader
+                                                </div>
+                                            ) : (
+                                                <>
+                                                    {/* Show the switch to add the item to the Bike Builder and Upgrader if not added */}
+                                                    <div className="bbu-container d-flex justify-content-between">
+                                                        <div className="title">Add to Bike Builder and Upgrader</div>
+                                                        <div className="switch form-check form-switch">
+                                                            <input
+                                                                className="form-check-input"
+                                                                type="checkbox"
+                                                                id="addPart"
+                                                                name="addPart"
+                                                                checked={selectedItem.add_part || false}
+                                                                onChange={() =>
+                                                                    setSelectedItem((prev) => ({
+                                                                        ...prev,
+                                                                        add_part: !prev.add_part,
+                                                                    }))
+                                                                }
+                                                                disabled={!isEditing}
+                                                            />
+                                                        </div>
+                                                    </div>
 
-                                    {viewingItem && !selectedItem.bb_bu_status && (
-                                        <div className="bbu-container d-flex justify-content-between">
-                                            <div className="title">Add to Bike Builder and Upgrader</div>
-                                            <div className="switch form-check form-switch">
-                                                <input
-                                                    className="form-check-input"
-                                                    type="checkbox"
-                                                    id="addPart"
-                                                    name="addPart"
-                                                    checked={selectedItem.add_part || false}
-                                                    onChange={() =>
-                                                        setSelectedItem((prev) => ({
-                                                            ...prev,
-                                                            add_part: !prev.add_part,
-                                                        }))
-                                                    }
-                                                    disabled={!isEditing}
-                                                />
-                                            </div>
-                                        </div>
-                                    )}
-
-                                    {viewingItem && selectedItem.add_part && !selectedItem.bb_bu_status && (
-                                        <div className="bike-part-container d-flex justify-content-between">
-                                            <div className="title">Bike Part</div>
-                                            <select
-                                                className="dropdown"
-                                                id="bike-part-select"
-                                                name="bikeParts"
-                                                value={selectedItem.bike_parts || ""}
-                                                onChange={(e) =>
-                                                    setSelectedItem((prev) => ({
-                                                        ...prev,
-                                                        bike_parts: e.target.value,
-                                                    }))
-                                                }
-                                                disabled={!isEditing}
-                                            >
-                                                <option value="">Select a part</option>
-                                                <option value="Frame">Frame</option>
-                                                <option value="Fork">Fork</option>
-                                                <option value="Groupset">Groupset</option>
-                                                <option value="Wheelset">Wheelset</option>
-                                                <option value="Cockpit">Cockpit</option>
-                                                <option value="Headset">Headset</option>
-                                                <option value="Handlebar">Handlebar</option>
-                                                <option value="Stem">Stem</option>
-                                                <option value="Hubs">Hubs</option>
-                                            </select>
-                                        </div>
+                                                    {/* Only show the dropdown if the item has been toggled on to be added */}
+                                                    {selectedItem.add_part && (
+                                                        <div className="bike-part-container d-flex justify-content-between">
+                                                            <div className="title">Bike Part</div>
+                                                            <select
+                                                                className="dropdown"
+                                                                id="bike-part-select"
+                                                                name="bikeParts"
+                                                                value={selectedItem.bike_parts || ""}
+                                                                onChange={(e) =>
+                                                                    setSelectedItem((prev) => ({
+                                                                        ...prev,
+                                                                        bike_parts: e.target.value,
+                                                                    }))
+                                                                }
+                                                                disabled={!isEditing}
+                                                            >
+                                                                <option value="">Select a part</option>
+                                                                <option value="Frame">Frame</option>
+                                                                <option value="Fork">Fork</option>
+                                                                <option value="Groupset">Groupset</option>
+                                                                <option value="Wheelset">Wheelset</option>
+                                                                <option value="Cockpit">Cockpit</option>
+                                                                <option value="Headset">Headset</option>
+                                                                <option value="Handlebar">Handlebar</option>
+                                                                <option value="Stem">Stem</option>
+                                                                <option value="Hubs">Hubs</option>
+                                                            </select>
+                                                        </div>
+                                                    )}
+                                                </>
+                                            )}
+                                        </>
                                     )}
 
                                     {isEditing && (

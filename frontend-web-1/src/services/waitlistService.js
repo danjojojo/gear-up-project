@@ -44,3 +44,14 @@ export const addGroupset = async (groupsetData) => {
     }
 };
 
+// Add item to groupset
+export const addWheelset = async (wheelsetData) => {
+    try {
+        const response = await api.post('/waitlist/add-wheelset', wheelsetData);
+        return response.data;
+    } catch (error) {
+        console.error('Error adding wheelset:', error);
+        throw error;    
+    }
+};
+

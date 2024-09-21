@@ -112,7 +112,7 @@ const addFrame = async (req, res) => {
 };
 
 
-// Add to Frame
+// Add to Fork
 const addFork = async (req, res) => {
     const {
         waitlist_item_id,
@@ -261,9 +261,85 @@ const addGroupset = async (req, res) => {
     }
 };
 
+
+// Add to Wheelset
+const addWheelset = async (req, res) => {
+    const {
+        waitlist_item_id,
+        item_id,
+        description,
+        tire_size,
+        tire_width,
+        rim_holes,
+        rim_width,
+        hub_type,
+        hub_speed,
+        hub_holes,
+        spokes,
+        axle_type,
+        rotor_type,
+        rotor_size,
+        weight,
+    } = req.body;
+
+    const image = req.file ? req.file.buffer : null;
+
+    try {
+        const query = `
+            INSERT INTO wheelset (
+                item_id, description, tire_size, tire_width, 
+                rim_holes, rim_width, hub_type, hub_speed, 
+                hub_holes, spokes, axle_type, rotor_type, 
+                rotor_size, weight, image, date_created, 
+                date_updated
+            ) VALUES (
+                $1, $2, $3, $4, $5, $6, $7, $8, $9, 
+                $10, $11, $12, $13, $14, $15, $16, $17
+            ) RETURNING *;
+        `;
+
+        const values = [
+            item_id,
+            description,
+            tire_size,
+            tire_width,
+            rim_holes,
+            rim_width,
+            hub_type,
+            hub_speed,
+            hub_holes,
+            spokes,
+            axle_type,
+            rotor_type,
+            rotor_size,
+            weight,
+            image,
+            new Date(),
+            new Date()
+        ];
+
+
+        const result = await pool.query(query, values);
+
+        // Update bb_bu_status in items table
+        const updateQuery = `UPDATE items SET bb_bu_status = true, add_part = false WHERE item_id = $1;`;
+        await pool.query(updateQuery, [item_id]);
+
+        // Delete the waitlist item
+        const deleteQuery = `DELETE FROM waitlist WHERE waitlist_item_id = $1;`;
+        await pool.query(deleteQuery, [waitlist_item_id]);
+
+        res.status(201).json(result.rows[0]);
+    } catch (error) {
+        console.error('Error adding wheelset:', error);
+        res.status(500).json({ error: 'Internal Server Error' });
+    }
+};
+
 module.exports = {
     getWaitlistItems,
     addFrame,
     addFork,
-    addGroupset
+    addGroupset,
+    addWheelset
 };

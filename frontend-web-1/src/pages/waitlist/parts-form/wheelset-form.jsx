@@ -2,10 +2,26 @@ import React, { useState, useEffect } from 'react';
 import exit from "../../../assets/icons/exit.png";
 import del from "../../../assets/icons/delete.png";
 import ImageUploadButton from '../../../components/img-upload-button/img-upload-button';
+import { addWheelset } from '../../../services/waitlistService';
 
-const WheelsetForm = ({ itemName, itemPrice, onClose }) => {
+const WheelsetForm = ({ waitlistItemID, itemID, itemName, itemPrice, onClose, refreshWaitlist }) => {
+    // States management
     const [name, setName] = useState('');
     const [price, setPrice] = useState('');
+    const [description, setDescription] = useState('');
+    const [tireSize, setTireSize] = useState('');
+    const [tireWidth, setTireWidth] = useState('');
+    const [rimHoles, setRimHoles] = useState('');
+    const [rimWidth, setRimWidth] = useState('');
+    const [hubType, setHubType] = useState('');
+    const [hubSpeed, setHubSpeed] = useState('');
+    const [hubHoles, setHubHoles] = useState('');
+    const [spokes, setSpokes] = useState('');
+    const [axleType, setAxleType] = useState('');
+    const [rotorType, setRotorType] = useState('');
+    const [rotorSize, setRotorSize] = useState('');
+    const [weight, setWeight] = useState('');
+    const [selectedFile, setSelectedFile] = useState(null);
 
     // Populate item name and price
     useEffect(() => {
@@ -13,8 +29,66 @@ const WheelsetForm = ({ itemName, itemPrice, onClose }) => {
         setPrice(itemPrice);
     }, [itemName, itemPrice]);
 
+    // Submit part
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+
+        const formData = new FormData();
+        formData.append('waitlist_item_id', waitlistItemID);
+        formData.append('item_id', itemID);
+        formData.append('description', description);
+        formData.append('tire_size', tireSize);
+        formData.append('tire_width', tireWidth);
+        formData.append('rim_holes', rimHoles);
+        formData.append('rim_width', rimWidth);
+        formData.append('hub_type', hubType);
+        formData.append('hub_speed', hubSpeed);
+        formData.append('hub_holes', hubHoles);
+        formData.append('spokes', spokes);
+        formData.append('axle_type', axleType);
+        formData.append('rotor_type', rotorType);
+        formData.append('rotor_size', rotorSize);
+        formData.append('weight', weight);
+        if (selectedFile) {
+            formData.append('image', selectedFile);
+        }
+
+        console.log('Form data being sent:', [...formData]);
+
+        try {
+            await addWheelset(formData);
+            alert("Item added successfully");
+
+            // Reset Form
+            setDescription('');
+            setTireSize('');
+            setTireWidth('');
+            setRimHoles('');
+            setRimWidth('');
+            setHubType('');
+            setHubSpeed('');
+            setHubHoles('');
+            setSpokes('');
+            setAxleType('');
+            setRotorType('');
+            setRotorSize('');
+            setWeight('');
+            setSelectedFile(null);
+            onClose();
+            refreshWaitlist();
+
+        } catch (error) {
+            console.error('Failed to add item:', error);
+        }
+    };
+
+    // Select image file
+    const handleFileSelect = (file) => {
+        setSelectedFile(file);
+    };
+
     return (
-        <form className="form-content">
+        <form className="form-content" onSubmit={handleSubmit}>
             <div className="container-1 d-flex">
                 <div className="exit-btn">
                     <img
@@ -31,7 +105,7 @@ const WheelsetForm = ({ itemName, itemPrice, onClose }) => {
                 </div>
             </div>
 
-            <ImageUploadButton />
+            <ImageUploadButton onFileSelect={handleFileSelect} />
 
             <div className="item-name form-group">
                 <label htmlFor="item-name-wheelset">Name</label>
@@ -63,6 +137,8 @@ const WheelsetForm = ({ itemName, itemPrice, onClose }) => {
                     type="text"
                     id="item-description-wheelset"
                     name="itemDescription"
+                    value={description}
+                    onChange={(e) => setDescription(e.target.value)}
                     placeholder="Enter item description"
                     required
                 />
@@ -74,6 +150,8 @@ const WheelsetForm = ({ itemName, itemPrice, onClose }) => {
                     className="dropdown"
                     id="tire-size"
                     name="tireSize"
+                    value={tireSize}
+                    onChange={(e) => setTireSize(e.target.value)}
                     required
                 >
                     <option value="">Select Size</option>
@@ -89,6 +167,8 @@ const WheelsetForm = ({ itemName, itemPrice, onClose }) => {
                     className="dropdown"
                     id="tire-width"
                     name="tireWidth"
+                    value={tireWidth}
+                    onChange={(e) => setTireWidth(e.target.value)}
                     required
                 >
                     <option value="">Select Width</option>
@@ -107,6 +187,8 @@ const WheelsetForm = ({ itemName, itemPrice, onClose }) => {
                     className="dropdown"
                     id="rim-holes"
                     name="rimHoles"
+                    value={rimHoles}
+                    onChange={(e) => setRimHoles(e.target.value)}
                     required
                 >
                     <option value="">Select Holes</option>
@@ -122,6 +204,8 @@ const WheelsetForm = ({ itemName, itemPrice, onClose }) => {
                     className="dropdown"
                     id="rim-width"
                     name="rimWidth"
+                    value={rimWidth}
+                    onChange={(e) => setRimWidth(e.target.value)}
                     required
                 >
                     <option value="">Select Width</option>
@@ -138,6 +222,8 @@ const WheelsetForm = ({ itemName, itemPrice, onClose }) => {
                     className="dropdown"
                     id="hub-type"
                     name="hubType"
+                    value={hubType}
+                    onChange={(e) => setHubType(e.target.value)}
                     required
                 >
                     <option value="">Select Type</option>
@@ -152,6 +238,8 @@ const WheelsetForm = ({ itemName, itemPrice, onClose }) => {
                     className="dropdown"
                     id="hub-speed"
                     name="hubSpeed"
+                    value={hubSpeed}
+                    onChange={(e) => setHubSpeed(e.target.value)}
                     required
                 >
                     <option value="">Select Speed</option>
@@ -169,6 +257,8 @@ const WheelsetForm = ({ itemName, itemPrice, onClose }) => {
                     className="dropdown"
                     id="hub-holes"
                     name="hubHoles"
+                    value={hubHoles}
+                    onChange={(e) => setHubHoles(e.target.value)}
                     required
                 >
                     <option value="">Select Holes</option>
@@ -184,6 +274,8 @@ const WheelsetForm = ({ itemName, itemPrice, onClose }) => {
                     className="dropdown"
                     id="spokes"
                     name="spokes"
+                    value={spokes}
+                    onChange={(e) => setSpokes(e.target.value)}
                     required
                 >
                     <option value="">Select Spokes</option>
@@ -199,6 +291,8 @@ const WheelsetForm = ({ itemName, itemPrice, onClose }) => {
                     className="dropdown"
                     id="axle-type"
                     name="axleType"
+                    value={axleType}
+                    onChange={(e) => setAxleType(e.target.value)}
                     required
                 >
                     <option value="">Select Type</option>
@@ -213,6 +307,8 @@ const WheelsetForm = ({ itemName, itemPrice, onClose }) => {
                     className="dropdown"
                     id="rotor-type"
                     name="rotorType"
+                    value={rotorType}
+                    onChange={(e) => setRotorType(e.target.value)}
                     required
                 >
                     <option value="">Select Type</option>
@@ -227,6 +323,8 @@ const WheelsetForm = ({ itemName, itemPrice, onClose }) => {
                     className="dropdown"
                     id="rotor-size"
                     name="rotorSize"
+                    value={rotorSize}
+                    onChange={(e) => setRotorSize(e.target.value)}
                     required
                 >
                     <option value="">Select Size</option>
@@ -236,23 +334,14 @@ const WheelsetForm = ({ itemName, itemPrice, onClose }) => {
                 </select>
             </div>
 
-            <div className="item-material form-group">
-                <label htmlFor="item-material-wheelset">Material</label>
-                <input
-                    type="text"
-                    id="item-material-wheelset"
-                    name="itemMaterial"
-                    placeholder="Enter item material"
-                    required
-                />
-            </div>
-
             <div className="item-weight form-group">
                 <label htmlFor="item-weight-wheelset">Weight</label>
                 <input
                     type="text"
                     id="item-weight-wheelset"
                     name="itemWeight"
+                    value={weight}
+                    onChange={(e) => setWeight(e.target.value)}
                     placeholder="Enter item weight"
                     required
                 />
