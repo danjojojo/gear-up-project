@@ -114,7 +114,7 @@ const FrameForm = ({ waitlistItemID, itemID, itemName, itemPrice, onClose, refre
                 </div>
             </div>
 
-            <ImageUploadButton onFileSelect={handleFileSelect} required/>
+            <ImageUploadButton onFileSelect={handleFileSelect}/>
 
             <div className="item-name form-group">
                 <label htmlFor="item-name-frame">Name</label>

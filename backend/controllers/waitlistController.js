@@ -97,7 +97,7 @@ const addFrame = async (req, res) => {
         const result = await pool.query(query, values);
 
         // Update bb_bu_status in items table
-        const updateQuery = `UPDATE items SET bb_bu_status = true WHERE item_id = $1;`;
+        const updateQuery = `UPDATE items SET bb_bu_status = true, add_part = false WHERE item_id = $1;`;
         await pool.query(updateQuery, [item_id]);
 
         // Delete the waitlist item
@@ -111,7 +111,83 @@ const addFrame = async (req, res) => {
     }
 };
 
+
+// Add to Frame
+const addFork = async (req, res) => {
+    const {
+        waitlist_item_id,
+        item_id,
+        description,
+        fork_size,
+        fork_tube_type,
+        fork_tube_upper_diameter,
+        fork_tube_lower_diameter,
+        axle_type,
+        axle_width,
+        suspension_type,
+        rotor_size,
+        max_tire_width,
+        brake_mount,
+        material,
+        weight,
+    } = req.body;
+
+    const image = req.file ? req.file.buffer : null;
+
+    try {
+        const query = `
+            INSERT INTO fork (
+                item_id, description, fork_size, fork_tube_type, 
+                fork_tube_upper_diameter, fork_tube_lower_diameter, 
+                axle_type, axle_width, suspension_type, rotor_size, 
+                max_tire_width, brake_mount, material, weight, image, 
+                date_created, date_updated
+            ) VALUES (
+                $1, $2, $3, $4, $5, $6, $7, $8, $9, 
+                $10, $11, $12, $13, $14, $15, $16, $17
+            ) RETURNING *;
+        `;
+
+        const values = [
+            item_id,
+            description,
+            fork_size,
+            fork_tube_type,
+            fork_tube_upper_diameter,
+            fork_tube_lower_diameter,
+            axle_type,
+            axle_width,
+            suspension_type,
+            rotor_size,
+            max_tire_width,
+            brake_mount,
+            material,
+            weight,
+            image,
+            new Date(),
+            new Date()
+        ];
+
+
+        const result = await pool.query(query, values);
+
+        // Update bb_bu_status in items table
+        const updateQuery = `UPDATE items SET bb_bu_status = true, add_part = false WHERE item_id = $1;`;
+        await pool.query(updateQuery, [item_id]);
+
+        // Delete the waitlist item
+        const deleteQuery = `DELETE FROM waitlist WHERE waitlist_item_id = $1;`;
+        await pool.query(deleteQuery, [waitlist_item_id]);
+
+        res.status(201).json(result.rows[0]);
+    } catch (error) {
+        console.error('Error adding fork:', error);
+        res.status(500).json({ error: 'Internal Server Error' });
+    }
+};
+
 module.exports = {
     getWaitlistItems,
-    addFrame
+    addFrame,
+    addFork
 };

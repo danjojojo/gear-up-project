@@ -137,6 +137,7 @@ const Waitlist = () => {
                                     itemName={selectedItem.item_name}
                                     itemPrice={selectedItem.item_price}
                                     onClose={handleCloseView}
+                                    refreshWaitlist={refreshWaitlist}
                                 />
                             )}
 
@@ -147,6 +148,7 @@ const Waitlist = () => {
                                     itemName={selectedItem.item_name}
                                     itemPrice={selectedItem.item_price}
                                     onClose={handleCloseView}
+                                    refreshWaitlist={refreshWaitlist}
                                 />
                             )}
 
@@ -157,6 +159,7 @@ const Waitlist = () => {
                                     itemName={selectedItem.item_name}
                                     itemPrice={selectedItem.item_price}
                                     onClose={handleCloseView}
+                                    refreshWaitlist={refreshWaitlist}
                                 />
                             )}
 
@@ -167,6 +170,7 @@ const Waitlist = () => {
                                     itemName={selectedItem.item_name}
                                     itemPrice={selectedItem.item_price}
                                     onClose={handleCloseView}
+                                    refreshWaitlist={refreshWaitlist}
                                 />
                             )}
 

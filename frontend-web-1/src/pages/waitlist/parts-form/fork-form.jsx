@@ -2,10 +2,25 @@ import React, { useState, useEffect } from 'react';
 import exit from "../../../assets/icons/exit.png";
 import del from "../../../assets/icons/delete.png";
 import ImageUploadButton from '../../../components/img-upload-button/img-upload-button';
+import { addFork } from '../../../services/waitlistService';
 
-const ForkForm = ({ itemName, itemPrice, onClose }) => {
+const ForkForm = ({ waitlistItemID, itemID, itemName, itemPrice, onClose, refreshWaitlist }) => {
     const [name, setName] = useState('');
     const [price, setPrice] = useState('');
+    const [description, setDescription] = useState('');
+    const [forkSize, setForkSize] = useState('');
+    const [forkTubeType, setForkTubeType] = useState('');
+    const [ftUpperDiameter, setFtUpperDiameter] = useState('');
+    const [ftLowerDiameter, setFtLowerDiameter] = useState('');
+    const [axleType, setAxleType] = useState('');
+    const [axleWidth, setAxleWidth] = useState('');
+    const [suspensionType, setSuspensionType] = useState('');
+    const [rotorSize, setRotorSize] = useState('');
+    const [maxTireWidth, setMaxTireWidth] = useState('');
+    const [brakeMount, setBrakeMount] = useState('');
+    const [material, setMaterial] = useState('');
+    const [weight, setWeight] = useState('');
+    const [selectedFile, setSelectedFile] = useState(null);
 
     // Populate item name and price
     useEffect(() => {
@@ -13,8 +28,66 @@ const ForkForm = ({ itemName, itemPrice, onClose }) => {
         setPrice(itemPrice);
     }, [itemName, itemPrice]);
 
+    // Submit part
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+
+        const formData = new FormData();
+        formData.append('waitlist_item_id', waitlistItemID);
+        formData.append('item_id', itemID);
+        formData.append('description', description);
+        formData.append('fork_size', forkSize);
+        formData.append('fork_tube_type', forkTubeType);
+        formData.append('fork_tube_upper_diameter', ftUpperDiameter);
+        formData.append('fork_tube_lower_diameter', ftLowerDiameter);
+        formData.append('axle_type', axleType);
+        formData.append('axle_width', axleWidth);
+        formData.append('suspension_type', suspensionType);
+        formData.append('rotor_size', rotorSize);
+        formData.append('max_tire_width', maxTireWidth);
+        formData.append('brake_mount', brakeMount);
+        formData.append('material', material);
+        formData.append('weight', weight);
+        if (selectedFile) {
+            formData.append('image', selectedFile);
+        }
+
+        console.log('Form data being sent:', [...formData]);
+
+        try {
+            await addFork(formData);
+            alert("Item added successfully");
+
+            // Reset Form
+            setDescription('');
+            setForkSize('');
+            setForkTubeType('');
+            setFtUpperDiameter('');
+            setFtLowerDiameter('');
+            setAxleType('');
+            setAxleWidth('');
+            setSuspensionType('');
+            setRotorSize('');
+            setMaxTireWidth('');
+            setBrakeMount('');
+            setMaterial('');
+            setWeight('');
+            setSelectedFile(null);
+            onClose();
+            refreshWaitlist();
+
+        } catch (error) {
+            console.error('Failed to add item:', error);
+        }
+    };
+
+    // Select image file
+    const handleFileSelect = (file) => {
+        setSelectedFile(file);
+    };
+
     return (
-        <form className="form-content">
+        <form className="form-content" onSubmit={handleSubmit}>
             <div className="container-1 d-flex">
                 <div className="exit-btn">
                     <img
@@ -31,7 +104,7 @@ const ForkForm = ({ itemName, itemPrice, onClose }) => {
                 </div>
             </div>
 
-            <ImageUploadButton />
+            <ImageUploadButton onFileSelect={handleFileSelect} />
 
             <div className="item-name form-group">
                 <label htmlFor="item-name-fork">Name</label>
@@ -63,6 +136,8 @@ const ForkForm = ({ itemName, itemPrice, onClose }) => {
                     type="text"
                     id="item-description-fork"
                     name="itemDescription"
+                    value={description}
+                    onChange={(e) => setDescription(e.target.value)}
                     placeholder="Enter item description"
                     required
                 />
@@ -74,6 +149,8 @@ const ForkForm = ({ itemName, itemPrice, onClose }) => {
                     className="dropdown"
                     id="fork-size"
                     name="forkSize"
+                    value={forkSize}
+                    onChange={(e) => setForkSize(e.target.value)}
                     required
                 >
                     <option value="">Select Size</option>
@@ -89,6 +166,8 @@ const ForkForm = ({ itemName, itemPrice, onClose }) => {
                     className="dropdown"
                     id="fork-tube-type"
                     name="forkTubeType"
+                    value={forkTubeType}
+                    onChange={(e) => setForkTubeType(e.target.value)}
                     required
                 >
                     <option value="">Select Type</option>
@@ -103,6 +182,8 @@ const ForkForm = ({ itemName, itemPrice, onClose }) => {
                     className="dropdown"
                     id="ft-upper-diameter"
                     name="ftUpperDiameter"
+                    value={ftUpperDiameter}
+                    onChange={(e) => setFtUpperDiameter(e.target.value)}
                     required
                 >
                     <option value="">Select Diameter</option>
@@ -118,6 +199,8 @@ const ForkForm = ({ itemName, itemPrice, onClose }) => {
                     className="dropdown"
                     id="ft-lower-diameter"
                     name="ftLowerDiameter"
+                    value={ftLowerDiameter}
+                    onChange={(e) => setFtLowerDiameter(e.target.value)}
                     required
                 >
                     <option value="">Select Diameter</option>
@@ -133,6 +216,8 @@ const ForkForm = ({ itemName, itemPrice, onClose }) => {
                     className="dropdown"
                     id="axle-type"
                     name="axleType"
+                    value={axleType}
+                    onChange={(e) => setAxleType(e.target.value)}
                     required
                 >
                     <option value="">Select Type</option>
@@ -147,6 +232,8 @@ const ForkForm = ({ itemName, itemPrice, onClose }) => {
                     className="dropdown"
                     id="axle-width"
                     name="axleWidth"
+                    value={axleWidth}
+                    onChange={(e) => setAxleWidth(e.target.value)}
                     required
                 >
                     <option value="">Select Width</option>
@@ -161,6 +248,8 @@ const ForkForm = ({ itemName, itemPrice, onClose }) => {
                     className="dropdown"
                     id="suspension-type"
                     name="suspensionType"
+                    value={suspensionType}
+                    onChange={(e) => setSuspensionType(e.target.value)}
                     required
                 >
                     <option value="">Select Type</option>
@@ -175,6 +264,8 @@ const ForkForm = ({ itemName, itemPrice, onClose }) => {
                     className="dropdown"
                     id="rotor-size"
                     name="rotorSize"
+                    value={rotorSize}
+                    onChange={(e) => setRotorSize(e.target.value)}
                     required
                 >
                     <option value="">Select Size</option>
@@ -190,6 +281,8 @@ const ForkForm = ({ itemName, itemPrice, onClose }) => {
                     className="dropdown"
                     id="max-tire-width"
                     name="maxTireWidth"
+                    value={maxTireWidth}
+                    onChange={(e) => setMaxTireWidth(e.target.value)}
                     required
                 >
                     <option value="">Select Width</option>
@@ -207,6 +300,8 @@ const ForkForm = ({ itemName, itemPrice, onClose }) => {
                     className="dropdown"
                     id="brake-mount"
                     name="brakeMount"
+                    value={brakeMount}
+                    onChange={(e) => setBrakeMount(e.target.value)}
                     required
                 >
                     <option value="">Select Mount</option>
@@ -222,6 +317,8 @@ const ForkForm = ({ itemName, itemPrice, onClose }) => {
                     type="text"
                     id="item-material-fork"
                     name="itemMaterial"
+                    value={material}
+                    onChange={(e) => setMaterial(e.target.value)}
                     placeholder="Enter item material"
                     required
                 />
@@ -233,6 +330,8 @@ const ForkForm = ({ itemName, itemPrice, onClose }) => {
                     type="text"
                     id="item-weight-fork"
                     name="itemWeight"
+                    value={weight}
+                    onChange={(e) => setWeight(e.target.value)}
                     placeholder="Enter item weight"
                     required
                 />

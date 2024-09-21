@@ -22,3 +22,14 @@ export const addFrame = async (frameData) => {
     }
 };
 
+// Add item to fork
+export const addFork = async (forkData) => {
+    try {
+        const response = await api.post('/waitlist/add-fork', forkData);
+        return response.data;
+    } catch (error) {
+        console.error('Error adding frame:', error);
+        throw error;    
+    }
+};
+
