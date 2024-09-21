@@ -18,18 +18,22 @@ const Waitlist = () => {
     const [selectedItem, setSelectedItem] = useState(null);
 
     // Fetch waitlist items when the component mounts
-    useEffect(() => {
-        const fetchItems = async () => {
-            try {
-                const data = await getWaitlistItems();
-                setItems(data);
-            } catch (error) {
-                console.error('Error fetching waitlist items:', error);
-            }
-        };
+    const fetchItems = async () => {
+        try {
+            const data = await getWaitlistItems();
+            setItems(data);
+        } catch (error) {
+            console.error('Error fetching waitlist items:', error);
+        }
+    };
 
+    useEffect(() => {
         fetchItems();
     }, []);
+
+    const refreshWaitlist = () => {
+        fetchItems();
+    };
 
     // Handle click on an item
     const handleItemClick = (item) => {
@@ -117,14 +121,19 @@ const Waitlist = () => {
 
                             {selectedItem.bike_parts === 'Frame' && (
                                 <FrameForm
+                                    waitlistItemID={selectedItem.waitlist_item_id}
+                                    itemID={selectedItem.item_id}
                                     itemName={selectedItem.item_name}
                                     itemPrice={selectedItem.item_price}
                                     onClose={handleCloseView}
+                                    refreshWaitlist={refreshWaitlist}
                                 />
                             )}
 
                             {selectedItem.bike_parts === 'Fork' && (
                                 <ForkForm
+                                    waitlistItemID={selectedItem.waitlist_item_id}
+                                    itemID={selectedItem.item_id}
                                     itemName={selectedItem.item_name}
                                     itemPrice={selectedItem.item_price}
                                     onClose={handleCloseView}
@@ -133,6 +142,8 @@ const Waitlist = () => {
 
                             {selectedItem.bike_parts === 'Groupset' && (
                                 <GroupsetForm
+                                    waitlistItemID={selectedItem.waitlist_item_id}
+                                    itemID={selectedItem.item_id}
                                     itemName={selectedItem.item_name}
                                     itemPrice={selectedItem.item_price}
                                     onClose={handleCloseView}
@@ -141,6 +152,8 @@ const Waitlist = () => {
 
                             {selectedItem.bike_parts === 'Wheelset' && (
                                 <WheelsetForm
+                                    waitlistItemID={selectedItem.waitlist_item_id}
+                                    itemID={selectedItem.item_id}
                                     itemName={selectedItem.item_name}
                                     itemPrice={selectedItem.item_price}
                                     onClose={handleCloseView}
@@ -149,6 +162,8 @@ const Waitlist = () => {
 
                             {selectedItem.bike_parts === 'Cockpit' && (
                                 <CockpitForm
+                                    waitlistItemID={selectedItem.waitlist_item_id}
+                                    itemID={selectedItem.item_id}
                                     itemName={selectedItem.item_name}
                                     itemPrice={selectedItem.item_price}
                                     onClose={handleCloseView}

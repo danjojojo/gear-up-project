@@ -71,6 +71,8 @@ const addItem = async (req, res) => {
         const itemAddToBikeBuilder = addToBikeBuilder === 'true';
         const itemBikeParts = itemAddToBikeBuilder ? bikeParts : null;
 
+        const bikeBuilderUpgraderStatus = false;
+
         // Insert item into database
         const query = `
             INSERT INTO items (
@@ -84,8 +86,9 @@ const addItem = async (req, res) => {
                 bike_parts,
                 item_image,
                 date_created,
-                date_updated
-            ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)
+                date_updated,
+                bb_bu_status
+            ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12)
             RETURNING *`;
 
         const values = [
@@ -98,8 +101,9 @@ const addItem = async (req, res) => {
             itemAddToBikeBuilder,
             itemBikeParts,
             itemImage,
-            new Date(), // date_created
-            new Date()  // date_updated
+            new Date(), 
+            new Date(),  
+            bikeBuilderUpgraderStatus
         ];
 
         const result = await pool.query(query, values);
@@ -112,7 +116,7 @@ const addItem = async (req, res) => {
                 INSERT INTO waitlist (item_id, date_created, date_updated)
                 VALUES ($1, $2, $3)
                 RETURNING *`;
-
+ 
             const waitlistValues = [
                 newItem.item_id,
                 new Date(), // date_created
@@ -170,6 +174,7 @@ const getItemById = async (req, res) => {
                 c.category_name,
                 i.add_part,
                 i.bike_parts,
+                i.bb_bu_status,
                 encode(i.item_image, 'base64') AS item_image
             FROM items i
             JOIN category c ON i.category_id = c.category_id

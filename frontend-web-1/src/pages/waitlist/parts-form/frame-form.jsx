@@ -2,10 +2,29 @@ import React, { useState, useEffect } from 'react';
 import exit from "../../../assets/icons/exit.png";
 import del from "../../../assets/icons/delete.png";
 import ImageUploadButton from '../../../components/img-upload-button/img-upload-button';
+import { addFrame } from '../../../services/waitlistService';
 
-const FrameForm = ({ itemName, itemPrice, onClose }) => {
+const FrameForm = ({ waitlistItemID, itemID, itemName, itemPrice, onClose, refreshWaitlist }) => {
+    // States management
     const [name, setName] = useState('');
     const [price, setPrice] = useState('');
+    const [description, setDescription] = useState('');
+    const [frameSize, setFrameSize] = useState('');
+    const [headTubeType, setHeadTubeType] = useState('');
+    const [htUpperDiameter, setHtUpperDiameter] = useState('');
+    const [htLowerDiameter, setHtLowerDiameter] = useState('');
+    const [seatpostDiameter, setSeatpostDiameter] = useState('');
+    const [axleType, setAxleType] = useState('');
+    const [axleWidth, setAxleWidth] = useState('');
+    const [bottomBracketType, setBottomBracketType] = useState('');
+    const [bbDiameter, setBbDiameter] = useState('');
+    const [rotorSize, setRotorSize] = useState('');
+    const [maxTireWidth, setMaxTireWidth] = useState('');
+    const [brakeMount, setBrakeMount] = useState('');
+    const [cableRouting, setCableRouting] = useState('');
+    const [material, setMaterial] = useState('');
+    const [weight, setWeight] = useState('');
+    const [selectedFile, setSelectedFile] = useState(null);
 
     // Populate item name and price
     useEffect(() => {
@@ -13,8 +32,72 @@ const FrameForm = ({ itemName, itemPrice, onClose }) => {
         setPrice(itemPrice);
     }, [itemName, itemPrice]);
 
+    // Submit part
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+
+        const formData = new FormData();
+        formData.append('waitlist_item_id', waitlistItemID);
+        formData.append('item_id', itemID);
+        formData.append('description', description);
+        formData.append('frame_size', frameSize);
+        formData.append('head_tube_type', headTubeType);
+        formData.append('head_tube_upper_diameter', htUpperDiameter);
+        formData.append('head_tube_lower_diameter', htLowerDiameter);
+        formData.append('seatpost_diameter', seatpostDiameter);
+        formData.append('axle_type', axleType);
+        formData.append('axle_width', axleWidth);
+        formData.append('bottom_bracket_type', bottomBracketType);
+        formData.append('bottom_bracket_diameter', bbDiameter);
+        formData.append('rotor_size', rotorSize);
+        formData.append('max_tire_width', maxTireWidth);
+        formData.append('brake_mount', brakeMount);
+        formData.append('cable_routing', cableRouting);
+        formData.append('material', material);
+        formData.append('weight', weight);
+        if (selectedFile) {
+            formData.append('image', selectedFile);
+        }
+
+        console.log('Form data being sent:', [...formData]);
+
+        try {
+            await addFrame(formData);
+            alert("Item added successfully");
+
+            // Reset Form
+            setDescription('');
+            setFrameSize('');
+            setHeadTubeType('');
+            setHtUpperDiameter('');
+            setHtLowerDiameter('');
+            setSeatpostDiameter('');
+            setAxleType('');
+            setAxleWidth('');
+            setBottomBracketType('');
+            setBbDiameter('');
+            setRotorSize('');
+            setMaxTireWidth('');
+            setBrakeMount('');
+            setCableRouting('');
+            setMaterial('');
+            setWeight('');
+            setSelectedFile(null);
+            onClose();
+            refreshWaitlist();
+
+        } catch (error) {
+            console.error('Failed to add item:', error);
+        }
+    };
+
+    // Select image file
+    const handleFileSelect = (file) => {
+        setSelectedFile(file);
+    };
+
     return (
-        <form className="form-content">
+        <form className="form-content" onSubmit={handleSubmit}>
             <div className="container-1 d-flex">
                 <div className="exit-btn">
                     <img
@@ -31,7 +114,7 @@ const FrameForm = ({ itemName, itemPrice, onClose }) => {
                 </div>
             </div>
 
-            <ImageUploadButton />
+            <ImageUploadButton onFileSelect={handleFileSelect} required/>
 
             <div className="item-name form-group">
                 <label htmlFor="item-name-frame">Name</label>
@@ -63,6 +146,8 @@ const FrameForm = ({ itemName, itemPrice, onClose }) => {
                     type="text"
                     id="item-description-frame"
                     name="itemDescription"
+                    value={description}
+                    onChange={(e) => setDescription(e.target.value)}
                     placeholder="Enter item description"
                     required
                 />
@@ -74,6 +159,8 @@ const FrameForm = ({ itemName, itemPrice, onClose }) => {
                     className="dropdown"
                     id="frame-size"
                     name="frameSize"
+                    value={frameSize}
+                    onChange={(e) => setFrameSize(e.target.value)}
                     required
                 >
                     <option value="">Select Size</option>
@@ -89,6 +176,8 @@ const FrameForm = ({ itemName, itemPrice, onClose }) => {
                     className="dropdown"
                     id="head-tube-type"
                     name="headTubeType"
+                    value={headTubeType}
+                    onChange={(e) => setHeadTubeType(e.target.value)}
                     required
                 >
                     <option value="">Select Type</option>
@@ -105,6 +194,8 @@ const FrameForm = ({ itemName, itemPrice, onClose }) => {
                     className="dropdown"
                     id="ht-upper-diameter"
                     name="htUpperDiameter"
+                    value={htUpperDiameter}
+                    onChange={(e) => setHtUpperDiameter(e.target.value)}
                     required
                 >
                     <option value="">Select Diameter</option>
@@ -120,6 +211,8 @@ const FrameForm = ({ itemName, itemPrice, onClose }) => {
                     className="dropdown"
                     id="ht-lower-diameter"
                     name="htLowerDiameter"
+                    value={htLowerDiameter}
+                    onChange={(e) => setHtLowerDiameter(e.target.value)}
                     required
                 >
                     <option value="">Select Diameter</option>
@@ -135,6 +228,8 @@ const FrameForm = ({ itemName, itemPrice, onClose }) => {
                     className="dropdown"
                     id="seatpost-diameter"
                     name="seatpostDiameter"
+                    value={seatpostDiameter}
+                    onChange={(e) => setSeatpostDiameter(e.target.value)}
                     required
                 >
                     <option value="">Select Diameter</option>
@@ -151,6 +246,8 @@ const FrameForm = ({ itemName, itemPrice, onClose }) => {
                     className="dropdown"
                     id="axle-type"
                     name="axleType"
+                    value={axleType}
+                    onChange={(e) => setAxleType(e.target.value)}
                     required
                 >
                     <option value="">Select Type</option>
@@ -165,6 +262,8 @@ const FrameForm = ({ itemName, itemPrice, onClose }) => {
                     className="dropdown"
                     id="axle-width"
                     name="axleWidth"
+                    value={axleWidth}
+                    onChange={(e) => setAxleWidth(e.target.value)}
                     required
                 >
                     <option value="">Select Width</option>
@@ -181,6 +280,8 @@ const FrameForm = ({ itemName, itemPrice, onClose }) => {
                     className="dropdown"
                     id="bottom-bracket-type"
                     name="bottomBracketType"
+                    value={bottomBracketType}
+                    onChange={(e) => setBottomBracketType(e.target.value)}
                     required
                 >
                     <option value="">Select Type</option>
@@ -198,6 +299,8 @@ const FrameForm = ({ itemName, itemPrice, onClose }) => {
                     className="dropdown"
                     id="bb-diameter"
                     name="bbDiameter"
+                    value={bbDiameter}
+                    onChange={(e) => setBbDiameter(e.target.value)}
                     required
                 >
                     <option value="">Select Diameter</option>
@@ -213,6 +316,8 @@ const FrameForm = ({ itemName, itemPrice, onClose }) => {
                     className="dropdown"
                     id="rotor-size"
                     name="rotorSize"
+                    value={rotorSize}
+                    onChange={(e) => setRotorSize(e.target.value)}
                     required
                 >
                     <option value="">Select Size</option>
@@ -228,6 +333,8 @@ const FrameForm = ({ itemName, itemPrice, onClose }) => {
                     className="dropdown"
                     id="max-tire-width"
                     name="maxTireWidth"
+                    value={maxTireWidth}
+                    onChange={(e) => setMaxTireWidth(e.target.value)}
                     required
                 >
                     <option value="">Select Width</option>
@@ -245,6 +352,8 @@ const FrameForm = ({ itemName, itemPrice, onClose }) => {
                     className="dropdown"
                     id="brake-mount"
                     name="brakeMount"
+                    value={brakeMount}
+                    onChange={(e) => setBrakeMount(e.target.value)}
                     required
                 >
                     <option value="">Select Mount</option>
@@ -260,6 +369,8 @@ const FrameForm = ({ itemName, itemPrice, onClose }) => {
                     className="dropdown"
                     id="cable-routing"
                     name="cableRouting"
+                    value={cableRouting}
+                    onChange={(e) => setCableRouting(e.target.value)}
                     required
                 >
                     <option value="">Select Routing</option>
@@ -274,6 +385,8 @@ const FrameForm = ({ itemName, itemPrice, onClose }) => {
                     type="text"
                     id="item-material-frame"
                     name="itemMaterial"
+                    value={material}
+                    onChange={(e) => setMaterial(e.target.value)}
                     placeholder="Enter item material"
                     required
                 />
@@ -285,6 +398,8 @@ const FrameForm = ({ itemName, itemPrice, onClose }) => {
                     type="text"
                     id="item-weight-frame"
                     name="itemWeight"
+                    value={weight}
+                    onChange={(e) => setWeight(e.target.value)}
                     placeholder="Enter item weight"
                     required
                 />

@@ -48,11 +48,7 @@ export const getItemDetails = async (itemId) => {
 // Update item
 export const updateItem = async (itemId, updatedData) => {
     try {
-        const response = await api.put(`/inventory/item/${itemId}`, updatedData, {
-            headers: {
-                'Content-Type': 'multipart/form-data'
-            }
-        });
+        const response = await api.put(`/inventory/item/${itemId}`, updatedData);
         return response.data;
     } catch (error) {
         console.error('Error updating item:', error);

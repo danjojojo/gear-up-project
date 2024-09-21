@@ -10,3 +10,15 @@ export const getWaitlistItems = async () => {
         throw error;
     }
 };
+
+// Add item to frame
+export const addFrame = async (frameData) => {
+    try {
+        const response = await api.post('/waitlist/add-frame', frameData);
+        return response.data;
+    } catch (error) {
+        console.error('Error adding frame:', error);
+        throw error;    
+    }
+};
+

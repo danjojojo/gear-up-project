@@ -46,6 +46,7 @@ const Inventory = () => {
         add_part: false,
         bike_parts: "",
         item_image: "",
+        bb_bu_status: ""
     });
     const [data, setData] = useState({
         totalItems: 0,
@@ -157,6 +158,7 @@ const Inventory = () => {
             add_part: item.add_part,
             bike_parts: item.bike_parts || "",
             item_image: imageBase64,
+            bb_bu_status: item.bb_bu_status,
         }));
 
         setItemImage(imageBase64);
@@ -542,29 +544,35 @@ const Inventory = () => {
                                         </div>
                                     )}
 
-                                    <div className="bbu-container d-flex justify-content-between">
-                                        <div className="title">
-                                            Add to Bike Builder and Upgrader
+                                    {viewingItem && selectedItem.bb_bu_status && (
+                                        <div className="item-status">
+                                            Added to bike builder and upgrader
                                         </div>
-                                        <div className="switch form-check form-switch">
-                                            <input
-                                                className="form-check-input"
-                                                type="checkbox"
-                                                id="addPart"
-                                                name="addPart"
-                                                checked={selectedItem.add_part || false}
-                                                onChange={() =>
-                                                    setSelectedItem((prev) => ({
-                                                        ...prev,
-                                                        add_part: !prev.add_part,
-                                                    }))
-                                                }
-                                                disabled={!isEditing}
-                                            />
-                                        </div>
-                                    </div>
+                                    )}
 
-                                    {selectedItem.add_part && (
+                                    {viewingItem && !selectedItem.bb_bu_status && (
+                                        <div className="bbu-container d-flex justify-content-between">
+                                            <div className="title">Add to Bike Builder and Upgrader</div>
+                                            <div className="switch form-check form-switch">
+                                                <input
+                                                    className="form-check-input"
+                                                    type="checkbox"
+                                                    id="addPart"
+                                                    name="addPart"
+                                                    checked={selectedItem.add_part || false}
+                                                    onChange={() =>
+                                                        setSelectedItem((prev) => ({
+                                                            ...prev,
+                                                            add_part: !prev.add_part,
+                                                        }))
+                                                    }
+                                                    disabled={!isEditing}
+                                                />
+                                            </div>
+                                        </div>
+                                    )}
+
+                                    {viewingItem && selectedItem.add_part && !selectedItem.bb_bu_status && (
                                         <div className="bike-part-container d-flex justify-content-between">
                                             <div className="title">Bike Part</div>
                                             <select
