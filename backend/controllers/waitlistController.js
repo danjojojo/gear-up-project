@@ -336,10 +336,100 @@ const addWheelset = async (req, res) => {
     }
 };
 
+
+// Add to Cockpit
+const addCockpit = async (req, res) => {
+    const {
+        waitlist_item_id,
+        item_id,
+        description,
+        seatpost_diameter,
+        seatpost_length,
+        seat_clamp_type,
+        handlebar_length,
+        handlebar_clamp_diameter,
+        handlebar_type,
+        stem_clamp_diameter,
+        stem_length,
+        stem_angle,
+        fork_upper_diameter,
+        headset_type,
+        headset_upper_diameter,
+        headset_lower_diameter,
+        headset_cup_type,
+        stem_material,
+        handlebar_material,
+        weight,
+    } = req.body;
+
+    const image = req.file ? req.file.buffer : null;
+
+    try {
+        const query = `
+            INSERT INTO cockpit (
+                item_id, description, seatpost_diameter,
+                seatpost_length, seat_clamp_type, handlebar_length,
+                handlebar_clamp_diameter, handlebar_type,
+                stem_clamp_diameter, stem_length, stem_angle,
+                fork_upper_diameter, headset_type, headset_upper_diameter,
+                headset_lower_diameter, headset_cup_type, stem_material,
+                handlebar_material, weight, image, date_created, 
+                date_updated
+            ) VALUES (
+                $1, $2, $3, $4, $5, $6, $7, $8, $9, 
+                $10, $11, $12, $13, $14, $15, $16, $17,
+                $18, $19, $20, $21, $22
+            ) RETURNING *;
+        `;
+
+        const values = [
+            item_id,
+            description,
+            seatpost_diameter,
+            seatpost_length,
+            seat_clamp_type,
+            handlebar_length,
+            handlebar_clamp_diameter,
+            handlebar_type,
+            stem_clamp_diameter,
+            stem_length,
+            stem_angle,
+            fork_upper_diameter,
+            headset_type,
+            headset_upper_diameter,
+            headset_lower_diameter,
+            headset_cup_type,
+            stem_material,
+            handlebar_material,
+            weight,
+            image,
+            new Date(),
+            new Date()
+        ];
+
+
+        const result = await pool.query(query, values);
+
+        // Update bb_bu_status in items table
+        const updateQuery = `UPDATE items SET bb_bu_status = true, add_part = false WHERE item_id = $1;`;
+        await pool.query(updateQuery, [item_id]);
+
+        // Delete the waitlist item
+        const deleteQuery = `DELETE FROM waitlist WHERE waitlist_item_id = $1;`;
+        await pool.query(deleteQuery, [waitlist_item_id]);
+
+        res.status(201).json(result.rows[0]);
+    } catch (error) {
+        console.error('Error adding cockpit:', error);
+        res.status(500).json({ error: 'Internal Server Error' });
+    }
+};
+
 module.exports = {
     getWaitlistItems,
     addFrame,
     addFork,
     addGroupset,
-    addWheelset
+    addWheelset,
+    addCockpit
 };

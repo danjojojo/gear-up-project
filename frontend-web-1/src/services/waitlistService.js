@@ -55,3 +55,14 @@ export const addWheelset = async (wheelsetData) => {
     }
 };
 
+// Add item to Cockpit
+export const addCockpit = async (cockpitData) => {
+    try {
+        const response = await api.post('/waitlist/add-cockpit', cockpitData);
+        return response.data;
+    } catch (error) {
+        console.error('Error adding cockpit:', error);
+        throw error;    
+    }
+};
+
