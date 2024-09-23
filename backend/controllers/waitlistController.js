@@ -1,6 +1,7 @@
 const pool = require('../config/db');
 require('dotenv').config();
 
+// Get waitlist items
 const getWaitlistItems = async (req, res) => {
     try {
         const query = `

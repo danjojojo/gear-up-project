@@ -3,6 +3,8 @@ const cors = require('cors');
 const authRoutes = require('./routers/authRouter');
 const inventoryRoutes = require('./routers/inventoryRouter');
 const waitlistRoutes = require('./routers/waitlistRouter');
+const bbuRoutes = require('./routers/bbuRouter');
+
 require('dotenv').config();
 
 const app = express();
@@ -16,6 +18,8 @@ app.use('/auth', authRoutes);
 app.use('/inventory', inventoryRoutes);
 
 app.use('/waitlist', waitlistRoutes);
+
+app.use('/bike-builder-upgrader', bbuRoutes);
 
 app.listen(port, () => {
     console.log(`Server running on port ${port}`);
