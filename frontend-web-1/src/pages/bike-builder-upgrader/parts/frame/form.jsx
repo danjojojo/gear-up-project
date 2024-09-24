@@ -1,11 +1,13 @@
-import React, { useState, useEffect } from 'react';
-import exit from "../../../assets/icons/exit.png";
-import del from "../../../assets/icons/delete.png";
-import ImageUploadButton from '../../../components/img-upload-button/img-upload-button';
-import { addFrame } from '../../../services/waitlistService';
+import React, { useState, useEffect } from "react";
+import exit from "../../../../assets/icons/exit.png";
+import edit from "../../../../assets/icons/edit.png";
+import cancel from "../../../../assets/icons/cancel.png";
+import del from "../../../../assets/icons/delete.png";
+import ImageUploadButton from "../../../../components/img-upload-button/img-upload-button";
+import { base64ToFile } from "../../../../utility/imageUtils";
+import { updateFrameItem } from "../../../../services/bbuService";
 
-const FrameForm = ({ waitlistItemID, itemID, itemName, itemPrice, onClose, refreshWaitlist }) => {
-    // States management
+const Form = ({ selectedItem, setSelectedItem, setItems, refreshWaitlist, onClose }) => {
     const [name, setName] = useState('');
     const [price, setPrice] = useState('');
     const [description, setDescription] = useState('');
@@ -24,77 +26,112 @@ const FrameForm = ({ waitlistItemID, itemID, itemName, itemPrice, onClose, refre
     const [cableRouting, setCableRouting] = useState('');
     const [material, setMaterial] = useState('');
     const [weight, setWeight] = useState('');
+    const [isEditing, setIsEditing] = useState(false);
+    const [itemImage, setItemImage] = useState(null)
     const [selectedFile, setSelectedFile] = useState(null);
+    const [originalItem, setOriginalItem] = useState(null);
 
-    // Populate item name and price
+    // Populate fields when a new item is selected
     useEffect(() => {
-        setName(itemName);
-        setPrice(itemPrice);
-    }, [itemName, itemPrice]);
+        if (selectedItem) {
+            const fileExtension = selectedItem.item_image && selectedItem.item_image.startsWith("data:image/png")
+                ? "png"
+                : "jpg";
 
-    // Submit part
-    const handleSubmit = async (e) => {
-        e.preventDefault();
+            const imageBase64 =
+                selectedItem.item_image && !selectedItem.item_image.startsWith("data:image/")
+                    ? `data:image/${fileExtension};base64,${selectedItem.item_image}`
+                    : selectedItem.item_image;
 
-        const formData = new FormData();
-        formData.append('waitlist_item_id', waitlistItemID);
-        formData.append('item_id', itemID);
-        formData.append('description', description);
-        formData.append('frame_size', frameSize);
-        formData.append('head_tube_type', headTubeType);
-        formData.append('head_tube_upper_diameter', htUpperDiameter);
-        formData.append('head_tube_lower_diameter', htLowerDiameter);
-        formData.append('seatpost_diameter', seatpostDiameter);
-        formData.append('axle_type', axleType);
-        formData.append('axle_width', axleWidth);
-        formData.append('bottom_bracket_type', bottomBracketType);
-        formData.append('bottom_bracket_diameter', bbDiameter);
-        formData.append('rotor_size', rotorSize);
-        formData.append('max_tire_width', maxTireWidth);
-        formData.append('brake_mount', brakeMount);
-        formData.append('cable_routing', cableRouting);
-        formData.append('material', material);
-        formData.append('weight', weight);
+            const imageFile = imageBase64
+                ? base64ToFile(imageBase64, `image.${fileExtension}`)
+                : null;
+
+            setName(selectedItem.item_name || '');
+            setPrice(selectedItem.item_price || '');
+            setDescription(selectedItem.description || '');
+            setFrameSize(selectedItem.frame_size || '');
+            setHeadTubeType(selectedItem.head_tube_type || '');
+            setHtUpperDiameter(selectedItem.head_tube_upper_diameter || '');
+            setHtLowerDiameter(selectedItem.head_tube_lower_diameter || '');
+            setSeatpostDiameter(selectedItem.seatpost_diameter || '');
+            setAxleType(selectedItem.axle_type || '');
+            setAxleWidth(selectedItem.axle_width || '');
+            setBottomBracketType(selectedItem.bottom_bracket_type || '');
+            setBbDiameter(selectedItem.bottom_bracket_diameter || '');
+            setRotorSize(selectedItem.rotor_size || '');
+            setMaxTireWidth(selectedItem.max_tire_width || '');
+            setBrakeMount(selectedItem.brake_mount || '');
+            setCableRouting(selectedItem.cable_routing || '');
+            setMaterial(selectedItem.material || '');
+            setWeight(selectedItem.weight || '');
+            setItemImage(imageBase64);
+            setOriginalItem({ ...selectedItem });
+
+            if (imageFile) {
+                handleFileSelect(imageFile);
+            }
+        }
+    }, [selectedItem]);
+
+
+    const handleSubmit = async (event) => {
+        event.preventDefault();
+
+        const updatedData = new FormData();
+        updatedData.append('description', description);
+        updatedData.append('frame_size', frameSize);
+        updatedData.append('head_tube_type', headTubeType);
+        updatedData.append('head_tube_upper_diameter', htUpperDiameter);
+        updatedData.append('head_tube_lower_diameter', htLowerDiameter);
+        updatedData.append('seatpost_diameter', seatpostDiameter);
+        updatedData.append('axle_type', axleType);
+        updatedData.append('axle_width', axleWidth);
+        updatedData.append('bottom_bracket_type', bottomBracketType);
+        updatedData.append('bottom_bracket_diameter', bbDiameter);
+        updatedData.append('rotor_size', rotorSize);
+        updatedData.append('max_tire_width', maxTireWidth);
+        updatedData.append('brake_mount', brakeMount);
+        updatedData.append('cable_routing', cableRouting);
+        updatedData.append('material', material);
+        updatedData.append('weight', weight);
+
         if (selectedFile) {
-            formData.append('image', selectedFile);
+            updatedData.append('item_image', selectedFile);
         }
 
-        console.log('Form data being sent:', [...formData]);
+        const updatedItem = await updateFrameItem(selectedItem.frame_id, updatedData);
+        alert("Item updated successfully");
 
-        try {
-            await addFrame(formData);
-            alert("Item added successfully");
+        setItems((prevItems) =>
+            prevItems.map((item) =>
+                item.frame_id === selectedItem.frame_id ? updatedItem : item
+            ),
+        );
 
-            // Reset Form
-            setDescription('');
-            setFrameSize('');
-            setHeadTubeType('');
-            setHtUpperDiameter('');
-            setHtLowerDiameter('');
-            setSeatpostDiameter('');
-            setAxleType('');
-            setAxleWidth('');
-            setBottomBracketType('');
-            setBbDiameter('');
-            setRotorSize('');
-            setMaxTireWidth('');
-            setBrakeMount('');
-            setCableRouting('');
-            setMaterial('');
-            setWeight('');
-            setSelectedFile(null);
-            onClose();
-            refreshWaitlist();
-
-        } catch (error) {
-            console.error('Failed to add item:', error);
-        }
+        refreshWaitlist();
+        setIsEditing(false);
+        onClose();
     };
+
 
     // Select image file
     const handleFileSelect = (file) => {
         setSelectedFile(file);
     };
+
+    // Handle editing an item
+    const handleEditClick = () => {
+        setOriginalItem({ ...selectedItem });
+        setIsEditing(true);
+    };
+
+    // Handle canceling the edit
+    const handleCancelEdit = async () => {
+        setSelectedItem(originalItem);
+        setIsEditing(false);
+    };
+
 
     return (
         <form className="form-content" onSubmit={handleSubmit}>
@@ -107,14 +144,48 @@ const FrameForm = ({ waitlistItemID, itemID, itemName, itemPrice, onClose, refre
                         onClick={onClose}
                     />
                 </div>
+                <div className="edit-btn">
+                    {isEditing ? (
+                        <img
+                            src={cancel}
+                            alt="Cancel"
+                            className="cancel-icon"
+                            onClick={handleCancelEdit}
+                        />
+                    ) : (
+                        <img
+                            src={edit}
+                            alt="Edit"
+                            className="edit-icon"
+                            onClick={handleEditClick}
+                        />
+                    )}
+                </div>
                 <div className="del-btn">
-                    <img src={del}
+                    <img
+                        src={del}
                         alt="Delete"
                         className="del-icon" />
                 </div>
             </div>
 
-            <ImageUploadButton onFileSelect={handleFileSelect}/>
+            {!isEditing ? (
+                itemImage ? (
+                    <div className="item-image-container">
+                        <img
+                            src={itemImage}
+                            alt="Item"
+                            className="item-image"
+                        />
+                    </div>
+                ) : (
+                    <div className="no-image-container">
+                        No image attached
+                    </div>
+                )
+            ) : (
+                <ImageUploadButton onFileSelect={handleFileSelect} />
+            )}
 
             <div className="input-container form-group">
                 <label htmlFor="item-name-frame">Name</label>
@@ -150,6 +221,7 @@ const FrameForm = ({ waitlistItemID, itemID, itemName, itemPrice, onClose, refre
                     onChange={(e) => setDescription(e.target.value)}
                     placeholder="Enter item description"
                     required
+                    disabled={!isEditing}
                 />
             </div>
 
@@ -162,6 +234,7 @@ const FrameForm = ({ waitlistItemID, itemID, itemName, itemPrice, onClose, refre
                     value={frameSize}
                     onChange={(e) => setFrameSize(e.target.value)}
                     required
+                    disabled={!isEditing}
                 >
                     <option value="">Select Size</option>
                     <option value='26"'>26"</option>
@@ -179,6 +252,7 @@ const FrameForm = ({ waitlistItemID, itemID, itemName, itemPrice, onClose, refre
                     value={headTubeType}
                     onChange={(e) => setHeadTubeType(e.target.value)}
                     required
+                    disabled={!isEditing}
                 >
                     <option value="">Select Type</option>
                     <option value="Tapered">Tapered</option>
@@ -197,6 +271,7 @@ const FrameForm = ({ waitlistItemID, itemID, itemName, itemPrice, onClose, refre
                     value={htUpperDiameter}
                     onChange={(e) => setHtUpperDiameter(e.target.value)}
                     required
+                    disabled={!isEditing}
                 >
                     <option value="">Select Diameter</option>
                     <option value='1 1/8" (28.6 mm)'>1 1/8" (28.6 mm)</option>
@@ -214,6 +289,7 @@ const FrameForm = ({ waitlistItemID, itemID, itemName, itemPrice, onClose, refre
                     value={htLowerDiameter}
                     onChange={(e) => setHtLowerDiameter(e.target.value)}
                     required
+                    disabled={!isEditing}
                 >
                     <option value="">Select Diameter</option>
                     <option value='1.5" (38.1 mm)'>1.5" (38.1 mm)</option>
@@ -231,6 +307,7 @@ const FrameForm = ({ waitlistItemID, itemID, itemName, itemPrice, onClose, refre
                     value={seatpostDiameter}
                     onChange={(e) => setSeatpostDiameter(e.target.value)}
                     required
+                    disabled={!isEditing}
                 >
                     <option value="">Select Diameter</option>
                     <option value="27.2 mm">27.2 mm</option>
@@ -249,6 +326,7 @@ const FrameForm = ({ waitlistItemID, itemID, itemName, itemPrice, onClose, refre
                     value={axleType}
                     onChange={(e) => setAxleType(e.target.value)}
                     required
+                    disabled={!isEditing}
                 >
                     <option value="">Select Type</option>
                     <option value="Quick Release (QR)">Quick Release (QR)</option>
@@ -265,6 +343,7 @@ const FrameForm = ({ waitlistItemID, itemID, itemName, itemPrice, onClose, refre
                     value={axleWidth}
                     onChange={(e) => setAxleWidth(e.target.value)}
                     required
+                    disabled={!isEditing}
                 >
                     <option value="">Select Width</option>
                     <option value="135 mm">135 mm</option>
@@ -283,6 +362,7 @@ const FrameForm = ({ waitlistItemID, itemID, itemName, itemPrice, onClose, refre
                     value={bottomBracketType}
                     onChange={(e) => setBottomBracketType(e.target.value)}
                     required
+                    disabled={!isEditing}
                 >
                     <option value="">Select Type</option>
                     <option value="BSA (Threaded)">BSA (Threaded)</option>
@@ -302,6 +382,7 @@ const FrameForm = ({ waitlistItemID, itemID, itemName, itemPrice, onClose, refre
                     value={bbDiameter}
                     onChange={(e) => setBbDiameter(e.target.value)}
                     required
+                    disabled={!isEditing}
                 >
                     <option value="">Select Diameter</option>
                     <option value="24 mm">24 mm</option>
@@ -319,6 +400,7 @@ const FrameForm = ({ waitlistItemID, itemID, itemName, itemPrice, onClose, refre
                     value={rotorSize}
                     onChange={(e) => setRotorSize(e.target.value)}
                     required
+                    disabled={!isEditing}
                 >
                     <option value="">Select Size</option>
                     <option value="160 mm">160 mm</option>
@@ -336,6 +418,7 @@ const FrameForm = ({ waitlistItemID, itemID, itemName, itemPrice, onClose, refre
                     value={maxTireWidth}
                     onChange={(e) => setMaxTireWidth(e.target.value)}
                     required
+                    disabled={!isEditing}
                 >
                     <option value="">Select Width</option>
                     <option value='2.1"'>2.1"</option>
@@ -355,6 +438,7 @@ const FrameForm = ({ waitlistItemID, itemID, itemName, itemPrice, onClose, refre
                     value={brakeMount}
                     onChange={(e) => setBrakeMount(e.target.value)}
                     required
+                    disabled={!isEditing}
                 >
                     <option value="">Select Mount</option>
                     <option value="Post Mount">Post Mount</option>
@@ -372,6 +456,7 @@ const FrameForm = ({ waitlistItemID, itemID, itemName, itemPrice, onClose, refre
                     value={cableRouting}
                     onChange={(e) => setCableRouting(e.target.value)}
                     required
+                    disabled={!isEditing}
                 >
                     <option value="">Select Routing</option>
                     <option value="Internal">Internal</option>
@@ -389,6 +474,7 @@ const FrameForm = ({ waitlistItemID, itemID, itemName, itemPrice, onClose, refre
                     onChange={(e) => setMaterial(e.target.value)}
                     placeholder="Enter item material"
                     required
+                    disabled={!isEditing}
                 />
             </div>
 
@@ -402,16 +488,19 @@ const FrameForm = ({ waitlistItemID, itemID, itemName, itemPrice, onClose, refre
                     onChange={(e) => setWeight(e.target.value)}
                     placeholder="Enter item weight"
                     required
+                    disabled={!isEditing}
                 />
             </div>
 
-            <div className="submit-container">
-                <button type="submit" className="submit-btn">
-                    Add
-                </button>
-            </div>
+            {isEditing && (
+                <div className="submit-container">
+                    <button type="submit" className="submit-btn">
+                        Save
+                    </button>
+                </div>
+            )}
         </form>
-    );
-};
+    )
+}
 
-export default FrameForm;
+export default Form;

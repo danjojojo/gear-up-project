@@ -107,7 +107,7 @@ const GroupsetForm = ({ waitlistItemID, itemID, itemName, itemPrice, onClose, re
 
             <ImageUploadButton onFileSelect={handleFileSelect} />
 
-            <div className="item-name form-group">
+            <div className="input-container form-group">
                 <label htmlFor="item-name-groupset">Name</label>
                 <input
                     type="text"
@@ -119,7 +119,7 @@ const GroupsetForm = ({ waitlistItemID, itemID, itemName, itemPrice, onClose, re
                 />
             </div>
 
-            <div className="item-price form-group">
+            <div className="input-container form-group">
                 <label htmlFor="item-price-groupset">Price</label>
                 <input
                     type="text"
@@ -131,7 +131,7 @@ const GroupsetForm = ({ waitlistItemID, itemID, itemName, itemPrice, onClose, re
                 />
             </div>
 
-            <div className="item-description form-group">
+            <div className="input-container form-group">
                 <label htmlFor="item-description-groupset">Description</label>
                 <input
                     type="text"
@@ -337,7 +337,7 @@ const GroupsetForm = ({ waitlistItemID, itemID, itemName, itemPrice, onClose, re
                 </select>
             </div>
 
-            <div className="item-weight form-group">
+            <div className="input-container form-group">
                 <label htmlFor="item-weight-groupset">Weight</label>
                 <input
                     type="text"

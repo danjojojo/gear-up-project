@@ -134,17 +134,19 @@ const Inventory = () => {
 
     // Populate form with item details
     const populateFormWithDetails = (item) => {
+        // Determine the file extension based on the image type
+        const fileExtension = item.item_image && item.item_image.startsWith("data:image/png")
+            ? "png"
+            : "jpg"; // Default to jpg if it's not a png
+
         const imageBase64 =
             item.item_image && !item.item_image.startsWith("data:image/")
-                ? `data:image/jpeg;base64,${item.item_image}`
+                ? `data:image/${fileExtension};base64,${item.item_image}`
                 : item.item_image;
 
-        if (!imageBase64) {
-            console.warn("No image data available for this item");
-        }
-
+        // Create a file with the correct extension (either .jpg or .png)
         const imageFile = imageBase64
-            ? base64ToFile(imageBase64, "image.jpg")
+            ? base64ToFile(imageBase64, `image.${fileExtension}`)
             : null;
 
         setSelectedItem((prev) => ({
@@ -194,7 +196,9 @@ const Inventory = () => {
     };
 
     // Handle saving the edited item
-    const handleSaveClick = async () => {
+    const handleSaveClick = async (event) => {
+        event.preventDefault();
+
         const updatedData = new FormData();
         updatedData.append("itemName", selectedItem.item_name);
         updatedData.append("itemPrice", parseFloat(selectedItem.item_price));

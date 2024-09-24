@@ -143,11 +143,83 @@ const getCockpitItems = async (req, res) => {
     }
 };
 
+// Update frame item
+const updateFrameItem = async (req, res) => {
+    try {
+        const { id } = req.params; // Get the item_id from the URL
+        const {
+            description,
+            frame_size,
+            head_tube_type,
+            head_tube_upper_diameter,
+            head_tube_lower_diameter,
+            seatpost_diameter,
+            axle_type,
+            axle_width,
+            bottom_bracket_type,
+            bottom_bracket_diameter,
+            rotor_size,
+            max_tire_width,
+            brake_mount,
+            cable_routing,
+            material,
+            weight,
+        } = req.body;
+
+        // Handle the image file if it exists
+        const item_image = req.file ? req.file.buffer : null;
+
+        // Prepare the SQL query and parameters
+        const query = `
+            UPDATE frame
+            SET 
+                description = $1,
+                frame_size = $2,
+                head_tube_type = $3,
+                head_tube_upper_diameter = $4,
+                head_tube_lower_diameter = $5,
+                seatpost_diameter = $6,
+                axle_type = $7,
+                axle_width = $8,
+                bottom_bracket_type = $9,
+                bottom_bracket_diameter = $10,
+                rotor_size = $11,
+                max_tire_width = $12,
+                brake_mount = $13,
+                cable_routing = $14,
+                material = $15,
+                weight = $16,
+                image = $17,
+                date_updated = $18
+            WHERE item_id = $19
+            RETURNING *;
+        `;
+
+        // Execute the query
+        const values = [
+            description, frame_size, head_tube_type, head_tube_upper_diameter,
+            head_tube_lower_diameter, seatpost_diameter, axle_type, axle_width,
+            bottom_bracket_type, bottom_bracket_diameter, rotor_size, max_tire_width,
+            brake_mount, cable_routing, material, weight, item_image, new Date(), id
+        ];
+
+        const updatedItem = await pool.query(query, values);  
+
+        // Send the updated item in the response
+        res.status(200).json({ message: 'Item updated successfully', item: updatedItem.rows[0] });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: 'An error occurred while updating the item', error });
+    }
+};
+
+
 module.exports = {
     getPartsCount,
     getFrameItems,
     getForkItems,
     getGroupsetItems,
     getWheelsetItems,
-    getCockpitItems
+    getCockpitItems,
+    updateFrameItem
 };

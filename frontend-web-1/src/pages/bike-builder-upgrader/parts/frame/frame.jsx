@@ -6,10 +6,12 @@ import filter from '../../../../assets/icons/filter.png';
 import sort from '../../../../assets/icons/sort.png';
 import SearchBar from '../../../../components/search-bar/search-bar';
 import { getFrameItems } from '../../../../services/bbuService';
+import Form from './form';
 
 const Frame = () => {
     const navigate = useNavigate();
     const [items, setItems] = useState([]);
+    const [selectedItem, setSelectedItem] = useState(null);
 
 
     const fetchItems = async () => {
@@ -31,13 +33,28 @@ const Frame = () => {
         navigate('/bike-builder-upgrader');
     };
 
+
+    // Handle click on an item
+    const handleItemClick = (item) => {
+        setSelectedItem(item);
+    };
+
+
+    // Handle closing the form
+    const handleCloseView = () => {
+        setSelectedItem(null);
+    };
+
+    const refreshWaitlist = () => {
+        fetchItems();
+    };
+
     return (
         <div className='frame p-3'>
             <PageLayout
                 leftContent={
                     <div className='parts-content'>
                         <div className='upper-container d-flex'>
-
                             <div className='title'>
                                 Frame
                             </div>
@@ -64,7 +81,7 @@ const Frame = () => {
                                         <div
                                             key={item.frame_id}
                                             className="item-container d-flex"
-                                        // onClick={() => handleItemClick(item)} 
+                                            onClick={() => handleItemClick(item)}
                                         >
                                             <div className="item-image">
                                                 {item.item_image ? (
@@ -74,7 +91,7 @@ const Frame = () => {
                                                     />
                                                 ) : (
                                                     <div className="no-image">
-                                                        No image available
+                                                        No image attached
                                                     </div>
                                                 )}
                                             </div>
@@ -101,9 +118,22 @@ const Frame = () => {
                 }
 
                 rightContent={
-                    <>
 
-                    </>
+                    selectedItem ? (
+                        <div className="form-container">
+                            <Form
+                                selectedItem={selectedItem}
+                                setSelectedItem={setSelectedItem}
+                                setItems={setItems}
+                                refreshWaitlist={refreshWaitlist}
+                                onClose={handleCloseView}
+                            />
+                        </div>
+                    ) : (
+                        <div className="no-selection">
+                            Select an item to view details
+                        </div>
+                    )
                 }
             />
         </div>

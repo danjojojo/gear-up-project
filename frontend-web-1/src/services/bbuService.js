@@ -65,3 +65,14 @@ export const getCockpitItems = async () => {
         throw error;
     }
 };
+
+// Update frame item
+export const updateFrameItem = async (itemId, updatedData) => {
+    try {
+        const response = await api.put(`/bike-builder-upgrader/update-frame/${itemId}`, updatedData);
+        return response.data;
+    } catch (error) {
+        console.error('Error updating item:', error);
+        throw error;
+    }
+};

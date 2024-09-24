@@ -383,7 +383,7 @@ const CockpitForm = ({ waitlistItemID, itemID, itemName, itemPrice, onClose, ref
                 </select>
             </div>
 
-            <div className="headset-cup-type form-group">
+            <div className="input-container form-group">
                 <label htmlFor="headset-cup-type">Headset Cup Type</label>
                 <input
                     type="text"
@@ -396,7 +396,7 @@ const CockpitForm = ({ waitlistItemID, itemID, itemName, itemPrice, onClose, ref
                 />
             </div>
 
-            <div className="stem-material form-group">
+            <div className="input-container form-group">
                 <label htmlFor="stem-material">Stem Material</label>
                 <input
                     type="text"
@@ -409,7 +409,7 @@ const CockpitForm = ({ waitlistItemID, itemID, itemName, itemPrice, onClose, ref
                 />
             </div>
 
-            <div className="handlebar-material form-group">
+            <div className="input-container form-group">
                 <label htmlFor="handlebar-material">Handlebar Material</label>
                 <input
                     type="text"
@@ -422,7 +422,7 @@ const CockpitForm = ({ waitlistItemID, itemID, itemName, itemPrice, onClose, ref
                 />
             </div>
 
-            <div className="item-weight form-group">
+            <div className="input-container form-group">
                 <label htmlFor="item-weight-cockpit">Weight</label>
                 <input
                     type="text"

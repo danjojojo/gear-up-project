@@ -107,7 +107,7 @@ const ForkForm = ({ waitlistItemID, itemID, itemName, itemPrice, onClose, refres
 
             <ImageUploadButton onFileSelect={handleFileSelect} />
 
-            <div className="item-name form-group">
+            <div className="input-container form-group">
                 <label htmlFor="item-name-fork">Name</label>
                 <input
                     type="text"
@@ -119,7 +119,7 @@ const ForkForm = ({ waitlistItemID, itemID, itemName, itemPrice, onClose, refres
                 />
             </div>
 
-            <div className="item-price form-group">
+            <div className=".input-container form-group">
                 <label htmlFor="item-price-fork">Price</label>
                 <input
                     type="text"
@@ -131,7 +131,7 @@ const ForkForm = ({ waitlistItemID, itemID, itemName, itemPrice, onClose, refres
                 />
             </div>
 
-            <div className="item-description form-group">
+            <div className="input-container form-group">
                 <label htmlFor="item-description-fork">Description</label>
                 <input
                     type="text"
@@ -312,7 +312,7 @@ const ForkForm = ({ waitlistItemID, itemID, itemName, itemPrice, onClose, refres
                 </select>
             </div>
 
-            <div className="item-material form-group">
+            <div className="input-container form-group">
                 <label htmlFor="item-material-fork">Material</label>
                 <input
                     type="text"
@@ -325,7 +325,7 @@ const ForkForm = ({ waitlistItemID, itemID, itemName, itemPrice, onClose, refres
                 />
             </div>
 
-            <div className="item-weight form-group">
+            <div className="input-container form-group">
                 <label htmlFor="item-weight-fork">Weight</label>
                 <input
                     type="text"

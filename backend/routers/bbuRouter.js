@@ -1,12 +1,14 @@
 const express = require('express');
 const router = express.Router();
+const upload = require('../middleware/imgUploadMiddleware');
 const { 
     getPartsCount, 
     getFrameItems, 
     getForkItems, 
     getGroupsetItems, 
     getWheelsetItems,
-    getCockpitItems
+    getCockpitItems,
+    updateFrameItem
 } = require('../controllers/bbuController');
 
 router.get('/part-count/:partType', getPartsCount);
@@ -20,5 +22,7 @@ router.get('/groupset-item', getGroupsetItems);
 router.get('/wheelset-item', getWheelsetItems);
 
 router.get('/cockpit-item', getCockpitItems);
+
+router.put('/update-frame/:id', upload.single('item_image'), updateFrameItem);
 
 module.exports = router;
