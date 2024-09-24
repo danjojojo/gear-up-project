@@ -45,6 +45,7 @@ const Frame = () => {
         setSelectedItem(null);
     };
 
+
     const refreshWaitlist = () => {
         fetchItems();
     };
@@ -118,7 +119,6 @@ const Frame = () => {
                 }
 
                 rightContent={
-
                     selectedItem ? (
                         <div className="form-container">
                             <Form

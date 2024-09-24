@@ -1,11 +1,13 @@
-import React, { useState, useEffect } from 'react';
-import exit from "../../../assets/icons/exit.png";
-import del from "../../../assets/icons/delete.png";
-import ImageUploadButton from '../../../components/img-upload-button/img-upload-button';
-import { addCockpit } from '../../../services/waitlistService';
+import React, { useState, useEffect } from "react";
+import exit from "../../../../assets/icons/exit.png";
+import edit from "../../../../assets/icons/edit.png";
+import cancel from "../../../../assets/icons/cancel.png";
+import del from "../../../../assets/icons/delete.png";
+import ImageUploadButton from "../../../../components/img-upload-button/img-upload-button";
+import { base64ToFile } from "../../../../utility/imageUtils";
+import { updateCockpitItem } from "../../../../services/bbuService";
 
-const CockpitForm = ({ waitlistItemID, itemID, itemName, itemPrice, onClose, refreshWaitlist }) => {
-    // States management
+const Form = ({ selectedItem, setSelectedItem, setItems, refreshWaitlist, onClose }) => {
     const [name, setName] = useState('');
     const [price, setPrice] = useState('');
     const [description, setDescription] = useState('');
@@ -26,81 +28,116 @@ const CockpitForm = ({ waitlistItemID, itemID, itemName, itemPrice, onClose, ref
     const [stemMaterial, setStemMaterial] = useState('');
     const [handlebarMaterial, setHandlebarMaterial] = useState('');
     const [weight, setWeight] = useState('');
+    const [isEditing, setIsEditing] = useState(false);
+    const [itemImage, setItemImage] = useState(null)
     const [selectedFile, setSelectedFile] = useState(null);
+    const [originalItem, setOriginalItem] = useState(null);
 
-    // Populate item name and price
+    // Populate fields when a new item is selected
     useEffect(() => {
-        setName(itemName);
-        setPrice(itemPrice);
-    }, [itemName, itemPrice]);
+        if (selectedItem) {
+            const fileExtension = selectedItem.item_image && selectedItem.item_image.startsWith("data:image/png")
+                ? "png"
+                : "jpg";
 
-    // Submit part
-    const handleSubmit = async (e) => {
-        e.preventDefault();
+            const imageBase64 =
+                selectedItem.item_image && !selectedItem.item_image.startsWith("data:image/")
+                    ? `data:image/${fileExtension};base64,${selectedItem.item_image}`
+                    : selectedItem.item_image;
 
-        const formData = new FormData();
-        formData.append('waitlist_item_id', waitlistItemID);
-        formData.append('item_id', itemID);
-        formData.append('description', description);
-        formData.append('seatpost_diameter', seatpostDiameter);
-        formData.append('seatpost_length', seatpostLength);
-        formData.append('seat_clamp_type', seatClampType);
-        formData.append('handlebar_length', handlebarLength);
-        formData.append('handlebar_clamp_diameter', handlebarClampDiameter);
-        formData.append('handlebar_type', handlebarType);
-        formData.append('stem_clamp_diameter', stemClampDiameter);
-        formData.append('stem_length', stemLength);
-        formData.append('stem_angle', stemAngle);
-        formData.append('fork_upper_diameter', forkUpperDiameter);
-        formData.append('headset_type', headsetType);
-        formData.append('headset_upper_diameter', headsetUpperDiameter);
-        formData.append('headset_lower_diameter', headsetLowerDiameter);
-        formData.append('headset_cup_type', headsetCupType);
-        formData.append('stem_material', stemMaterial);
-        formData.append('handlebar_material', handlebarMaterial);
-        formData.append('weight', weight);
+            const imageFile = imageBase64
+                ? base64ToFile(imageBase64, `image.${fileExtension}`)
+                : null;
+
+            setName(selectedItem.item_name || '');
+            setPrice(selectedItem.item_price || '');
+            setDescription(selectedItem.description || '');
+            setSeatpostDiameter(selectedItem.seatpost_diameter || '');
+            setSeatpostLength(selectedItem.seatpost_length || '');
+            setSeatClampType(selectedItem.seat_clamp_type || '');
+            setHandlebarLength(selectedItem.handlebar_length || '');
+            setHandlebarClampDiameter(selectedItem.handlebar_clamp_diameter || '');
+            setHandlebarType(selectedItem.handlebar_type || '');
+            setStemClampDiameter(selectedItem.stem_clamp_diameter || '');
+            setStemLength(selectedItem.stem_length || '');
+            setStemAngle(selectedItem.stem_angle || '');
+            setForkUpperDiameter(selectedItem.fork_upper_diameter || '');
+            setHeadsetType(selectedItem.headset_type || '');
+            setHeadsetUpperDiameter(selectedItem.headset_upper_diameter || '');
+            setHeadsetLowerDiameter(selectedItem.headset_lower_diameter || '');
+            setHeadsetCupType(selectedItem.headset_cup_type || '');
+            setStemMaterial(selectedItem.stem_material || '');
+            setHandlebarMaterial(selectedItem.handlebar_material || '');
+            setWeight(selectedItem.weight || '');
+            setItemImage(imageBase64);
+            setOriginalItem({ ...selectedItem });
+
+            if (imageFile) {
+                handleFileSelect(imageFile);
+            }
+        }
+    }, [selectedItem]);
+
+
+    const handleSubmit = async (event) => {
+        event.preventDefault();
+
+        const updatedData = new FormData();
+        updatedData.append('description', description);
+        updatedData.append('seatpost_diameter', seatpostDiameter);
+        updatedData.append('seatpost_length', seatpostLength);
+        updatedData.append('seat_clamp_type', seatClampType);
+        updatedData.append('handlebar_length', handlebarLength);
+        updatedData.append('handlebar_clamp_diameter', handlebarClampDiameter);
+        updatedData.append('handlebar_type', handlebarType);
+        updatedData.append('stem_clamp_diameter', stemClampDiameter);
+        updatedData.append('stem_length', stemLength);
+        updatedData.append('stem_angle', stemAngle);
+        updatedData.append('fork_upper_diameter', forkUpperDiameter);
+        updatedData.append('headset_type', headsetType);
+        updatedData.append('headset_upper_diameter', headsetUpperDiameter);
+        updatedData.append('headset_lower_diameter', headsetLowerDiameter);
+        updatedData.append('headset_cup_type', headsetCupType);
+        updatedData.append('stem_material', stemMaterial);
+        updatedData.append('handlebar_material', handlebarMaterial);
+        updatedData.append('weight', weight);
+
         if (selectedFile) {
-            formData.append('image', selectedFile);
+            updatedData.append('item_image', selectedFile);
         }
 
-        console.log('Form data being sent:', [...formData]);
+        const updatedItem = await updateCockpitItem(selectedItem.cockpit_id, updatedData);
+        alert("Item updated successfully");
 
-        try {
-            await addCockpit(formData);
-            alert("Item added successfully");
+        setItems((prevItems) =>
+            prevItems.map((item) =>
+                item.cockpit_id === selectedItem.cockpit_id ? updatedItem : item
+            ),
+        );
 
-            // Reset Form
-            setDescription('');
-            setSeatpostDiameter('');
-            setSeatpostLength('');
-            setSeatClampType('');
-            setHandlebarLength('');
-            setHandlebarClampDiameter('');
-            setHandlebarType('');
-            setStemClampDiameter('');
-            setStemLength('');
-            setStemAngle('');
-            setForkUpperDiameter('');
-            setHeadsetType('');
-            setHeadsetUpperDiameter('');
-            setHeadsetLowerDiameter('');
-            setHeadsetCupType('');
-            setStemMaterial('');
-            setHandlebarMaterial('');
-            setWeight('');
-            setSelectedFile(null);
-            onClose();
-            refreshWaitlist();
-
-        } catch (error) {
-            console.error('Failed to add item:', error);
-        }
+        refreshWaitlist();
+        setIsEditing(false);
+        onClose();
     };
+
 
     // Select image file
     const handleFileSelect = (file) => {
         setSelectedFile(file);
     };
+
+    // Handle editing an item
+    const handleEditClick = () => {
+        setOriginalItem({ ...selectedItem });
+        setIsEditing(true);
+    };
+
+    // Handle canceling the edit
+    const handleCancelEdit = async () => {
+        setSelectedItem(originalItem);
+        setIsEditing(false);
+    };
+
 
     return (
         <form className="form-content" onSubmit={handleSubmit}>
@@ -113,14 +150,48 @@ const CockpitForm = ({ waitlistItemID, itemID, itemName, itemPrice, onClose, ref
                         onClick={onClose}
                     />
                 </div>
+                <div className="edit-btn">
+                    {isEditing ? (
+                        <img
+                            src={cancel}
+                            alt="Cancel"
+                            className="cancel-icon"
+                            onClick={handleCancelEdit}
+                        />
+                    ) : (
+                        <img
+                            src={edit}
+                            alt="Edit"
+                            className="edit-icon"
+                            onClick={handleEditClick}
+                        />
+                    )}
+                </div>
                 <div className="del-btn">
-                    <img src={del}
+                    <img
+                        src={del}
                         alt="Delete"
                         className="del-icon" />
                 </div>
             </div>
 
-            <ImageUploadButton onFileSelect={handleFileSelect} />
+            {!isEditing ? (
+                itemImage ? (
+                    <div className="item-image-container">
+                        <img
+                            src={itemImage}
+                            alt="Item"
+                            className="item-image"
+                        />
+                    </div>
+                ) : (
+                    <div className="no-image-container">
+                        No image attached
+                    </div>
+                )
+            ) : (
+                <ImageUploadButton onFileSelect={handleFileSelect} />
+            )}
 
             <div className="input-container form-group">
                 <label htmlFor="item-name-cockpit">Name</label>
@@ -156,6 +227,7 @@ const CockpitForm = ({ waitlistItemID, itemID, itemName, itemPrice, onClose, ref
                     onChange={(e) => setDescription(e.target.value)}
                     placeholder="Enter item description"
                     required
+                    disabled={!isEditing}
                 />
             </div>
 
@@ -168,6 +240,7 @@ const CockpitForm = ({ waitlistItemID, itemID, itemName, itemPrice, onClose, ref
                     value={seatpostDiameter}
                     onChange={(e) => setSeatpostDiameter(e.target.value)}
                     required
+                    disabled={!isEditing}
                 >
                     <option value="">Select Diameter</option>
                     <option value="27.2 mm">27.2 mm</option>
@@ -186,6 +259,7 @@ const CockpitForm = ({ waitlistItemID, itemID, itemName, itemPrice, onClose, ref
                     value={seatpostLength}
                     onChange={(e) => setSeatpostLength(e.target.value)}
                     required
+                    disabled={!isEditing}
                 >
                     <option value="">Select Length</option>
                     <option value="350 mm">350 mm</option>
@@ -203,6 +277,7 @@ const CockpitForm = ({ waitlistItemID, itemID, itemName, itemPrice, onClose, ref
                     value={seatClampType}
                     onChange={(e) => setSeatClampType(e.target.value)}
                     required
+                    disabled={!isEditing}
                 >
                     <option value="">Select Type</option>
                     <option value="Quick Release">Quick Release</option>
@@ -219,6 +294,7 @@ const CockpitForm = ({ waitlistItemID, itemID, itemName, itemPrice, onClose, ref
                     value={handlebarLength}
                     onChange={(e) => setHandlebarLength(e.target.value)}
                     required
+                    disabled={!isEditing}
                 >
                     <option value="">Select Length</option>
                     <option value="680 mm">680 mm</option>
@@ -237,6 +313,7 @@ const CockpitForm = ({ waitlistItemID, itemID, itemName, itemPrice, onClose, ref
                     value={handlebarClampDiameter}
                     onChange={(e) => setHandlebarClampDiameter(e.target.value)}
                     required
+                    disabled={!isEditing}
                 >
                     <option value="">Select Diameter</option>
                     <option value="25.4 mm">25.4 mm</option>
@@ -254,6 +331,7 @@ const CockpitForm = ({ waitlistItemID, itemID, itemName, itemPrice, onClose, ref
                     value={handlebarType}
                     onChange={(e) => setHandlebarType(e.target.value)}
                     required
+                    disabled={!isEditing}
                 >
                     <option value="">Select Type</option>
                     <option value="Flat">Flat</option>
@@ -271,6 +349,7 @@ const CockpitForm = ({ waitlistItemID, itemID, itemName, itemPrice, onClose, ref
                     value={stemClampDiameter}
                     onChange={(e) => setStemClampDiameter(e.target.value)}
                     required
+                    disabled={!isEditing}
                 >
                     <option value="">Select Diameter</option>
                     <option value="25.4 mm">25.4 mm</option>
@@ -288,6 +367,7 @@ const CockpitForm = ({ waitlistItemID, itemID, itemName, itemPrice, onClose, ref
                     value={stemLength}
                     onChange={(e) => setStemLength(e.target.value)}
                     required
+                    disabled={!isEditing}
                 >
                     <option value="">Select Length</option>
                     <option value="60 mm">60 mm</option>
@@ -307,6 +387,7 @@ const CockpitForm = ({ waitlistItemID, itemID, itemName, itemPrice, onClose, ref
                     value={stemAngle}
                     onChange={(e) => setStemAngle(e.target.value)}
                     required
+                    disabled={!isEditing}
                 >
                     <option value="">Select Angle</option>
                     <option value="Negative">Negative</option>
@@ -323,6 +404,7 @@ const CockpitForm = ({ waitlistItemID, itemID, itemName, itemPrice, onClose, ref
                     value={forkUpperDiameter}
                     onChange={(e) => setForkUpperDiameter(e.target.value)}
                     required
+                    disabled={!isEditing}
                 >
                     <option value="">Select Diameter</option>
                     <option value='1 1/8" (28.6 mm)'>1 1/8" (28.6 mm)</option>
@@ -340,6 +422,7 @@ const CockpitForm = ({ waitlistItemID, itemID, itemName, itemPrice, onClose, ref
                     value={headsetType}
                     onChange={(e) => setHeadsetType(e.target.value)}
                     required
+                    disabled={!isEditing}
                 >
                     <option value="">Select Type</option>
                     <option value="Threadless">Threadless</option>
@@ -358,6 +441,7 @@ const CockpitForm = ({ waitlistItemID, itemID, itemName, itemPrice, onClose, ref
                     value={headsetUpperDiameter}
                     onChange={(e) => setHeadsetUpperDiameter(e.target.value)}
                     required
+                    disabled={!isEditing}
                 >
                     <option value="">Select Diameter</option>
                     <option value='1 1/8" (28.6 mm)'>1 1/8" (28.6 mm)</option>
@@ -375,6 +459,7 @@ const CockpitForm = ({ waitlistItemID, itemID, itemName, itemPrice, onClose, ref
                     value={headsetLowerDiameter}
                     onChange={(e) => setHeadsetLowerDiameter(e.target.value)}
                     required
+                    disabled={!isEditing}
                 >
                     <option value="">Select Diameter</option>
                     <option value='1.5" (38.1 mm)'>1.5" (38.1 mm)</option>
@@ -393,6 +478,7 @@ const CockpitForm = ({ waitlistItemID, itemID, itemName, itemPrice, onClose, ref
                     onChange={(e) => setHeadsetCupType(e.target.value)}
                     placeholder="Enter headset cup type"
                     required
+                    disabled={!isEditing}
                 />
             </div>
 
@@ -406,6 +492,7 @@ const CockpitForm = ({ waitlistItemID, itemID, itemName, itemPrice, onClose, ref
                     onChange={(e) => setStemMaterial(e.target.value)}
                     placeholder="Enter stem material"
                     required
+                    disabled={!isEditing}
                 />
             </div>
 
@@ -419,6 +506,7 @@ const CockpitForm = ({ waitlistItemID, itemID, itemName, itemPrice, onClose, ref
                     onChange={(e) => setHandlebarMaterial(e.target.value)}
                     placeholder="Enter handlebar material"
                     required
+                    disabled={!isEditing}
                 />
             </div>
 
@@ -432,16 +520,19 @@ const CockpitForm = ({ waitlistItemID, itemID, itemName, itemPrice, onClose, ref
                     onChange={(e) => setWeight(e.target.value)}
                     placeholder="Enter item weight"
                     required
+                    disabled={!isEditing}
                 />
             </div>
 
-            <div className="submit-container">
-                <button type="submit" className="submit-btn">
-                    Add
-                </button>
-            </div>
+            {isEditing && (
+                <div className="submit-container">
+                    <button type="submit" className="submit-btn">
+                        Save
+                    </button>
+                </div>
+            )}
         </form>
-    );
-};
+    )
+}
 
-export default CockpitForm;
+export default Form;

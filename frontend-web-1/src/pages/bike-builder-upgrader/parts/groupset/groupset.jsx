@@ -6,10 +6,12 @@ import filter from '../../../../assets/icons/filter.png';
 import sort from '../../../../assets/icons/sort.png';
 import SearchBar from '../../../../components/search-bar/search-bar';
 import { getGroupsetItems } from '../../../../services/bbuService';
+import Form from './form';
 
 const Groupset = () => {
     const navigate = useNavigate();
     const [items, setItems] = useState([]);
+    const [selectedItem, setSelectedItem] = useState(null);
 
 
     const fetchItems = async () => {
@@ -29,6 +31,23 @@ const Groupset = () => {
 
     const handleBackClick = () => {
         navigate('/bike-builder-upgrader');
+    };
+
+
+    // Handle click on an item
+    const handleItemClick = (item) => {
+        setSelectedItem(item);
+    };
+
+
+    // Handle closing the form
+    const handleCloseView = () => {
+        setSelectedItem(null);
+    };
+
+
+    const refreshWaitlist = () => {
+        fetchItems();
     };
 
     return (
@@ -64,7 +83,7 @@ const Groupset = () => {
                                         <div
                                             key={item.groupset_id}
                                             className="item-container d-flex"
-                                        // onClick={() => handleItemClick(item)} 
+                                            onClick={() => handleItemClick(item)}
                                         >
                                             <div className="item-image">
                                                 {item.item_image ? (
@@ -101,9 +120,21 @@ const Groupset = () => {
                 }
 
                 rightContent={
-                    <>
-
-                    </>
+                    selectedItem ? (
+                        <div className="form-container">
+                            <Form
+                                selectedItem={selectedItem}
+                                setSelectedItem={setSelectedItem}
+                                setItems={setItems}
+                                refreshWaitlist={refreshWaitlist}
+                                onClose={handleCloseView}
+                            />
+                        </div>
+                    ) : (
+                        <div className="no-selection">
+                            Select an item to view details
+                        </div>
+                    )
                 }
             />
         </div>

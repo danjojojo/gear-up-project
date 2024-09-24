@@ -3,6 +3,10 @@ import { useNavigate } from 'react-router-dom';
 import './bike-builder-upgrader.scss';
 import PageLayout from '../../components/page-layout/page-layout';
 import frame from "../../assets/images/frame.png";
+import fork from "../../assets/images/fork.png";
+import groupset from "../../assets/images/groupset.png";
+import wheelset from "../../assets/images/wheelset.png";
+import cockpit from "../../assets/images/cockpit.png";
 import { getItemCount } from '../../services/bbuService';
 
 const BikeBuilderUpgrader = () => {
@@ -79,7 +83,9 @@ const BikeBuilderUpgrader = () => {
                                 onClick={() => handlePartClick('fork')}
                             >
                                 <div className='content'>
-                                    <div className='image'></div>
+                                    <div className='image'>
+                                        <img src={fork} alt='Frame' />
+                                    </div>
                                     <div className='part-item-count'>
                                         <div className='part fs-6 fw-bold'>Fork</div>
                                         <div className='item-count fw-light fs-7'>{partCounts.fork} items</div>
@@ -92,7 +98,9 @@ const BikeBuilderUpgrader = () => {
                                 onClick={() => handlePartClick('groupset')}
                             >
                                 <div className='content'>
-                                    <div className='image'></div>
+                                    <div className='image'>
+                                        <img src={groupset} alt='Frame' />
+                                    </div>
                                     <div className='part-item-count'>
                                         <div className='part fs-6 fw-bold'>Groupset</div>
                                         <div className='item-count fw-light fs-7'>{partCounts.groupset} items</div>
@@ -107,7 +115,9 @@ const BikeBuilderUpgrader = () => {
                                 onClick={() => handlePartClick('wheelset')}
                             >
                                 <div className='content'>
-                                    <div className='image'></div>
+                                    <div className='image'>
+                                        <img src={wheelset} alt='Frame' />
+                                    </div>
                                     <div className='part-item-count'>
                                         <div className='part fs-6 fw-bold'>Wheelset</div>
                                         <div className='item-count fw-light fs-7'>{partCounts.wheelset} items</div>
@@ -120,7 +130,9 @@ const BikeBuilderUpgrader = () => {
                                 onClick={() => handlePartClick('cockpit')}
                             >
                                 <div className='content'>
-                                    <div className='image'></div>
+                                    <div className='image'>
+                                        <img src={cockpit} alt='Frame' />
+                                    </div>
                                     <div className='part-item-count'>
                                         <div className='part fs-6 fw-bold'>Cockpit</div>
                                         <div className='item-count fw-light fs-7'>{partCounts.cockpit} items</div>

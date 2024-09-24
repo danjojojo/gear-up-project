@@ -6,10 +6,12 @@ import filter from '../../../../assets/icons/filter.png';
 import sort from '../../../../assets/icons/sort.png';
 import SearchBar from '../../../../components/search-bar/search-bar';
 import { getCockpitItems } from '../../../../services/bbuService';
+import Form from './form';
 
 const Cockpit = () => {
     const navigate = useNavigate();
     const [items, setItems] = useState([]);
+    const [selectedItem, setSelectedItem] = useState(null);
 
 
     const fetchItems = async () => {
@@ -31,6 +33,22 @@ const Cockpit = () => {
         navigate('/bike-builder-upgrader');
     };
 
+
+    // Handle click on an item
+    const handleItemClick = (item) => {
+        setSelectedItem(item);
+    };
+
+
+    // Handle closing the form
+    const handleCloseView = () => {
+        setSelectedItem(null);
+    };
+
+
+    const refreshWaitlist = () => {
+        fetchItems();
+    };
     return (
         <div className='cockpit p-3'>
             <PageLayout
@@ -64,7 +82,7 @@ const Cockpit = () => {
                                         <div
                                             key={item.cockpit_id}
                                             className="item-container d-flex"
-                                        // onClick={() => handleItemClick(item)} 
+                                            onClick={() => handleItemClick(item)}
                                         >
                                             <div className="item-image">
                                                 {item.item_image ? (
@@ -101,9 +119,21 @@ const Cockpit = () => {
                 }
 
                 rightContent={
-                    <>
-
-                    </>
+                    selectedItem ? (
+                        <div className="form-container">
+                            <Form
+                                selectedItem={selectedItem}
+                                setSelectedItem={setSelectedItem}
+                                setItems={setItems}
+                                refreshWaitlist={refreshWaitlist}
+                                onClose={handleCloseView}
+                            />
+                        </div>
+                    ) : (
+                        <div className="no-selection">
+                            Select an item to view details
+                        </div>
+                    )
                 }
             />
         </div>

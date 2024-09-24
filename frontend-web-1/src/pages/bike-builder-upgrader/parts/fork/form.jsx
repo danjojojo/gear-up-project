@@ -1,11 +1,13 @@
-import React, { useState, useEffect } from 'react';
-import exit from "../../../assets/icons/exit.png";
-import del from "../../../assets/icons/delete.png";
-import ImageUploadButton from '../../../components/img-upload-button/img-upload-button';
-import { addFork } from '../../../services/waitlistService';
+import React, { useState, useEffect } from "react";
+import exit from "../../../../assets/icons/exit.png";
+import edit from "../../../../assets/icons/edit.png";
+import cancel from "../../../../assets/icons/cancel.png";
+import del from "../../../../assets/icons/delete.png";
+import ImageUploadButton from "../../../../components/img-upload-button/img-upload-button";
+import { base64ToFile } from "../../../../utility/imageUtils";
+import { updateForkItem } from "../../../../services/bbuService";
 
-const ForkForm = ({ waitlistItemID, itemID, itemName, itemPrice, onClose, refreshWaitlist }) => {
-    // States management
+const Form = ({ selectedItem, setSelectedItem, setItems, refreshWaitlist, onClose }) => {
     const [name, setName] = useState('');
     const [price, setPrice] = useState('');
     const [description, setDescription] = useState('');
@@ -21,71 +23,106 @@ const ForkForm = ({ waitlistItemID, itemID, itemName, itemPrice, onClose, refres
     const [brakeMount, setBrakeMount] = useState('');
     const [material, setMaterial] = useState('');
     const [weight, setWeight] = useState('');
+    const [isEditing, setIsEditing] = useState(false);
+    const [itemImage, setItemImage] = useState(null)
     const [selectedFile, setSelectedFile] = useState(null);
+    const [originalItem, setOriginalItem] = useState(null);
 
-    // Populate item name and price
+    // Populate fields when a new item is selected
     useEffect(() => {
-        setName(itemName);
-        setPrice(itemPrice);
-    }, [itemName, itemPrice]);
+        if (selectedItem) {
+            const fileExtension = selectedItem.item_image && selectedItem.item_image.startsWith("data:image/png")
+                ? "png"
+                : "jpg";
 
-    // Submit part
-    const handleSubmit = async (e) => {
-        e.preventDefault();
+            const imageBase64 =
+                selectedItem.item_image && !selectedItem.item_image.startsWith("data:image/")
+                    ? `data:image/${fileExtension};base64,${selectedItem.item_image}`
+                    : selectedItem.item_image;
 
-        const formData = new FormData();
-        formData.append('waitlist_item_id', waitlistItemID);
-        formData.append('item_id', itemID);
-        formData.append('description', description);
-        formData.append('fork_size', forkSize);
-        formData.append('fork_tube_type', forkTubeType);
-        formData.append('fork_tube_upper_diameter', ftUpperDiameter);
-        formData.append('fork_tube_lower_diameter', ftLowerDiameter);
-        formData.append('axle_type', axleType);
-        formData.append('axle_width', axleWidth);
-        formData.append('suspension_type', suspensionType);
-        formData.append('rotor_size', rotorSize);
-        formData.append('max_tire_width', maxTireWidth);
-        formData.append('brake_mount', brakeMount);
-        formData.append('material', material);
-        formData.append('weight', weight);
+            const imageFile = imageBase64
+                ? base64ToFile(imageBase64, `image.${fileExtension}`)
+                : null;
+
+            setName(selectedItem.item_name || '');
+            setPrice(selectedItem.item_price || '');
+            setDescription(selectedItem.description || '');
+            setForkSize(selectedItem.fork_size || '');
+            setForkTubeType(selectedItem.fork_tube_type || '');
+            setFtUpperDiameter(selectedItem.fork_tube_upper_diameter || '');
+            setFtLowerDiameter(selectedItem.fork_tube_lower_diameter || '');
+            setAxleType(selectedItem.axle_type || '');
+            setAxleWidth(selectedItem.axle_width || '');
+            setSuspensionType(selectedItem.suspension_type || '');
+            setRotorSize(selectedItem.rotor_size || '');
+            setMaxTireWidth(selectedItem.max_tire_width || '');
+            setBrakeMount(selectedItem.brake_mount || '');
+            setMaterial(selectedItem.material || '');
+            setWeight(selectedItem.weight || '');
+            setItemImage(imageBase64);
+            setOriginalItem({ ...selectedItem });
+
+            if (imageFile) {
+                handleFileSelect(imageFile);
+            }
+        }
+    }, [selectedItem]);
+
+
+    const handleSubmit = async (event) => {
+        event.preventDefault();
+
+        const updatedData = new FormData();
+        updatedData.append('description', description);
+        updatedData.append('fork_size', forkSize);
+        updatedData.append('fork_tube_type', forkTubeType);
+        updatedData.append('fork_tube_upper_diameter', ftUpperDiameter);
+        updatedData.append('fork_tube_lower_diameter', ftLowerDiameter);
+        updatedData.append('axle_type', axleType);
+        updatedData.append('axle_width', axleWidth);
+        updatedData.append('suspension_type', suspensionType);
+        updatedData.append('rotor_size', rotorSize);
+        updatedData.append('max_tire_width', maxTireWidth);
+        updatedData.append('brake_mount', brakeMount);
+        updatedData.append('material', material);
+        updatedData.append('weight', weight);
+
         if (selectedFile) {
-            formData.append('image', selectedFile);
+            updatedData.append('item_image', selectedFile);
         }
 
-        console.log('Form data being sent:', [...formData]);
+        const updatedItem = await updateForkItem(selectedItem.fork_id, updatedData);
+        alert("Item updated successfully");
 
-        try {
-            await addFork(formData);
-            alert("Item added successfully");
+        setItems((prevItems) =>
+            prevItems.map((item) =>
+                item.fork_id === selectedItem.fork_id ? updatedItem : item
+            ),
+        );
 
-            // Reset Form
-            setDescription('');
-            setForkSize('');
-            setForkTubeType('');
-            setFtUpperDiameter('');
-            setFtLowerDiameter('');
-            setAxleType('');
-            setAxleWidth('');
-            setSuspensionType('');
-            setRotorSize('');
-            setMaxTireWidth('');
-            setBrakeMount('');
-            setMaterial('');
-            setWeight('');
-            setSelectedFile(null);
-            onClose();
-            refreshWaitlist();
-
-        } catch (error) {
-            console.error('Failed to add item:', error);
-        }
+        refreshWaitlist();
+        setIsEditing(false);
+        onClose();
     };
+
 
     // Select image file
     const handleFileSelect = (file) => {
         setSelectedFile(file);
     };
+
+    // Handle editing an item
+    const handleEditClick = () => {
+        setOriginalItem({ ...selectedItem });
+        setIsEditing(true);
+    };
+
+    // Handle canceling the edit
+    const handleCancelEdit = async () => {
+        setSelectedItem(originalItem);
+        setIsEditing(false);
+    };
+
 
     return (
         <form className="form-content" onSubmit={handleSubmit}>
@@ -98,14 +135,48 @@ const ForkForm = ({ waitlistItemID, itemID, itemName, itemPrice, onClose, refres
                         onClick={onClose}
                     />
                 </div>
+                <div className="edit-btn">
+                    {isEditing ? (
+                        <img
+                            src={cancel}
+                            alt="Cancel"
+                            className="cancel-icon"
+                            onClick={handleCancelEdit}
+                        />
+                    ) : (
+                        <img
+                            src={edit}
+                            alt="Edit"
+                            className="edit-icon"
+                            onClick={handleEditClick}
+                        />
+                    )}
+                </div>
                 <div className="del-btn">
-                    <img src={del}
+                    <img
+                        src={del}
                         alt="Delete"
                         className="del-icon" />
                 </div>
             </div>
 
-            <ImageUploadButton onFileSelect={handleFileSelect} />
+            {!isEditing ? (
+                itemImage ? (
+                    <div className="item-image-container">
+                        <img
+                            src={itemImage}
+                            alt="Item"
+                            className="item-image"
+                        />
+                    </div>
+                ) : (
+                    <div className="no-image-container">
+                        No image attached
+                    </div>
+                )
+            ) : (
+                <ImageUploadButton onFileSelect={handleFileSelect} />
+            )}
 
             <div className="input-container form-group">
                 <label htmlFor="item-name-fork">Name</label>
@@ -141,6 +212,7 @@ const ForkForm = ({ waitlistItemID, itemID, itemName, itemPrice, onClose, refres
                     onChange={(e) => setDescription(e.target.value)}
                     placeholder="Enter item description"
                     required
+                    disabled={!isEditing}
                 />
             </div>
 
@@ -153,6 +225,7 @@ const ForkForm = ({ waitlistItemID, itemID, itemName, itemPrice, onClose, refres
                     value={forkSize}
                     onChange={(e) => setForkSize(e.target.value)}
                     required
+                    disabled={!isEditing}
                 >
                     <option value="">Select Size</option>
                     <option value='26"'>26"</option>
@@ -170,6 +243,7 @@ const ForkForm = ({ waitlistItemID, itemID, itemName, itemPrice, onClose, refres
                     value={forkTubeType}
                     onChange={(e) => setForkTubeType(e.target.value)}
                     required
+                    disabled={!isEditing}
                 >
                     <option value="">Select Type</option>
                     <option value="Tapered">Tapered</option>
@@ -186,6 +260,7 @@ const ForkForm = ({ waitlistItemID, itemID, itemName, itemPrice, onClose, refres
                     value={ftUpperDiameter}
                     onChange={(e) => setFtUpperDiameter(e.target.value)}
                     required
+                    disabled={!isEditing}
                 >
                     <option value="">Select Diameter</option>
                     <option value='1 1/8" (28.6 mm)'>1 1/8" (28.6 mm)</option>
@@ -203,6 +278,7 @@ const ForkForm = ({ waitlistItemID, itemID, itemName, itemPrice, onClose, refres
                     value={ftLowerDiameter}
                     onChange={(e) => setFtLowerDiameter(e.target.value)}
                     required
+                    disabled={!isEditing}
                 >
                     <option value="">Select Diameter</option>
                     <option value='1.5" (38.1 mm)'>1.5" (38.1 mm)</option>
@@ -220,6 +296,7 @@ const ForkForm = ({ waitlistItemID, itemID, itemName, itemPrice, onClose, refres
                     value={axleType}
                     onChange={(e) => setAxleType(e.target.value)}
                     required
+                    disabled={!isEditing}
                 >
                     <option value="">Select Type</option>
                     <option value="Quick Release (QR)">Quick Release (QR)</option>
@@ -236,6 +313,7 @@ const ForkForm = ({ waitlistItemID, itemID, itemName, itemPrice, onClose, refres
                     value={axleWidth}
                     onChange={(e) => setAxleWidth(e.target.value)}
                     required
+                    disabled={!isEditing}
                 >
                     <option value="">Select Width</option>
                     <option value="100 mm (Standard)">100 mm (Standard)</option>
@@ -252,6 +330,7 @@ const ForkForm = ({ waitlistItemID, itemID, itemName, itemPrice, onClose, refres
                     value={suspensionType}
                     onChange={(e) => setSuspensionType(e.target.value)}
                     required
+                    disabled={!isEditing}
                 >
                     <option value="">Select Type</option>
                     <option value="Coil">Coil</option>
@@ -268,6 +347,7 @@ const ForkForm = ({ waitlistItemID, itemID, itemName, itemPrice, onClose, refres
                     value={rotorSize}
                     onChange={(e) => setRotorSize(e.target.value)}
                     required
+                    disabled={!isEditing}
                 >
                     <option value="">Select Size</option>
                     <option value="160 mm">160 mm</option>
@@ -285,6 +365,7 @@ const ForkForm = ({ waitlistItemID, itemID, itemName, itemPrice, onClose, refres
                     value={maxTireWidth}
                     onChange={(e) => setMaxTireWidth(e.target.value)}
                     required
+                    disabled={!isEditing}
                 >
                     <option value="">Select Width</option>
                     <option value='2.1"'>2.1"</option>
@@ -304,6 +385,7 @@ const ForkForm = ({ waitlistItemID, itemID, itemName, itemPrice, onClose, refres
                     value={brakeMount}
                     onChange={(e) => setBrakeMount(e.target.value)}
                     required
+                    disabled={!isEditing}
                 >
                     <option value="">Select Mount</option>
                     <option value="Post Mount">Post Mount</option>
@@ -322,6 +404,7 @@ const ForkForm = ({ waitlistItemID, itemID, itemName, itemPrice, onClose, refres
                     onChange={(e) => setMaterial(e.target.value)}
                     placeholder="Enter item material"
                     required
+                    disabled={!isEditing}
                 />
             </div>
 
@@ -335,16 +418,19 @@ const ForkForm = ({ waitlistItemID, itemID, itemName, itemPrice, onClose, refres
                     onChange={(e) => setWeight(e.target.value)}
                     placeholder="Enter item weight"
                     required
+                    disabled={!isEditing}
                 />
             </div>
 
-            <div className="submit-container">
-                <button type="submit" className="submit-btn">
-                    Add
-                </button>
-            </div>
+            {isEditing && (
+                <div className="submit-container">
+                    <button type="submit" className="submit-btn">
+                        Save
+                    </button>
+                </div>
+            )}
         </form>
-    );
-};
+    )
+}
 
-export default ForkForm;
+export default Form;

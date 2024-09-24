@@ -76,3 +76,48 @@ export const updateFrameItem = async (itemId, updatedData) => {
         throw error;
     }
 };
+
+// Update fork item
+export const updateForkItem = async (itemId, updatedData) => {
+    try {
+        const response = await api.put(`/bike-builder-upgrader/update-fork/${itemId}`, updatedData);
+        return response.data;
+    } catch (error) {
+        console.error('Error updating item:', error);
+        throw error;
+    }
+};
+
+// Update groupset item
+export const updateGroupsetItem = async (itemId, updatedData) => {
+    try {
+        const response = await api.put(`/bike-builder-upgrader/update-groupset/${itemId}`, updatedData);
+        return response.data;
+    } catch (error) {
+        console.error('Error updating item:', error);
+        throw error;
+    }
+};
+
+// Update wheelset item
+export const updateWheelsetItem = async (itemId, updatedData) => {
+    try {
+        const response = await api.put(`/bike-builder-upgrader/update-wheelset/${itemId}`, updatedData);
+        return response.data;
+    } catch (error) {
+        console.error('Error updating item:', error);
+        throw error;
+    }
+};
+
+// Update cockpit item
+export const updateCockpitItem = async (itemId, updatedData) => {
+    try {
+        const response = await api.put(`/bike-builder-upgrader/update-cockpit/${itemId}`, updatedData);
+        return response.data;
+    } catch (error) {
+        console.error('Error updating item:', error);
+        throw error;
+    }
+};
+
