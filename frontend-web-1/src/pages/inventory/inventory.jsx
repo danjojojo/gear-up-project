@@ -1,6 +1,6 @@
 import "./inventory.scss";
 import PageLayout from "../../components/page-layout/page-layout";
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import SearchBar from "../../components/search-bar/search-bar";
 import filter from "../../assets/icons/filter.png";
 import sort from "../../assets/icons/sort.png";
@@ -8,6 +8,8 @@ import exit from "../../assets/icons/exit.png";
 import edit from "../../assets/icons/edit.png";
 import del from "../../assets/icons/delete.png";
 import cancel from "../../assets/icons/cancel.png";
+import archive from "../../assets/icons/archive.png";
+import restore from "../../assets/icons/restore.png";
 import ImageUploadButton from "../../components/img-upload-button/img-upload-button";
 import {
     addItem,
@@ -17,6 +19,7 @@ import {
     updateItem,
 } from "../../services/inventoryService";
 import { base64ToFile } from "../../utility/imageUtils";
+import { archiveItem, restoreItem, deleteItem } from "../../services/inventoryService";
 
 const Inventory = () => {
     // State management
@@ -36,6 +39,8 @@ const Inventory = () => {
     const [isEditing, setIsEditing] = useState(false);
     const [itemImage, setItemImage] = useState(null);
     const [originalItem, setOriginalItem] = useState(null);
+    const [showArchived, setShowArchived] = useState(false);
+    const [displayItem, setDisplayItem] = useState(true);
     const [selectedItem, setSelectedItem] = useState({
         item_name: "",
         item_price: "",
@@ -65,24 +70,21 @@ const Inventory = () => {
         }
     };
 
+    // Fetch and display items
+    const fetchItems = useCallback(async () => {
+        try {
+            const data = await displayItems(displayItem);
+            setItems(data);
+        } catch (error) {
+            console.error("Error fetching items:", error);
+        }
+    }, [displayItem]);
+
     // Fetch data on component mount
     useEffect(() => {
         fetchDashboardData();
-    }, []);
-
-    // Fetch and display items
-    useEffect(() => {
-        const fetchItems = async () => {
-            try {
-                const data = await displayItems();
-                setItems(data);
-            } catch (error) {
-                console.error("Error fetching items:", error);
-            }
-        };
-
         fetchItems();
-    }, []);
+    }, [fetchItems]);
 
     // Handle form submission (Add item)
     const handleFormSubmit = async (event) => {
@@ -240,6 +242,7 @@ const Inventory = () => {
             await fetchDashboardData();
             setIsEditing(false);
             setIsAddingStock(false);
+            setViewingItem(false)
         } catch (error) {
             alert("An error occurred while updating the item");
         }
@@ -254,6 +257,70 @@ const Inventory = () => {
     const handleFileSelect = (file) => {
         setSelectedFile(file);
     };
+
+    // Handle archive item click
+    const handleActiveItemClick = () => {
+        setDisplayItem(true)
+        setShowArchived(false)
+        setViewingItem(null);
+    }
+    // Handle archive item click
+    const handleArchiveItemClick = () => {
+        setDisplayItem(false)
+        setShowArchived(true)
+        setViewingItem(null);
+    }
+
+    // Archive item
+    const handleArchiveItem = async (item_id) => {
+        try {
+            await archiveItem(item_id);
+            alert("Item archived successfully");
+
+            setViewingItem(false);
+            fetchDashboardData();
+            fetchItems();
+        } catch (error) {
+            console.error("Error archiving item:", error);
+            alert("An error occurred while archiving the item");
+        }
+    }
+
+    // Restore item
+    const handleRestoreItem = async (item_id) => {
+        try {
+            await restoreItem(item_id);
+            alert("Item restored successfully");
+
+            setViewingItem(false);
+            setDisplayItem(true)
+            setShowArchived(false)
+            fetchDashboardData();
+            fetchItems();
+        } catch (error) {
+            console.error("Error restoring item:", error);
+            alert("An error occurred while restoring the item");
+        }
+    }
+
+    // Delete item
+    const handleDeleteItem = async (item_id) => {
+        const confirmDelete = window.confirm("Are you sure you want to delete this item? This action cannot be undone.");
+
+        if (!confirmDelete) return;
+
+        try {
+            await deleteItem(item_id);
+            alert("Item deleted successfully");
+
+            setViewingItem(false);
+            fetchDashboardData();
+            fetchItems();
+        } catch (error) {
+            console.error("Error deleting item:", error);
+            alert("An error occurred while deleting the item");
+        }
+    }
 
     // Reset the form fields
     const resetForm = () => {
@@ -286,6 +353,15 @@ const Inventory = () => {
                             <button className="sort">
                                 <img src={sort} alt="Sort" className="button-icon" />
                             </button>
+                            {showArchived ? (
+                                <button className="active" onClick={handleActiveItemClick}>
+                                    Active Items
+                                </button>
+                            ) : (
+                                <button className="archive" onClick={handleArchiveItemClick}>
+                                    Archived Items
+                                </button>
+                            )}
                         </div>
 
                         <div className="lower-container">
@@ -366,7 +442,14 @@ const Inventory = () => {
                                             />
                                         </div>
                                         <div className="edit-btn">
-                                            {isEditing ? (
+                                            {showArchived ? (
+                                                <img
+                                                    src={restore}
+                                                    alt="Restore"
+                                                    className="restore-icon"
+                                                    onClick={() => handleRestoreItem(selectedItem.item_id)}
+                                                />
+                                            ) : isEditing ? (
                                                 <img
                                                     src={cancel}
                                                     alt="Cancel"
@@ -383,7 +466,21 @@ const Inventory = () => {
                                             )}
                                         </div>
                                         <div className="del-btn">
-                                            <img src={del} alt="Delete" className="del-icon" />
+                                            {showArchived ? (
+                                                <img
+                                                    src={del}
+                                                    alt="Delete"
+                                                    className="del-icon"
+                                                    onClick={() => handleDeleteItem(selectedItem.item_id)}
+                                                />
+                                            ) : (
+                                                <img
+                                                    src={archive}
+                                                    alt="Archive"
+                                                    className="archive-icon"
+                                                    onClick={() => handleArchiveItem(selectedItem.item_id)}
+                                                />
+                                            )}
                                         </div>
                                     </div>
 

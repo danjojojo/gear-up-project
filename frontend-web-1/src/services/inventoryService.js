@@ -23,9 +23,11 @@ export const addItem = async (itemData) => {
 };
 
 // Display items
-export const displayItems = async () => {
+export const displayItems = async (archived) => {
     try {
-        const response = await api.get('/inventory/display-item');
+        const response = await api.get(`/inventory/display-item`, {
+            params: { archived }
+        });
         return response.data;
     } catch (error) {
         console.error('Error fetching items:', error);
@@ -53,5 +55,38 @@ export const updateItem = async (itemId, updatedData) => {
     } catch (error) {
         console.error('Error updating item:', error);
         throw error;
+    }
+};
+
+// Archive item
+export const archiveItem = async (item_id) => {
+    try {
+        const response = await api.put(`/inventory/archive-item/${item_id}`);
+        return response.data; 
+    } catch (error) {
+        console.error('Error updating item status:', error);
+        throw error; 
+    }
+};
+
+// Restore item
+export const restoreItem = async (item_id) => { 
+    try {
+        const response = await api.put(`/inventory/restore-item/${item_id}`);
+        return response.data; 
+    } catch (error) {
+        console.error('Error restoring item:', error);
+        throw error; 
+    }
+};
+
+// Delete item
+export const deleteItem = async (item_id) => { 
+    try {
+        const response = await api.put(`/inventory/delete-item/${item_id}`);
+        return response.data; 
+    } catch (error) {
+        console.error('Error deleting item:', error);
+        throw error; 
     }
 };

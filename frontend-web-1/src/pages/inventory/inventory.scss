@@ -8,7 +8,9 @@
             .upper-container {
                 height: 7%;
 
-                .add-btn {
+                .add-btn,
+                .archive,
+                .active {
                     width: 15%;
                     margin: 5px;
                     font-size: 12px;
@@ -34,7 +36,7 @@
                 }
 
                 .search-bar {
-                    width: 75%;
+                    width: 60%;
                     margin: 5px;
                 }
 
@@ -209,14 +211,14 @@
                         }
                     }
 
-                    .edit-btn,
-                    .cancel-btn {
+                    .edit-btn {
                         width: 15%;
                         display: flex;
                         justify-content: end;
 
                         .edit-icon,
-                        .cancel-icon {
+                        .cancel-icon,
+                        .restore-icon {
                             height: 20px;
                             width: 20px;
                             cursor: pointer;
@@ -229,7 +231,8 @@
                         display: flex;
                         justify-content: end;
 
-                        .del-icon {
+                        .del-icon,
+                        .archive-icon {
                             height: 20px;
                             width: 20px;
                             cursor: pointer;
@@ -445,7 +448,7 @@
                     }
                 }
 
-                .item-status{
+                .item-status {
                     height: 5%;
                     margin-top: 15px;
                     font-size: 12px;

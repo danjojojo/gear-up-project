@@ -18,6 +18,8 @@ const getWaitlistItems = async (req, res) => {
                 items i
             ON 
                 w.item_id = i.item_id
+            WHERE 
+                i.status = true 
             ORDER BY 
                 w.date_created DESC;
         `;
