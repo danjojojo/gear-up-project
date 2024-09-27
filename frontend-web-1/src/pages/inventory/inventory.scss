@@ -84,6 +84,12 @@
                     overflow-y: auto;
                     display: block;
 
+                    .no-items-message {
+                        display: flex;
+                        justify-content: center;
+                        font-size: 12px;
+                        color: #888
+                    }
 
                     .item-container {
                         cursor: pointer;
@@ -312,15 +318,50 @@
                         align-self: center;
                     }
 
-                    .increment-btn {
-                        width: 7% !important;
-                    }
-
-                    .stock-btn,
-                    .increment-btn {
+                    .stock-btn {
                         align-self: center;
                         height: 30px;
                         width: 40%;
+                        font-size: 12px;
+                        background-color: #f9f9f9;
+                        border: 1px solid #ccc;
+                        border-radius: 5px;
+                        cursor: pointer;
+                        outline: none;
+                        transition: background-color 0.2s ease, border-color 0.2s ease;
+                        align-items: center;
+                        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+
+                        &:hover,
+                        &:focus {
+                            background-color: #fff;
+                            border-color: #888;
+                        }
+
+                        &:active {
+                            background-color: #e6e6e6;
+                        }
+                    }
+                }
+
+                .add-stock-container {
+                    height: 5%;
+                    align-items: center;
+
+                    input {
+                        height: 30px;
+                        width: 90%;
+                        padding: 5px;
+                        font-size: 12px;
+                        border: 1px solid #ddd;
+                        border-radius: 5px;
+                        align-content: center;
+                    }
+
+                    .increment-btn {
+                        align-self: center;
+                        height: 30px;
+                        width: 7%;
                         font-size: 12px;
                         background-color: #f9f9f9;
                         border: 1px solid #ccc;
@@ -398,13 +439,6 @@
                     height: 5%;
                     align-content: center;
 
-                    label {
-                        display: block;
-                        font-size: 12px;
-                        color: #555;
-                        margin-bottom: 5px;
-                    }
-
                     input {
                         width: 100%;
                         padding: 5px;
@@ -460,7 +494,7 @@
                 }
 
                 .submit-container {
-                    height: 12%;
+                    height: 7%;
                     align-content: end;
 
                     .submit-btn {

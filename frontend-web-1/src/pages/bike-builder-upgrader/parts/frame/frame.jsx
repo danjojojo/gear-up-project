@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import './frame.scss';
 import PageLayout from '../../../../components/page-layout/page-layout';
@@ -12,21 +12,23 @@ const Frame = () => {
     const navigate = useNavigate();
     const [items, setItems] = useState([]);
     const [selectedItem, setSelectedItem] = useState(null);
+    const [showArchived, setShowArchived] = useState(false);
+    const [displayItem, setDisplayItem] = useState(true);
 
 
-    const fetchItems = async () => {
+    const fetchItems = useCallback(async () => {
         try {
-            const data = await getFrameItems();
+            const data = await getFrameItems(displayItem);
             setItems(data);
         } catch (error) {
             console.error('Error fetching frame items:', error);
         }
-    }
+    }, [displayItem]);
 
 
     useEffect(() => {
         fetchItems();
-    }, []);
+    }, [fetchItems]);
 
 
     const handleBackClick = () => {
@@ -50,6 +52,22 @@ const Frame = () => {
         fetchItems();
     };
 
+
+    // Handle archive item click
+    const handleActiveItemClick = () => {
+        setDisplayItem(true)
+        setShowArchived(false)
+        handleCloseView();
+    }
+
+
+    // Handle archive item click
+    const handleArchiveItemClick = () => {
+        setDisplayItem(false)
+        setShowArchived(true)
+        handleCloseView();
+    }
+    
     return (
         <div className='frame p-3'>
             <PageLayout
@@ -73,11 +91,25 @@ const Frame = () => {
                             <button className='sort'>
                                 <img src={sort} alt='Sort' className='button-icon' />
                             </button>
+
+                            {showArchived ? (
+                                <button className="active" onClick={handleActiveItemClick}>
+                                    Active Items
+                                </button>
+                            ) : (
+                                <button className="archive" onClick={handleArchiveItemClick}>
+                                    Archived Items
+                                </button>
+                            )}
                         </div>
 
                         <div className='lower-container'>
                             <div className='lower-content'>
-                                {items.length > 0 ? (
+                                {items.length === 0 ? (
+                                    <div className="no-items-message">
+                                        {displayItem === false ? 'No archived items' : 'No active items'}
+                                    </div>
+                                ) : (
                                     items.map((item) => (
                                         <div
                                             key={item.frame_id}
@@ -108,10 +140,6 @@ const Frame = () => {
                                             </div>
                                         </div>
                                     ))
-                                ) : (
-                                    <div className='no-item'>
-                                        No items in the frame section
-                                    </div>
                                 )}
                             </div>
                         </div>
@@ -127,6 +155,7 @@ const Frame = () => {
                                 setItems={setItems}
                                 refreshWaitlist={refreshWaitlist}
                                 onClose={handleCloseView}
+                                showArchived={showArchived}
                             />
                         </div>
                     ) : (

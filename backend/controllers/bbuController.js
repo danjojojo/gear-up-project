@@ -9,22 +9,45 @@ const getPartsCount = async (req, res) => {
         'cockpit', 'headset', 'handlebar', 'stem', 'hubs'
     ];
 
+    // Validate the partType against the allowed values
     if (!validPartTypes.includes(partType)) {
         return res.status(400).json({ error: 'Invalid part type' });
     }
 
     try {
-        const query = `SELECT COUNT(*) AS count FROM ${partType}`;
+        // Use a parameterized query to avoid SQL injection
+        const query = `
+        SELECT 
+            COUNT(*) AS count
+        FROM 
+            ${partType} p
+        JOIN 
+            items i
+        ON 
+            p.item_id = i.item_id
+        WHERE 
+            i.status = true 
+            AND p.status = true;
+        `;
+
         const result = await pool.query(query);
-        res.json({ count: result.rows[0].count });
+
+        // Check if the result has any rows
+        if (result.rows.length === 0) {
+            return res.json({ count: 0 }); // Return 0 count if no rows found
+        }
+
+        res.json({ count: parseInt(result.rows[0].count, 10) });
     } catch (error) {
-        console.error(`Error fetching count for ${partType}:`, error);
+        console.error(`Error fetching count for ${partType}:`, error.message);
         res.status(500).json({ error: 'Internal server error' });
     }
 };
 
 // Get frame items
 const getFrameItems = async (req, res) => {
+    const { archived } = req.query;
+
     try {
         const query = `
             SELECT 
@@ -32,15 +55,19 @@ const getFrameItems = async (req, res) => {
                 i.item_name,
                 i.item_price,
                 encode(f.image, 'base64') AS item_image
-                FROM 
-                    frame f
-                JOIN 
-                    items i
-                ON 
-                    f.item_id = i.item_id;
+            FROM 
+                frame f
+            JOIN 
+                items i
+            ON 
+                f.item_id = i.item_id
+            WHERE 
+                i.status = true 
+                AND f.status = $1;
         `;
-        const result = await pool.query(query);
-        res.status(200).json(result.rows);
+
+        const { rows } = await pool.query(query, [archived === 'true']);
+        res.json(rows);
     } catch (error) {
         console.error('Error fetching frame items:', error);
         res.status(500).json({ error: 'Internal Server Error' });
@@ -49,6 +76,8 @@ const getFrameItems = async (req, res) => {
 
 // Get fork items
 const getForkItems = async (req, res) => {
+    const { archived } = req.query;
+
     try {
         const query = `
             SELECT 
@@ -56,15 +85,19 @@ const getForkItems = async (req, res) => {
                 i.item_name,
                 i.item_price,
                 encode(f.image, 'base64') AS item_image
-                FROM 
-                    fork f
-                JOIN 
-                    items i
-                ON 
-                    f.item_id = i.item_id;
+            FROM 
+                fork f
+            JOIN 
+                items i
+            ON 
+                f.item_id = i.item_id
+            WHERE 
+                i.status = true 
+                AND f.status = $1;
         `;
-        const result = await pool.query(query);
-        res.status(200).json(result.rows);
+
+        const { rows } = await pool.query(query, [archived === 'true']);
+        res.json(rows);
     } catch (error) {
         console.error('Error fetching fork items:', error);
         res.status(500).json({ error: 'Internal Server Error' });
@@ -73,6 +106,8 @@ const getForkItems = async (req, res) => {
 
 // Get groupset items
 const getGroupsetItems = async (req, res) => {
+    const { archived } = req.query;
+
     try {
         const query = `
             SELECT 
@@ -85,10 +120,14 @@ const getGroupsetItems = async (req, res) => {
                 JOIN 
                     items i
                 ON 
-                    g.item_id = i.item_id;
+                    g.item_id = i.item_id
+                WHERE 
+                    i.status = true 
+                    AND g.status = $1;
         `;
-        const result = await pool.query(query);
-        res.status(200).json(result.rows);
+
+        const { rows } = await pool.query(query, [archived === 'true']);
+        res.json(rows);
     } catch (error) {
         console.error('Error fetching groupset items:', error);
         res.status(500).json({ error: 'Internal Server Error' });
@@ -97,6 +136,8 @@ const getGroupsetItems = async (req, res) => {
 
 // Get wheelset items
 const getWheelsetItems = async (req, res) => {
+    const { archived } = req.query;
+
     try {
         const query = `
             SELECT 
@@ -109,10 +150,14 @@ const getWheelsetItems = async (req, res) => {
                 JOIN 
                     items i
                 ON 
-                    w.item_id = i.item_id;
+                    w.item_id = i.item_id
+                WHERE 
+                    i.status = true 
+                    AND w.status = $1;
         `;
-        const result = await pool.query(query);
-        res.status(200).json(result.rows);
+
+        const { rows } = await pool.query(query, [archived === 'true']);
+        res.json(rows);
     } catch (error) {
         console.error('Error fetching wheelset items:', error);
         res.status(500).json({ error: 'Internal Server Error' });
@@ -121,6 +166,8 @@ const getWheelsetItems = async (req, res) => {
 
 // Get cockpit items
 const getCockpitItems = async (req, res) => {
+    const { archived } = req.query;
+
     try {
         const query = `
             SELECT 
@@ -133,10 +180,14 @@ const getCockpitItems = async (req, res) => {
                 JOIN 
                     items i
                 ON 
-                    c.item_id = i.item_id;
+                    c.item_id = i.item_id
+                WHERE 
+                    i.status = true 
+                    AND c.status = $1;
         `;
-        const result = await pool.query(query);
-        res.status(200).json(result.rows);
+        
+        const { rows } = await pool.query(query, [archived === 'true']);
+        res.json(rows);
     } catch (error) {
         console.error('Error fetching cockpit items:', error);
         res.status(500).json({ error: 'Internal Server Error' });
@@ -527,6 +578,486 @@ const updateCockpitItem = async (req, res) => {
     }
 };
 
+// Archive  frame item
+const archiveFrameItem = async (req, res) => {
+    const { frame_id } = req.params;
+
+    try {
+        const query = `
+            UPDATE frame
+            SET status = false
+            WHERE frame_id = $1
+            RETURNING *; 
+        `;
+        const result = await pool.query(query, [frame_id]);
+
+        if (result.rowCount === 0) {
+            return res.status(404).json({ message: 'Item not found' });
+        }
+
+        res.status(200).json({
+            message: 'Item archived successfully',
+            item: result.rows[0],
+        });
+    } catch (error) {
+        console.error('Error archiving item:', error);
+        res.status(500).json({ error: 'Internal Server Error' });
+    }
+};
+
+// Archive fork item
+const archiveForkItem = async (req, res) => {
+    const { fork_id } = req.params;
+
+    try {
+        const query = `
+            UPDATE fork
+            SET status = false
+            WHERE fork_id = $1
+            RETURNING *; 
+        `;
+        const result = await pool.query(query, [fork_id]);
+
+        if (result.rowCount === 0) {
+            return res.status(404).json({ message: 'Item not found' });
+        }
+
+        res.status(200).json({
+            message: 'Item archived successfully',
+            item: result.rows[0],
+        });
+    } catch (error) {
+        console.error('Error archiving item:', error);
+        res.status(500).json({ error: 'Internal Server Error' });
+    }
+};
+
+// Archive groupset item
+const archiveGroupsetItem = async (req, res) => {
+    const { groupset_id } = req.params;
+
+    try {
+        const query = `
+            UPDATE groupset
+            SET status = false
+            WHERE groupset_id = $1
+            RETURNING *; 
+        `;
+        const result = await pool.query(query, [groupset_id]);
+
+        if (result.rowCount === 0) {
+            return res.status(404).json({ message: 'Item not found' });
+        }
+
+        res.status(200).json({
+            message: 'Item archived successfully',
+            item: result.rows[0],
+        });
+    } catch (error) {
+        console.error('Error archiving item:', error);
+        res.status(500).json({ error: 'Internal Server Error' });
+    }
+};
+
+// Archive wheelset item
+const archiveWheelsetItem = async (req, res) => {
+    const { wheelset_id } = req.params;
+
+    try {
+        const query = `
+            UPDATE wheelset
+            SET status = false
+            WHERE wheelset_id = $1
+            RETURNING *; 
+        `;
+        const result = await pool.query(query, [wheelset_id]);
+
+        if (result.rowCount === 0) {
+            return res.status(404).json({ message: 'Item not found' });
+        }
+
+        res.status(200).json({
+            message: 'Item archived successfully',
+            item: result.rows[0],
+        });
+    } catch (error) {
+        console.error('Error archiving item:', error);
+        res.status(500).json({ error: 'Internal Server Error' });
+    }
+};
+
+// Archive cockpit item
+const archiveCockpitItem = async (req, res) => {
+    const { cockpit_id } = req.params;
+
+    try {
+        const query = `
+            UPDATE cockpit
+            SET status = false
+            WHERE cockpit_id = $1
+            RETURNING *; 
+        `;
+        const result = await pool.query(query, [cockpit_id]);
+
+        if (result.rowCount === 0) {
+            return res.status(404).json({ message: 'Item not found' });
+        }
+
+        res.status(200).json({
+            message: 'Item archived successfully',
+            item: result.rows[0],
+        });
+    } catch (error) {
+        console.error('Error archiving item:', error);
+        res.status(500).json({ error: 'Internal Server Error' });
+    }
+};
+
+// Restore frame item
+const restoreFrameItem = async (req, res) => {
+    const { frame_id } = req.params;
+
+    try {
+        const query = `
+            UPDATE frame
+            SET status = true
+            WHERE frame_id = $1
+            RETURNING *; 
+        `;
+        const result = await pool.query(query, [frame_id]);
+
+        // Check if the item was found and updated
+        if (result.rowCount === 0) {
+            return res.status(404).json({ message: 'Item not found' });
+        }
+
+        // Send a success response with the updated item
+        res.status(200).json({
+            message: 'Item restored successfully',
+            item: result.rows[0], // Return the restored item details
+        });
+    } catch (error) {
+        console.error('Error restoring item:', error);
+        res.status(500).json({ error: 'Internal Server Error' });
+    }
+};
+
+// Restore fork item
+const restoreForkItem = async (req, res) => {
+    const { fork_id } = req.params;
+
+    try {
+        const query = `
+            UPDATE fork
+            SET status = true
+            WHERE fork_id = $1
+            RETURNING *; 
+        `;
+        const result = await pool.query(query, [fork_id]);
+
+        // Check if the item was found and updated
+        if (result.rowCount === 0) {
+            return res.status(404).json({ message: 'Item not found' });
+        }
+
+        // Send a success response with the updated item
+        res.status(200).json({
+            message: 'Item restored successfully',
+            item: result.rows[0], // Return the restored item details
+        });
+    } catch (error) {
+        console.error('Error restoring item:', error);
+        res.status(500).json({ error: 'Internal Server Error' });
+    }
+};
+
+// Restore groupset item
+const restoreGroupsetItem = async (req, res) => {
+    const { groupset_id } = req.params;
+
+    try {
+        const query = `
+            UPDATE groupset
+            SET status = true
+            WHERE groupset_id = $1
+            RETURNING *; 
+        `;
+        const result = await pool.query(query, [groupset_id]);
+
+        // Check if the item was found and updated
+        if (result.rowCount === 0) {
+            return res.status(404).json({ message: 'Item not found' });
+        }
+
+        // Send a success response with the updated item
+        res.status(200).json({
+            message: 'Item restored successfully',
+            item: result.rows[0], // Return the restored item details
+        });
+    } catch (error) {
+        console.error('Error restoring item:', error);
+        res.status(500).json({ error: 'Internal Server Error' });
+    }
+};
+
+// Restore wheelset item
+const restoreWheelsetItem = async (req, res) => {
+    const { wheelset_id } = req.params;
+
+    try {
+        const query = `
+            UPDATE wheelset
+            SET status = true
+            WHERE wheelset_id = $1
+            RETURNING *; 
+        `;
+        const result = await pool.query(query, [wheelset_id]);
+
+        // Check if the item was found and updated
+        if (result.rowCount === 0) {
+            return res.status(404).json({ message: 'Item not found' });
+        }
+
+        // Send a success response with the updated item
+        res.status(200).json({
+            message: 'Item restored successfully',
+            item: result.rows[0], // Return the restored item details
+        });
+    } catch (error) {
+        console.error('Error restoring item:', error);
+        res.status(500).json({ error: 'Internal Server Error' });
+    }
+};
+
+// Restore cockpit item
+const restoreCockpitItem = async (req, res) => {
+    const { cockpit_id } = req.params;
+
+    try {
+        const query = `
+            UPDATE cockpit
+            SET status = true
+            WHERE cockpit_id = $1
+            RETURNING *; 
+        `;
+        const result = await pool.query(query, [cockpit_id]);
+
+        // Check if the item was found and updated
+        if (result.rowCount === 0) {
+            return res.status(404).json({ message: 'Item not found' });
+        }
+
+        // Send a success response with the updated item
+        res.status(200).json({
+            message: 'Item restored successfully',
+            item: result.rows[0], // Return the restored item details
+        });
+    } catch (error) {
+        console.error('Error restoring item:', error);
+        res.status(500).json({ error: 'Internal Server Error' });
+    }
+};
+
+// Delete frame item
+const deleteFrameItem = async (req, res) => {
+    const { frame_id } = req.params;
+
+    try {
+        const getItemQuery = `
+            SELECT item_id FROM frame WHERE frame_id = $1;
+        `;
+        const getItemResult = await pool.query(getItemQuery, [frame_id]);
+
+        if (getItemResult.rowCount === 0) {
+            return res.status(404).json({ message: 'Frame not found' });
+        }
+
+        const item_id = getItemResult.rows[0].item_id;
+
+        const deleteQuery = `
+            DELETE FROM frame WHERE frame_id = $1 RETURNING *;
+        `;
+        const deleteResult = await pool.query(deleteQuery, [frame_id]);
+
+        const updateItemQuery = `
+            UPDATE items
+            SET bike_parts = NULL, bb_bu_status = FALSE
+            WHERE item_id = $1
+            RETURNING *;
+        `;
+        const updateResult = await pool.query(updateItemQuery, [item_id]);
+
+        res.status(200).json({
+            message: 'Item deleted successfully',
+            frame: deleteResult.rows[0],
+            updatedItem: updateResult.rows[0]
+        });
+    } catch (error) {
+        console.error('Error deleting item:', error);
+        res.status(500).json({ error: 'Internal Server Error' });
+    }
+};
+
+// Delete fork item
+const deleteForkItem = async (req, res) => {
+    const { fork_id } = req.params;
+
+    try {
+        const getItemQuery = `
+            SELECT item_id FROM fork WHERE fork_id = $1;
+        `;
+        const getItemResult = await pool.query(getItemQuery, [fork_id]);
+
+        if (getItemResult.rowCount === 0) {
+            return res.status(404).json({ message: 'Fork not found' });
+        }
+
+        const item_id = getItemResult.rows[0].item_id;
+
+        const deleteQuery = `
+            DELETE FROM fork WHERE fork_id = $1 RETURNING *;
+        `;
+        const deleteResult = await pool.query(deleteQuery, [fork_id]);
+
+        const updateItemQuery = `
+            UPDATE items
+            SET bike_parts = NULL, bb_bu_status = FALSE
+            WHERE item_id = $1
+            RETURNING *;
+        `;
+        const updateResult = await pool.query(updateItemQuery, [item_id]);
+
+        res.status(200).json({
+            message: 'Item deleted successfully',
+            fork: deleteResult.rows[0],
+            updatedItem: updateResult.rows[0]
+        });
+    } catch (error) {
+        console.error('Error deleting item:', error);
+        res.status(500).json({ error: 'Internal Server Error' });
+    }
+};
+
+// Delete groupset item
+const deleteGroupsetItem = async (req, res) => {
+    const { groupset_id } = req.params;
+
+    try {
+        const getItemQuery = `
+            SELECT item_id FROM groupset WHERE groupset_id = $1;
+        `;
+        const getItemResult = await pool.query(getItemQuery, [groupset_id]);
+
+        if (getItemResult.rowCount === 0) {
+            return res.status(404).json({ message: 'Groupset not found' });
+        }
+
+        const item_id = getItemResult.rows[0].item_id;
+
+        const deleteQuery = `
+            DELETE FROM groupset WHERE groupset_id = $1 RETURNING *;
+        `;
+        const deleteResult = await pool.query(deleteQuery, [groupset_id]);
+
+        const updateItemQuery = `
+            UPDATE items
+            SET bike_parts = NULL, bb_bu_status = FALSE
+            WHERE item_id = $1
+            RETURNING *;
+        `;
+        const updateResult = await pool.query(updateItemQuery, [item_id]);
+
+        res.status(200).json({
+            message: 'Item deleted successfully',
+            groupset: deleteResult.rows[0],
+            updatedItem: updateResult.rows[0]
+        });
+    } catch (error) {
+        console.error('Error deleting item:', error);
+        res.status(500).json({ error: 'Internal Server Error' });
+    }
+};
+
+// Delete wheelset item
+const deleteWheelsetItem = async (req, res) => {
+    const { wheelset_id } = req.params;
+
+    try {
+        const getItemQuery = `
+            SELECT item_id FROM wheelset WHERE wheelset_id = $1;
+        `;
+        const getItemResult = await pool.query(getItemQuery, [wheelset_id]);
+
+        if (getItemResult.rowCount === 0) {
+            return res.status(404).json({ message: 'Wheelset not found' });
+        }
+
+        const item_id = getItemResult.rows[0].item_id;
+
+        const deleteQuery = `
+            DELETE FROM wheelset WHERE wheelset_id = $1 RETURNING *;
+        `;
+        const deleteResult = await pool.query(deleteQuery, [wheelset_id]);
+
+        const updateItemQuery = `
+            UPDATE items
+            SET bike_parts = NULL, bb_bu_status = FALSE
+            WHERE item_id = $1
+            RETURNING *;
+        `;
+        const updateResult = await pool.query(updateItemQuery, [item_id]);
+
+        res.status(200).json({
+            message: 'Item deleted successfully',
+            wheelset: deleteResult.rows[0],
+            updatedItem: updateResult.rows[0]
+        });
+    } catch (error) {
+        console.error('Error deleting item:', error);
+        res.status(500).json({ error: 'Internal Server Error' });
+    }
+};
+
+// Delete cockpit item
+const deleteCockpitItem = async (req, res) => {
+    const { cockpit_id } = req.params;
+
+    try {
+        const getItemQuery = `
+            SELECT item_id FROM cockpit WHERE cockpit_id = $1;
+        `;
+        const getItemResult = await pool.query(getItemQuery, [cockpit_id]);
+
+        if (getItemResult.rowCount === 0) {
+            return res.status(404).json({ message: 'Cockpit not found' });
+        }
+
+        const item_id = getItemResult.rows[0].item_id;
+
+        const deleteQuery = `
+            DELETE FROM cockpit WHERE cockpit_id = $1 RETURNING *;
+        `;
+        const deleteResult = await pool.query(deleteQuery, [cockpit_id]);
+
+        const updateItemQuery = `
+            UPDATE items
+            SET bike_parts = NULL, bb_bu_status = FALSE
+            WHERE item_id = $1
+            RETURNING *;
+        `;
+        const updateResult = await pool.query(updateItemQuery, [item_id]);
+
+        res.status(200).json({
+            message: 'Item deleted successfully',
+            cockpit: deleteResult.rows[0],
+            updatedItem: updateResult.rows[0]
+        });
+    } catch (error) {
+        console.error('Error deleting item:', error);
+        res.status(500).json({ error: 'Internal Server Error' });
+    }
+};
+
 
 module.exports = {
     getPartsCount,
@@ -535,9 +1066,28 @@ module.exports = {
     getGroupsetItems,
     getWheelsetItems,
     getCockpitItems,
+
     updateFrameItem,
     updateForkItem,
     updateGroupsetItem,
     updateWheelsetItem,
-    updateCockpitItem
+    updateCockpitItem,
+
+    archiveFrameItem,
+    archiveForkItem,
+    archiveGroupsetItem,
+    archiveWheelsetItem,
+    archiveCockpitItem,
+
+    restoreFrameItem,
+    restoreForkItem,
+    restoreGroupsetItem,
+    restoreWheelsetItem,
+    restoreCockpitItem,
+
+    deleteFrameItem,
+    deleteForkItem,
+    deleteGroupsetItem,
+    deleteWheelsetItem,
+    deleteCockpitItem
 };

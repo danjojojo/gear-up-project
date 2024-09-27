@@ -30,6 +30,7 @@ const Inventory = () => {
     const [lowStockThreshold, setLowStockThreshold] = useState("");
     const [isAddingStock, setIsAddingStock] = useState(false);
     const [stockInput, setStockInput] = useState(0);
+    const [confirmedStock, setConfirmedStock] = useState(0);
     const [itemName, setItemName] = useState("");
     const [itemPrice, setItemPrice] = useState("");
     const [category, setCategory] = useState("Accessories");
@@ -124,6 +125,7 @@ const Inventory = () => {
         setSelectedItem(item);
         setViewingItem(true);
         setIsAddingItem(false);
+        setIsAddingStock(false);
         setIsEditing(false);
 
         try {
@@ -182,6 +184,7 @@ const Inventory = () => {
         resetForm();
         setIsAddingItem(true);
         setViewingItem(null);
+        setIsAddingStock(false);
     };
 
     // Handle editing an item
@@ -250,7 +253,11 @@ const Inventory = () => {
 
     // Handle stock input change
     const handleStockInputChange = (event) => {
-        setStockInput(event.target.value);
+        const value = Number(event.target.value);
+        // Allow only valid inputs (numbers >= 0)
+        if (!isNaN(value) && value >= 0) {
+            setStockInput(value);
+        }
     };
 
     // Handle file selection for image upload
@@ -293,8 +300,6 @@ const Inventory = () => {
             alert("Item restored successfully");
 
             setViewingItem(false);
-            setDisplayItem(true)
-            setShowArchived(false)
             fetchDashboardData();
             fetchItems();
         } catch (error) {
@@ -335,6 +340,12 @@ const Inventory = () => {
         setItemImage(null);
         setSelectedFile(null);
         setIsAddingItem(false);
+    };
+
+
+    const handleConfirm = () => {
+        setConfirmedStock(stockInput);
+        setIsAddingStock(false);
     };
 
     return (
@@ -386,42 +397,48 @@ const Inventory = () => {
                                     </div>
                                 </div>
 
-                                {items.map((item) => (
-                                    <div
-                                        key={item.item_id}
-                                        className="item-container d-flex p-4"
-                                        onClick={() => handleItemClick(item)}
-                                    >
-                                        <div className="item-name fw-bold">{item.item_name}</div>
-                                        <div className="item-category">{item.category_name}</div>
-                                        <div className="item-price">₱ {item.item_price}</div>
-                                        <div className="item-stocks">{item.stock_count}</div>
-                                        <div className="item-stock-status">
-                                            <div
-                                                className="status-container"
-                                                style={{
-                                                    backgroundColor:
-                                                        item.stock_count === 0
-                                                            ? "#DA7777" // No stock
-                                                            : item.low_stock_alert &&
-                                                                item.stock_count <= item.low_stock_count
-                                                                ? "#DABE77" // Low stock
-                                                                : "#77DA87", // In stock
-                                                }}
-                                            >
-                                                {item.low_stock_alert
-                                                    ? item.stock_count === 0
-                                                        ? "No stock"
-                                                        : item.stock_count <= item.low_stock_count
-                                                            ? "Low stock"
-                                                            : "In stock"
-                                                    : item.stock_count === 0
-                                                        ? "No stock"
-                                                        : "In stock"}
+                                {items.length === 0 ? (
+                                    <div className="no-items-message">
+                                        {displayItem === false ? 'No archived items' : 'No active items'}
+                                    </div>
+                                ) : (
+                                    items.map((item) => (
+                                        <div
+                                            key={item.item_id}
+                                            className="item-container d-flex p-4"
+                                            onClick={() => handleItemClick(item)}
+                                        >
+                                            <div className="item-name fw-bold">{item.item_name}</div>
+                                            <div className="item-category">{item.category_name}</div>
+                                            <div className="item-price">₱ {item.item_price}</div>
+                                            <div className="item-stocks">{item.stock_count}</div>
+                                            <div className="item-stock-status">
+                                                <div
+                                                    className="status-container"
+                                                    style={{
+                                                        backgroundColor:
+                                                            item.stock_count === 0
+                                                                ? "#DA7777" // No stock
+                                                                : item.low_stock_alert &&
+                                                                    item.stock_count <= item.low_stock_count
+                                                                    ? "#DABE77" // Low stock
+                                                                    : "#77DA87", // In stock
+                                                    }}
+                                                >
+                                                    {item.low_stock_alert
+                                                        ? item.stock_count === 0
+                                                            ? "No stock"
+                                                            : item.stock_count <= item.low_stock_count
+                                                                ? "Low stock"
+                                                                : "In stock"
+                                                        : item.stock_count === 0
+                                                            ? "No stock"
+                                                            : "In stock"}
+                                                </div>
                                             </div>
                                         </div>
-                                    </div>
-                                ))}
+                                    ))
+                                )}
                             </div>
                         </div>
                     </div>
@@ -545,33 +562,21 @@ const Inventory = () => {
 
                                         <div className="count">{selectedItem.stock_count}</div>
 
-                                        {isAddingStock && (
-                                            <button
-                                                className="increment-btn"
-                                                type="button"
-                                                disabled={!isEditing}
-                                                onClick={() => {
-                                                    // Increment stock count by 1 when clicked
-                                                    setSelectedItem((prev) => ({
-                                                        ...prev,
-                                                        stock_count: parseInt(prev.stock_count, 10) + 1,
-                                                    }));
-                                                }}
-                                            >
-                                                +
-                                            </button>
-                                        )}
-
                                         <button
                                             className="stock-btn"
                                             type="button"
                                             disabled={!isEditing}
                                             onClick={() => {
                                                 if (isAddingStock) {
-                                                    // If currently adding stock, confirm the changes
+                                                    // Add the input value to the existing stock count
+                                                    setSelectedItem((prev) => ({
+                                                        ...prev,
+                                                        stock_count: parseInt(prev.stock_count, 10) + parseInt(prev.stock_input || 0, 10), // Add input to stock count
+                                                        stock_input: 0, // Reset the input after adding
+                                                    }));
                                                     setIsAddingStock(false);
                                                 } else {
-                                                    // If not in adding mode, switch to adding mode
+                                                    // Switch to stock adding mode
                                                     setIsAddingStock(true);
                                                 }
                                             }}
@@ -579,6 +584,41 @@ const Inventory = () => {
                                             {isAddingStock ? "Confirm" : "Add Stock"}
                                         </button>
                                     </div>
+
+                                    {isAddingStock && (
+                                        <div className="add-stock-container form-group d-flex justify-content-between">
+                                            <input
+                                                type="text"
+                                                id="add-stock"
+                                                name="addStock"
+                                                value={selectedItem.stock_input || ""} // Use stock_input for the input field
+                                                onChange={(e) =>
+                                                    setSelectedItem((prev) => ({
+                                                        ...prev,
+                                                        stock_input: e.target.value, // Update stock_input with user input
+                                                    }))
+                                                }
+                                                placeholder="Enter stock amount"
+                                                disabled={!isEditing}
+                                                required
+                                            />
+
+                                            <button
+                                                className="increment-btn"
+                                                type="button"
+                                                disabled={!isEditing}
+                                                onClick={() => {
+                                                    // Increment the input value by 1 when clicked
+                                                    setSelectedItem((prev) => ({
+                                                        ...prev,
+                                                        stock_input: parseInt(prev.stock_input || 0, 10) + 1, // Increment stock_input by 1
+                                                    }));
+                                                }}
+                                            >
+                                                +
+                                            </button>
+                                        </div>
+                                    )}
 
                                     <div className="category-container d-flex justify-content-between">
                                         <div className="title">Category</div>
@@ -760,35 +800,41 @@ const Inventory = () => {
 
                                         <div className="stock-container d-flex justify-content-between">
                                             <div className="title">Stock Count</div>
-                                            {isAddingStock ? (
-                                                <input
-                                                    type="number"
-                                                    id="stock-input-add"
-                                                    name="stockInput"
-                                                    className="count-input"
-                                                    value={stockInput}
-                                                    min="0"
-                                                    onChange={handleStockInputChange}
-                                                />
-                                            ) : (
-                                                <div className="count">{stockInput}</div>
-                                            )}
+
+                                            <div className="count">{confirmedStock}</div> {/* Show confirmed stock */}
                                             <button
                                                 className="stock-btn"
                                                 type="button"
                                                 onClick={() => {
                                                     if (isAddingStock) {
-                                                        // Confirm and switch back to text view mode
-                                                        setIsAddingStock(false);
+                                                        handleConfirm(); // Confirm input
                                                     } else {
-                                                        // Switch to input mode
-                                                        setIsAddingStock(true);
+                                                        setIsAddingStock(true); // Show input field
                                                     }
                                                 }}
                                             >
                                                 {isAddingStock ? "Confirm" : "Add Stock"}
                                             </button>
                                         </div>
+
+                                        {isAddingStock && (
+                                            <div className="add-stock-container d-flex justify-content-between">
+                                                <input
+                                                    type="text"
+                                                    value={stockInput === 0 ? "" : stockInput}
+                                                    min="0"
+                                                    onChange={handleStockInputChange}
+                                                    placeholder="Enter stock count"
+                                                />
+                                                <button
+                                                    className="increment-btn"
+                                                    type="button"
+                                                    onClick={() => setStockInput(stockInput + 1)}
+                                                >
+                                                    +
+                                                </button>
+                                            </div>
+                                        )}
 
                                         <div className="category-container d-flex justify-content-between">
                                             <div className="title">Category</div>

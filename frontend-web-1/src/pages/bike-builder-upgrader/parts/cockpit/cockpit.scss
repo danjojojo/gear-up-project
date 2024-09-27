@@ -21,7 +21,9 @@
                     text-transform: capitalize;
                 }
 
-                .back-btn {
+                .back-btn,
+                .active,
+                .archive {
                     width: 15%;
                     margin: 5px;
                     font-size: 12px;
@@ -94,6 +96,16 @@
                     overflow-y: auto;
                     display: flex;
                     flex-wrap: wrap;
+
+                    .no-items-message {
+                        width: 100%;
+                        display: flex;
+                        justify-content: center;
+                        align-items: flex-start;
+                        font-size: 12px;
+                        text-align: center;
+                        color: #888;
+                    }
 
                     .item-container {
                         width: 33.33%;
@@ -193,14 +205,14 @@
                         }
                     }
 
-                    .edit-btn,
-                    .cancel-btn {
+                    .edit-btn {
                         width: 15%;
                         display: flex;
                         justify-content: end;
 
                         .edit-icon,
-                        .cancel-icon {
+                        .cancel-icon,
+                        .restore-icon {
                             height: 20px;
                             width: 20px;
                             cursor: pointer;
@@ -213,7 +225,8 @@
                         display: flex;
                         justify-content: end;
 
-                        .del-icon {
+                        .del-icon,
+                        .archive-icon {
                             height: 20px;
                             width: 20px;
                             cursor: pointer;

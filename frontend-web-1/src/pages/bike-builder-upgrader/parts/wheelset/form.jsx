@@ -1,13 +1,16 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import exit from "../../../../assets/icons/exit.png";
 import edit from "../../../../assets/icons/edit.png";
 import cancel from "../../../../assets/icons/cancel.png";
 import del from "../../../../assets/icons/delete.png";
+import archive from "../../../../assets/icons/archive.png";
+import restore from "../../../../assets/icons/restore.png";
 import ImageUploadButton from "../../../../components/img-upload-button/img-upload-button";
 import { base64ToFile } from "../../../../utility/imageUtils";
-import { updateWheelsetItem } from "../../../../services/bbuService";
+import { AuthContext } from "../../../../context/auth-context";
+import { updateWheelsetItem, archiveWheelsetItem, restoreWheelsetItem, deleteWheelsetItem } from "../../../../services/bbuService";
 
-const Form = ({ selectedItem, setSelectedItem, setItems, refreshWaitlist, onClose }) => {
+const Form = ({ selectedItem, setSelectedItem, setItems, refreshWaitlist, onClose, showArchived }) => {
     const [name, setName] = useState('');
     const [price, setPrice] = useState('');
     const [description, setDescription] = useState('');
@@ -27,6 +30,7 @@ const Form = ({ selectedItem, setSelectedItem, setItems, refreshWaitlist, onClos
     const [itemImage, setItemImage] = useState(null)
     const [selectedFile, setSelectedFile] = useState(null);
     const [originalItem, setOriginalItem] = useState(null);
+    const { userRole } = useContext(AuthContext);
 
     // Populate fields when a new item is selected
     useEffect(() => {
@@ -123,6 +127,55 @@ const Form = ({ selectedItem, setSelectedItem, setItems, refreshWaitlist, onClos
         setIsEditing(false);
     };
 
+    // Archive item
+    const handleArchiveItem = async (wheelset_id) => {
+        try {
+            await archiveWheelsetItem(wheelset_id);
+            alert("Item archived successfully");
+
+            refreshWaitlist();
+            setIsEditing(false);
+            onClose();
+        } catch (error) {
+            console.error("Error archiving item:", error);
+            alert("An error occurred while archiving the item");
+        }
+    }
+
+    // Restore item
+    const handleRestoreItem = async (wheelset_id) => {
+        try {
+            await restoreWheelsetItem(wheelset_id);
+            alert("Item restored successfully");
+
+            refreshWaitlist();
+            setIsEditing(false);
+            onClose();
+        } catch (error) {
+            console.error("Error restoring item:", error);
+            alert("An error occurred while restoring the item");
+        }
+    }
+
+    // Delete item
+    const handleDeleteItem = async (wheelset_id) => {
+        const confirmDelete = window.confirm("Are you sure you want to delete this item? This action cannot be undone.");
+
+        if (!confirmDelete) return;
+
+        try {
+            await deleteWheelsetItem(wheelset_id);
+            alert("Item deleted successfully");
+
+            refreshWaitlist();
+            setIsEditing(false);
+            onClose();
+        } catch (error) {
+            console.error("Error deleting item:", error);
+            alert("An error occurred while deleting the item");
+        }
+    }
+
 
     return (
         <form className="form-content" onSubmit={handleSubmit}>
@@ -136,7 +189,14 @@ const Form = ({ selectedItem, setSelectedItem, setItems, refreshWaitlist, onClos
                     />
                 </div>
                 <div className="edit-btn">
-                    {isEditing ? (
+                    {showArchived ? (
+                        <img
+                            src={restore}
+                            alt="Restore"
+                            className="restore-icon"
+                            onClick={() => handleRestoreItem(selectedItem.wheelset_id)}
+                        />
+                    ) : isEditing ? (
                         <img
                             src={cancel}
                             alt="Cancel"
@@ -153,10 +213,22 @@ const Form = ({ selectedItem, setSelectedItem, setItems, refreshWaitlist, onClos
                     )}
                 </div>
                 <div className="del-btn">
-                    <img
-                        src={del}
-                        alt="Delete"
-                        className="del-icon" />
+                    {showArchived ? (
+                        <img
+                            src={del}
+                            alt="Delete"
+                            className="del-icon"
+                            onClick={userRole === 'admin' ? () => handleDeleteItem(selectedItem.wheelset_id) : null}
+                            style={{ opacity: userRole === 'admin' ? 1 : 0.5, cursor: userRole === 'admin' ? 'pointer' : 'not-allowed' }} // Adjust appearance based on role
+                        />
+                    ) : (
+                        <img
+                            src={archive}
+                            alt="Archive"
+                            className="archive-icon"
+                            onClick={() => handleArchiveItem(selectedItem.wheelset_id)}
+                        />
+                    )}
                 </div>
             </div>
 
