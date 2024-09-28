@@ -21,7 +21,7 @@ const Cockpit = () => {
             const data = await getCockpitItems(displayItem);
             setItems(data);
         } catch (error) {
-            console.error('Error fetching frame items:', error);
+            console.error('Error fetching cockpit items:', error);
         }
     }, [displayItem]);
 

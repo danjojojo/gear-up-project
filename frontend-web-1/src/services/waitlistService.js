@@ -66,3 +66,47 @@ export const addCockpit = async (cockpitData) => {
     }
 };
 
+// Add item to headset
+export const addHeadset = async (headsetData) => {
+    try {
+        const response = await api.post('/waitlist/add-headset', headsetData);
+        return response.data;
+    } catch (error) {
+        console.error('Error adding headset:', error);
+        throw error;    
+    }
+};
+
+// Add item to handlebar
+export const addHandlebar = async (handlebarData) => {
+    try {
+        const response = await api.post('/waitlist/add-handlebar', handlebarData);
+        return response.data;
+    } catch (error) {
+        console.error('Error adding handlebar:', error);
+        throw error;    
+    }
+};
+
+// Add item to stem
+export const addStem = async (stemData) => {
+    try {
+        const response = await api.post('/waitlist/add-stem', stemData);
+        return response.data;
+    } catch (error) {
+        console.error('Error adding stem:', error);
+        throw error;    
+    }
+};
+
+// Add item to hubs
+export const addHubs = async (hubsData) => {
+    try {
+        const response = await api.post('/waitlist/add-hubs', hubsData);
+        return response.data;
+    } catch (error) {
+        console.error('Error adding hubs:', error);
+        throw error;    
+    }
+};
+

@@ -86,10 +86,8 @@ const addItem = async (req, res) => {
                 low_stock_count,
                 add_part,
                 bike_parts,
-                item_image,
-                date_created,
-                date_updated
-            ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)
+                item_image
+            ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
             RETURNING *`;
 
         const values = [
@@ -101,9 +99,7 @@ const addItem = async (req, res) => {
             itemLowStockThreshold,
             itemAddToBikeBuilder,
             itemBikeParts,
-            itemImage,
-            new Date(),
-            new Date()
+            itemImage
         ];
 
         const result = await pool.query(query, values);
@@ -113,14 +109,12 @@ const addItem = async (req, res) => {
         // Insert into waitlist if add_to_bike_builder is true
         if (itemAddToBikeBuilder) {
             const waitlistQuery = `
-                INSERT INTO waitlist (item_id, date_created, date_updated)
-                VALUES ($1, $2, $3)
+                INSERT INTO waitlist (item_id)
+                VALUES ($1)
                 RETURNING *`;
 
             const waitlistValues = [
-                newItem.item_id,
-                new Date(), // date_created
-                new Date()  // date_updated
+                newItem.item_id
             ];
 
             await pool.query(waitlistQuery, waitlistValues);
@@ -231,7 +225,8 @@ const displayItem = async (req, res) => {
                 c.category_name 
             FROM items i 
             JOIN category c ON i.category_id = c.category_id
-            WHERE i.status = $1;  
+            WHERE i.status = $1
+            ORDER BY date_created DESC; 
         `;
 
         const { rows } = await pool.query(query, [archived === 'true']);
@@ -336,14 +331,12 @@ const updateItem = async (req, res) => {
         if (itemAddToBikeBuilder && !isCurrentlyInWaitlist) {
             // Add to waitlist if not already present
             const waitlistQuery = `
-                INSERT INTO waitlist (item_id, date_created, date_updated)
-                VALUES ($1, $2, $3)
+                INSERT INTO waitlist (item_id)
+                VALUES ($1)
                 RETURNING *`;
 
             const waitlistValues = [
-                updatedItem.item_id,
-                new Date(), // date_created
-                new Date()  // date_updated
+                updatedItem.item_id
             ];
 
             await pool.query(waitlistQuery, waitlistValues);

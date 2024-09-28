@@ -21,7 +21,7 @@ const Wheelset = () => {
             const data = await getWheelsetItems(displayItem);
             setItems(data);
         } catch (error) {
-            console.error('Error fetching frame items:', error);
+            console.error('Error fetching wheelset items:', error);
         }
     }, [displayItem]);
 

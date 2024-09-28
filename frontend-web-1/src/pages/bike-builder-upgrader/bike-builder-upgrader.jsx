@@ -7,6 +7,11 @@ import fork from "../../assets/images/fork.png";
 import groupset from "../../assets/images/groupset.png";
 import wheelset from "../../assets/images/wheelset.png";
 import cockpit from "../../assets/images/cockpit.png";
+import headset from "../../assets/images/headset.png";
+import handlebar from "../../assets/images/handlebar.png";
+import stem from "../../assets/images/stem.png";
+import hub from "../../assets/images/hub.png";
+
 import { getItemCount } from '../../services/bbuService';
 
 const BikeBuilderUpgrader = () => {
@@ -16,11 +21,11 @@ const BikeBuilderUpgrader = () => {
         fork: 0,
         groupset: 0,
         wheelset: 0,
-        cockpit: 0
-        // headset: 0,
-        // handlebar: 0,
-        // stem: 0,
-        // hubs: 0,
+        cockpit: 0,
+        headset: 0,
+        handlebar: 0,
+        stem: 0,
+        hubs: 0,
     });
 
     const handlePartClick = (part) => {
@@ -33,11 +38,11 @@ const BikeBuilderUpgrader = () => {
             getItemCount('fork'),
             getItemCount('groupset'),
             getItemCount('wheelset'),
-            getItemCount('cockpit')
-            // getItemCount('headset'),
-            // getItemCount('handlebar'),
-            // getItemCount('stem'),
-            // getItemCount('hubs'),
+            getItemCount('cockpit'),
+            getItemCount('headset'),
+            getItemCount('handlebar'),
+            getItemCount('stem'),
+            getItemCount('hubs'),
         ]);
 
         setPartCounts({
@@ -45,11 +50,11 @@ const BikeBuilderUpgrader = () => {
             fork: counts[1].count,
             groupset: counts[2].count,
             wheelset: counts[3].count,
-            cockpit: counts[4].count
-            // headset: counts[5].count,
-            // handlebar: counts[6].count,
-            // stem: counts[7].count,
-            // hubs: counts[8].count,
+            cockpit: counts[4].count,
+            headset: counts[5].count,
+            handlebar: counts[6].count,
+            stem: counts[7].count,
+            hubs: counts[8].count,
         });
     };
 
@@ -84,7 +89,7 @@ const BikeBuilderUpgrader = () => {
                             >
                                 <div className='content'>
                                     <div className='image'>
-                                        <img src={fork} alt='Frame' />
+                                        <img src={fork} alt='Fork' />
                                     </div>
                                     <div className='part-item-count'>
                                         <div className='part fs-6 fw-bold'>Fork</div>
@@ -99,7 +104,7 @@ const BikeBuilderUpgrader = () => {
                             >
                                 <div className='content'>
                                     <div className='image'>
-                                        <img src={groupset} alt='Frame' />
+                                        <img src={groupset} alt='Groupset' />
                                     </div>
                                     <div className='part-item-count'>
                                         <div className='part fs-6 fw-bold'>Groupset</div>
@@ -116,7 +121,7 @@ const BikeBuilderUpgrader = () => {
                             >
                                 <div className='content'>
                                     <div className='image'>
-                                        <img src={wheelset} alt='Frame' />
+                                        <img src={wheelset} alt='Wheelset' />
                                     </div>
                                     <div className='part-item-count'>
                                         <div className='part fs-6 fw-bold'>Wheelset</div>
@@ -131,7 +136,7 @@ const BikeBuilderUpgrader = () => {
                             >
                                 <div className='content'>
                                     <div className='image'>
-                                        <img src={cockpit} alt='Frame' />
+                                        <img src={cockpit} alt='Cockpit' />
                                     </div>
                                     <div className='part-item-count'>
                                         <div className='part fs-6 fw-bold'>Cockpit</div>
@@ -145,10 +150,12 @@ const BikeBuilderUpgrader = () => {
                                 onClick={() => handlePartClick('headset')}
                             >
                                 <div className='content'>
-                                    <div className='image'></div>
+                                    <div className='image'>
+                                        <img src={headset} alt='Headset' />
+                                    </div>
                                     <div className='part-item-count'>
                                         <div className='part fs-6 fw-bold'>Headset</div>
-                                        {/* <div className='item-count fw-light fs-7'>{partCounts.headset} items</div> */}
+                                        <div className='item-count fw-light fs-7'>{partCounts.headset} items</div>
                                     </div>
                                 </div>
                             </div>
@@ -160,10 +167,12 @@ const BikeBuilderUpgrader = () => {
                                 onClick={() => handlePartClick('handlebar')}
                             >
                                 <div className='content'>
-                                    <div className='image'></div>
+                                    <div className='image'>
+                                        <img src={handlebar} alt='Handlebar' />
+                                    </div>
                                     <div className='part-item-count'>
                                         <div className='part fs-6 fw-bold'>Handlebar</div>
-                                        {/* <div className='item-count fw-light fs-7'>{partCounts.handlebar} items</div> */}
+                                        <div className='item-count fw-light fs-7'>{partCounts.handlebar} items</div>
                                     </div>
                                 </div>
                             </div>
@@ -173,10 +182,12 @@ const BikeBuilderUpgrader = () => {
                                 onClick={() => handlePartClick('stem')}
                             >
                                 <div className='content'>
-                                    <div className='image'></div>
+                                    <div className='image'>
+                                        <img src={stem} alt='Stem' />
+                                    </div>
                                     <div className='part-item-count'>
                                         <div className='part fs-6 fw-bold'>Stem</div>
-                                        {/* <div className='item-count fw-light fs-7'>{partCounts.stem} items</div> */}
+                                        <div className='item-count fw-light fs-7'>{partCounts.stem} items</div>
                                     </div>
                                 </div>
                             </div>
@@ -186,10 +197,12 @@ const BikeBuilderUpgrader = () => {
                                 onClick={() => handlePartClick('hubs')}
                             >
                                 <div className='content'>
-                                    <div className='image'></div>
+                                    <div className='image'>
+                                        <img src={hub} alt='Hub' />
+                                    </div>
                                     <div className='part-item-count'>
                                         <div className='part fs-6 fw-bold'>Hubs</div>
-                                        {/* <div className='item-count fw-light fs-7'>{partCounts.hubs} items</div> */}
+                                        <div className='item-count fw-light fs-7'>{partCounts.hubs} items</div>
                                     </div>
                                 </div>
                             </div>

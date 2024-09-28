@@ -337,6 +337,7 @@ const Inventory = () => {
         setItemName("");
         setItemPrice("");
         setStockInput(0);
+        setConfirmedStock(0);
         setCategory("");
         setLowStockAlert(false);
         setLowStockThreshold("");

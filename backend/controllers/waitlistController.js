@@ -64,12 +64,11 @@ const addFrame = async (req, res) => {
                 seatpost_diameter, axle_type, axle_width, 
                 bottom_bracket_type, bottom_bracket_diameter, 
                 rotor_size, max_tire_width, brake_mount, 
-                cable_routing, material, weight, image, date_created, 
-                date_updated
+                cable_routing, material, weight, image
             ) VALUES (
                 $1, $2, $3, $4, $5, $6, $7, $8, $9, 
                 $10, $11, $12, $13, $14, $15, $16, $17,
-                $18, $19, $20
+                $18
             ) RETURNING *;
         `;
 
@@ -91,9 +90,7 @@ const addFrame = async (req, res) => {
             cable_routing,
             material,
             weight,
-            image,
-            new Date(),
-            new Date()
+            image
         ];
 
 
@@ -143,11 +140,10 @@ const addFork = async (req, res) => {
                 item_id, description, fork_size, fork_tube_type, 
                 fork_tube_upper_diameter, fork_tube_lower_diameter, 
                 axle_type, axle_width, suspension_type, rotor_size, 
-                max_tire_width, brake_mount, material, weight, image, 
-                date_created, date_updated
+                max_tire_width, brake_mount, material, weight, image
             ) VALUES (
                 $1, $2, $3, $4, $5, $6, $7, $8, $9, 
-                $10, $11, $12, $13, $14, $15, $16, $17
+                $10, $11, $12, $13, $14, $15
             ) RETURNING *;
         `;
 
@@ -166,9 +162,7 @@ const addFork = async (req, res) => {
             brake_mount,
             material,
             weight,
-            image,
-            new Date(),
-            new Date()
+            image
         ];
 
 
@@ -218,11 +212,10 @@ const addGroupset = async (req, res) => {
                 item_id, description, chainring_speed, crank_arm_length,
                 front_derailleur_speed, rear_derailleur_speed, cassette_type,
                 cassette_speed, chain_speed, bottom_bracket_type,
-                bottom_bracket_diameter, brake_type, axle_type, weight, image, 
-                date_created, date_updated
+                bottom_bracket_diameter, brake_type, axle_type, weight, image
             ) VALUES (
                 $1, $2, $3, $4, $5, $6, $7, $8, $9, 
-                $10, $11, $12, $13, $14, $15, $16, $17
+                $10, $11, $12, $13, $14, $15
             ) RETURNING *;
         `;
 
@@ -241,9 +234,7 @@ const addGroupset = async (req, res) => {
             brake_type,
             axle_type,
             weight,
-            image,
-            new Date(),
-            new Date()
+            image
         ];
 
 
@@ -293,11 +284,10 @@ const addWheelset = async (req, res) => {
                 item_id, description, tire_size, tire_width, 
                 rim_holes, rim_width, hub_type, hub_speed, 
                 hub_holes, spokes, axle_type, rotor_type, 
-                rotor_size, weight, image, date_created, 
-                date_updated
+                rotor_size, weight, image
             ) VALUES (
                 $1, $2, $3, $4, $5, $6, $7, $8, $9, 
-                $10, $11, $12, $13, $14, $15, $16, $17
+                $10, $11, $12, $13, $14, $15
             ) RETURNING *;
         `;
 
@@ -316,9 +306,7 @@ const addWheelset = async (req, res) => {
             rotor_type,
             rotor_size,
             weight,
-            image,
-            new Date(),
-            new Date()
+            image
         ];
 
 
@@ -376,12 +364,11 @@ const addCockpit = async (req, res) => {
                 stem_clamp_diameter, stem_length, stem_angle,
                 fork_upper_diameter, headset_type, headset_upper_diameter,
                 headset_lower_diameter, headset_cup_type, stem_material,
-                handlebar_material, weight, image, date_created, 
-                date_updated
+                handlebar_material, weight, image
             ) VALUES (
                 $1, $2, $3, $4, $5, $6, $7, $8, $9, 
                 $10, $11, $12, $13, $14, $15, $16, $17,
-                $18, $19, $20, $21, $22
+                $18, $19, $20
             ) RETURNING *;
         `;
 
@@ -405,9 +392,7 @@ const addCockpit = async (req, res) => {
             stem_material,
             handlebar_material,
             weight,
-            image,
-            new Date(),
-            new Date()
+            image
         ];
 
 
@@ -428,11 +413,244 @@ const addCockpit = async (req, res) => {
     }
 };
 
+
+// Add to Headset
+const addHeadset = async (req, res) => {
+    const {
+        waitlist_item_id,
+        item_id,
+        description,
+        headset_type,
+        headset_upper_diameter,
+        headset_lower_diameter,
+        headset_cup_type,
+        material,
+        weight,
+    } = req.body;
+
+    const image = req.file ? req.file.buffer : null;
+
+    try {
+        const query = `
+            INSERT INTO headset (
+                item_id, description, headset_type, headset_upper_diameter, 
+                headset_lower_diameter, headset_cup_type, material, weight, 
+                image
+            ) VALUES (
+                $1, $2, $3, $4, $5, $6, $7, $8, $9
+            ) RETURNING *;
+        `;
+
+        const values = [
+            item_id,
+            description,
+            headset_type,
+            headset_upper_diameter,
+            headset_lower_diameter,
+            headset_cup_type,
+            material,
+            weight,
+            image
+        ];
+
+
+        const result = await pool.query(query, values);
+
+        // Update bb_bu_status in items table
+        const updateQuery = `UPDATE items SET bb_bu_status = true, add_part = false WHERE item_id = $1;`;
+        await pool.query(updateQuery, [item_id]);
+
+        // Delete the waitlist item
+        const deleteQuery = `DELETE FROM waitlist WHERE waitlist_item_id = $1;`;
+        await pool.query(deleteQuery, [waitlist_item_id]);
+
+        res.status(201).json(result.rows[0]);
+    } catch (error) {
+        console.error('Error adding headset:', error);
+        res.status(500).json({ error: 'Internal Server Error' });
+    }
+};
+
+
+// Add to Handlebar
+const addHandlebar = async (req, res) => {
+    const {
+        waitlist_item_id,
+        item_id,
+        description,
+        handlebar_length,
+        handlebar_clamp_diameter,
+        handlebar_type,
+        material,
+        weight,
+    } = req.body;
+
+    const image = req.file ? req.file.buffer : null;
+
+    try {
+        const query = `
+            INSERT INTO handlebar (
+                item_id, description, handlebar_length, handlebar_clamp_diameter, 
+                handlebar_type, material, weight, image
+            ) VALUES (
+                $1, $2, $3, $4, $5, $6, $7, $8
+            ) RETURNING *;
+        `;
+
+        const values = [
+            item_id,
+            description,
+            handlebar_length,
+            handlebar_clamp_diameter,
+            handlebar_type,
+            material,
+            weight,
+            image
+        ];
+
+
+        const result = await pool.query(query, values);
+
+        // Update bb_bu_status in items table
+        const updateQuery = `UPDATE items SET bb_bu_status = true, add_part = false WHERE item_id = $1;`;
+        await pool.query(updateQuery, [item_id]);
+
+        // Delete the waitlist item
+        const deleteQuery = `DELETE FROM waitlist WHERE waitlist_item_id = $1;`;
+        await pool.query(deleteQuery, [waitlist_item_id]);
+
+        res.status(201).json(result.rows[0]);
+    } catch (error) {
+        console.error('Error adding handlebar:', error);
+        res.status(500).json({ error: 'Internal Server Error' });
+    }
+};
+
+
+// Add to Stem
+const addStem = async (req, res) => {
+    const {
+        waitlist_item_id,
+        item_id,
+        description,
+        stem_clamp_diameter,
+        stem_length,
+        stem_angle,
+        material,
+        weight,
+    } = req.body;
+
+    const image = req.file ? req.file.buffer : null;
+
+    try {
+        const query = `
+            INSERT INTO stem (
+                item_id, description, stem_clamp_diameter, stem_length, 
+                stem_angle, material, weight, image
+            ) VALUES (
+                $1, $2, $3, $4, $5, $6, $7, $8
+            ) RETURNING *;
+        `;
+
+        const values = [
+            item_id,
+            description,
+            stem_clamp_diameter,
+            stem_length,
+            stem_angle,
+            material,
+            weight,
+            image
+        ];
+
+
+        const result = await pool.query(query, values);
+
+        // Update bb_bu_status in items table
+        const updateQuery = `UPDATE items SET bb_bu_status = true, add_part = false WHERE item_id = $1;`;
+        await pool.query(updateQuery, [item_id]);
+
+        // Delete the waitlist item
+        const deleteQuery = `DELETE FROM waitlist WHERE waitlist_item_id = $1;`;
+        await pool.query(deleteQuery, [waitlist_item_id]);
+
+        res.status(201).json(result.rows[0]);
+    } catch (error) {
+        console.error('Error adding stem:', error);
+        res.status(500).json({ error: 'Internal Server Error' });
+    }
+};
+
+
+// Add to Hubs
+const addHubs = async (req, res) => {
+    const {
+        waitlist_item_id,
+        item_id,
+        description,
+        hub_type,
+        hub_speed,
+        hub_holes,
+        axle_type,
+        rotor_type,
+        material,
+        weight,
+    } = req.body;
+
+    const image = req.file ? req.file.buffer : null;
+
+    try {
+        const query = `
+            INSERT INTO hubs (
+                item_id, description, hub_type, hub_speed, 
+                hub_holes, axle_type, rotor_type, material, 
+                weight, image
+            ) VALUES (
+                $1, $2, $3, $4, $5, $6, $7, $8, $9, $10
+            ) RETURNING *;
+        `;
+
+        const values = [
+            item_id,
+            description,
+            hub_type,
+            hub_speed,
+            hub_holes,
+            axle_type,
+            rotor_type,
+            material,
+            weight,
+            image
+        ];
+
+
+        const result = await pool.query(query, values);
+
+        // Update bb_bu_status in items table
+        const updateQuery = `UPDATE items SET bb_bu_status = true, add_part = false WHERE item_id = $1;`;
+        await pool.query(updateQuery, [item_id]);
+
+        // Delete the waitlist item
+        const deleteQuery = `DELETE FROM waitlist WHERE waitlist_item_id = $1;`;
+        await pool.query(deleteQuery, [waitlist_item_id]);
+
+        res.status(201).json(result.rows[0]);
+    } catch (error) {
+        console.error('Error adding hubs:', error);
+        res.status(500).json({ error: 'Internal Server Error' });
+    }
+};
+
+
 module.exports = {
     getWaitlistItems,
     addFrame,
     addFork,
     addGroupset,
     addWheelset,
-    addCockpit
+    addCockpit,
+    addHeadset,
+    addHandlebar,
+    addStem,
+    addHubs
 };

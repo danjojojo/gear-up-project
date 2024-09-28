@@ -20,7 +20,7 @@ const Groupset = () => {
             const data = await getGroupsetItems(displayItem);
             setItems(data);
         } catch (error) {
-            console.error('Error fetching frame items:', error);
+            console.error('Error fetching groupset items:', error);
         }
     }, [displayItem]);
 
