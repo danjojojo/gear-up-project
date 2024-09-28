@@ -1,9 +1,8 @@
 .upload-container {
-
     button {
         height: 100%;
         width: 100%;
-        padding: 10px;
+        padding: 5px; // Set padding to 5px
         font-size: 12px;
         background-color: #f9f9f9;
         border: 1px dashed #ccc;
@@ -11,6 +10,11 @@
         cursor: pointer;
         outline: none;
         transition: background-color 0.2s ease, border-color 0.2s ease;
+
+        // Background image styling
+        background-size: contain; // Use contain to fit the image within the button
+        background-position: center; // Center the image
+        background-repeat: no-repeat; // Prevent the image from repeating
 
         &:hover,
         &:focus {
@@ -28,7 +32,7 @@
             margin-bottom: 5px;
         }
 
-        p{
+        p {
             font-size: 12px;
         }
     }

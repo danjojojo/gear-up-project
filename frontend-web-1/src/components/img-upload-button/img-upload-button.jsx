@@ -31,8 +31,6 @@ function ImageUploadButton({ onFileSelect }) {
                 onClick={handleClick}
                 style={{
                     backgroundImage: `url(${backgroundImage})`, // Set background image
-                    backgroundSize: 'cover', // Cover the button area
-                    backgroundPosition: 'center', // Center the image
                 }}
                 className={selectedFile ? 'image-upload-button with-image' : 'image-upload-button'}
             >

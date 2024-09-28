@@ -9,6 +9,7 @@ import ImageUploadButton from "../../../../components/img-upload-button/img-uplo
 import { base64ToFile } from "../../../../utility/imageUtils";
 import { AuthContext } from "../../../../context/auth-context";
 import { updateFrameItem, archiveFrameItem, restoreFrameItem, deleteFrameItem } from "../../../../services/bbuService";
+import ImagePreviewModal from "../../../../components/image-preview-modal/image-preview";
 
 const Form = ({ selectedItem, setSelectedItem, setItems, refreshWaitlist, onClose, showArchived }) => {
     const [name, setName] = useState('');
@@ -34,6 +35,9 @@ const Form = ({ selectedItem, setSelectedItem, setItems, refreshWaitlist, onClos
     const [selectedFile, setSelectedFile] = useState(null);
     const [originalItem, setOriginalItem] = useState(null);
     const { userRole } = useContext(AuthContext);
+    const [showModal, setShowModal] = useState(false);
+    const handleOpenModal = () => setShowModal(true);
+    const handleCloseModal = () => setShowModal(false);
 
     // Populate fields when a new item is selected
     useEffect(() => {
@@ -244,7 +248,7 @@ const Form = ({ selectedItem, setSelectedItem, setItems, refreshWaitlist, onClos
 
             {!isEditing ? (
                 itemImage ? (
-                    <div className="item-image-container">
+                    <div className="item-image-container" onClick={handleOpenModal}>
                         <img
                             src={itemImage}
                             alt="Item"
@@ -259,6 +263,12 @@ const Form = ({ selectedItem, setSelectedItem, setItems, refreshWaitlist, onClos
             ) : (
                 <ImageUploadButton onFileSelect={handleFileSelect} />
             )}
+
+            <ImagePreviewModal
+                show={showModal}
+                handleClose={handleCloseModal}
+                src={itemImage}
+            />
 
             <div className="input-container form-group">
                 <label htmlFor="item-name-frame">Name</label>

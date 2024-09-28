@@ -20,6 +20,7 @@ import {
 } from "../../services/inventoryService";
 import { base64ToFile } from "../../utility/imageUtils";
 import { archiveItem, restoreItem, deleteItem } from "../../services/inventoryService";
+import ImagePreviewModal from "../../components/image-preview-modal/image-preview";
 
 const Inventory = () => {
     // State management
@@ -60,6 +61,10 @@ const Inventory = () => {
         stockCounts: 0,
         stockValue: "₱ 0",
     });
+
+    const [showModal, setShowModal] = useState(false);
+    const handleOpenModal = () => setShowModal(true);
+    const handleCloseModal = () => setShowModal(false);
 
     // Fetch dashboard data
     const fetchDashboardData = async () => {
@@ -503,7 +508,7 @@ const Inventory = () => {
 
                                     {!isEditing ? (
                                         itemImage ? (
-                                            <div className="item-image-container">
+                                            <div className="item-image-container" onClick={handleOpenModal}>
                                                 <img
                                                     src={itemImage}
                                                     alt="Item"
@@ -518,6 +523,13 @@ const Inventory = () => {
                                     ) : (
                                         <ImageUploadButton onFileSelect={handleFileSelect} />
                                     )}
+
+
+                                    <ImagePreviewModal
+                                        show={showModal}
+                                        handleClose={handleCloseModal}
+                                        src={itemImage}
+                                    />
 
                                     <div className="item-name form-group">
                                         <label htmlFor="item-name">Name</label>
@@ -592,12 +604,16 @@ const Inventory = () => {
                                                 id="add-stock"
                                                 name="addStock"
                                                 value={selectedItem.stock_input || ""} // Use stock_input for the input field
-                                                onChange={(e) =>
-                                                    setSelectedItem((prev) => ({
-                                                        ...prev,
-                                                        stock_input: e.target.value, // Update stock_input with user input
-                                                    }))
-                                                }
+                                                onChange={(e) => {
+                                                    const value = Number(e.target.value);
+                                                    // Allow only valid inputs (numbers >= 0)
+                                                    if (!isNaN(value) && value >= 0) {
+                                                        setSelectedItem((prev) => ({
+                                                            ...prev,
+                                                            stock_input: value, // Set the valid numeric value
+                                                        }));
+                                                    }
+                                                }}
                                                 placeholder="Enter stock amount"
                                                 disabled={!isEditing}
                                                 required
@@ -667,15 +683,19 @@ const Inventory = () => {
                                                 type="text"
                                                 id="low-stock-threshold"
                                                 name="lowStockThreshold"
-                                                value={selectedItem.low_stock_count}
-                                                onChange={(e) =>
-                                                    setSelectedItem((prev) => ({
-                                                        ...prev,
-                                                        low_stock_count: e.target.value,
-                                                    }))
-                                                }
+                                                value={selectedItem.low_stock_count || ""}
+                                                onChange={(e) => {
+                                                    const value = Number(e.target.value);
+                                                    if (!isNaN(value) && value >= 0) {
+                                                        setSelectedItem((prev) => ({
+                                                            ...prev,
+                                                            low_stock_count: value,
+                                                        }));
+                                                    }
+                                                }}
                                                 placeholder="Enter stock threshold"
                                                 disabled={!isEditing}
+                                                min="0"
                                                 required
                                             />
                                         </div>
@@ -868,12 +888,19 @@ const Inventory = () => {
                                         {lowStockAlert && (
                                             <div className="low-stock-threshold form-group">
                                                 <input
-                                                    type="text"
+                                                    type="text" // Change to number input
                                                     id="low-stock-threshold-add"
                                                     name="lowStockThreshold"
-                                                    value={lowStockThreshold}
-                                                    onChange={(e) => setLowStockThreshold(e.target.value)}
+                                                    value={lowStockThreshold || ""} // Display threshold or empty string if undefined
+                                                    onChange={(e) => {
+                                                        const value = Number(e.target.value);
+                                                        // Allow only valid inputs (numbers >= 0)
+                                                        if (!isNaN(value) && value >= 0) {
+                                                            setLowStockThreshold(value); // Update state with valid value
+                                                        }
+                                                    }}
                                                     placeholder="Enter stock threshold"
+                                                    min="0" // Ensure no negative values
                                                     required
                                                 />
                                             </div>
