@@ -222,11 +222,14 @@ const displayItem = async (req, res) => {
                 i.stock_count, 
                 i.low_stock_alert, 
                 i.low_stock_count,
+                i.date_created,
                 c.category_name 
-            FROM items i 
-            JOIN category c ON i.category_id = c.category_id
-            WHERE i.status = $1
-            ORDER BY date_created DESC; 
+            FROM 
+                items i 
+            JOIN 
+                category c ON i.category_id = c.category_id 
+            WHERE 
+                i.status = $1;
         `;
 
         const { rows } = await pool.query(query, [archived === 'true']);

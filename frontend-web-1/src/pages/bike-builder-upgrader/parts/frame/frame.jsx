@@ -2,8 +2,9 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import './frame.scss';
 import PageLayout from '../../../../components/page-layout/page-layout';
-import filter from '../../../../assets/icons/filter.png';
 import sort from '../../../../assets/icons/sort.png';
+import arrowUp from "../../../../assets/icons/arrow-up.png";
+import arrowDown from "../../../../assets/icons/arrow-down.png";
 import SearchBar from '../../../../components/search-bar/search-bar';
 import { getFrameItems } from '../../../../services/bbuService';
 import Form from './form';
@@ -14,21 +15,56 @@ const Frame = () => {
     const [selectedItem, setSelectedItem] = useState(null);
     const [showArchived, setShowArchived] = useState(false);
     const [displayItem, setDisplayItem] = useState(true);
+    const [sortCriteria, setSortCriteria] = useState("name");
+    const [sortOrder, setSortOrder] = useState("asc");
+    const [searchTerm, setSearchTerm] = useState('');
+    const [showSort, setShowSort] = useState(false);
+    const showMiddleSection = showSort;
 
-
+    
     const fetchItems = useCallback(async () => {
         try {
             const data = await getFrameItems(displayItem);
-            setItems(data);
+
+            // Sort items based on selected sort criteria
+            const sortedItems = data.sort((a, b) => {
+                let aValue, bValue;
+
+                // Determine sorting criteria
+                if (sortCriteria === "name") {
+                    aValue = a.item_name.toLowerCase(); // Sort by name (case-insensitive)
+                    bValue = b.item_name.toLowerCase();
+                } else if (sortCriteria === "price") {
+                    aValue = a.item_price; // Sort by price
+                    bValue = b.item_price;
+                } else {
+                    aValue = new Date(a.date_created); // Sort by date created
+                    bValue = new Date(b.date_created);
+                }
+
+                // Determine sort order (ascending or descending)
+                if (sortOrder === "asc") {
+                    return aValue < bValue ? -1 : aValue > bValue ? 1 : 0;
+                } else {
+                    return aValue > bValue ? -1 : aValue < bValue ? 1 : 0;
+                }
+            });
+
+            setItems(sortedItems);
         } catch (error) {
-            console.error('Error fetching frame items:', error);
+            console.error("Error fetching frame items:", error);
         }
-    }, [displayItem]);
+    }, [displayItem, sortCriteria, sortOrder]);
 
 
     useEffect(() => {
         fetchItems();
     }, [fetchItems]);
+
+
+    const filteredItems = items.filter(item =>
+        item.item_name.toLowerCase().includes(searchTerm.toLowerCase())
+    );
 
 
     const handleBackClick = () => {
@@ -58,6 +94,9 @@ const Frame = () => {
         setDisplayItem(true)
         setShowArchived(false)
         handleCloseView();
+        setSortCriteria("name");
+        setSortOrder("asc");
+        setShowSort(false);
     }
 
 
@@ -66,8 +105,11 @@ const Frame = () => {
         setDisplayItem(false)
         setShowArchived(true)
         handleCloseView();
+        setSortCriteria("name");
+        setSortOrder("asc");
+        setShowSort(false);
     }
-    
+
     return (
         <div className='frame p-3'>
             <PageLayout
@@ -82,14 +124,13 @@ const Frame = () => {
                                 Back
                             </button>
 
-                            <SearchBar />
+                            <SearchBar
+                                value={searchTerm}
+                                onChange={(e) => setSearchTerm(e.target.value)}
+                            />
 
-                            <button className='filter'>
-                                <img src={filter} alt='Filter' className='button-icon' />
-                            </button>
-
-                            <button className='sort'>
-                                <img src={sort} alt='Sort' className='button-icon' />
+                            <button className="sort" onClick={() => setShowSort(!showSort)}>
+                                <img src={sort} alt="Sort" className="button-icon" />
                             </button>
 
                             {showArchived ? (
@@ -103,14 +144,53 @@ const Frame = () => {
                             )}
                         </div>
 
+                        {showMiddleSection && (
+                            <div className="middle-container">
+                                <div className="middle-content">
+                                    {showSort && (
+                                        <>
+                                            <div className="title">
+                                                <img src={sort} alt="Sort" className="icon me-2" />
+                                                Sort by:
+                                            </div>
+
+                                            <select
+                                                className="dropdown"
+                                                value={sortCriteria}
+                                                onChange={(e) => setSortCriteria(e.target.value)}
+                                            >
+                                                <option value="name">Item Name</option>
+                                                <option value="price">Price</option>
+                                                <option value="date">Date Added</option>
+                                            </select>
+
+                                            <button
+                                                className="btn"
+                                                onClick={() => {
+                                                    setSortOrder(sortOrder === "asc" ? "desc" : "asc");
+                                                    fetchItems(); // Fetch items after changing sort order
+                                                }}
+                                            >
+                                                {sortOrder === "asc" ? (
+                                                    <img src={arrowDown} alt="Sort Descending" />
+                                                ) : (
+                                                    <img src={arrowUp} alt="Sort Ascending" />
+                                                )}
+                                            </button>
+                                        </>
+                                    )}
+                                </div>
+                            </div>
+                        )}
+
                         <div className='lower-container'>
                             <div className='lower-content'>
-                                {items.length === 0 ? (
+                                {filteredItems.length === 0 ? (
                                     <div className="no-items-message">
                                         {displayItem === false ? 'No archived items' : 'No active items'}
                                     </div>
                                 ) : (
-                                    items.map((item) => (
+                                    filteredItems.map((item) => (
                                         <div
                                             key={item.frame_id}
                                             className="item-container d-flex"

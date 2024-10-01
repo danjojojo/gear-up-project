@@ -4,6 +4,8 @@ import React, { useState, useEffect, useCallback } from "react";
 import SearchBar from "../../components/search-bar/search-bar";
 import filter from "../../assets/icons/filter.png";
 import sort from "../../assets/icons/sort.png";
+import arrowUp from "../../assets/icons/arrow-up.png";
+import arrowDown from "../../assets/icons/arrow-down.png";
 import exit from "../../assets/icons/exit.png";
 import edit from "../../assets/icons/edit.png";
 import del from "../../assets/icons/delete.png";
@@ -11,13 +13,7 @@ import cancel from "../../assets/icons/cancel.png";
 import archive from "../../assets/icons/archive.png";
 import restore from "../../assets/icons/restore.png";
 import ImageUploadButton from "../../components/img-upload-button/img-upload-button";
-import {
-    addItem,
-    displayItems,
-    dashboardData,
-    getItemDetails,
-    updateItem,
-} from "../../services/inventoryService";
+import { addItem, displayItems, dashboardData, getItemDetails, updateItem } from "../../services/inventoryService";
 import { base64ToFile } from "../../utility/imageUtils";
 import { archiveItem, restoreItem, deleteItem } from "../../services/inventoryService";
 import ImagePreviewModal from "../../components/image-preview-modal/image-preview";
@@ -65,6 +61,19 @@ const Inventory = () => {
     const [showModal, setShowModal] = useState(false);
     const handleOpenModal = () => setShowModal(true);
     const handleCloseModal = () => setShowModal(false);
+    const [sortCriteria, setSortCriteria] = useState("name"); // Default sorting by name
+    const [sortOrder, setSortOrder] = useState("asc"); // Default order
+    const [selectedCategory, setSelectedCategory] = useState(""); // For filtering
+    const [selectedStockCount, setSelectedStockCount] = useState("");
+    const [searchTerm, setSearchTerm] = useState('');
+    const [showFilter, setShowFilter] = useState(false);
+    const [showSort, setShowSort] = useState(false);
+    const showMiddleSection = showFilter || showSort;
+
+    // Assuming items is an array of item objects
+    const filteredItems = items.filter(item =>
+        item.item_name.toLowerCase().includes(searchTerm.toLowerCase())
+    );
 
     // Fetch dashboard data
     const fetchDashboardData = async () => {
@@ -80,11 +89,34 @@ const Inventory = () => {
     const fetchItems = useCallback(async () => {
         try {
             const data = await displayItems(displayItem);
-            setItems(data);
+
+            // Filter items
+            const filteredItems = data.filter((item) => {
+                const categoryMatch = selectedCategory ? item.category_name === selectedCategory : true;
+                const stockMatch = selectedStockCount === "" ||
+                    (selectedStockCount === "no" && item.stock_count === 0) ||
+                    (selectedStockCount === "low" && item.stock_count <= item.low_stock_count && item.stock_count > 0) ||
+                    (selectedStockCount === "in" && item.stock_count > item.low_stock_count && item.stock_count > 0);
+                return categoryMatch && stockMatch;
+            });
+
+            // Sort items
+            const sortedItems = filteredItems.sort((a, b) => {
+                const aValue = sortCriteria === "name" ? a.item_name : sortCriteria === "stock" ? a.stock_count : new Date(a.date_created);
+                const bValue = sortCriteria === "name" ? b.item_name : sortCriteria === "stock" ? b.stock_count : new Date(b.date_created);
+
+                if (sortOrder === "asc") {
+                    return aValue < bValue ? -1 : aValue > bValue ? 1 : 0;
+                } else {
+                    return aValue > bValue ? -1 : aValue < bValue ? 1 : 0;
+                }
+            });
+
+            setItems(sortedItems);
         } catch (error) {
             console.error("Error fetching items:", error);
         }
-    }, [displayItem]);
+    }, [displayItem, selectedCategory, selectedStockCount, sortCriteria, sortOrder]);
 
     // Fetch data on component mount
     useEffect(() => {
@@ -119,7 +151,8 @@ const Inventory = () => {
                 setItems(result.items);
             }
             resetForm();
-            await fetchDashboardData();
+            fetchDashboardData();
+            fetchItems();
         } catch (error) {
             alert("An error occurred while adding the item");
         }
@@ -272,15 +305,27 @@ const Inventory = () => {
 
     // Handle archive item click
     const handleActiveItemClick = () => {
-        setDisplayItem(true)
-        setShowArchived(false)
+        setDisplayItem(true);
+        setShowArchived(false);
         setViewingItem(null);
+        setSortCriteria("name");
+        setSortOrder("asc");
+        setSelectedCategory("");
+        setSelectedStockCount("");
+        setShowSort(false);
+        setShowFilter(false);
     }
     // Handle archive item click
     const handleArchiveItemClick = () => {
-        setDisplayItem(false)
-        setShowArchived(true)
+        setDisplayItem(false);
+        setShowArchived(true);
         setViewingItem(null);
+        setSortCriteria("name");
+        setSortOrder("asc");
+        setSelectedCategory("");
+        setSelectedStockCount("");
+        setShowSort(false);
+        setShowFilter(false);
     }
 
     // Archive item
@@ -363,13 +408,22 @@ const Inventory = () => {
                             <button className="add-btn" onClick={handleAddItemClick}>
                                 Add Item +
                             </button>
-                            <SearchBar />
-                            <button className="filter">
+
+                            <SearchBar
+                                value={searchTerm}
+                                onChange={(e) => setSearchTerm(e.target.value)}
+                            />
+
+                            {/* Toggle filter visibility */}
+                            <button className="filter" onClick={() => setShowFilter(!showFilter)}>
                                 <img src={filter} alt="Filter" className="button-icon" />
                             </button>
-                            <button className="sort">
+
+                            {/* Toggle sort visibility */}
+                            <button className="sort" onClick={() => setShowSort(!showSort)}>
                                 <img src={sort} alt="Sort" className="button-icon" />
                             </button>
+
                             {showArchived ? (
                                 <button className="active" onClick={handleActiveItemClick}>
                                     Active Items
@@ -380,6 +434,79 @@ const Inventory = () => {
                                 </button>
                             )}
                         </div>
+
+                        {showMiddleSection && (
+                            <div className="middle-container">
+                                <div className="middle-content">
+
+                                    {/* Conditional rendering for Filter section */}
+                                    {showFilter && (
+                                        <>
+                                            <div className="title">
+                                                <img src={filter} alt="Filter" className="icon me-2" />
+                                                Filter by:
+                                            </div>
+
+                                            <select
+                                                className="dropdown"
+                                                onChange={(e) => setSelectedCategory(e.target.value)}
+                                                value={selectedCategory}
+                                            >
+                                                <option value="">Category</option>
+                                                {["Accessories", "Parts", "Components", "Sets", "Cleaning", "Tools"].map((category) => (
+                                                    <option key={category} value={category}>{category}</option>
+                                                ))}
+                                            </select>
+
+                                            <select
+                                                className="dropdown"
+                                                onChange={(e) => setSelectedStockCount(e.target.value)}
+                                                value={selectedStockCount}
+                                            >
+                                                <option value="">Stock Status</option>
+                                                <option value="no">No Stock</option>
+                                                <option value="low">Low Stock</option>
+                                                <option value="in">In Stock</option>
+                                            </select>
+                                        </>
+                                    )}
+
+                                    {/* Conditional rendering for Sort section */}
+                                    {showSort && (
+                                        <>
+                                            <div className="title">
+                                                <img src={sort} alt="Sort" className="icon me-2" />
+                                                Sort by:
+                                            </div>
+
+                                            <select
+                                                className="dropdown"
+                                                value={sortCriteria}
+                                                onChange={(e) => setSortCriteria(e.target.value)}
+                                            >
+                                                <option value="name">Item Name</option>
+                                                <option value="stock">Stock Count</option>
+                                                <option value="date">Date Added</option>
+                                            </select>
+
+                                            <button
+                                                className="btn"
+                                                onClick={() => {
+                                                    setSortOrder(sortOrder === "asc" ? "desc" : "asc");
+                                                    fetchItems();
+                                                }}
+                                            >
+                                                {sortOrder === "asc" ? (
+                                                    <img src={arrowDown} alt="Sort Descending" />
+                                                ) : (
+                                                    <img src={arrowUp} alt="Sort Ascending" />
+                                                )}
+                                            </button>
+                                        </>
+                                    )}
+                                </div>
+                            </div>
+                        )}
 
                         <div className="lower-container">
                             <div className="lower-content">
@@ -394,6 +521,10 @@ const Inventory = () => {
                                         Price
                                     </div>
 
+                                    <div className="item-date fw-bold text-light">
+                                        Date Added
+                                    </div>
+
                                     <div className="item-stocks fw-bold text-light">
                                         Stock
                                     </div>
@@ -403,12 +534,12 @@ const Inventory = () => {
                                     </div>
                                 </div>
 
-                                {items.length === 0 ? (
+                                {filteredItems.length === 0 ? (
                                     <div className="no-items-message">
                                         {displayItem === false ? 'No archived items' : 'No active items'}
                                     </div>
                                 ) : (
-                                    items.map((item) => (
+                                    filteredItems.map((item) => (
                                         <div
                                             key={item.item_id}
                                             className="item-container d-flex p-4"
@@ -417,6 +548,9 @@ const Inventory = () => {
                                             <div className="item-name fw-bold">{item.item_name}</div>
                                             <div className="item-category">{item.category_name}</div>
                                             <div className="item-price">₱ {item.item_price}</div>
+                                            <div className="item-date">
+                                                {new Date(item.date_created).toLocaleDateString()}
+                                            </div>
                                             <div className="item-stocks">{item.stock_count}</div>
                                             <div className="item-stock-status">
                                                 <div
@@ -425,8 +559,7 @@ const Inventory = () => {
                                                         backgroundColor:
                                                             item.stock_count === 0
                                                                 ? "#DA7777" // No stock
-                                                                : item.low_stock_alert &&
-                                                                    item.stock_count <= item.low_stock_count
+                                                                : item.low_stock_alert && item.stock_count <= item.low_stock_count
                                                                     ? "#DABE77" // Low stock
                                                                     : "#77DA87", // In stock
                                                     }}
@@ -655,6 +788,11 @@ const Inventory = () => {
                                         >
                                             <option value="">Select category</option>
                                             <option value="Accessories">Accessories</option>
+                                            <option value="Parts">Parts</option>
+                                            <option value="Components">Components</option>
+                                            <option value="Sets">Sets</option>
+                                            <option value="Cleaning">Cleaning</option>
+                                            <option value="Tools">Tools</option>
                                         </select>
                                     </div>
 
@@ -869,6 +1007,11 @@ const Inventory = () => {
                                             >
                                                 <option value="">Select category</option>
                                                 <option value="Accessories">Accessories</option>
+                                                <option value="Parts">Parts</option>
+                                                <option value="Components">Components</option>
+                                                <option value="Sets">Sets</option>
+                                                <option value="Cleaning">Cleaning</option>
+                                                <option value="Tools">Tools</option>
                                             </select>
                                         </div>
 

@@ -1,9 +1,11 @@
 import './waitlist.scss';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import PageLayout from '../../components/page-layout/page-layout';
 import SearchBar from '../../components/search-bar/search-bar';
 import filter from '../../assets/icons/filter.png';
 import sort from '../../assets/icons/sort.png';
+import arrowUp from "../../assets/icons/arrow-up.png";
+import arrowDown from "../../assets/icons/arrow-down.png";
 import { getWaitlistItems } from '../../services/waitlistService';
 
 // Parts Form
@@ -20,20 +22,59 @@ import HubsForm from './parts-form/hubs-form';
 const Waitlist = () => {
     const [items, setItems] = useState([]);
     const [selectedItem, setSelectedItem] = useState(null);
+    const [sortCriteria, setSortCriteria] = useState("name"); // Default sorting by name
+    const [sortOrder, setSortOrder] = useState("asc");
+    const [selectedPart, setSelectedPart] = useState("");
+    const [searchTerm, setSearchTerm] = useState('');
+    const [showFilter, setShowFilter] = useState(false);
+    const [showSort, setShowSort] = useState(false);
+    const showMiddleSection = showFilter || showSort;
 
     // Fetch waitlist items when the component mounts
-    const fetchItems = async () => {
+    const fetchItems = useCallback(async () => {
         try {
             const data = await getWaitlistItems();
-            setItems(data);
+
+            // Filter items by selected part
+            const filteredItems = data.filter((item) => {
+                return selectedPart ? item.bike_parts === selectedPart : true;
+            });
+
+            // Sort items by item name or date added
+            const sortedItems = filteredItems.sort((a, b) => {
+                let aValue, bValue;
+
+                // Determine sorting criteria based on sortCriteria state
+                if (sortCriteria === "name") {
+                    aValue = a.item_name.toLowerCase(); // Normalize case for comparison
+                    bValue = b.item_name.toLowerCase();
+                } else if (sortCriteria === "date") {
+                    aValue = new Date(a.date_created);
+                    bValue = new Date(b.date_created);
+                }
+
+                // Perform comparison based on sort order
+                if (sortOrder === "asc") {
+                    return aValue < bValue ? -1 : aValue > bValue ? 1 : 0;
+                } else {
+                    return aValue > bValue ? -1 : aValue < bValue ? 1 : 0;
+                }
+            });
+
+            setItems(sortedItems);
         } catch (error) {
-            console.error('Error fetching waitlist items:', error);
+            console.error("Error fetching waitlist items:", error);
         }
-    };
+    }, [selectedPart, sortCriteria, sortOrder]);
 
     useEffect(() => {
         fetchItems();
-    }, []);
+    }, [fetchItems]);
+
+    // Assuming items is an array of item objects
+    const filteredItems = items.filter(item =>
+        item.item_name.toLowerCase().includes(searchTerm.toLowerCase())
+    );
 
     const refreshWaitlist = () => {
         fetchItems();
@@ -55,14 +96,83 @@ const Waitlist = () => {
                 leftContent={
                     <div className='waitlist-content'>
                         <div className='upper-container d-flex'>
-                            <SearchBar />
-                            <button className='filter'>
-                                <img src={filter} alt='Filter' className='button-icon' />
+                            <SearchBar
+                                value={searchTerm}
+                                onChange={(e) => setSearchTerm(e.target.value)}
+                            />
+
+                            {/* Toggle filter visibility */}
+                            <button className="filter" onClick={() => setShowFilter(!showFilter)}>
+                                <img src={filter} alt="Filter" className="button-icon" />
                             </button>
-                            <button className='sort'>
-                                <img src={sort} alt='Sort' className='button-icon' />
+
+                            {/* Toggle sort visibility */}
+                            <button className="sort" onClick={() => setShowSort(!showSort)}>
+                                <img src={sort} alt="Sort" className="button-icon" />
                             </button>
                         </div>
+
+                        {showMiddleSection && (
+                            <div className="middle-container">
+                                <div className="middle-content">
+
+                                    {/* Conditional rendering for Filter section */}
+                                    {showFilter && (
+                                        <>
+                                            <div className="title">
+                                                <img src={filter} alt="Filter" className="icon me-2" />
+                                                Filter by:
+                                            </div>
+
+                                            <select
+                                                className="dropdown"
+                                                onChange={(e) => setSelectedPart(e.target.value)}
+                                                value={selectedPart}
+                                            >
+                                                <option value="">Bike Parts</option>
+                                                {["Frame", "Fork", "Groupset", "Wheelset", "Cockpit",
+                                                    "Headset", "Handlebar", "Stem", "Hubs"].map((parts) => (
+                                                        <option key={parts} value={parts}>{parts}</option>
+                                                    ))}
+                                            </select>
+                                        </>
+                                    )}
+
+                                    {/* Conditional rendering for Sort section */}
+                                    {showSort && (
+                                        <>
+                                            <div className="title">
+                                                <img src={sort} alt="Sort" className="icon me-2" />
+                                                Sort by:
+                                            </div>
+
+                                            <select
+                                                className="dropdown"
+                                                value={sortCriteria}
+                                                onChange={(e) => setSortCriteria(e.target.value)}
+                                            >
+                                                <option value="name">Item Name</option>
+                                                <option value="date">Date Added</option>
+                                            </select>
+
+                                            <button
+                                                className="btn"
+                                                onClick={() => {
+                                                    setSortOrder(sortOrder === "asc" ? "desc" : "asc");
+                                                    fetchItems();
+                                                }}
+                                            >
+                                                {sortOrder === "asc" ? (
+                                                    <img src={arrowDown} alt="Sort Descending" />
+                                                ) : (
+                                                    <img src={arrowUp} alt="Sort Ascending" />
+                                                )}
+                                            </button>
+                                        </>
+                                    )}
+                                </div>
+                            </div>
+                        )}
 
                         <div className='lower-container'>
                             <div className='lower-content'>
@@ -84,8 +194,8 @@ const Waitlist = () => {
                                     </div>
                                 </div>
 
-                                {items.length > 0 ? (
-                                    items.map((item) => (
+                                {filteredItems.length > 0 ? (
+                                    filteredItems.map((item) => (
                                         <div
                                             key={item.waitlist_item_id}
                                             className="item-container d-flex p-4"

@@ -85,13 +85,97 @@
 
             }
 
+            .middle-container {
+                height: 5%;
+
+                .middle-content {
+                    height: 100%;
+                    width: 100%;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+
+                    .title {
+                        width: 15%;
+                        padding: 5px;
+                        align-items: center;
+                        font-size: 12px;
+                        font-weight: 600;
+                        margin: 5px;
+                        display: flex;
+                        justify-content: center;
+                        border-radius: 5px;
+                        border: solid 1px #ccc;
+                        background-color: #f9f9f9;
+
+                        .icon {
+                            height: 20px;
+                            width: 20px;
+                        }
+                    }
+
+                    .dropdown {
+                        width: 20%;
+                        padding: 5px;
+                        margin: 5px;
+                        font-size: 12px;
+                        background-color: #f9f9f9;
+                        border: 1px solid #ccc;
+                        border-radius: 4px;
+                        cursor: pointer;
+                        outline: none;
+                        transition: background-color 0.2s ease, border-color 0.2s ease;
+
+                        &:hover,
+                        &:focus {
+                            background-color: #fff;
+                            border-color: #888;
+                        }
+
+                        option {
+                            font-size: 14px;
+                        }
+                    }
+
+                    .btn {
+                        width: 5%;
+                        margin: 5px;
+                        background-color: #f9f9f9;
+                        border: 1px solid #ccc;
+                        border-radius: 5px;
+                        cursor: pointer;
+                        outline: none;
+                        transition: background-color 0.2s ease, border-color 0.2s ease;
+                        display: flex;
+                        justify-content: center;
+                        align-items: center;
+                        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+
+                        &:hover,
+                        &:focus {
+                            background-color: #fff;
+                            border-color: #888;
+                        }
+
+                        &:active {
+                            background-color: #e6e6e6;
+                        }
+
+                        img {
+                            height: 16px;
+                            width: 16px;
+                        }
+                    }
+                }
+            }
+
             .lower-container {
-                height: 93%;
+                height: 88%;
                 border-radius: 20px;
                 overflow: hidden;
 
                 .lower-content {
-                    height: calc(100vh - 220px);
+                    height: calc(100vh - 250px);
                     overflow-y: auto;
                     display: flex;
                     flex-wrap: wrap;
