@@ -5,7 +5,7 @@ const getPartsCount = async (req, res) => {
     const { partType } = req.params;
 
     const validPartTypes = [
-        'frame', 'fork', 'groupset', 'wheelset',
+        'frame', 'fork', 'groupset', 'wheelset', 'seat',
         'cockpit', 'headset', 'handlebar', 'stem', 'hubs'
     ];
 
@@ -160,6 +160,36 @@ const getWheelsetItems = async (req, res) => {
         res.json(rows);
     } catch (error) {
         console.error('Error fetching wheelset items:', error);
+        res.status(500).json({ error: 'Internal Server Error' });
+    }
+};
+
+// Get seat items
+const getSeatItems = async (req, res) => {
+    const { archived } = req.query;
+
+    try {
+        const query = `
+            SELECT 
+                s.*,
+                i.item_name,
+                i.item_price,
+                encode(s.image, 'base64') AS item_image
+                FROM 
+                    seat s
+                JOIN 
+                    items i
+                ON 
+                    s.item_id = i.item_id
+                WHERE 
+                    i.status = true 
+                    AND s.status = $1;
+        `;
+
+        const { rows } = await pool.query(query, [archived === 'true']);
+        res.json(rows);
+    } catch (error) {
+        console.error('Error fetching seat items:', error);
         res.status(500).json({ error: 'Internal Server Error' });
     }
 };
@@ -320,21 +350,19 @@ const updateFrameItem = async (req, res) => {
         const { id } = req.params;
         const {
             description,
+            purpose,
             frame_size,
             head_tube_type,
             head_tube_upper_diameter,
             head_tube_lower_diameter,
             seatpost_diameter,
             axle_type,
-            axle_width,
+            axle_diameter,
             bottom_bracket_type,
-            bottom_bracket_diameter,
+            bottom_bracket_width,
             rotor_size,
             max_tire_width,
-            brake_mount,
-            cable_routing,
             material,
-            weight,
         } = req.body;
 
         const item_image = req.file ? req.file.buffer : null;
@@ -343,44 +371,40 @@ const updateFrameItem = async (req, res) => {
             UPDATE frame
             SET 
                 description = $1,
-                frame_size = $2,
-                head_tube_type = $3,
-                head_tube_upper_diameter = $4,
-                head_tube_lower_diameter = $5,
-                seatpost_diameter = $6,
-                axle_type = $7,
-                axle_width = $8,
-                bottom_bracket_type = $9,
-                bottom_bracket_diameter = $10,
-                rotor_size = $11,
-                max_tire_width = $12,
-                brake_mount = $13,
-                cable_routing = $14,
-                material = $15,
-                weight = $16,
-                image = $17,
-                date_updated = $18
-            WHERE frame_id = $19
+                purpose = $2,
+                frame_size = $3,
+                head_tube_type = $4,
+                head_tube_upper_diameter = $5,
+                head_tube_lower_diameter = $6,
+                seatpost_diameter = $7,
+                axle_type = $8,
+                axle_diameter = $9,
+                bottom_bracket_type = $10,
+                bottom_bracket_width = $11,
+                rotor_size = $12,
+                max_tire_width = $13,
+                material = $14,
+                image = $15,
+                date_updated = $16
+            WHERE frame_id = $17
             RETURNING *;
         `;
 
         const values = [
             description,
+            purpose,
             frame_size,
             head_tube_type,
             head_tube_upper_diameter,
             head_tube_lower_diameter,
             seatpost_diameter,
             axle_type,
-            axle_width,
+            axle_diameter,
             bottom_bracket_type,
-            bottom_bracket_diameter,
+            bottom_bracket_width,
             rotor_size,
             max_tire_width,
-            brake_mount,
-            cable_routing,
             material,
-            weight,
             item_image,
             new Date(),
             id,
@@ -401,18 +425,18 @@ const updateForkItem = async (req, res) => {
         const { id } = req.params;
         const {
             description,
+            fork_type,
             fork_size,
             fork_tube_type,
             fork_tube_upper_diameter,
             fork_tube_lower_diameter,
+            fork_travel,
             axle_type,
-            axle_width,
+            axle_diameter,
             suspension_type,
             rotor_size,
             max_tire_width,
-            brake_mount,
             material,
-            weight,
         } = req.body;
 
         const item_image = req.file ? req.file.buffer : null;
@@ -421,18 +445,18 @@ const updateForkItem = async (req, res) => {
             UPDATE fork
             SET 
                 description = $1,
-                fork_size = $2,
-                fork_tube_type = $3,
-                fork_tube_upper_diameter = $4,
-                fork_tube_lower_diameter = $5,
-                axle_type = $6,
-                axle_width = $7,
-                suspension_type = $8,
-                rotor_size = $9,
-                max_tire_width= $10 ,
-                brake_mount = $11,
-                material = $12,
-                weight = $13,
+                fork_type = $2,
+                fork_size = $3,
+                fork_tube_type = $4,
+                fork_tube_upper_diameter = $5,
+                fork_tube_lower_diameter = $6,
+                fork_travel = $7,
+                axle_type = $8,
+                axle_diameter = $9,
+                suspension_type = $10,
+                rotor_size = $11,
+                max_tire_width= $12,
+                material = $13,
                 image = $14,
                 date_updated = $15
             WHERE fork_id = $16
@@ -441,18 +465,18 @@ const updateForkItem = async (req, res) => {
 
         const values = [
             description,
+            fork_type,
             fork_size,
             fork_tube_type,
             fork_tube_upper_diameter,
             fork_tube_lower_diameter,
+            fork_travel,
             axle_type,
-            axle_width,
+            axle_diameter,
             suspension_type,
             rotor_size,
             max_tire_width,
-            brake_mount,
             material,
-            weight,
             item_image,
             new Date(),
             id
@@ -481,10 +505,10 @@ const updateGroupsetItem = async (req, res) => {
             cassette_speed,
             chain_speed,
             bottom_bracket_type,
-            bottom_bracket_diameter,
+            bottom_bracket_width,
             brake_type,
-            axle_type,
-            weight,
+            rotor_mount_type,
+            rotor_size,
         } = req.body;
 
         const item_image = req.file ? req.file.buffer : null;
@@ -501,10 +525,10 @@ const updateGroupsetItem = async (req, res) => {
                 cassette_speed = $7,
                 chain_speed = $8,
                 bottom_bracket_type = $9,
-                bottom_bracket_diameter = $10,
+                bottom_bracket_width = $10,
                 brake_type = $11  ,
-                axle_type = $12,
-                weight = $13,
+                rotor_mount_type = $12,
+                rotor_size = $13,
                 image = $14,
                 date_updated = $15
             WHERE groupset_id = $16
@@ -521,10 +545,10 @@ const updateGroupsetItem = async (req, res) => {
             cassette_speed,
             chain_speed,
             bottom_bracket_type,
-            bottom_bracket_diameter,
+            bottom_bracket_width,
             brake_type,
-            axle_type,
-            weight,
+            rotor_mount_type,
+            rotor_size,
             item_image,
             new Date(),
             id
@@ -545,18 +569,19 @@ const updateWheelsetItem = async (req, res) => {
         const { id } = req.params;
         const {
             description,
+            hub_rotor_type,
+            hub_cassette_type,
+            hub_holes,
+            front_hub_width,
+            front_hub_axle_type,
+            front_hub_axle_diameter,
+            rear_hub_width,
+            rear_hub_axle_type,
+            rear_hub_axle_diameter,
+            rear_hub_speed,
             tire_size,
             tire_width,
-            rim_holes,
-            rim_width,
-            hub_type,
-            hub_speed,
-            hub_holes,
-            spokes,
-            axle_type,
-            rotor_type,
-            rotor_size,
-            weight,
+            rim_spokes,
         } = req.body;
 
         const item_image = req.file ? req.file.buffer : null;
@@ -565,38 +590,88 @@ const updateWheelsetItem = async (req, res) => {
             UPDATE wheelset
             SET 
                 description = $1,
-                tire_size = $2,
-                tire_width = $3,
-                rim_holes = $4,
-                rim_width = $5,
-                hub_type = $6,
-                hub_speed = $7,
-                hub_holes = $8,
-                spokes = $9,
-                axle_type = $10,
-                rotor_type = $11,
-                rotor_size = $12,
-                weight = $13,
-                image = $14,
-                date_updated = $15
-            WHERE wheelset_id = $16
+                hub_rotor_type = $2,
+                hub_cassette_type = $3,
+                hub_holes = $4,
+                front_hub_width = $5,
+                front_hub_axle_type = $6,
+                front_hub_axle_diameter = $7,
+                rear_hub_width = $8,
+                rear_hub_axle_type = $9,
+                rear_hub_axle_diameter = $10,
+                rear_hub_speed = $11,
+                tire_size = $12,
+                tire_width = $13,
+                rim_spokes = $14,
+                image = $15,
+                date_updated = $16
+            WHERE wheelset_id = $17
             RETURNING *;
         `;
 
         const values = [
             description,
+            hub_rotor_type,
+            hub_cassette_type,
+            hub_holes,
+            front_hub_width,
+            front_hub_axle_type,
+            front_hub_axle_diameter,
+            rear_hub_width,
+            rear_hub_axle_type,
+            rear_hub_axle_diameter,
+            rear_hub_speed,
             tire_size,
             tire_width,
-            rim_holes,
-            rim_width,
-            hub_type,
-            hub_speed,
-            hub_holes,
-            spokes,
-            axle_type,
-            rotor_type,
-            rotor_size,
-            weight,
+            rim_spokes,
+            item_image,
+            new Date(),
+            id
+        ];
+
+        const updatedItem = await pool.query(query, values);
+
+        res.status(200).json({ message: 'Item updated successfully', item: updatedItem.rows[0] });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: 'An error occurred while updating the item', error });
+    }
+};
+
+// Update seat item
+const updateSeatItem = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const {
+            description,
+            seatpost_diameter,
+            seatpost_length,
+            seat_clamp_type,
+            saddle_material,
+        } = req.body;
+
+        const item_image = req.file ? req.file.buffer : null;
+
+        const query = `
+            UPDATE seat
+            SET 
+                description = $1,
+                seatpost_diameter = $2,
+                seatpost_length = $3,
+                seat_clamp_type = $4,
+                saddle_material = $5,
+                image = $6,
+                date_updated = $7
+            WHERE seat_id = $8
+            RETURNING *;
+        `;
+
+        const values = [
+            description,
+            seatpost_diameter,
+            seatpost_length,
+            seat_clamp_type,
+            saddle_material,
             item_image,
             new Date(),
             id
@@ -617,23 +692,17 @@ const updateCockpitItem = async (req, res) => {
         const { id } = req.params;
         const {
             description,
-            seatpost_diameter,
-            seatpost_length,
-            seat_clamp_type,
             handlebar_length,
             handlebar_clamp_diameter,
             handlebar_type,
             stem_clamp_diameter,
             stem_length,
             stem_angle,
-            fork_upper_diameter,
+            stem_fork_diameter,
             headset_type,
+            headset_cup_type,
             headset_upper_diameter,
             headset_lower_diameter,
-            headset_cup_type,
-            stem_material,
-            handlebar_material,
-            weight,
         } = req.body;
 
         const item_image = req.file ? req.file.buffer : null;
@@ -642,48 +711,36 @@ const updateCockpitItem = async (req, res) => {
             UPDATE cockpit
             SET 
                 description = $1,
-                seatpost_diameter = $2,
-                seatpost_length = $3,
-                seat_clamp_type = $4,
-                handlebar_length = $5,
-                handlebar_clamp_diameter = $6,
-                handlebar_type = $7,
-                stem_clamp_diameter = $8,
-                stem_length = $9,
-                stem_angle = $10,
-                fork_upper_diameter = $11,
-                headset_type = $12,
-                headset_upper_diameter = $13,
-                headset_lower_diameter = $14,
-                headset_cup_type = $15,
-                stem_material = $16,
-                handlebar_material = $17,
-                weight = $18,
-                image = $19,
-                date_updated = $20
-            WHERE cockpit_id = $21
+                handlebar_length = $2,
+                handlebar_clamp_diameter = $3,
+                handlebar_type = $4,
+                stem_clamp_diameter = $5,
+                stem_length = $6,
+                stem_angle = $7,
+                stem_fork_diameter = $8,
+                headset_type = $9,
+                headset_cup_type = $10,
+                headset_upper_diameter = $11,
+                headset_lower_diameter = $12,
+                image = $13,
+                date_updated = $14
+            WHERE cockpit_id = $15
             RETURNING *;
         `;
 
         const values = [
             description,
-            seatpost_diameter,
-            seatpost_length,
-            seat_clamp_type,
             handlebar_length,
             handlebar_clamp_diameter,
             handlebar_type,
             stem_clamp_diameter,
             stem_length,
             stem_angle,
-            fork_upper_diameter,
+            stem_fork_diameter,
             headset_type,
+            headset_cup_type,
             headset_upper_diameter,
             headset_lower_diameter,
-            headset_cup_type,
-            stem_material,
-            handlebar_material,
-            weight,
             item_image,
             new Date(),
             id
@@ -1019,6 +1076,33 @@ const archiveWheelsetItem = async (req, res) => {
     }
 };
 
+// Archive seat item
+const archiveSeatItem = async (req, res) => {
+    const { seat_id } = req.params;
+
+    try {
+        const query = `
+            UPDATE seat
+            SET status = false
+            WHERE seat_id = $1
+            RETURNING *; 
+        `;
+        const result = await pool.query(query, [seat_id]);
+
+        if (result.rowCount === 0) {
+            return res.status(404).json({ message: 'Item not found' });
+        }
+
+        res.status(200).json({
+            message: 'Item archived successfully',
+            item: result.rows[0],
+        });
+    } catch (error) {
+        console.error('Error archiving item:', error);
+        res.status(500).json({ error: 'Internal Server Error' });
+    }
+};
+
 // Archive cockpit item
 const archiveCockpitItem = async (req, res) => {
     const { cockpit_id } = req.params;
@@ -1253,6 +1337,35 @@ const restoreWheelsetItem = async (req, res) => {
             RETURNING *; 
         `;
         const result = await pool.query(query, [wheelset_id]);
+
+        // Check if the item was found and updated
+        if (result.rowCount === 0) {
+            return res.status(404).json({ message: 'Item not found' });
+        }
+
+        // Send a success response with the updated item
+        res.status(200).json({
+            message: 'Item restored successfully',
+            item: result.rows[0], // Return the restored item details
+        });
+    } catch (error) {
+        console.error('Error restoring item:', error);
+        res.status(500).json({ error: 'Internal Server Error' });
+    }
+};
+
+// Restore seat item
+const restoreSeatItem = async (req, res) => {
+    const { seat_id } = req.params;
+
+    try {
+        const query = `
+            UPDATE seat
+            SET status = true
+            WHERE seat_id = $1
+            RETURNING *; 
+        `;
+        const result = await pool.query(query, [seat_id]);
 
         // Check if the item was found and updated
         if (result.rowCount === 0) {
@@ -1575,6 +1688,46 @@ const deleteWheelsetItem = async (req, res) => {
     }
 };
 
+// Delete seat item
+const deleteSeatItem = async (req, res) => {
+    const { seat_id } = req.params;
+
+    try {
+        const getItemQuery = `
+            SELECT item_id FROM seat WHERE seat_id = $1;
+        `;
+        const getItemResult = await pool.query(getItemQuery, [seat_id]);
+
+        if (getItemResult.rowCount === 0) {
+            return res.status(404).json({ message: 'Seat not found' });
+        }
+
+        const item_id = getItemResult.rows[0].item_id;
+
+        const deleteQuery = `
+            DELETE FROM seat WHERE seat_id = $1 RETURNING *;
+        `;
+        const deleteResult = await pool.query(deleteQuery, [seat_id]);
+
+        const updateItemQuery = `
+            UPDATE items
+            SET bike_parts = NULL, bb_bu_status = FALSE
+            WHERE item_id = $1
+            RETURNING *;
+        `;
+        const updateResult = await pool.query(updateItemQuery, [item_id]);
+
+        res.status(200).json({
+            message: 'Item deleted successfully',
+            seat: deleteResult.rows[0],
+            updatedItem: updateResult.rows[0]
+        });
+    } catch (error) {
+        console.error('Error deleting item:', error);
+        res.status(500).json({ error: 'Internal Server Error' });
+    }
+};
+
 // Delete cockpit item
 const deleteCockpitItem = async (req, res) => {
     const { cockpit_id } = req.params;
@@ -1782,6 +1935,7 @@ module.exports = {
     getForkItems,
     getGroupsetItems,
     getWheelsetItems,
+    getSeatItems,
     getCockpitItems,
     getHeadsetItems,
     getHandlebarItems,
@@ -1792,6 +1946,7 @@ module.exports = {
     updateForkItem,
     updateGroupsetItem,
     updateWheelsetItem,
+    updateSeatItem,
     updateCockpitItem,
     updateHeadsetItem,
     updateHandlebarItem,
@@ -1802,6 +1957,7 @@ module.exports = {
     archiveForkItem,
     archiveGroupsetItem,
     archiveWheelsetItem,
+    archiveSeatItem,
     archiveCockpitItem,
     archiveHeadsetItem,
     archiveHandlebarItem,
@@ -1812,6 +1968,7 @@ module.exports = {
     restoreForkItem,
     restoreGroupsetItem,
     restoreWheelsetItem,
+    restoreSeatItem,
     restoreCockpitItem,
     restoreHeadsetItem,
     restoreHandlebarItem,
@@ -1822,6 +1979,7 @@ module.exports = {
     deleteForkItem,
     deleteGroupsetItem,
     deleteWheelsetItem,
+    deleteSeatItem,
     deleteCockpitItem,
     deleteHeadsetItem,
     deleteHandlebarItem,

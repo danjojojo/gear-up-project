@@ -6,12 +6,12 @@ import frame from "../../assets/images/frame.png";
 import fork from "../../assets/images/fork.png";
 import groupset from "../../assets/images/groupset.png";
 import wheelset from "../../assets/images/wheelset.png";
+import seat from "../../assets/images/seat.png";
 import cockpit from "../../assets/images/cockpit.png";
 import headset from "../../assets/images/headset.png";
 import handlebar from "../../assets/images/handlebar.png";
 import stem from "../../assets/images/stem.png";
 import hub from "../../assets/images/hub.png";
-
 import { getItemCount } from '../../services/bbuService';
 
 const BikeBuilderUpgrader = () => {
@@ -21,6 +21,7 @@ const BikeBuilderUpgrader = () => {
         fork: 0,
         groupset: 0,
         wheelset: 0,
+        seat: 0,
         cockpit: 0,
         headset: 0,
         handlebar: 0,
@@ -38,6 +39,7 @@ const BikeBuilderUpgrader = () => {
             getItemCount('fork'),
             getItemCount('groupset'),
             getItemCount('wheelset'),
+            getItemCount('seat'),
             getItemCount('cockpit'),
             getItemCount('headset'),
             getItemCount('handlebar'),
@@ -50,11 +52,12 @@ const BikeBuilderUpgrader = () => {
             fork: counts[1].count,
             groupset: counts[2].count,
             wheelset: counts[3].count,
-            cockpit: counts[4].count,
-            headset: counts[5].count,
-            handlebar: counts[6].count,
-            stem: counts[7].count,
-            hubs: counts[8].count,
+            seat: counts[4].count,
+            cockpit: counts[5].count,
+            headset: counts[6].count,
+            handlebar: counts[7].count,
+            stem: counts[8].count,
+            hubs: counts[9].count,
         });
     };
 
@@ -112,9 +115,7 @@ const BikeBuilderUpgrader = () => {
                                     </div>
                                 </div>
                             </div>
-                        </div>
 
-                        <div className='middle-container d-flex'>
                             <div
                                 className='wheelset-container'
                                 onClick={() => handlePartClick('wheelset')}
@@ -126,6 +127,23 @@ const BikeBuilderUpgrader = () => {
                                     <div className='part-item-count'>
                                         <div className='part fs-6 fw-bold'>Wheelset</div>
                                         <div className='item-count fw-light fs-7'>{partCounts.wheelset} items</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div className='middle-container d-flex'>
+                            <div
+                                className='seat-container'
+                                onClick={() => handlePartClick('seat')}
+                            >
+                                <div className='content'>
+                                    <div className='image'>
+                                        <img src={seat} alt='Seat' />
+                                    </div>
+                                    <div className='part-item-count'>
+                                        <div className='part fs-6 fw-bold'>Seat</div>
+                                        <div className='item-count fw-light fs-7'>{partCounts.seat} items</div>
                                     </div>
                                 </div>
                             </div>
@@ -159,9 +177,7 @@ const BikeBuilderUpgrader = () => {
                                     </div>
                                 </div>
                             </div>
-                        </div>
 
-                        <div className='lower-container d-flex'>
                             <div
                                 className='handlebar-container'
                                 onClick={() => handlePartClick('handlebar')}
@@ -176,7 +192,9 @@ const BikeBuilderUpgrader = () => {
                                     </div>
                                 </div>
                             </div>
+                        </div>
 
+                        <div className='lower-container d-flex'>
                             <div
                                 className='stem-container'
                                 onClick={() => handlePartClick('stem')}

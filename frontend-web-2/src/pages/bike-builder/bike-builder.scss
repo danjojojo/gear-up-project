@@ -1,0 +1,205 @@
+.bike-builder-container {
+    height: calc(100vh - 119px);
+
+    .budget-container {
+        background-color: #2E2E2E;
+        height: 100%;
+        width: 100%;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+
+        .budget-content {
+            background-color: #525252;
+            width: 1000px;
+            height: 600px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 20px;
+
+
+            .content {
+                display: flex;
+                justify-content: space-between;
+                flex-direction: column;
+                align-items: center;
+
+                label {
+                    font-family: "poppins";
+                    font-size: 18px;
+                    color: white;
+                    display: block;
+                    margin-bottom: 10px;
+                    align-self: center;
+                }
+
+                input {
+                    font-family: "poppins";
+                    padding: 10px;
+                    font-size: 16px;
+                    margin-bottom: 20px;
+                    border: none;
+                    border-radius: 5px;
+                    width: 500px;
+                    align-self: center;
+                }
+
+                .btn-1,
+                .btn-2 {
+                    height: 200px;
+                    width: 500px;
+                    font-size: 16px;
+                    font-family: "poppins";
+                    background-color: #2E2E2E;
+                    color: white;
+                    border: none;
+                    border-radius: 5px;
+                    cursor: pointer;
+                    transition: background-color 0.3s ease;
+                    margin: 20px;
+
+                    &:hover {
+                        background-color: #666666;
+                    }
+                }
+
+                .btn-2 {
+                    height: 50px;
+                    margin: 0;
+                    width: 500px;
+                }
+
+            }
+
+        }
+
+    }
+
+
+
+    .builder-container {
+        height: 100%;
+
+        .bike-parts-sidebar {
+            width: 450px;
+            height: 100%;
+
+            .upper-container {
+                background-color: #2E2E2E;
+                height: 20%;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                flex-direction: column;
+
+                .part-title {
+                    font-family: "poppins";
+                    color: white;
+
+                }
+
+                .btn-container {
+                    button {
+                        height: 35px;
+                        width: 180px;
+                        margin: 15px;
+                        border-radius: 50px;
+                        border: none;
+                        cursor: pointer;
+                        font-family: "poppins";
+                        font-size: 14px;
+                    }
+
+                    .btn-1 {
+                        background-color: #D9D9D9;
+                    }
+
+                    .btn-2 {
+                        background-color: #F9961F;
+                    }
+                }
+            }
+
+            .lower-container {
+                background-color: #2E2E2E;
+                height: 80%;
+                display: flex;
+                justify-content: center;
+                padding: 5px;
+                overflow: hidden;
+
+                .parts-container {
+                    height: calc(100vh - 300px);
+                    background-color: #2E2E2E;
+                    width: 100%;
+                    overflow-y: auto;
+                    display: block;
+                    padding: 15px 15px 0 15px;
+                    scrollbar-color: #888 #2E2E2E;
+                    scrollbar-width: thin;
+
+                    .parts-card {
+                        background-color: white;
+                        border-radius: 20px;
+                        width: 100%;
+                        height: auto;
+                        margin-bottom: 15px;
+                        padding: 30px;
+
+                        .item-image {
+                            border-radius: 5px;
+                            height: 150px;
+                            padding: 15px;
+                            margin-bottom: 30px;
+
+                            img {
+                                width: 100%;
+                                height: 100%;
+                                object-fit: contain;
+                            }
+                        }
+
+                        .accordion {
+                            margin-bottom: 50px;
+
+                            .accordion-body {
+                                padding: 10px;
+
+                                .specs-container {
+                                    margin: 10px;
+                                    padding: 15px;
+                                    font-size: 14px;
+                                    border: solid 1px #dee2e6;
+                                }
+                            }
+                        }
+
+                        .item-name {
+                            margin-bottom: 15px;
+                            font-size: 20px;
+                        }
+
+                        .item-price {
+                            margin-bottom: 20px;
+                            font-size: 20px;
+                        }
+
+                        .add-to-build {
+                            background-color: #2E2E2E;
+                            color: white;
+                            height: 40px;
+                            width: 100%;
+                            border-radius: 5px;
+                            border: none;
+                            cursor: pointer;
+                            font-family: "poppins";
+                        }
+
+
+                    }
+                }
+            }
+        }
+    }
+}

@@ -15,6 +15,7 @@ import BikeBuilderUpgrader from './bike-builder-upgrader/bike-builder-upgrader.j
     import Fork from './bike-builder-upgrader/parts/fork/fork.jsx';
     import Groupset from './bike-builder-upgrader/parts/groupset/groupset.jsx';
     import Wheelset from './bike-builder-upgrader/parts/wheelset/wheelset.jsx';
+    import Seat from './bike-builder-upgrader/parts/seat/seat.jsx';
     import Cockpit from './bike-builder-upgrader/parts/cockpit/cockpit.jsx';
     import Headset from './bike-builder-upgrader/parts/headset/headset.jsx';
     import Handlebar from './bike-builder-upgrader/parts/handlebar/handlebar.jsx';
@@ -67,6 +68,7 @@ const Pages = {
         Fork,
         Groupset,
         Wheelset,
+        Seat,
         Cockpit,
         Headset,
         Handlebar,

@@ -23,10 +23,10 @@ const Form = ({ selectedItem, setSelectedItem, setItems, refreshWaitlist, onClos
     const [cassetteSpeed, setCassetteSpeed] = useState('');
     const [chainSpeed, setChainSpeed] = useState('');
     const [bottomBracketType, setBottomBracketType] = useState('');
-    const [bbDiameter, setBbDiameter] = useState('');
+    const [bottomBracketWidth, setBottomBracketWidth] = useState('');
     const [brakeType, setBrakeType] = useState('');
-    const [axleType, setAxleType] = useState('');
-    const [weight, setWeight] = useState('');
+    const [rotorMountType, setRotorMountType] = useState('');
+    const [rotorSize, setRotorSize] = useState('');;
     const [isEditing, setIsEditing] = useState(false);
     const [itemImage, setItemImage] = useState(null)
     const [selectedFile, setSelectedFile] = useState(null);
@@ -63,10 +63,10 @@ const Form = ({ selectedItem, setSelectedItem, setItems, refreshWaitlist, onClos
             setCassetteSpeed(selectedItem.cassette_speed || '');
             setChainSpeed(selectedItem.chain_speed || '');
             setBottomBracketType(selectedItem.bottom_bracket_type || '');
-            setBbDiameter(selectedItem.bottom_bracket_diameter || '');
+            setBottomBracketWidth(selectedItem.bottom_bracket_width || '');
             setBrakeType(selectedItem.brake_type || '');
-            setAxleType(selectedItem.axle_type || '');
-            setWeight(selectedItem.weight || '');
+            setRotorMountType(selectedItem.rotor_mount_type || '');
+            setRotorSize(selectedItem.rotor_size || '');
             setItemImage(imageBase64);
             setOriginalItem({ ...selectedItem });
 
@@ -90,10 +90,10 @@ const Form = ({ selectedItem, setSelectedItem, setItems, refreshWaitlist, onClos
         updatedData.append('cassette_speed', cassetteSpeed);
         updatedData.append('chain_speed', chainSpeed);
         updatedData.append('bottom_bracket_type', bottomBracketType);
-        updatedData.append('bottom_bracket_diameter', bbDiameter);
+        updatedData.append('bottom_bracket_width', bottomBracketWidth);
         updatedData.append('brake_type', brakeType);
-        updatedData.append('axle_type', axleType);
-        updatedData.append('weight', weight);
+        updatedData.append('rotor_mount_type', rotorMountType);
+        updatedData.append('rotor_size', rotorSize);
 
         if (selectedFile) {
             updatedData.append('item_image', selectedFile);
@@ -306,7 +306,6 @@ const Form = ({ selectedItem, setSelectedItem, setItems, refreshWaitlist, onClos
                     value={chainringSpeed}
                     onChange={(e) => setChainringSpeed(e.target.value)}
                     required
-                    disabled={!isEditing}
                 >
                     <option value="">Select Speed</option>
                     <option value="Single (1x)">Single (1x)</option>
@@ -324,7 +323,6 @@ const Form = ({ selectedItem, setSelectedItem, setItems, refreshWaitlist, onClos
                     value={crankArmLength}
                     onChange={(e) => setCrankArmLength(e.target.value)}
                     required
-                    disabled={!isEditing}
                 >
                     <option value="">Select Length</option>
                     <option value="165 mm">165 mm</option>
@@ -343,11 +341,11 @@ const Form = ({ selectedItem, setSelectedItem, setItems, refreshWaitlist, onClos
                     value={frontDerailleurSpeed}
                     onChange={(e) => setFrontDerailleurSpeed(e.target.value)}
                     required
-                    disabled={!isEditing}
                 >
                     <option value="">Select Speed</option>
                     <option value="2-speed">2-speed</option>
                     <option value="3-speed">3-speed</option>
+                    <option value="N/A (1x Chainring speed)">N/A (1x Chainring speed)</option>
                 </select>
             </div>
 
@@ -360,7 +358,6 @@ const Form = ({ selectedItem, setSelectedItem, setItems, refreshWaitlist, onClos
                     value={rearDerailleurSpeed}
                     onChange={(e) => setRearDerailleurSpeed(e.target.value)}
                     required
-                    disabled={!isEditing}
                 >
                     <option value="">Select Speed</option>
                     <option value="8-speed">8-speed</option>
@@ -380,7 +377,6 @@ const Form = ({ selectedItem, setSelectedItem, setItems, refreshWaitlist, onClos
                     value={cassetteType}
                     onChange={(e) => setCassetteType(e.target.value)}
                     required
-                    disabled={!isEditing}
                 >
                     <option value="">Select Type</option>
                     <option value="Cassette">Cassette</option>
@@ -397,7 +393,6 @@ const Form = ({ selectedItem, setSelectedItem, setItems, refreshWaitlist, onClos
                     value={cassetteSpeed}
                     onChange={(e) => setCassetteSpeed(e.target.value)}
                     required
-                    disabled={!isEditing}
                 >
                     <option value="">Select Speed</option>
                     <option value="8-speed">8-speed</option>
@@ -417,7 +412,6 @@ const Form = ({ selectedItem, setSelectedItem, setItems, refreshWaitlist, onClos
                     value={chainSpeed}
                     onChange={(e) => setChainSpeed(e.target.value)}
                     required
-                    disabled={!isEditing}
                 >
                     <option value="">Select Speed</option>
                     <option value="8-speed">8-speed</option>
@@ -437,29 +431,25 @@ const Form = ({ selectedItem, setSelectedItem, setItems, refreshWaitlist, onClos
                     value={bottomBracketType}
                     onChange={(e) => setBottomBracketType(e.target.value)}
                     required
-                    disabled={!isEditing}
                 >
                     <option value="">Select Type</option>
                     <option value="BSA (Threaded)">BSA (Threaded)</option>
-                    <option value="Press Fit (PF30)">Press Fit (PF30)</option>
+                    <option value="Press-Fit (PF30, BB86, BB92)">Press-Fit (PF30, BB86, BB92)</option>
                     <option value="BB30">BB30</option>
-                    <option value="BB92">BB92</option>
-                    <option value="BB86">BB86</option>
                 </select>
             </div>
 
             <div className="dropdown-container d-flex justify-content-between">
-                <div className="title">Bottom Bracket Diameter</div>
+                <div className="title">Bottom Bracket Width</div>
                 <select
                     className="dropdown"
-                    id="bb-diameter"
-                    name="bbDiameter"
-                    value={bbDiameter}
-                    onChange={(e) => setBbDiameter(e.target.value)}
+                    id="bottom-bracket-width"
+                    name="bottomBracketWidth"
+                    value={bottomBracketWidth}
+                    onChange={(e) => setBottomBracketWidth(e.target.value)}
                     required
-                    disabled={!isEditing}
                 >
-                    <option value="">Select Diameter</option>
+                    <option value="">Select Width</option>
                     <option value="24 mm">24 mm</option>
                     <option value="30 mm">30 mm</option>
                     <option value="41 mm">41 mm</option>
@@ -475,44 +465,45 @@ const Form = ({ selectedItem, setSelectedItem, setItems, refreshWaitlist, onClos
                     value={brakeType}
                     onChange={(e) => setBrakeType(e.target.value)}
                     required
-                    disabled={!isEditing}
                 >
                     <option value="">Select Type</option>
-                    <option value="Mechanical Disc">Mechanical Disc</option>
-                    <option value="Hydraulic Disc">Hydraulic Disc</option>
+                    <option value="Mechanical">Mechanical</option>
+                    <option value="Hydraulic">Hydraulic</option>
                     <option value="Rim Brake">Rim Brake</option>
                 </select>
             </div>
 
             <div className="dropdown-container d-flex justify-content-between">
-                <div className="title">Axle Type</div>
+                <div className="title">Rotor Mount Type</div>
                 <select
                     className="dropdown"
-                    id="axle-type"
-                    name="axleType"
-                    value={axleType}
-                    onChange={(e) => setAxleType(e.target.value)}
+                    id="rotor-mount-type"
+                    name="rotorMountType"
+                    value={rotorMountType}
+                    onChange={(e) => setRotorMountType(e.target.value)}
                     required
-                    disabled={!isEditing}
                 >
                     <option value="">Select Type</option>
-                    <option value="Quick Release (QR)">Quick Release (QR)</option>
-                    <option value="Thru-Axle (TA)">Thru-Axle (TA)</option>
+                    <option value="6-bolt">6-bolt</option>
+                    <option value="Centerlock">Centerlock</option>
                 </select>
             </div>
 
-            <div className="input-container form-group">
-                <label htmlFor="item-weight-groupset">Weight</label>
-                <input
-                    type="text"
-                    id="item-weight-groupset"
-                    name="itemWeight"
-                    value={weight}
-                    onChange={(e) => setWeight(e.target.value)}
-                    placeholder="Enter item weight"
+            <div className="dropdown-container d-flex justify-content-between">
+                <div className="title">Rotor Size</div>
+                <select
+                    className="dropdown"
+                    id="rotor-size"
+                    name="rotorSize"
+                    value={rotorSize}
+                    onChange={(e) => setRotorSize(e.target.value)}
                     required
-                    disabled={!isEditing}
-                />
+                >
+                    <option value="">Select Size</option>
+                    <option value="160mm">160mm</option>
+                    <option value="180mm">180mm</option>
+                    <option value="203mm">203mm</option>
+                </select>
             </div>
 
             {isEditing && (

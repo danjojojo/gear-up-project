@@ -15,18 +15,19 @@ const Form = ({ selectedItem, setSelectedItem, setItems, refreshWaitlist, onClos
     const [name, setName] = useState('');
     const [price, setPrice] = useState('');
     const [description, setDescription] = useState('');
+    const [hubRotorType, setHubRotorType] = useState('');
+    const [hubCassetteType, setHubCassetteType] = useState('');
+    const [hubHoles, setHubHoles] = useState('');
+    const [frontHubWidth, setFrontHubWidth] = useState('');
+    const [frontHubAxleType, setFrontHubAxleType] = useState('');
+    const [frontHubAxleDiameter, setFrontHubAxleDiameter] = useState('');
+    const [rearHubWidth, setRearHubWidth] = useState('');
+    const [rearHubAxleType, setRearHubAxleType] = useState('');
+    const [rearHubAxleDiameter, setRearHubAxleDiameter] = useState('');
+    const [rearHubSpeed, setRearHubSpeed] = useState('');
     const [tireSize, setTireSize] = useState('');
     const [tireWidth, setTireWidth] = useState('');
-    const [rimHoles, setRimHoles] = useState('');
-    const [rimWidth, setRimWidth] = useState('');
-    const [hubType, setHubType] = useState('');
-    const [hubSpeed, setHubSpeed] = useState('');
-    const [hubHoles, setHubHoles] = useState('');
-    const [spokes, setSpokes] = useState('');
-    const [axleType, setAxleType] = useState('');
-    const [rotorType, setRotorType] = useState('');
-    const [rotorSize, setRotorSize] = useState('');
-    const [weight, setWeight] = useState('');
+    const [rimSpokes, setRimSpokes] = useState('');
     const [isEditing, setIsEditing] = useState(false);
     const [itemImage, setItemImage] = useState(null)
     const [selectedFile, setSelectedFile] = useState(null);
@@ -55,18 +56,19 @@ const Form = ({ selectedItem, setSelectedItem, setItems, refreshWaitlist, onClos
             setName(selectedItem.item_name || '');
             setPrice(selectedItem.item_price || '');
             setDescription(selectedItem.description || '');
+            setHubRotorType(selectedItem.hub_rotor_type || '');
+            setHubCassetteType(selectedItem.hub_cassette_type || '');
+            setHubHoles(selectedItem.hub_holes || '');
+            setFrontHubWidth(selectedItem.front_hub_width || '');
+            setFrontHubAxleType(selectedItem.front_hub_axle_type || '');
+            setFrontHubAxleDiameter(selectedItem.front_hub_axle_diameter || '');
+            setRearHubWidth(selectedItem.rear_hub_width || '');
+            setRearHubAxleType(selectedItem.rear_hub_axle_type || '');
+            setRearHubAxleDiameter(selectedItem.rear_hub_axle_diameter || '');
+            setRearHubSpeed(selectedItem.rear_hub_speed || '');
             setTireSize(selectedItem.tire_size || '');
             setTireWidth(selectedItem.tire_width || '');
-            setRimHoles(selectedItem.rim_holes || '');
-            setRimWidth(selectedItem.rim_width || '');
-            setHubType(selectedItem.hub_type || '');
-            setHubSpeed(selectedItem.hub_speed || '');
-            setHubHoles(selectedItem.hub_holes || '');
-            setSpokes(selectedItem.spokes || '');
-            setAxleType(selectedItem.axle_type || '');
-            setRotorType(selectedItem.rotor_type || '');
-            setRotorSize(selectedItem.rotor_size || '');
-            setWeight(selectedItem.weight || '');
+            setRimSpokes(selectedItem.rim_spokes || '');
             setItemImage(imageBase64);
             setOriginalItem({ ...selectedItem });
 
@@ -82,18 +84,19 @@ const Form = ({ selectedItem, setSelectedItem, setItems, refreshWaitlist, onClos
 
         const updatedData = new FormData();
         updatedData.append('description', description);
+        updatedData.append('hub_rotor_type', hubRotorType);
+        updatedData.append('hub_cassette_type', hubCassetteType);
+        updatedData.append('front_hub_width', frontHubWidth);
+        updatedData.append('front_hub_axle_type', frontHubAxleType);
+        updatedData.append('front_hub_axle_diameter', frontHubAxleDiameter);
+        updatedData.append('rear_hub_width', rearHubWidth);
+        updatedData.append('rear_hub_axle_type', rearHubAxleType);
+        updatedData.append('rear_hub_axle_diameter', rearHubAxleDiameter);
+        updatedData.append('hub_holes', hubHoles);
+        updatedData.append('rear_hub_speed', rearHubSpeed);
         updatedData.append('tire_size', tireSize);
         updatedData.append('tire_width', tireWidth);
-        updatedData.append('rim_holes', rimHoles);
-        updatedData.append('rim_width', rimWidth);
-        updatedData.append('hub_type', hubType);
-        updatedData.append('hub_speed', hubSpeed);
-        updatedData.append('hub_holes', hubHoles);
-        updatedData.append('spokes', spokes);
-        updatedData.append('axle_type', axleType);
-        updatedData.append('rotor_type', rotorType);
-        updatedData.append('rotor_size', rotorSize);
-        updatedData.append('weight', weight);
+        updatedData.append('rim_spokes', rimSpokes);
 
         if (selectedFile) {
             updatedData.append('item_image', selectedFile);
@@ -299,6 +302,187 @@ const Form = ({ selectedItem, setSelectedItem, setItems, refreshWaitlist, onClos
             </div>
 
             <div className="dropdown-container d-flex justify-content-between">
+                <div className="title">Hub - Rotor Type</div>
+                <select
+                    className="dropdown"
+                    id="hub-rotor-type"
+                    name="hubRotorType"
+                    value={hubRotorType}
+                    onChange={(e) => setHubRotorType(e.target.value)}
+                    required
+                    disabled={!isEditing}
+                >
+                    <option value="">Select Holes</option>
+                    <option value="6-bolt">6-bolt</option>
+                    <option value="Centerlock">Centerlock</option>
+
+                </select>
+            </div>
+
+            <div className="dropdown-container d-flex justify-content-between">
+                <div className="title">Hub - Cassette Type</div>
+                <select
+                    className="dropdown"
+                    id="hub-cassette-ype"
+                    name="hubCassetteType"
+                    value={hubCassetteType}
+                    onChange={(e) => setHubCassetteType(e.target.value)}
+                    required
+                    disabled={!isEditing}
+                >
+                    <option value="">Select Type</option>
+                    <option value="Cassette">Cassette</option>
+                    <option value="Threaded">Threaded</option>
+                </select>
+            </div>
+
+            <div className="dropdown-container d-flex justify-content-between">
+                <div className="title">Hub Holes</div>
+                <select
+                    className="dropdown"
+                    id="hub-holes"
+                    name="hubHoles"
+                    value={hubHoles}
+                    onChange={(e) => setHubHoles(e.target.value)}
+                    required
+                    disabled={!isEditing}
+                >
+                    <option value="">Select Holes</option>
+                    <option value="28H">28H</option>
+                    <option value="32H">32H</option>
+                    <option value="36H">36H</option>
+                </select>
+            </div>
+
+            <div className="dropdown-container d-flex justify-content-between">
+                <div className="title">Front Hub Width</div>
+                <select
+                    className="dropdown"
+                    id="front-hub-width"
+                    name="frontHubWidth"
+                    value={frontHubWidth}
+                    onChange={(e) => setFrontHubWidth(e.target.value)}
+                    required
+                    disabled={!isEditing}
+                >
+                    <option value="">Select Width</option>
+                    <option value="100mm (Front)">100mm (Front)</option>
+                    <option value="110mm (Boost Front)">110mm (Boost Front)</option>
+                </select>
+            </div>
+
+            <div className="dropdown-container d-flex justify-content-between">
+                <div className="title">Front Hub - Axle Type</div>
+                <select
+                    className="dropdown"
+                    id="front-hub-axle-type"
+                    name="frontHubAxleType"
+                    value={frontHubAxleType}
+                    onChange={(e) => setFrontHubAxleType(e.target.value)}
+                    required
+                    disabled={!isEditing}
+                >
+                    <option value="">Select Type</option>
+                    <option value="Quick Release (QR)">Quick Release (QR)</option>
+                    <option value="Thru-Axle (TA)">Thru-Axle (TA)</option>
+                </select>
+            </div>
+
+            <div className="dropdown-container d-flex justify-content-between">
+                <div className="title">Front Hub - Axle Diameter</div>
+                <select
+                    className="dropdown"
+                    id="front-hub-axle-diameter"
+                    name="frontHubAxleDiameter"
+                    value={frontHubAxleDiameter}
+                    onChange={(e) => setFrontHubAxleDiameter(e.target.value)}
+                    required
+                    disabled={!isEditing}
+                >
+                    <option value="">Select Diameter</option>
+                    <option value="9mm (QR)">9mm (QR)</option>
+                    <option value="12mm (Thru-Axle)">12mm (Thru-Axle)</option>
+                    <option value="15mm (Thru-Axle)">15mm (Thru-Axle)</option>
+                    <option value="20mm (Thru-Axle)">20mm (Thru-Axle)</option>
+                </select>
+            </div>
+
+            <div className="dropdown-container d-flex justify-content-between">
+                <div className="title">Rear Hub Width</div>
+                <select
+                    className="dropdown"
+                    id="rear-hub-width"
+                    name="rearHubWidth"
+                    value={rearHubWidth}
+                    onChange={(e) => setRearHubWidth(e.target.value)}
+                    required
+                    disabled={!isEditing}
+                >
+                    <option value="">Select Width</option>
+                    <option value="135mm (Rear)">135mm (Rear)</option>
+                    <option value="142mm (Rear)">142mm (Rear)</option>
+                    <option value="148mm (Boost Rear)">148mm (Boost Rear)</option>
+                    <option value="150mm (Downhill)">150mm (Downhill)</option>
+                </select>
+            </div>
+
+            <div className="dropdown-container d-flex justify-content-between">
+                <div className="title">Rear Hub - Axle Type</div>
+                <select
+                    className="dropdown"
+                    id="rear-hub-axle-type"
+                    name="rearHubAxleType"
+                    value={rearHubAxleType}
+                    onChange={(e) => setRearHubAxleType(e.target.value)}
+                    required
+                    disabled={!isEditing}
+                >
+                    <option value="">Select Type</option>
+                    <option value="Quick Release (QR)">Quick Release (QR)</option>
+                    <option value="Thru-Axle (TA)">Thru-Axle (TA)</option>
+                </select>
+            </div>
+
+            <div className="dropdown-container d-flex justify-content-between">
+                <div className="title">Rear Hub - Axle Diameter</div>
+                <select
+                    className="dropdown"
+                    id="rear-hub-axle-diameter"
+                    name="rearHubAxleDiameter"
+                    value={rearHubAxleDiameter}
+                    onChange={(e) => setRearHubAxleDiameter(e.target.value)}
+                    required
+                    disabled={!isEditing}
+                >
+                    <option value="">Select Diameter</option>
+                    <option value="9mm (QR)">9mm (QR)</option>
+                    <option value="12mm (Thru-Axle)">12mm (Thru-Axle)</option>
+                    <option value="15mm (Thru-Axle)">15mm (Thru-Axle)</option>
+                    <option value="20mm (Thru-Axle)">20mm (Thru-Axle)</option>
+                </select>
+            </div>
+
+            <div className="dropdown-container d-flex justify-content-between">
+                <div className="title">Rear Hub Speed</div>
+                <select
+                    className="dropdown"
+                    id="rear-hub-speed"
+                    name="rearHubSpeed"
+                    value={rearHubSpeed}
+                    onChange={(e) => setRearHubSpeed(e.target.value)}
+                    required
+                    disabled={!isEditing}
+                >
+                    <option value="">Select Speed</option>
+                    <option value="8-speed">8-speed</option>
+                    <option value="9-speed">9-speed</option>
+                    <option value="10-speed">10-speed</option>
+                    <option value="11-speed">11-speed</option>
+                    <option value="12-speed">12-speed</option>
+                </select>
+            </div>
+
+            <div className="dropdown-container d-flex justify-content-between">
                 <div className="title">Tire Size</div>
                 <select
                     className="dropdown"
@@ -328,9 +512,10 @@ const Form = ({ selectedItem, setSelectedItem, setItems, refreshWaitlist, onClos
                     disabled={!isEditing}
                 >
                     <option value="">Select Width</option>
+                    <option value='1.9"'>1.9"</option>
+                    <option value='2.0"'>2.0"</option>
                     <option value='2.1"'>2.1"</option>
                     <option value='2.25"'>2.25"</option>
-                    <option value='2.3"'>2.3"</option>
                     <option value='2.4"'>2.4"</option>
                     <option value='2.6"'>2.6"</option>
                     <option value='2.8"'>2.8"</option>
@@ -338,105 +523,13 @@ const Form = ({ selectedItem, setSelectedItem, setItems, refreshWaitlist, onClos
             </div>
 
             <div className="dropdown-container d-flex justify-content-between">
-                <div className="title">Rim Holes</div>
+                <div className="title">Rim Spokes</div>
                 <select
                     className="dropdown"
-                    id="rim-holes"
-                    name="rimHoles"
-                    value={rimHoles}
-                    onChange={(e) => setRimHoles(e.target.value)}
-                    required
-                    disabled={!isEditing}
-                >
-                    <option value="">Select Holes</option>
-                    <option value="28H">28H</option>
-                    <option value="32H">32H</option>
-                    <option value="36H">36H</option>
-                </select>
-            </div>
-
-            <div className="dropdown-container d-flex justify-content-between">
-                <div className="title">Rim Width</div>
-                <select
-                    className="dropdown"
-                    id="rim-width"
-                    name="rimWidth"
-                    value={rimWidth}
-                    onChange={(e) => setRimWidth(e.target.value)}
-                    required
-                    disabled={!isEditing}
-                >
-                    <option value="">Select Width</option>
-                    <option value="20 mm">20 mm</option>
-                    <option value="23 mm">23 mm</option>
-                    <option value="25 mm">25 mm</option>
-                    <option value="30 mm">30 mm</option>
-                </select>
-            </div>
-
-            <div className="dropdown-container d-flex justify-content-between">
-                <div className="title">Hub Type</div>
-                <select
-                    className="dropdown"
-                    id="hub-type"
-                    name="hubType"
-                    value={hubType}
-                    onChange={(e) => setHubType(e.target.value)}
-                    required
-                    disabled={!isEditing}
-                >
-                    <option value="">Select Type</option>
-                    <option value="Quick Release (QR)">Quick Release (QR)</option>
-                    <option value="Thru-Axle (TA)">Thru-Axle (TA)</option>
-                </select>
-            </div>
-
-            <div className="dropdown-container d-flex justify-content-between">
-                <div className="title">Hub Speed</div>
-                <select
-                    className="dropdown"
-                    id="hub-speed"
-                    name="hubSpeed"
-                    value={hubSpeed}
-                    onChange={(e) => setHubSpeed(e.target.value)}
-                    required
-                    disabled={!isEditing}
-                >
-                    <option value="">Select Speed</option>
-                    <option value="8-speed">8-speed</option>
-                    <option value="9-speed">9-speed</option>
-                    <option value="10-speed">10-speed</option>
-                    <option value="11-speed">11-speed</option>
-                    <option value="12-speed">12-speed</option>
-                </select>
-            </div>
-
-            <div className="dropdown-container d-flex justify-content-between">
-                <div className="title">Hub Holes</div>
-                <select
-                    className="dropdown"
-                    id="hub-holes"
-                    name="hubHoles"
-                    value={hubHoles}
-                    onChange={(e) => setHubHoles(e.target.value)}
-                    required
-                    disabled={!isEditing}
-                >
-                    <option value="">Select Holes</option>
-                    <option value="28H">28H</option>
-                    <option value="32H">32H</option>
-                    <option value="36H">36H</option>
-                </select>
-            </div>
-
-            <div className="dropdown-container d-flex justify-content-between">
-                <div className="title">Spokes</div>
-                <select
-                    className="dropdown"
-                    id="spokes"
-                    name="spokes"
-                    value={spokes}
-                    onChange={(e) => setSpokes(e.target.value)}
+                    id="rim-spokes"
+                    name="rimSpokes"
+                    value={rimSpokes}
+                    onChange={(e) => setRimSpokes(e.target.value)}
                     required
                     disabled={!isEditing}
                 >
@@ -445,72 +538,6 @@ const Form = ({ selectedItem, setSelectedItem, setItems, refreshWaitlist, onClos
                     <option value="32">32</option>
                     <option value="36">36</option>
                 </select>
-            </div>
-
-            <div className="dropdown-container d-flex justify-content-between">
-                <div className="title">Axle Type</div>
-                <select
-                    className="dropdown"
-                    id="axle-type"
-                    name="axleType"
-                    value={axleType}
-                    onChange={(e) => setAxleType(e.target.value)}
-                    required
-                    disabled={!isEditing}
-                >
-                    <option value="">Select Type</option>
-                    <option value="Quick Release (QR)">Quick Release (QR)</option>
-                    <option value="Thru-Axle (TA)">Thru-Axle (TA)</option>
-                </select>
-            </div>
-
-            <div className="dropdown-container d-flex justify-content-between">
-                <div className="title">Rotor Type</div>
-                <select
-                    className="dropdown"
-                    id="rotor-type"
-                    name="rotorType"
-                    value={rotorType}
-                    onChange={(e) => setRotorType(e.target.value)}
-                    required
-                    disabled={!isEditing}
-                >
-                    <option value="">Select Type</option>
-                    <option value="6-bolt">6-bolt</option>
-                    <option value="Centerlock">Centerlock</option>
-                </select>
-            </div>
-
-            <div className="dropdown-container d-flex justify-content-between">
-                <div className="title">Rotor Size</div>
-                <select
-                    className="dropdown"
-                    id="rotor-size"
-                    name="rotorSize"
-                    value={rotorSize}
-                    onChange={(e) => setRotorSize(e.target.value)}
-                    required
-                    disabled={!isEditing}
-                >
-                    <option value="">Select Size</option>
-                    <option value="160 mm">160 mm</option>
-                    <option value="180 mm">180 mm</option>
-                    <option value="203 mm">203 mm</option>
-                </select>
-            </div>
-
-            <div className="input-container form-group">
-                <label htmlFor="item-weight-wheelset">Weight</label>
-                <input
-                    type="text"
-                    id="item-weight-wheelset"
-                    name="itemWeight"
-                    value={weight}
-                    onChange={(e) => setWeight(e.target.value)}
-                    placeholder="Enter item weight"
-                    required
-                    disabled={!isEditing}
-                />
             </div>
 
             {isEditing && (

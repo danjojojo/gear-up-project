@@ -4,26 +4,24 @@ import del from "../../../assets/icons/delete.png";
 import ImageUploadButton from '../../../components/img-upload-button/img-upload-button';
 import { addFrame } from '../../../services/waitlistService';
 
-const FrameForm = ({ waitlistItemID, itemID, itemName, itemPrice, onClose, refreshWaitlist }) => {
+const FrameForm = ({ waitlistItemID, itemID, itemName, itemPrice, onClose, refreshWaitlist, deleteItem }) => {
     // States management
     const [name, setName] = useState('');
     const [price, setPrice] = useState('');
     const [description, setDescription] = useState('');
+    const [purpose, setPurpose] = useState('');
     const [frameSize, setFrameSize] = useState('');
     const [headTubeType, setHeadTubeType] = useState('');
     const [htUpperDiameter, setHtUpperDiameter] = useState('');
     const [htLowerDiameter, setHtLowerDiameter] = useState('');
     const [seatpostDiameter, setSeatpostDiameter] = useState('');
     const [axleType, setAxleType] = useState('');
-    const [axleWidth, setAxleWidth] = useState('');
+    const [axleDiameter, setAxleDiameter] = useState('');
     const [bottomBracketType, setBottomBracketType] = useState('');
-    const [bbDiameter, setBbDiameter] = useState('');
+    const [bottomBracketWidth, setBottomBracketWidth] = useState('');
     const [rotorSize, setRotorSize] = useState('');
     const [maxTireWidth, setMaxTireWidth] = useState('');
-    const [brakeMount, setBrakeMount] = useState('');
-    const [cableRouting, setCableRouting] = useState('');
     const [material, setMaterial] = useState('');
-    const [weight, setWeight] = useState('');
     const [selectedFile, setSelectedFile] = useState(null);
 
     // Populate item name and price
@@ -40,21 +38,19 @@ const FrameForm = ({ waitlistItemID, itemID, itemName, itemPrice, onClose, refre
         formData.append('waitlist_item_id', waitlistItemID);
         formData.append('item_id', itemID);
         formData.append('description', description);
+        formData.append('purpose', purpose);
         formData.append('frame_size', frameSize);
         formData.append('head_tube_type', headTubeType);
         formData.append('head_tube_upper_diameter', htUpperDiameter);
         formData.append('head_tube_lower_diameter', htLowerDiameter);
         formData.append('seatpost_diameter', seatpostDiameter);
         formData.append('axle_type', axleType);
-        formData.append('axle_width', axleWidth);
+        formData.append('axle_diameter', axleDiameter);
         formData.append('bottom_bracket_type', bottomBracketType);
-        formData.append('bottom_bracket_diameter', bbDiameter);
+        formData.append('bottom_bracket_width', bottomBracketWidth);
         formData.append('rotor_size', rotorSize);
         formData.append('max_tire_width', maxTireWidth);
-        formData.append('brake_mount', brakeMount);
-        formData.append('cable_routing', cableRouting);
         formData.append('material', material);
-        formData.append('weight', weight);
         if (selectedFile) {
             formData.append('image', selectedFile);
         }
@@ -67,21 +63,19 @@ const FrameForm = ({ waitlistItemID, itemID, itemName, itemPrice, onClose, refre
 
             // Reset Form
             setDescription('');
+            setPurpose("");
             setFrameSize('');
             setHeadTubeType('');
             setHtUpperDiameter('');
             setHtLowerDiameter('');
             setSeatpostDiameter('');
             setAxleType('');
-            setAxleWidth('');
+            setAxleDiameter('');
             setBottomBracketType('');
-            setBbDiameter('');
+            setBottomBracketWidth('');
             setRotorSize('');
             setMaxTireWidth('');
-            setBrakeMount('');
-            setCableRouting('');
             setMaterial('');
-            setWeight('');
             setSelectedFile(null);
             onClose();
             refreshWaitlist();
@@ -110,11 +104,12 @@ const FrameForm = ({ waitlistItemID, itemID, itemName, itemPrice, onClose, refre
                 <div className="del-btn">
                     <img src={del}
                         alt="Delete"
-                        className="del-icon" />
+                        className="del-icon" 
+                        onClick={() => deleteItem(waitlistItemID)}/>
                 </div>
             </div>
 
-            <ImageUploadButton onFileSelect={handleFileSelect}/>
+            <ImageUploadButton onFileSelect={handleFileSelect} />
 
             <div className="input-container form-group">
                 <label htmlFor="item-name-frame">Name</label>
@@ -154,6 +149,23 @@ const FrameForm = ({ waitlistItemID, itemID, itemName, itemPrice, onClose, refre
             </div>
 
             <div className="dropdown-container d-flex justify-content-between">
+                <div className="title">Purpose</div>
+                <select
+                    className="dropdown"
+                    id="purpose"
+                    name="purpose"
+                    value={purpose}
+                    onChange={(e) => setPurpose(e.target.value)}
+                    required
+                >
+                    <option value="">Select Purpose</option>
+                    <option value="Cross-country (XC)">Cross-country (XC)</option>
+                    <option value="Enduro">Enduro</option>
+                    <option value="Downhill (DH)">Downhill (DH)</option>
+                </select>
+            </div>
+
+            <div className="dropdown-container d-flex justify-content-between">
                 <div className="title">Frame Size</div>
                 <select
                     className="dropdown"
@@ -181,10 +193,8 @@ const FrameForm = ({ waitlistItemID, itemID, itemName, itemPrice, onClose, refre
                     required
                 >
                     <option value="">Select Type</option>
+                    <option value="Non Tapered">Non Tapered</option>
                     <option value="Tapered">Tapered</option>
-                    <option value="Straight">Straight</option>
-                    <option value="Integrated">Integrated</option>
-                    <option value="External">External</option>
                 </select>
             </div>
 
@@ -199,9 +209,10 @@ const FrameForm = ({ waitlistItemID, itemID, itemName, itemPrice, onClose, refre
                     required
                 >
                     <option value="">Select Diameter</option>
-                    <option value='1 1/8" (28.6 mm)'>1 1/8" (28.6 mm)</option>
-                    <option value='1 1/4" (31.75 mm)'>1 1/4" (31.75 mm)</option>
-                    <option value='1.5" (38.1 mm)'>1.5" (38.1 mm)</option>
+                    <option value="34mm">34mm</option>
+                    <option value="44mm">44mm</option>
+                    <option value="49mm">49mm</option>
+                    <option value="55mm">55mm</option>
                 </select>
             </div>
 
@@ -216,9 +227,10 @@ const FrameForm = ({ waitlistItemID, itemID, itemName, itemPrice, onClose, refre
                     required
                 >
                     <option value="">Select Diameter</option>
-                    <option value='1.5" (38.1 mm)'>1.5" (38.1 mm)</option>
-                    <option value='1 1/4" (31.75 mm)'>1 1/4" (31.75 mm)</option>
-                    <option value='1 3/8" (34.9 mm)'>1 3/8" (34.9 mm)</option>
+                    <option value="34mm">34mm</option>
+                    <option value="44mm">44mm</option>
+                    <option value="55mm">55mm</option>
+                    <option value="56mm">56mm</option>
                 </select>
             </div>
 
@@ -241,7 +253,7 @@ const FrameForm = ({ waitlistItemID, itemID, itemName, itemPrice, onClose, refre
             </div>
 
             <div className="dropdown-container d-flex justify-content-between">
-                <div className="title">Axle Type</div>
+                <div className="title">Frame Axle Type</div>
                 <select
                     className="dropdown"
                     id="axle-type"
@@ -257,25 +269,25 @@ const FrameForm = ({ waitlistItemID, itemID, itemName, itemPrice, onClose, refre
             </div>
 
             <div className="dropdown-container d-flex justify-content-between">
-                <div className="title">Axle Width</div>
+                <div className="title">Frame Axle Diameter</div>
                 <select
                     className="dropdown"
-                    id="axle-width"
-                    name="axleWidth"
-                    value={axleWidth}
-                    onChange={(e) => setAxleWidth(e.target.value)}
+                    id="axle-diameter"
+                    name="axleDiameter"
+                    value={axleDiameter}
+                    onChange={(e) => setAxleDiameter(e.target.value)}
                     required
                 >
-                    <option value="">Select Width</option>
-                    <option value="135 mm">135 mm</option>
-                    <option value="142 mm">142 mm</option>
-                    <option value="148 mm (Boost)">148 mm (Boost)</option>
-                    <option value="150 mm">150 mm</option>
+                    <option value="">Select Diameter</option>
+                    <option value="9mm (QR)">9mm (QR)</option>
+                    <option value="12mm (Thru-Axle)">12mm (Thru-Axle)</option>
+                    <option value="15mm (Thru-Axle)">15mm (Thru-Axle)</option>
+                    <option value="20mm (Thru-Axle)">20mm (Thru-Axle)</option>
                 </select>
             </div>
 
             <div className="dropdown-container d-flex justify-content-between">
-                <div className="title">Bottom Bracket Type</div>
+                <div className="title">Frame Bottom Bracket Type</div>
                 <select
                     className="dropdown"
                     id="bottom-bracket-type"
@@ -286,32 +298,32 @@ const FrameForm = ({ waitlistItemID, itemID, itemName, itemPrice, onClose, refre
                 >
                     <option value="">Select Type</option>
                     <option value="BSA (Threaded)">BSA (Threaded)</option>
-                    <option value="Press Fit (PF30)">Press Fit (PF30)</option>
+                    <option value="Press-Fit (PF30, BB86, BB92)">Press-Fit (PF30, BB86, BB92)</option>
                     <option value="BB30">BB30</option>
-                    <option value="BB92">BB92</option>
-                    <option value="BB86">BB86</option>
                 </select>
             </div>
 
             <div className="dropdown-container d-flex justify-content-between">
-                <div className="title">Bottom Bracket Diameter</div>
+                <div className="title">Frame Bottom Bracket Width</div>
                 <select
                     className="dropdown"
-                    id="bb-diameter"
-                    name="bbDiameter"
-                    value={bbDiameter}
-                    onChange={(e) => setBbDiameter(e.target.value)}
+                    id="bottom-bracket-Width"
+                    name="bottomBracketWidth"
+                    value={bottomBracketWidth}
+                    onChange={(e) => setBottomBracketWidth(e.target.value)}
                     required
                 >
-                    <option value="">Select Diameter</option>
-                    <option value="24 mm">24 mm</option>
-                    <option value="30 mm">30 mm</option>
-                    <option value="41 mm">41 mm</option>
+                    <option value="">Select Width</option>
+                    <option value="68mm">68mm</option>
+                    <option value="73mm (MTB)">73mm (MTB)</option>
+                    <option value="83mm (Downhill)">83mm (Downhill)</option>
+                    <option value="86mm (Press-Fit)">86mm (Press-Fit)</option>
+                    <option value="92mm (MTB)">92mm (MTB)</option>
                 </select>
             </div>
 
             <div className="dropdown-container d-flex justify-content-between">
-                <div className="title">Rotor Size</div>
+                <div className="title">Frame Rotor Size</div>
                 <select
                     className="dropdown"
                     id="rotor-size"
@@ -328,7 +340,7 @@ const FrameForm = ({ waitlistItemID, itemID, itemName, itemPrice, onClose, refre
             </div>
 
             <div className="dropdown-container d-flex justify-content-between">
-                <div className="title">Max Tire Width</div>
+                <div className="title">Frame Max Tire Width</div>
                 <select
                     className="dropdown"
                     id="max-tire-width"
@@ -346,39 +358,6 @@ const FrameForm = ({ waitlistItemID, itemID, itemName, itemPrice, onClose, refre
                 </select>
             </div>
 
-            <div className="dropdown-container d-flex justify-content-between">
-                <div className="title">Brake Mount</div>
-                <select
-                    className="dropdown"
-                    id="brake-mount"
-                    name="brakeMount"
-                    value={brakeMount}
-                    onChange={(e) => setBrakeMount(e.target.value)}
-                    required
-                >
-                    <option value="">Select Mount</option>
-                    <option value="Post Mount">Post Mount</option>
-                    <option value="Flat Mount">Flat Mount</option>
-                    <option value="IS (International Standard)">IS (International Standard)</option>
-                </select>
-            </div>
-
-            <div className="dropdown-container d-flex justify-content-between">
-                <div className="title">Cable Routing</div>
-                <select
-                    className="dropdown"
-                    id="cable-routing"
-                    name="cableRouting"
-                    value={cableRouting}
-                    onChange={(e) => setCableRouting(e.target.value)}
-                    required
-                >
-                    <option value="">Select Routing</option>
-                    <option value="Internal">Internal</option>
-                    <option value="External">External</option>
-                </select>
-            </div>
-
             <div className="input-container form-group">
                 <label htmlFor="item-material-frame">Material</label>
                 <input
@@ -388,19 +367,6 @@ const FrameForm = ({ waitlistItemID, itemID, itemName, itemPrice, onClose, refre
                     value={material}
                     onChange={(e) => setMaterial(e.target.value)}
                     placeholder="Enter item material"
-                    required
-                />
-            </div>
-
-            <div className="input-container form-group">
-                <label htmlFor="item-weight-frame">Weight</label>
-                <input
-                    type="text"
-                    id="item-weight-frame"
-                    name="itemWeight"
-                    value={weight}
-                    onChange={(e) => setWeight(e.target.value)}
-                    placeholder="Enter item weight"
                     required
                 />
             </div>

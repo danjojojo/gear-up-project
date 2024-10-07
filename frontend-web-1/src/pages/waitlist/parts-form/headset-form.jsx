@@ -4,7 +4,7 @@ import del from "../../../assets/icons/delete.png";
 import ImageUploadButton from '../../../components/img-upload-button/img-upload-button';
 import { addHeadset } from '../../../services/waitlistService';
 
-const HeadsetForm = ({ waitlistItemID, itemID, itemName, itemPrice, onClose, refreshWaitlist }) => {
+const HeadsetForm = ({ waitlistItemID, itemID, itemName, itemPrice, onClose, refreshWaitlist, deleteItem }) => {
     // States management
     const [name, setName] = useState('');
     const [price, setPrice] = useState('');
@@ -83,7 +83,8 @@ const HeadsetForm = ({ waitlistItemID, itemID, itemName, itemPrice, onClose, ref
                 <div className="del-btn">
                     <img src={del}
                         alt="Delete"
-                        className="del-icon" />
+                        className="del-icon"
+                        onClick={() => deleteItem(waitlistItemID)} />
                 </div>
             </div>
 

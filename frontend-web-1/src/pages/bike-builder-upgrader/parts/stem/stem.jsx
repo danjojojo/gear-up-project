@@ -63,7 +63,7 @@ const Stem = () => {
 
 
     const filteredItems = items.filter(item =>
-        item.item_name.toLowerCase().includes(searchTerm.toLowerCase())
+        item?.item_name?.toLowerCase().includes(searchTerm.toLowerCase())
     );
 
 

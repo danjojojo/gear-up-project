@@ -4,23 +4,23 @@ import del from "../../../assets/icons/delete.png";
 import ImageUploadButton from '../../../components/img-upload-button/img-upload-button';
 import { addFork } from '../../../services/waitlistService';
 
-const ForkForm = ({ waitlistItemID, itemID, itemName, itemPrice, onClose, refreshWaitlist }) => {
+const ForkForm = ({ waitlistItemID, itemID, itemName, itemPrice, onClose, refreshWaitlist, deleteItem }) => {
     // States management
     const [name, setName] = useState('');
     const [price, setPrice] = useState('');
     const [description, setDescription] = useState('');
+    const [forkType, setForkType] = useState('');
     const [forkSize, setForkSize] = useState('');
     const [forkTubeType, setForkTubeType] = useState('');
     const [ftUpperDiameter, setFtUpperDiameter] = useState('');
     const [ftLowerDiameter, setFtLowerDiameter] = useState('');
+    const [forkTravel, setForkTravel] = useState('');
     const [axleType, setAxleType] = useState('');
-    const [axleWidth, setAxleWidth] = useState('');
+    const [axleDiameter, setAxleDiameter] = useState('');
     const [suspensionType, setSuspensionType] = useState('');
     const [rotorSize, setRotorSize] = useState('');
     const [maxTireWidth, setMaxTireWidth] = useState('');
-    const [brakeMount, setBrakeMount] = useState('');
     const [material, setMaterial] = useState('');
-    const [weight, setWeight] = useState('');
     const [selectedFile, setSelectedFile] = useState(null);
 
     // Populate item name and price
@@ -37,18 +37,18 @@ const ForkForm = ({ waitlistItemID, itemID, itemName, itemPrice, onClose, refres
         formData.append('waitlist_item_id', waitlistItemID);
         formData.append('item_id', itemID);
         formData.append('description', description);
+        formData.append('fork_type', forkType);
         formData.append('fork_size', forkSize);
         formData.append('fork_tube_type', forkTubeType);
         formData.append('fork_tube_upper_diameter', ftUpperDiameter);
         formData.append('fork_tube_lower_diameter', ftLowerDiameter);
+        formData.append('fork_travel', forkTravel);
         formData.append('axle_type', axleType);
-        formData.append('axle_width', axleWidth);
+        formData.append('axle_diameter', axleDiameter);
         formData.append('suspension_type', suspensionType);
         formData.append('rotor_size', rotorSize);
         formData.append('max_tire_width', maxTireWidth);
-        formData.append('brake_mount', brakeMount);
         formData.append('material', material);
-        formData.append('weight', weight);
         if (selectedFile) {
             formData.append('image', selectedFile);
         }
@@ -61,18 +61,17 @@ const ForkForm = ({ waitlistItemID, itemID, itemName, itemPrice, onClose, refres
 
             // Reset Form
             setDescription('');
+            setForkType("");
             setForkSize('');
             setForkTubeType('');
             setFtUpperDiameter('');
             setFtLowerDiameter('');
             setAxleType('');
-            setAxleWidth('');
+            setAxleDiameter('');
             setSuspensionType('');
             setRotorSize('');
             setMaxTireWidth('');
-            setBrakeMount('');
             setMaterial('');
-            setWeight('');
             setSelectedFile(null);
             onClose();
             refreshWaitlist();
@@ -101,7 +100,8 @@ const ForkForm = ({ waitlistItemID, itemID, itemName, itemPrice, onClose, refres
                 <div className="del-btn">
                     <img src={del}
                         alt="Delete"
-                        className="del-icon" />
+                        className="del-icon"
+                        onClick={() => deleteItem(waitlistItemID)} />
                 </div>
             </div>
 
@@ -145,6 +145,22 @@ const ForkForm = ({ waitlistItemID, itemID, itemName, itemPrice, onClose, refres
             </div>
 
             <div className="dropdown-container d-flex justify-content-between">
+                <div className="title">Fork Type</div>
+                <select
+                    className="dropdown"
+                    id="fork-type"
+                    name="forkType"
+                    value={forkType}
+                    onChange={(e) => setForkType(e.target.value)}
+                    required
+                >
+                    <option value="">Select Type</option>
+                    <option value="Suspension">Suspension</option>
+                    <option value="Rigid">Rigid</option>
+                </select>
+            </div>
+
+            <div className="dropdown-container d-flex justify-content-between">
                 <div className="title">Fork Size</div>
                 <select
                     className="dropdown"
@@ -172,8 +188,8 @@ const ForkForm = ({ waitlistItemID, itemID, itemName, itemPrice, onClose, refres
                     required
                 >
                     <option value="">Select Type</option>
+                    <option value="Non Tapered">Non Tapered</option>
                     <option value="Tapered">Tapered</option>
-                    <option value="Straight">Straight</option>
                 </select>
             </div>
 
@@ -188,9 +204,9 @@ const ForkForm = ({ waitlistItemID, itemID, itemName, itemPrice, onClose, refres
                     required
                 >
                     <option value="">Select Diameter</option>
-                    <option value='1 1/8" (28.6 mm)'>1 1/8" (28.6 mm)</option>
-                    <option value='1 1/4" (31.75 mm)'>1 1/4" (31.75 mm)</option>
-                    <option value='1.5" (38.1 mm)'>1.5" (38.1 mm)</option>
+                    <option value='1 1/8"'>1 1/8"</option>
+                    <option value='1 1/4"'>1 1/4"</option>
+                    <option value='1.5"'>1.5"</option>
                 </select>
             </div>
 
@@ -205,9 +221,28 @@ const ForkForm = ({ waitlistItemID, itemID, itemName, itemPrice, onClose, refres
                     required
                 >
                     <option value="">Select Diameter</option>
-                    <option value='1.5" (38.1 mm)'>1.5" (38.1 mm)</option>
-                    <option value='1 1/4" (31.75 mm)'>1 1/4" (31.75 mm)</option>
-                    <option value='1 3/8" (34.9 mm)'>1 3/8" (34.9 mm)</option>
+                    <option value='1 1/8"'>1 1/8"</option>
+                    <option value='1 1/4"'>1 1/4"</option>
+                    <option value='1.5"'>1.5"</option>
+                </select>
+            </div>
+
+            <div className="dropdown-container d-flex justify-content-between">
+                <div className="title">Fork Travel</div>
+                <select
+                    className="dropdown"
+                    id="fork-travel"
+                    name="forkTravel"
+                    value={forkTravel}
+                    onChange={(e) => setForkTravel(e.target.value)}
+                    required
+                >
+                    <option value="">Select Travel</option>
+                    <option value="80mm to 120mm">80mm to 120mm</option>
+                    <option value="120mm to 160mm">120mm to 160mm</option>
+                    <option value="150mm to 180mm">150mm to 180mm</option>
+                    <option value="180mm to 200mm">180mm to 200mm</option>
+                    <option value="N/A (Rigid)">N/A (Rigid)</option>
                 </select>
             </div>
 
@@ -228,18 +263,19 @@ const ForkForm = ({ waitlistItemID, itemID, itemName, itemPrice, onClose, refres
             </div>
 
             <div className="dropdown-container d-flex justify-content-between">
-                <div className="title">Axle Width</div>
+                <div className="title">Axle Diameter</div>
                 <select
                     className="dropdown"
-                    id="axle-width"
-                    name="axleWidth"
-                    value={axleWidth}
-                    onChange={(e) => setAxleWidth(e.target.value)}
+                    id="axle-diameter"
+                    name="axleDiameter"
+                    value={axleDiameter}
+                    onChange={(e) => setAxleDiameter(e.target.value)}
                     required
                 >
-                    <option value="">Select Width</option>
-                    <option value="100 mm (Standard)">100 mm (Standard)</option>
-                    <option value="110 mm (Boost)">110 mm (Boost)</option>
+                    <option value="">Select Diameter</option>
+                    <option value="9mm (QR)">9mm (QR)</option>
+                    <option value="15mm (Thru-Axle)">15mm (Thru-Axle)</option>
+                    <option value="20mm (Thru-Axle)">20mm (Thru-Axle)</option>
                 </select>
             </div>
 
@@ -254,8 +290,9 @@ const ForkForm = ({ waitlistItemID, itemID, itemName, itemPrice, onClose, refres
                     required
                 >
                     <option value="">Select Type</option>
-                    <option value="Coil">Coil</option>
                     <option value="Air">Air</option>
+                    <option value="Coil">Coil</option>
+                    <option value="N/A (Rigid)">N/A (Rigid)</option>
                 </select>
             </div>
 
@@ -295,23 +332,6 @@ const ForkForm = ({ waitlistItemID, itemID, itemName, itemPrice, onClose, refres
                 </select>
             </div>
 
-            <div className="dropdown-container d-flex justify-content-between">
-                <div className="title">Brake Mount</div>
-                <select
-                    className="dropdown"
-                    id="brake-mount"
-                    name="brakeMount"
-                    value={brakeMount}
-                    onChange={(e) => setBrakeMount(e.target.value)}
-                    required
-                >
-                    <option value="">Select Mount</option>
-                    <option value="Post Mount">Post Mount</option>
-                    <option value="Flat Mount">Flat Mount</option>
-                    <option value="IS (International Standard)">IS (International Standard)</option>
-                </select>
-            </div>
-
             <div className="input-container form-group">
                 <label htmlFor="item-material-fork">Material</label>
                 <input
@@ -321,19 +341,6 @@ const ForkForm = ({ waitlistItemID, itemID, itemName, itemPrice, onClose, refres
                     value={material}
                     onChange={(e) => setMaterial(e.target.value)}
                     placeholder="Enter item material"
-                    required
-                />
-            </div>
-
-            <div className="input-container form-group">
-                <label htmlFor="item-weight-fork">Weight</label>
-                <input
-                    type="text"
-                    id="item-weight-fork"
-                    name="itemWeight"
-                    value={weight}
-                    onChange={(e) => setWeight(e.target.value)}
-                    placeholder="Enter item weight"
                     required
                 />
             </div>

@@ -25,7 +25,7 @@ const Frame = () => {
     const fetchItems = useCallback(async () => {
         try {
             const data = await getFrameItems(displayItem);
-
+            console.log(data);
             // Sort items based on selected sort criteria
             const sortedItems = data.sort((a, b) => {
                 let aValue, bValue;
@@ -63,7 +63,7 @@ const Frame = () => {
 
 
     const filteredItems = items.filter(item =>
-        item.item_name.toLowerCase().includes(searchTerm.toLowerCase())
+        item?.item_name?.toLowerCase().includes(searchTerm.toLowerCase())
     );
 
 

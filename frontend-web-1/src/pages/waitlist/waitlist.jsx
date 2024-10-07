@@ -6,13 +6,14 @@ import filter from '../../assets/icons/filter.png';
 import sort from '../../assets/icons/sort.png';
 import arrowUp from "../../assets/icons/arrow-up.png";
 import arrowDown from "../../assets/icons/arrow-down.png";
-import { getWaitlistItems } from '../../services/waitlistService';
+import { getWaitlistItems, deleteWaitlistItem } from '../../services/waitlistService';
 
 // Parts Form
 import FrameForm from './parts-form/frame-form';
 import ForkForm from './parts-form/fork-form';
 import GroupsetForm from './parts-form/groupset-form';
 import WheelsetForm from './parts-form/wheelset-form';
+import SeatForm from './parts-form/seat-form';
 import CockpitForm from './parts-form/cockpit-form';
 import HeadsetForm from './parts-form/headset-form';
 import HandlebarForm from './parts-form/handlebar-form';
@@ -90,6 +91,23 @@ const Waitlist = () => {
         setSelectedItem(null);
     };
 
+    // Delete item
+    const deleteItem = async (waitlist_item_id) => {
+        const confirmDelete = window.confirm("Are you sure you want to delete this item? This action cannot be undone.");
+
+        if (!confirmDelete) return;
+
+        try {
+            await deleteWaitlistItem(waitlist_item_id);
+            alert("Item deleted successfully");
+
+            refreshWaitlist();
+        } catch (error) {
+            console.error("Error deleting item:", error);
+            alert("An error occurred while deleting the item");
+        }
+    }
+
     return (
         <div className='waitlist p-3'>
             <PageLayout
@@ -130,7 +148,7 @@ const Waitlist = () => {
                                                 value={selectedPart}
                                             >
                                                 <option value="">Bike Parts</option>
-                                                {["Frame", "Fork", "Groupset", "Wheelset", "Cockpit",
+                                                {["Frame", "Fork", "Groupset", "Wheelset", "Seat", "Cockpit",
                                                     "Headset", "Handlebar", "Stem", "Hubs"].map((parts) => (
                                                         <option key={parts} value={parts}>{parts}</option>
                                                     ))}
@@ -241,6 +259,7 @@ const Waitlist = () => {
                                     itemPrice={selectedItem.item_price}
                                     onClose={handleCloseView}
                                     refreshWaitlist={refreshWaitlist}
+                                    deleteItem={deleteItem}
                                 />
                             )}
 
@@ -252,6 +271,7 @@ const Waitlist = () => {
                                     itemPrice={selectedItem.item_price}
                                     onClose={handleCloseView}
                                     refreshWaitlist={refreshWaitlist}
+                                    deleteItem={deleteItem}
                                 />
                             )}
 
@@ -263,6 +283,7 @@ const Waitlist = () => {
                                     itemPrice={selectedItem.item_price}
                                     onClose={handleCloseView}
                                     refreshWaitlist={refreshWaitlist}
+                                    deleteItem={deleteItem}
                                 />
                             )}
 
@@ -274,6 +295,19 @@ const Waitlist = () => {
                                     itemPrice={selectedItem.item_price}
                                     onClose={handleCloseView}
                                     refreshWaitlist={refreshWaitlist}
+                                    deleteItem={deleteItem}
+                                />
+                            )}
+
+                            {selectedItem.bike_parts === 'Seat' && (
+                                <SeatForm
+                                    waitlistItemID={selectedItem.waitlist_item_id}
+                                    itemID={selectedItem.item_id}
+                                    itemName={selectedItem.item_name}
+                                    itemPrice={selectedItem.item_price}
+                                    onClose={handleCloseView}
+                                    refreshWaitlist={refreshWaitlist}
+                                    deleteItem={deleteItem}
                                 />
                             )}
 
@@ -285,6 +319,7 @@ const Waitlist = () => {
                                     itemPrice={selectedItem.item_price}
                                     onClose={handleCloseView}
                                     refreshWaitlist={refreshWaitlist}
+                                    deleteItem={deleteItem}
                                 />
                             )}
 
@@ -296,6 +331,7 @@ const Waitlist = () => {
                                     itemPrice={selectedItem.item_price}
                                     onClose={handleCloseView}
                                     refreshWaitlist={refreshWaitlist}
+                                    deleteItem={deleteItem}
                                 />
                             )}
 
@@ -307,6 +343,7 @@ const Waitlist = () => {
                                     itemPrice={selectedItem.item_price}
                                     onClose={handleCloseView}
                                     refreshWaitlist={refreshWaitlist}
+                                    deleteItem={deleteItem}
                                 />
                             )}
 
@@ -318,6 +355,7 @@ const Waitlist = () => {
                                     itemPrice={selectedItem.item_price}
                                     onClose={handleCloseView}
                                     refreshWaitlist={refreshWaitlist}
+                                    deleteItem={deleteItem}
                                 />
                             )}
 
@@ -329,6 +367,7 @@ const Waitlist = () => {
                                     itemPrice={selectedItem.item_price}
                                     onClose={handleCloseView}
                                     refreshWaitlist={refreshWaitlist}
+                                    deleteItem={deleteItem}
                                 />
                             )}
 

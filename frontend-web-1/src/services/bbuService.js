@@ -50,7 +50,7 @@ export const getGroupsetItems = async (archived) => {
     }
 };
 
-// Fetch Wheelset items
+// Fetch wheelset items
 export const getWheelsetItems = async (archived) => {
     try {
         const response = await api.get('/bike-builder-upgrader/wheelset-item', {
@@ -59,6 +59,19 @@ export const getWheelsetItems = async (archived) => {
         return response.data;
     } catch (error) {
         console.error('Error fetching wheelset items:', error);
+        throw error;
+    }
+};
+
+// Fetch seat items
+export const getSeatItems = async (archived) => {
+    try {
+        const response = await api.get('/bike-builder-upgrader/seat-item', {
+            params: { archived }
+        });
+        return response.data;
+    } catch (error) {
+        console.error('Error fetching seat items:', error);
         throw error;
     }
 };
@@ -172,6 +185,17 @@ export const updateWheelsetItem = async (itemId, updatedData) => {
     }
 };
 
+// Update seat item
+export const updateSeatItem = async (itemId, updatedData) => {
+    try {
+        const response = await api.put(`/bike-builder-upgrader/update-seat/${itemId}`, updatedData);
+        return response.data;
+    } catch (error) {
+        console.error('Error updating item:', error);
+        throw error;
+    }
+};
+
 // Update cockpit item
 export const updateCockpitItem = async (itemId, updatedData) => {
     try {
@@ -264,6 +288,17 @@ export const archiveGroupsetItem = async (groupset_id) => {
 export const archiveWheelsetItem = async (wheelset_id) => {
     try {
         const response = await api.put(`/bike-builder-upgrader/archive-wheelset/${wheelset_id}`);
+        return response.data;
+    } catch (error) {
+        console.error('Error updating item status:', error);
+        throw error;
+    }
+};
+
+// Archive seat item
+export const archiveSeatItem = async (seat_id) => {
+    try {
+        const response = await api.put(`/bike-builder-upgrader/archive-seat/${seat_id}`);
         return response.data;
     } catch (error) {
         console.error('Error updating item status:', error);
@@ -370,6 +405,17 @@ export const restoreWheelsetItem = async (wheelset_id) => {
     }
 };
 
+// Restore seat item
+export const restoreSeatItem = async (seat_id) => {
+    try {
+        const response = await api.put(`/bike-builder-upgrader/restore-seat/${seat_id}`);
+        return response.data;
+    } catch (error) {
+        console.error('Error restoring item:', error);
+        throw error;
+    }
+};
+
 // Restore cockpit item
 export const restoreCockpitItem = async (cockpit_id) => {
     try {
@@ -462,6 +508,17 @@ export const deleteGroupsetItem = async (groupset_id) => {
 export const deleteWheelsetItem = async (wheelset_id) => {
     try {
         const response = await api.put(`/bike-builder-upgrader/delete-wheelset/${wheelset_id}`);
+        return response.data;
+    } catch (error) {
+        console.error('Error deleting item:', error);
+        throw error;
+    }
+};
+
+// Delete seat item
+export const deleteSeatItem = async (seat_id) => {
+    try {
+        const response = await api.put(`/bike-builder-upgrader/delete-seat/${seat_id}`);
         return response.data;
     } catch (error) {
         console.error('Error deleting item:', error);

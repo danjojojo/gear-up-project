@@ -4,7 +4,7 @@ import del from "../../../assets/icons/delete.png";
 import ImageUploadButton from '../../../components/img-upload-button/img-upload-button';
 import { addGroupset } from '../../../services/waitlistService';
 
-const GroupsetForm = ({ waitlistItemID, itemID, itemName, itemPrice, onClose, refreshWaitlist }) => {
+const GroupsetForm = ({ waitlistItemID, itemID, itemName, itemPrice, onClose, refreshWaitlist, deleteItem }) => {
     // States management
     const [name, setName] = useState('');
     const [price, setPrice] = useState('');
@@ -17,10 +17,10 @@ const GroupsetForm = ({ waitlistItemID, itemID, itemName, itemPrice, onClose, re
     const [cassetteSpeed, setCassetteSpeed] = useState('');
     const [chainSpeed, setChainSpeed] = useState('');
     const [bottomBracketType, setBottomBracketType] = useState('');
-    const [bbDiameter, setBbDiameter] = useState('');
+    const [bottomBracketWidth, setBottomBracketWidth] = useState('');
     const [brakeType, setBrakeType] = useState('');
-    const [axleType, setAxleType] = useState('');
-    const [weight, setWeight] = useState('');
+    const [rotorMountType, setRotorMountType] = useState('');
+    const [rotorSize, setRotorSize] = useState('');
     const [selectedFile, setSelectedFile] = useState(null);
 
     // Populate item name and price
@@ -45,10 +45,10 @@ const GroupsetForm = ({ waitlistItemID, itemID, itemName, itemPrice, onClose, re
         formData.append('cassette_speed', cassetteSpeed);
         formData.append('chain_speed', chainSpeed);
         formData.append('bottom_bracket_type', bottomBracketType);
-        formData.append('bottom_bracket_diameter', bbDiameter);
+        formData.append('bottom_bracket_width', bottomBracketWidth);
         formData.append('brake_type', brakeType);
-        formData.append('axle_type', axleType);
-        formData.append('weight', weight);
+        formData.append('rotor_mount_type', rotorMountType);
+        formData.append('rotor_size', rotorSize);
         if (selectedFile) {
             formData.append('image', selectedFile);
         }
@@ -69,10 +69,10 @@ const GroupsetForm = ({ waitlistItemID, itemID, itemName, itemPrice, onClose, re
             setCassetteSpeed('');
             setChainSpeed('');
             setBottomBracketType('');
-            setBbDiameter('');
+            setBottomBracketWidth('');
             setBrakeType('');
-            setAxleType('');
-            setWeight('');
+            setRotorMountType('');
+            setRotorSize('');
             setSelectedFile(null);
             onClose();
             refreshWaitlist();
@@ -101,7 +101,8 @@ const GroupsetForm = ({ waitlistItemID, itemID, itemName, itemPrice, onClose, re
                 <div className="del-btn">
                     <img src={del}
                         alt="Delete"
-                        className="del-icon" />
+                        className="del-icon"
+                        onClick={() => deleteItem(waitlistItemID)} />
                 </div>
             </div>
 
@@ -192,6 +193,7 @@ const GroupsetForm = ({ waitlistItemID, itemID, itemName, itemPrice, onClose, re
                     <option value="">Select Speed</option>
                     <option value="2-speed">2-speed</option>
                     <option value="3-speed">3-speed</option>
+                    <option value="N/A (1x Chainring speed)">N/A (1x Chainring speed)</option>
                 </select>
             </div>
 
@@ -280,24 +282,22 @@ const GroupsetForm = ({ waitlistItemID, itemID, itemName, itemPrice, onClose, re
                 >
                     <option value="">Select Type</option>
                     <option value="BSA (Threaded)">BSA (Threaded)</option>
-                    <option value="Press Fit (PF30)">Press Fit (PF30)</option>
+                    <option value="Press-Fit (PF30, BB86, BB92)">Press-Fit (PF30, BB86, BB92)</option>
                     <option value="BB30">BB30</option>
-                    <option value="BB92">BB92</option>
-                    <option value="BB86">BB86</option>
                 </select>
             </div>
 
             <div className="dropdown-container d-flex justify-content-between">
-                <div className="title">Bottom Bracket Diameter</div>
+                <div className="title">Bottom Bracket Width</div>
                 <select
                     className="dropdown"
-                    id="bb-diameter"
-                    name="bbDiameter"
-                    value={bbDiameter}
-                    onChange={(e) => setBbDiameter(e.target.value)}
+                    id="bottom-bracket-width"
+                    name="bottomBracketWidth"
+                    value={bottomBracketWidth}
+                    onChange={(e) => setBottomBracketWidth(e.target.value)}
                     required
                 >
-                    <option value="">Select Diameter</option>
+                    <option value="">Select Width</option>
                     <option value="24 mm">24 mm</option>
                     <option value="30 mm">30 mm</option>
                     <option value="41 mm">41 mm</option>
@@ -315,39 +315,43 @@ const GroupsetForm = ({ waitlistItemID, itemID, itemName, itemPrice, onClose, re
                     required
                 >
                     <option value="">Select Type</option>
-                    <option value="Mechanical Disc">Mechanical Disc</option>
-                    <option value="Hydraulic Disc">Hydraulic Disc</option>
+                    <option value="Mechanical">Mechanical</option>
+                    <option value="Hydraulic">Hydraulic</option>
                     <option value="Rim Brake">Rim Brake</option>
                 </select>
             </div>
 
             <div className="dropdown-container d-flex justify-content-between">
-                <div className="title">Axle Type</div>
+                <div className="title">Rotor Mount Type</div>
                 <select
                     className="dropdown"
-                    id="axle-type"
-                    name="axleType"
-                    value={axleType}
-                    onChange={(e) => setAxleType(e.target.value)}
+                    id="rotor-mount-type"
+                    name="rotorMountType"
+                    value={rotorMountType}
+                    onChange={(e) => setRotorMountType(e.target.value)}
                     required
                 >
                     <option value="">Select Type</option>
-                    <option value="Quick Release (QR)">Quick Release (QR)</option>
-                    <option value="Thru-Axle (TA)">Thru-Axle (TA)</option>
+                    <option value="6-bolt">6-bolt</option>
+                    <option value="Centerlock">Centerlock</option>
                 </select>
             </div>
 
-            <div className="input-container form-group">
-                <label htmlFor="item-weight-groupset">Weight</label>
-                <input
-                    type="text"
-                    id="item-weight-groupset"
-                    name="itemWeight"
-                    value={weight}
-                    onChange={(e) => setWeight(e.target.value)}
-                    placeholder="Enter item weight"
+            <div className="dropdown-container d-flex justify-content-between">
+                <div className="title">Rotor Size</div>
+                <select
+                    className="dropdown"
+                    id="rotor-size"
+                    name="rotorSize"
+                    value={rotorSize}
+                    onChange={(e) => setRotorSize(e.target.value)}
                     required
-                />
+                >
+                    <option value="">Select Size</option>
+                    <option value="160mm">160mm</option>
+                    <option value="180mm">180mm</option>
+                    <option value="203mm">203mm</option>
+                </select>
             </div>
 
             <div className="submit-container">

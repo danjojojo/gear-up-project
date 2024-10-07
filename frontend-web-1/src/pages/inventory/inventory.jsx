@@ -892,6 +892,7 @@ const Inventory = () => {
                                                                 <option value="Fork">Fork</option>
                                                                 <option value="Groupset">Groupset</option>
                                                                 <option value="Wheelset">Wheelset</option>
+                                                                <option value="Seat">Seat</option>
                                                                 <option value="Cockpit">Cockpit</option>
                                                                 <option value="Headset">Headset</option>
                                                                 <option value="Handlebar">Handlebar</option>
@@ -1081,6 +1082,7 @@ const Inventory = () => {
                                                     <option value="Fork">Fork</option>
                                                     <option value="Groupset">Groupset</option>
                                                     <option value="Wheelset">Wheelset</option>
+                                                    <option value="Seat">Seat</option>
                                                     <option value="Cockpit">Cockpit</option>
                                                     <option value="Headset">Headset</option>
                                                     <option value="Handlebar">Handlebar</option>

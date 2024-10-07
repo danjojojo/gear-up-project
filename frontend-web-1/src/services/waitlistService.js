@@ -18,7 +18,7 @@ export const addFrame = async (frameData) => {
         return response.data;
     } catch (error) {
         console.error('Error adding frame:', error);
-        throw error;    
+        throw error;
     }
 };
 
@@ -29,7 +29,7 @@ export const addFork = async (forkData) => {
         return response.data;
     } catch (error) {
         console.error('Error adding fork:', error);
-        throw error;    
+        throw error;
     }
 };
 
@@ -40,7 +40,7 @@ export const addGroupset = async (groupsetData) => {
         return response.data;
     } catch (error) {
         console.error('Error adding groupset:', error);
-        throw error;    
+        throw error;
     }
 };
 
@@ -51,7 +51,18 @@ export const addWheelset = async (wheelsetData) => {
         return response.data;
     } catch (error) {
         console.error('Error adding wheelset:', error);
-        throw error;    
+        throw error;
+    }
+};
+
+// Add item to seat
+export const addSeat = async (seatData) => {
+    try {
+        const response = await api.post('/waitlist/add-seat', seatData);
+        return response.data;
+    } catch (error) {
+        console.error('Error adding seat:', error);
+        throw error;
     }
 };
 
@@ -62,7 +73,7 @@ export const addCockpit = async (cockpitData) => {
         return response.data;
     } catch (error) {
         console.error('Error adding cockpit:', error);
-        throw error;    
+        throw error;
     }
 };
 
@@ -73,7 +84,7 @@ export const addHeadset = async (headsetData) => {
         return response.data;
     } catch (error) {
         console.error('Error adding headset:', error);
-        throw error;    
+        throw error;
     }
 };
 
@@ -84,7 +95,7 @@ export const addHandlebar = async (handlebarData) => {
         return response.data;
     } catch (error) {
         console.error('Error adding handlebar:', error);
-        throw error;    
+        throw error;
     }
 };
 
@@ -95,7 +106,7 @@ export const addStem = async (stemData) => {
         return response.data;
     } catch (error) {
         console.error('Error adding stem:', error);
-        throw error;    
+        throw error;
     }
 };
 
@@ -106,7 +117,18 @@ export const addHubs = async (hubsData) => {
         return response.data;
     } catch (error) {
         console.error('Error adding hubs:', error);
-        throw error;    
+        throw error;
+    }
+};
+
+// Delete waitlist item
+export const deleteWaitlistItem = async (waitlist_id) => {
+    try {
+        const response = await api.put(`/waitlist/delete-item/${waitlist_id}`);
+        return response.data;
+    } catch (error) {
+        console.error('Error deleting waitlist item:', error);
+        throw error;
     }
 };
 
