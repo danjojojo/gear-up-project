@@ -40,6 +40,45 @@ const Wheelset = () => {
                         <Accordion.Item eventKey="1">
                             <Accordion.Header>Tech Specs</Accordion.Header>
                             <Accordion.Body>
+                                <div className='specs-container'>
+                                    Hub - Rotor Type: {item.hub_rotor_type}
+                                </div>
+
+                                <div className='specs-container'>
+                                    Hub - Cassette Type: {item.hub_cassette_type}
+                                </div>
+
+                                <div className='specs-container'>
+                                    Hub Holes: {item.hub_holes}
+                                </div>
+
+                                <div className='specs-container'>
+                                    Front Hub Width: {item.front_hub_width}
+                                </div>
+
+                                <div className='specs-container'>
+                                    Front Hub - Axle Type: {item.front_hub_axle_type}
+                                </div>
+
+                                <div className='specs-container'>
+                                    Front Hub - Axle Diameter: {item.front_hub_axle_diameter}
+                                </div>
+
+                                <div className='specs-container'>
+                                    Rear Hub Width: {item.rear_hub_width}
+                                </div>
+
+                                <div className='specs-container'>
+                                    Rear Hub - Axle Type: {item.rear_hub_axle_type}
+                                </div>
+
+                                <div className='specs-container'>
+                                    Rear Hub - Axle Diameter: {item.rear_hub_axle_diameter}
+                                </div>
+
+                                <div className='specs-container'>
+                                    Rear Hub Speed: {item.rear_hub_speed}
+                                </div>
 
                                 <div className='specs-container'>
                                     Tire Size: {item.tire_size}
@@ -50,43 +89,7 @@ const Wheelset = () => {
                                 </div>
 
                                 <div className='specs-container'>
-                                    Rim Holes: {item.rim_holes}
-                                </div>
-
-                                <div className='specs-container'>
-                                    Rim Width: {item.rim_width}
-                                </div>
-
-                                <div className='specs-container'>
-                                    Hub Type: {item.hub_type}
-                                </div>
-
-                                <div className='specs-container'>
-                                    Hub Speed: {item.hub_speed}
-                                </div>
-
-                                <div className='specs-container'>
-                                    Hub Holes: {item.hub_holes}
-                                </div>
-
-                                <div className='specs-container'>
-                                    Spokes: {item.spokes}
-                                </div>
-
-                                <div className='specs-container'>
-                                    Axle Type: {item.axle_type}
-                                </div>
-
-                                <div className='specs-container'>
-                                    Rotor Type: {item.rotor_type}
-                                </div>
-
-                                <div className='specs-container'>
-                                    Rotor Size: {item.rotor_size}
-                                </div>
-
-                                <div className='specs-container'>
-                                    Weight: {item.weight}
+                                    Rim Spokes: {item.rim_spokes}
                                 </div>
                             </Accordion.Body>
                         </Accordion.Item>

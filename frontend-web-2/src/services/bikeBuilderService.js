@@ -40,52 +40,22 @@ export const getWheelsetItems = async () => {
     }
 };
 
+export const getSeatItems = async () => {
+    try {
+        const response = await api.get('/bike-builder/seat-item');
+        return response.data;
+    } catch (error) {
+        console.error('Error fetching seat items:', error);
+        throw error;
+    }
+};
+
 export const getCockpitItems = async () => {
     try {
         const response = await api.get('/bike-builder/cockpit-item');
         return response.data;
     } catch (error) {
         console.error('Error fetching cockpit items:', error);
-        throw error;
-    }
-};
-
-export const getHeadsetItems = async () => {
-    try {
-        const response = await api.get('/bike-builder/headset-item');
-        return response.data;
-    } catch (error) {
-        console.error('Error fetching headset items:', error);
-        throw error;
-    }
-};
-
-export const getHandlebarItems = async () => {
-    try {
-        const response = await api.get('/bike-builder/handlebar-item');
-        return response.data;
-    } catch (error) {
-        console.error('Error fetching handlebar items:', error);
-        throw error;
-    }
-};
-
-export const getStemItems = async () => {
-    try {
-        const response = await api.get('/bike-builder/stem-item');
-        return response.data;
-    } catch (error) {
-        console.error('Error fetching stem items:', error);
-        throw error;
-    }
-};
-
-export const getHubsItems = async () => {
-    try {
-        const response = await api.get('/bike-builder/hubs-item');
-        return response.data;
-    } catch (error) {
-        console.error('Error fetching hubs items:', error);
         throw error;
     }
 };

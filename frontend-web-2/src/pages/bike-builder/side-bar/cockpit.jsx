@@ -40,19 +40,6 @@ const Cockpit = () => {
                         <Accordion.Item eventKey="1">
                             <Accordion.Header>Tech Specs</Accordion.Header>
                             <Accordion.Body>
-
-                                <div className='specs-container'>
-                                    Seatpost Diameter: {item.seatpost_diameter}
-                                </div>
-
-                                <div className='specs-container'>
-                                    Seatpost Length: {item.seatpost_length}
-                                </div>
-
-                                <div className='specs-container'>
-                                    Seat Clamp Type: {item.seat_clamp_type}
-                                </div>
-
                                 <div className='specs-container'>
                                     Handlebar Length: {item.handlebar_length}
                                 </div>
@@ -78,11 +65,15 @@ const Cockpit = () => {
                                 </div>
 
                                 <div className='specs-container'>
-                                    Fork Upper Diameter: {item.fork_upper_diameter}
+                                    Stem Fork Diameter: {item.stem_fork_diameter}
                                 </div>
 
                                 <div className='specs-container'>
                                     Headset Type: {item.headset_type}
+                                </div>
+
+                                <div className='specs-container'>
+                                    Headset Cup Type: {item.headset_cup_type}
                                 </div>
 
                                 <div className='specs-container'>
@@ -91,22 +82,6 @@ const Cockpit = () => {
 
                                 <div className='specs-container'>
                                     Headset Lower Diameter: {item.headset_lower_diameter}
-                                </div>
-
-                                <div className='specs-container'>
-                                    Headset Cup Type: {item.headset_cup_type}
-                                </div>
-
-                                <div className='specs-container'>
-                                    Stem Material: {item.stem_material}
-                                </div>
-
-                                <div className='specs-container'>
-                                    Handlebar Material: {item.handlebar_material}
-                                </div>
-
-                                <div className='specs-container'>
-                                    Weight: {item.weight}
                                 </div>
                             </Accordion.Body>
                         </Accordion.Item>

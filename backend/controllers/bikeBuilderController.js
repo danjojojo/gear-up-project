@@ -112,6 +112,34 @@ const getWheelsetItems = async (req, res) => {
     }
 };
 
+// Get seat items
+const getSeatItems = async (req, res) => {
+    try {
+        const query = `
+            SELECT 
+                s.*,
+                i.item_name,
+                i.item_price,
+                encode(s.image, 'base64') AS item_image
+                FROM 
+                    seat s
+                JOIN 
+                    items i
+                ON 
+                    s.item_id = i.item_id
+                WHERE 
+                    i.status = true 
+                    AND s.status = true;
+        `;
+
+        const result = await pool.query(query);
+        res.status(200).json(result.rows);
+    } catch (error) {
+        console.error('Error fetching seat items:', error);
+        res.status(500).json({ error: 'Internal Server Error' });
+    }
+};
+
 // Get cockpit items
 const getCockpitItems = async (req, res) => {
     try {
@@ -140,126 +168,11 @@ const getCockpitItems = async (req, res) => {
     }
 };
 
-// Get headset items
-const getHeadsetItems = async (req, res) => {
-    try {
-        const query = `
-            SELECT 
-                h.*,
-                i.item_name,
-                i.item_price,
-                encode(h.image, 'base64') AS item_image
-                FROM 
-                    headset h
-                JOIN 
-                    items i
-                ON 
-                    h.item_id = i.item_id
-                WHERE 
-                    i.status = true 
-                    AND h.status = true;
-        `;
-
-        const result = await pool.query(query);
-        res.status(200).json(result.rows);
-    } catch (error) {
-        console.error('Error fetching headset items:', error);
-        res.status(500).json({ error: 'Internal Server Error' });
-    }
-};
-
-// Get handlebar items
-const getHandlebarItems = async (req, res) => {
-    try {
-        const query = `
-            SELECT 
-                h.*,
-                i.item_name,
-                i.item_price,
-                encode(h.image, 'base64') AS item_image
-                FROM 
-                    handlebar h
-                JOIN 
-                    items i
-                ON 
-                    h.item_id = i.item_id
-                WHERE 
-                    i.status = true 
-                    AND h.status = true;
-        `;
-
-        const result = await pool.query(query);
-        res.status(200).json(result.rows);
-    } catch (error) {
-        console.error('Error fetching handlebar items:', error);
-        res.status(500).json({ error: 'Internal Server Error' });
-    }
-};
-
-// Get stem items
-const getStemItems = async (req, res) => {
-    try {
-        const query = `
-            SELECT 
-                s.*,
-                i.item_name,
-                i.item_price,
-                encode(s.image, 'base64') AS item_image
-                FROM 
-                    stem s
-                JOIN 
-                    items i
-                ON 
-                    s.item_id = i.item_id
-                WHERE 
-                    i.status = true 
-                    AND s.status = true;
-        `;
-
-        const result = await pool.query(query);
-        res.status(200).json(result.rows);
-    } catch (error) {
-        console.error('Error fetching stem items:', error);
-        res.status(500).json({ error: 'Internal Server Error' });
-    }
-};
-
-// Get hubs items
-const getHubsItems = async (req, res) => {
-    try {
-        const query = `
-            SELECT 
-                h.*,
-                i.item_name,
-                i.item_price,
-                encode(h.image, 'base64') AS item_image
-                FROM 
-                    hubs h
-                JOIN 
-                    items i
-                ON 
-                    h.item_id = i.item_id
-                WHERE 
-                    i.status = true 
-                    AND h.status = true;
-        `;
-
-        const result = await pool.query(query);
-        res.status(200).json(result.rows);
-    } catch (error) {
-        console.error('Error fetching hubs items:', error);
-        res.status(500).json({ error: 'Internal Server Error' });
-    }
-};
-
 module.exports = {
     getFrameItems,
     getForkItems,
     getGroupsetItems,
     getWheelsetItems,
-    getCockpitItems,
-    getHeadsetItems,
-    getHandlebarItems,
-    getStemItems,
-    getHubsItems
+    getSeatItems,
+    getCockpitItems
 };

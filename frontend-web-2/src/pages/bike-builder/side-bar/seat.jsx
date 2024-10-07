@@ -1,16 +1,16 @@
 import React, { useState, useEffect } from 'react';
 import { Accordion } from 'react-bootstrap';
-import { getForkItems } from '../../../services/bikeBuilderService';
+import { getSeatItems } from '../../../services/bikeBuilderService';
 
-const Fork = () => {
+const Seat = () => {
     const [items, setItems] = useState([]);
 
     const fetchItems = async () => {
         try {
-            const data = await getForkItems();
+            const data = await getSeatItems();
             setItems(data);
         } catch (error) {
-            console.error("Error fetching fork items:", error);
+            console.error("Error fetching seat items:", error);
         }
     };
 
@@ -21,7 +21,7 @@ const Fork = () => {
     return (
         <div className="parts-container">
             {items.map((item) => (
-                <div className="parts-card" key={item.fork_id}>
+                <div className="parts-card" key={item.seat_id}>
                     <div className="item-image">
                         {item.item_image ? (
                             <img src={`data:image/png;base64,${item.item_image}`} alt="frame" />
@@ -41,51 +41,19 @@ const Fork = () => {
                             <Accordion.Header>Tech Specs</Accordion.Header>
                             <Accordion.Body>
                                 <div className='specs-container'>
-                                    Fork Type: {item.fork_type}
+                                    Seatpost Diameter: {item.seatpost_diameter}
                                 </div>
 
                                 <div className='specs-container'>
-                                    Fork Size: {item.fork_size}
+                                    Seatpost Length: {item.seatpost_length}
                                 </div>
 
                                 <div className='specs-container'>
-                                    Fork Tube Type: {item.fork_tube_type}
+                                    Seat Clamp Type: {item.seat_clamp_type}
                                 </div>
 
                                 <div className='specs-container'>
-                                    Fork Tube Upper Diameter: {item.fork_tube_upper_diameter}
-                                </div>
-
-                                <div className='specs-container'>
-                                    Fork Tube Lower Diameter: {item.fork_tube_lower_diameter}
-                                </div>
-
-                                <div className='specs-container'>
-                                    Fork Travel: {item.fork_travel}
-                                </div>
-
-                                <div className='specs-container'>
-                                    Axle Type: {item.axle_type}
-                                </div>
-
-                                <div className='specs-container'>
-                                    Axle Diameter: {item.axle_diameter}
-                                </div>
-
-                                <div className='specs-container'>
-                                    Suspension Type: {item.suspension_type}
-                                </div>
-
-                                <div className='specs-container'>
-                                    Rotor Size: {item.rotor_size}
-                                </div>
-
-                                <div className='specs-container'>
-                                    Max Tire Width: {item.max_tire_width}
-                                </div>
-
-                                <div className='specs-container'>
-                                    Material: {item.material}
+                                    Saddle Material: {item.saddle_material}
                                 </div>
                             </Accordion.Body>
                         </Accordion.Item>
@@ -98,4 +66,4 @@ const Fork = () => {
     );
 };
 
-export default Fork;
+export default Seat;

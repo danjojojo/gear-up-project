@@ -74,7 +74,7 @@ const Groupset = () => {
                                 </div>
 
                                 <div className='specs-container'>
-                                    Bottom Bracket Diameter: {item.bottom_bracket_diameter}
+                                    Bottom Bracket Width: {item.bottom_bracket_width}
                                 </div>
 
                                 <div className='specs-container'>
@@ -82,11 +82,11 @@ const Groupset = () => {
                                 </div>
 
                                 <div className='specs-container'>
-                                    Axle Type: {item.axle_type}
+                                    Rotor Mount Type: {item.rotor_mount_type}
                                 </div>
 
                                 <div className='specs-container'>
-                                    Weight: {item.weight}
+                                    Rotor Size: {item.rotor_size}
                                 </div>
 
                             </Accordion.Body>

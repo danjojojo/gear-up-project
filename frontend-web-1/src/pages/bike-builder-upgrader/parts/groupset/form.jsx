@@ -306,6 +306,7 @@ const Form = ({ selectedItem, setSelectedItem, setItems, refreshWaitlist, onClos
                     value={chainringSpeed}
                     onChange={(e) => setChainringSpeed(e.target.value)}
                     required
+                    disabled={!isEditing}
                 >
                     <option value="">Select Speed</option>
                     <option value="Single (1x)">Single (1x)</option>
@@ -323,6 +324,7 @@ const Form = ({ selectedItem, setSelectedItem, setItems, refreshWaitlist, onClos
                     value={crankArmLength}
                     onChange={(e) => setCrankArmLength(e.target.value)}
                     required
+                    disabled={!isEditing}
                 >
                     <option value="">Select Length</option>
                     <option value="165 mm">165 mm</option>
@@ -341,6 +343,7 @@ const Form = ({ selectedItem, setSelectedItem, setItems, refreshWaitlist, onClos
                     value={frontDerailleurSpeed}
                     onChange={(e) => setFrontDerailleurSpeed(e.target.value)}
                     required
+                    disabled={!isEditing}
                 >
                     <option value="">Select Speed</option>
                     <option value="2-speed">2-speed</option>
@@ -358,6 +361,7 @@ const Form = ({ selectedItem, setSelectedItem, setItems, refreshWaitlist, onClos
                     value={rearDerailleurSpeed}
                     onChange={(e) => setRearDerailleurSpeed(e.target.value)}
                     required
+                    disabled={!isEditing}
                 >
                     <option value="">Select Speed</option>
                     <option value="8-speed">8-speed</option>
@@ -377,6 +381,7 @@ const Form = ({ selectedItem, setSelectedItem, setItems, refreshWaitlist, onClos
                     value={cassetteType}
                     onChange={(e) => setCassetteType(e.target.value)}
                     required
+                    disabled={!isEditing}
                 >
                     <option value="">Select Type</option>
                     <option value="Cassette">Cassette</option>
@@ -393,6 +398,7 @@ const Form = ({ selectedItem, setSelectedItem, setItems, refreshWaitlist, onClos
                     value={cassetteSpeed}
                     onChange={(e) => setCassetteSpeed(e.target.value)}
                     required
+                    disabled={!isEditing}
                 >
                     <option value="">Select Speed</option>
                     <option value="8-speed">8-speed</option>
@@ -412,6 +418,7 @@ const Form = ({ selectedItem, setSelectedItem, setItems, refreshWaitlist, onClos
                     value={chainSpeed}
                     onChange={(e) => setChainSpeed(e.target.value)}
                     required
+                    disabled={!isEditing}
                 >
                     <option value="">Select Speed</option>
                     <option value="8-speed">8-speed</option>
@@ -431,6 +438,7 @@ const Form = ({ selectedItem, setSelectedItem, setItems, refreshWaitlist, onClos
                     value={bottomBracketType}
                     onChange={(e) => setBottomBracketType(e.target.value)}
                     required
+                    disabled={!isEditing}
                 >
                     <option value="">Select Type</option>
                     <option value="BSA (Threaded)">BSA (Threaded)</option>
@@ -448,6 +456,7 @@ const Form = ({ selectedItem, setSelectedItem, setItems, refreshWaitlist, onClos
                     value={bottomBracketWidth}
                     onChange={(e) => setBottomBracketWidth(e.target.value)}
                     required
+                    disabled={!isEditing}
                 >
                     <option value="">Select Width</option>
                     <option value="24 mm">24 mm</option>
@@ -465,6 +474,7 @@ const Form = ({ selectedItem, setSelectedItem, setItems, refreshWaitlist, onClos
                     value={brakeType}
                     onChange={(e) => setBrakeType(e.target.value)}
                     required
+                    disabled={!isEditing}
                 >
                     <option value="">Select Type</option>
                     <option value="Mechanical">Mechanical</option>
@@ -482,6 +492,7 @@ const Form = ({ selectedItem, setSelectedItem, setItems, refreshWaitlist, onClos
                     value={rotorMountType}
                     onChange={(e) => setRotorMountType(e.target.value)}
                     required
+                    disabled={!isEditing}
                 >
                     <option value="">Select Type</option>
                     <option value="6-bolt">6-bolt</option>
@@ -498,6 +509,7 @@ const Form = ({ selectedItem, setSelectedItem, setItems, refreshWaitlist, onClos
                     value={rotorSize}
                     onChange={(e) => setRotorSize(e.target.value)}
                     required
+                    disabled={!isEditing}
                 >
                     <option value="">Select Size</option>
                     <option value="160mm">160mm</option>

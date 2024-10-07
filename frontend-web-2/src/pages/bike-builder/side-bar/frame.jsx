@@ -40,6 +40,11 @@ const Frame = () => {
                         <Accordion.Item eventKey="1">
                             <Accordion.Header>Tech Specs</Accordion.Header>
                             <Accordion.Body>
+
+                                <div className='specs-container'>
+                                    Purpose: {item.purpose}
+                                </div>
+
                                 <div className='specs-container'>
                                     Frame Size: {item.frame_size}
                                 </div>
@@ -53,7 +58,7 @@ const Frame = () => {
                                 </div>
 
                                 <div className='specs-container'>
-                                    Head Tube Upper Diameter: {item.head_tube_lower_diameter}
+                                    Head Tube Lower Diameter: {item.head_tube_lower_diameter}
                                 </div>
 
                                 <div className='specs-container'>
@@ -61,43 +66,31 @@ const Frame = () => {
                                 </div>
 
                                 <div className='specs-container'>
-                                    Axle Type: {item.axle_type}
+                                    Frame Axle Type: {item.axle_type}
                                 </div>
 
                                 <div className='specs-container'>
-                                    Axle Width: {item.axle_width}
+                                    Frame Axle Diameter: {item.axle_diameter}
                                 </div>
 
                                 <div className='specs-container'>
-                                    Bottom Bracket Type: {item.bottom_bracket_type}
+                                    Frame Bottom Bracket Type: {item.bottom_bracket_type}
                                 </div>
 
                                 <div className='specs-container'>
-                                    Bottom Bracket Diameter: {item.bottom_bracket_diameter}
+                                    Frame Bottom Bracket Width: {item.bottom_bracket_width}
                                 </div>
 
                                 <div className='specs-container'>
-                                    Rotor Size: {item.rotor_size}
+                                    Frame Rotor Size: {item.rotor_size}
                                 </div>
 
                                 <div className='specs-container'>
-                                    Max Tire Width: {item.max_tire_width}
-                                </div>
-
-                                <div className='specs-container'>
-                                    Brake Mount: {item.brake_mount}
-                                </div>
-
-                                <div className='specs-container'>
-                                    Cable Routing: {item.cable_routing}
+                                    Frame Max Tire Width: {item.max_tire_width}
                                 </div>
 
                                 <div className='specs-container'>
                                     Material: {item.material}
-                                </div>
-
-                                <div className='specs-container'>
-                                    Weight: {item.weight}
                                 </div>
                             </Accordion.Body>
                         </Accordion.Item>

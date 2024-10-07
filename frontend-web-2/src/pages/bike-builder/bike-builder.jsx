@@ -4,6 +4,7 @@ import Frame from "./side-bar/frame";
 import Fork from "./side-bar/fork";
 import Groupset from "./side-bar/groupset";
 import Wheelset from "./side-bar/wheelset";
+import Seat from "./side-bar/seat";
 import Cockpit from "./side-bar/cockpit";
 
 const BikeBuilder = () => {
@@ -66,7 +67,8 @@ const BikeBuilder = () => {
                                 {step === 2 && "Choose Fork"}
                                 {step === 3 && "Choose Groupset"}
                                 {step === 4 && "Choose Wheelset"}
-                                {step === 5 && "Choose Cockpit"}
+                                {step === 5 && "Choose Seat"}
+                                {step === 6 && "Choose Cockpit"}
                             </div>
 
                             <div className="btn-container">
@@ -80,7 +82,8 @@ const BikeBuilder = () => {
                             {step === 2 && <Fork />}
                             {step === 3 && <Groupset />}
                             {step === 4 && <Wheelset />}
-                            {step === 5 && <Cockpit />}
+                            {step === 5 && <Seat />}
+                            {step === 6 && <Cockpit />}
                         </div>
                     </div>
                 </div>
