@@ -90,6 +90,10 @@ const Frame = ({ onAddToBuild }) => {
                                 </div>
 
                                 <div className='specs-container'>
+                                    Rear Hub Width: {item.rear_hub_width}
+                                </div>
+
+                                <div className='specs-container'>
                                     Material: {item.material}
                                 </div>
                             </Accordion.Body>

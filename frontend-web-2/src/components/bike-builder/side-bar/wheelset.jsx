@@ -2,21 +2,51 @@ import React, { useState, useEffect } from 'react';
 import { Accordion } from 'react-bootstrap';
 import { getWheelsetItems } from '../../../services/bikeBuilderService';
 
-const Wheelset = ({ onAddToBuild }) => {
+const Wheelset = ({ onAddToBuild, selectedFrame, selectedFork, selectedGroupset }) => {
     const [items, setItems] = useState([]);
 
-    const fetchItems = async () => {
-        try {
-            const data = await getWheelsetItems();
-            setItems(data);
-        } catch (error) {
-            console.error("Error fetching wheelset items:", error);
-        }
-    };
-
     useEffect(() => {
-        fetchItems();
-    }, []);
+        const fetchItems = async () => {
+            try {
+                const data = await getWheelsetItems();
+
+                // Apply filtering logic based on selected frame, fork, and groupset attributes
+                const filteredWheelsets = data.filter(item => {
+                    const isCassetteTypeMatch = item.hub_cassette_type === selectedGroupset.cassette_type;
+                    const isHubSpeedMatch = item.rear_hub_speed === selectedGroupset.cassette_speed;
+                    const isRotorMountTypeMatch = item.rotor_mount_type === selectedGroupset.hub_rotor_type;
+
+                    const isRearHubWidthMatch = item.rear_hub_width === selectedFrame.rear_hub_width;
+                    const isFrontHubWidthMatch = item.front_hub_width === selectedFork.front_hub_width;
+
+                    const isRearHubAxleTypeMatch = item.rear_hub_axle_type === selectedFrame.axle_type;
+                    const isFrontHubAxleTypeMatch = item.front_hub_axle_type === selectedFork.axle_type;
+
+                    const isTireSizeMatch = item.tire_size === selectedFrame.frame_size;
+                    const isTireWidthMatch = item.tire_width === selectedFrame.max_tire_width;
+
+                    // Return only if all conditions are met
+                    return isCassetteTypeMatch &&
+                        isHubSpeedMatch &&
+                        isRotorMountTypeMatch &&
+                        isRearHubWidthMatch &&
+                        isFrontHubWidthMatch &&
+                        isRearHubAxleTypeMatch &&
+                        isFrontHubAxleTypeMatch &&
+                        isTireSizeMatch &&
+                        isTireWidthMatch;
+                });
+
+                setItems(filteredWheelsets);
+            } catch (error) {
+                console.error("Error fetching wheelset items:", error);
+            }
+        };
+
+        if (selectedFrame && selectedFork && selectedGroupset) {
+            fetchItems();
+        }
+    }, [selectedFrame, selectedFork, selectedGroupset]);
 
     return (
         <div className="parts-container">

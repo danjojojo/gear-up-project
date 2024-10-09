@@ -2,21 +2,32 @@ import React, { useState, useEffect } from 'react';
 import { Accordion } from 'react-bootstrap';
 import { getSeatItems } from '../../../services/bikeBuilderService';
 
-const Seat = ({ onAddToBuild }) => {
+const Seat = ({ onAddToBuild, selectedFrame }) => {
     const [items, setItems] = useState([]);
 
-    const fetchItems = async () => {
-        try {
-            const data = await getSeatItems();
-            setItems(data);
-        } catch (error) {
-            console.error("Error fetching seat items:", error);
-        }
-    };
-
     useEffect(() => {
-        fetchItems();
-    }, []);
+        const fetchItems = async () => {
+            try {
+                const data = await getSeatItems();
+
+                // Apply filtering logic based on selected frame attributes
+                const filteredSeats = data.filter(item => {
+                    const isSeatpostDiameterMatch = item.seatpost_diameter === selectedFrame.seatpost_diameter;
+
+                    // Return only if seatpost diameter matches
+                    return isSeatpostDiameterMatch;
+                });
+
+                setItems(filteredSeats);
+            } catch (error) {
+                console.error("Error fetching seat items:", error);
+            }
+        };
+
+        if (selectedFrame) {
+            fetchItems();
+        }
+    }, [selectedFrame]);
 
     return (
         <div className="parts-container">

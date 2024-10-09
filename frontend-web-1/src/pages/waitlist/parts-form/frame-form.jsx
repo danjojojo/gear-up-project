@@ -197,8 +197,8 @@ const FrameForm = ({ waitlistItemID, itemID, itemName, itemPrice, onClose, refre
                     required
                 >
                     <option value="">Select Type</option>
-                    <option value="Non Tapered">Non Tapered</option>
                     <option value="Tapered">Tapered</option>
+                    <option value="Non Tapered">Non Tapered</option>
                 </select>
             </div>
 
@@ -213,7 +213,6 @@ const FrameForm = ({ waitlistItemID, itemID, itemName, itemPrice, onClose, refre
                     required
                 >
                     <option value="">Select Diameter</option>
-                    <option value="34mm">34mm</option>
                     <option value="44mm">44mm</option>
                     <option value="49mm">49mm</option>
                     <option value="55mm">55mm</option>
@@ -231,7 +230,6 @@ const FrameForm = ({ waitlistItemID, itemID, itemName, itemPrice, onClose, refre
                     required
                 >
                     <option value="">Select Diameter</option>
-                    <option value="34mm">34mm</option>
                     <option value="44mm">44mm</option>
                     <option value="55mm">55mm</option>
                     <option value="56mm">56mm</option>
@@ -337,9 +335,9 @@ const FrameForm = ({ waitlistItemID, itemID, itemName, itemPrice, onClose, refre
                     required
                 >
                     <option value="">Select Size</option>
-                    <option value="160 mm">160 mm</option>
-                    <option value="180 mm">180 mm</option>
-                    <option value="203 mm">203 mm</option>
+                    <option value="160mm">160mm</option>
+                    <option value="180mm">180mm</option>
+                    <option value="203mm">203mm</option>
                 </select>
             </div>
 

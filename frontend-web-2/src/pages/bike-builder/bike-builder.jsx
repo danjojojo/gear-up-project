@@ -139,7 +139,8 @@ const BikeBuilder = () => {
                         proceedToNextPart={proceedToNextPart}
                         isPartSelectedForCurrentStep={isPartSelectedForCurrentStep}
                         handleAddToBuild={handleAddToBuild}
-                        handleReset={handleReset}   
+                        handleReset={handleReset}
+                        selectedParts={selectedParts}
                     />
                     <CanvasContainer
                         frameImage={frameImage}

@@ -2,21 +2,38 @@ import React, { useState, useEffect } from 'react';
 import { Accordion } from 'react-bootstrap';
 import { getGroupsetItems } from '../../../services/bikeBuilderService';
 
-const Groupset = ({ onAddToBuild }) => {
+const Groupset = ({ onAddToBuild, selectedFrame, selectedFork }) => {
     const [items, setItems] = useState([]);
 
-    const fetchItems = async () => {
-        try {
-            const data = await getGroupsetItems();
-            setItems(data);
-        } catch (error) {
-            console.error("Error fetching groupset items:", error);
-        }
-    };
-
     useEffect(() => {
-        fetchItems();
-    }, []);
+        const fetchItems = async () => {
+            try {
+                const data = await getGroupsetItems();
+
+                // Apply filtering logic based on selected frame and fork attributes
+                const filteredGroupsets = data.filter(item => {
+                    const isBottomBracketTypeMatch = item.bottom_bracket_type === selectedFrame.bottom_bracket_type;
+                    const isBottomBracketWidthMatch = item.bottom_bracket_width === selectedFrame.bottom_bracket_width;
+
+                    // Rotor size should match both frame and fork rotor sizes
+                    const isRotorSizeMatch =
+                        item.rotor_size === selectedFrame.rotor_size &&
+                        item.rotor_size === selectedFork.rotor_size;
+
+                    // Return only if all conditions are met
+                    return isBottomBracketTypeMatch && isBottomBracketWidthMatch && isRotorSizeMatch;
+                });
+
+                setItems(filteredGroupsets);
+            } catch (error) {
+                console.error("Error fetching groupset items:", error);
+            }
+        };
+
+        if (selectedFrame && selectedFork) {
+            fetchItems();
+        }
+    }, [selectedFrame, selectedFork]);
 
     return (
         <div className="parts-container">

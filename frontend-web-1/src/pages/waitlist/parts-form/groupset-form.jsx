@@ -228,7 +228,7 @@ const GroupsetForm = ({ waitlistItemID, itemID, itemName, itemPrice, onClose, re
                 >
                     <option value="">Select Type</option>
                     <option value="Cassette">Cassette</option>
-                    <option value="Threaded Freewheel">Threaded Freewheel</option>
+                    <option value="Threaded">Threaded</option>
                 </select>
             </div>
 
@@ -298,9 +298,11 @@ const GroupsetForm = ({ waitlistItemID, itemID, itemName, itemPrice, onClose, re
                     required
                 >
                     <option value="">Select Width</option>
-                    <option value="24 mm">24 mm</option>
-                    <option value="30 mm">30 mm</option>
-                    <option value="41 mm">41 mm</option>
+                    <option value="68mm">68mm</option>
+                    <option value="73mm (MTB)">73mm (MTB)</option>
+                    <option value="83mm (Downhill)">83mm (Downhill)</option>
+                    <option value="86mm (Press-Fit)">86mm (Press-Fit)</option>
+                    <option value="92mm (MTB)">92mm (MTB)</option>
                 </select>
             </div>
 

@@ -172,8 +172,8 @@ const ForkForm = ({ waitlistItemID, itemID, itemName, itemPrice, onClose, refres
                     required
                 >
                     <option value="">Select Type</option>
-                    <option value="Non Tapered">Non Tapered</option>
                     <option value="Tapered">Tapered</option>
+                    <option value="Non Tapered">Non Tapered</option>
                 </select>
             </div>
 
@@ -290,9 +290,9 @@ const ForkForm = ({ waitlistItemID, itemID, itemName, itemPrice, onClose, refres
                     required
                 >
                     <option value="">Select Size</option>
-                    <option value="160 mm">160 mm</option>
-                    <option value="180 mm">180 mm</option>
-                    <option value="203 mm">203 mm</option>
+                    <option value="160mm">160mm</option>
+                    <option value="180mm">180mm</option>
+                    <option value="203mm">203mm</option>
                 </select>
             </div>
 

@@ -7,7 +7,15 @@ import Seat from '../side-bar/seat';
 import Cockpit from '../side-bar/cockpit';
 import backbutton from "../../../assets/icons/back-button.png"
 
-const BuilderSidebar = ({ step, goBackToPreviousPart, proceedToNextPart, isPartSelectedForCurrentStep, handleAddToBuild, handleReset }) => (
+const BuilderSidebar = ({
+    step,
+    goBackToPreviousPart,
+    proceedToNextPart,
+    isPartSelectedForCurrentStep,
+    handleAddToBuild,
+    handleReset,
+    selectedParts
+}) => (
     <div className="bike-parts-sidebar">
         <div className="upper-container">
             {/* Back Button */}
@@ -36,12 +44,50 @@ const BuilderSidebar = ({ step, goBackToPreviousPart, proceedToNextPart, isPartS
         </div>
 
         <div className="lower-container">
-            {step === 1 && <Frame onAddToBuild={(item) => handleAddToBuild("frame", item)} />}
-            {step === 2 && <Fork onAddToBuild={(item) => handleAddToBuild("fork", item)} />}
-            {step === 3 && <Groupset onAddToBuild={(item) => handleAddToBuild("groupset", item)} />}
-            {step === 4 && <Wheelset onAddToBuild={(item) => handleAddToBuild("wheelset", item)} />}
-            {step === 5 && <Seat onAddToBuild={(item) => handleAddToBuild("seat", item)} />}
-            {step === 6 && <Cockpit onAddToBuild={(item) => handleAddToBuild("cockpit", item)} />}
+            {step === 1 &&
+                <Frame onAddToBuild={(item) =>
+                    handleAddToBuild("frame", item)}
+                />
+            }
+
+            {step === 2 &&
+                <Fork onAddToBuild={(item) =>
+                    handleAddToBuild("fork", item)}
+                    selectedFramePurpose={selectedParts.frame?.purpose}
+                    selectedFrame={selectedParts.frame}
+                />
+            }
+
+            {step === 3 && (
+                <Groupset
+                    onAddToBuild={(item) => handleAddToBuild("groupset", item)}
+                    selectedFrame={selectedParts.frame}
+                    selectedFork={selectedParts.fork}
+                />
+            )}
+
+            {step === 4 && (
+                <Wheelset
+                    onAddToBuild={(item) => handleAddToBuild("wheelset", item)}
+                    selectedFrame={selectedParts.frame}
+                    selectedFork={selectedParts.fork}
+                    selectedGroupset={selectedParts.groupset}
+                />
+            )}
+            {step === 5 && (
+                <Seat
+                    onAddToBuild={(item) => handleAddToBuild("seat", item)}
+                    selectedFrame={selectedParts.frame}
+                />
+            )}
+
+            {step === 6 && (
+                <Cockpit
+                    onAddToBuild={(item) => handleAddToBuild("cockpit", item)}
+                    selectedFrame={selectedParts.frame}
+                    selectedFork={selectedParts.fork}
+                />
+            )}
         </div>
     </div>
 );

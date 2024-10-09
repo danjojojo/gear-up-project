@@ -247,7 +247,7 @@ const CockpitForm = ({ waitlistItemID, itemID, itemName, itemPrice, onClose, ref
             </div>
 
             <div className="dropdown-container d-flex justify-content-between">
-                <div className="title">Stem Fork Diameter</div>
+                <div className="title">Stem - Fork Diameter</div>
                 <select
                     className="dropdown"
                     id="stem-fork-diameter"
@@ -257,9 +257,9 @@ const CockpitForm = ({ waitlistItemID, itemID, itemName, itemPrice, onClose, ref
                     required
                 >
                     <option value="">Select Diameter</option>
-                    <option value='1 1/8" (28.6 mm)'>1 1/8" (28.6 mm)</option>
-                    <option value='1 1/4" (31.75 mm)'>1 1/4" (31.75 mm)</option>
-                    <option value='1.5" (38.1 mm)'>1.5" (38.1 mm)</option>
+                    <option value='1 1/8"'>1 1/8"</option>
+                    <option value='1 1/4"'>1 1/4"</option>
+                    <option value='1.5"'>1.5"</option>
                 </select>
             </div>
 
@@ -306,9 +306,9 @@ const CockpitForm = ({ waitlistItemID, itemID, itemName, itemPrice, onClose, ref
                     required
                 >
                     <option value="">Select Diameter</option>
-                    <option value='1 1/8" (28.6 mm)'>1 1/8" (28.6 mm)</option>
-                    <option value='1 1/4" (31.75 mm)'>1 1/4" (31.75 mm)</option>
-                    <option value='1.5" (38.1 mm)'>1.5" (38.1 mm)</option>
+                    <option value="44mm">44mm</option>
+                    <option value="55mm">55mm</option>
+                    <option value="56mm">56mm</option>
                 </select>
             </div>
 
@@ -323,9 +323,9 @@ const CockpitForm = ({ waitlistItemID, itemID, itemName, itemPrice, onClose, ref
                     required
                 >
                     <option value="">Select Diameter</option>
-                    <option value='1.5" (38.1 mm)'>1.5" (38.1 mm)</option>
-                    <option value='1 1/4" (31.75 mm)'>1 1/4" (31.75 mm)</option>
-                    <option value='1 3/8" (34.9 mm)'>1 3/8" (34.9 mm)</option>
+                    <option value="44mm">44mm</option>
+                    <option value="55mm">55mm</option>
+                    <option value="56mm">56mm</option>
                 </select>
             </div>
 

@@ -2,21 +2,35 @@ import React, { useState, useEffect } from 'react';
 import { Accordion } from 'react-bootstrap';
 import { getCockpitItems } from '../../../services/bikeBuilderService';
 
-const Cockpit = ({ onAddToBuild }) => {
+const Cockpit = ({ onAddToBuild, selectedFrame, selectedFork }) => {
     const [items, setItems] = useState([]);
 
-    const fetchItems = async () => {
-        try {
-            const data = await getCockpitItems();
-            setItems(data);
-        } catch (error) {
-            console.error("Error fetching cockpit items:", error);
-        }
-    };
-
     useEffect(() => {
-        fetchItems();
-    }, []);
+        const fetchItems = async () => {
+            try {
+                const data = await getCockpitItems();
+
+                // Apply filtering logic based on selected frame and fork attributes
+                const filteredCockpits = data.filter(item => {
+                    const isStemForkDiameterMatch = item.stem_fork_diameter === selectedFork.fork_tube_upper_diameter;
+                    const isHeadsetTypeMatch = item.headset_type === selectedFrame.head_tube_type;
+                    const isHeadsetUpperDiameterMatch = item.headset_upper_diameter === selectedFrame.head_tube_upper_diameter;
+                    const isHeadsetLowerDiameterMatch = item.headset_lower_diameter === selectedFrame.head_tube_lower_diameter;
+
+                    // Return only if all conditions are met
+                    return isStemForkDiameterMatch && isHeadsetTypeMatch && isHeadsetUpperDiameterMatch && isHeadsetLowerDiameterMatch;
+                });
+
+                setItems(filteredCockpits);
+            } catch (error) {
+                console.error("Error fetching cockpit items:", error);
+            }
+        };
+
+        if (selectedFrame && selectedFork) {
+            fetchItems();
+        }
+    }, [selectedFrame, selectedFork]);
 
     return (
         <div className="parts-container">

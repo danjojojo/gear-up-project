@@ -348,8 +348,10 @@ const WheelsetForm = ({ waitlistItemID, itemID, itemName, itemPrice, onClose, re
                 >
                     <option value="">Select Width</option>
                     <option value='1.9"'>1.9"</option>
+                    <option value='1.95"'>1.95"</option>
                     <option value='2.0"'>2.0"</option>
                     <option value='2.1"'>2.1"</option>
+                    <option value='2.125"'>2.125"</option>
                     <option value='2.25"'>2.25"</option>
                     <option value='2.4"'>2.4"</option>
                     <option value='2.6"'>2.6"</option>
