@@ -1,16 +1,16 @@
 import React, { useState, useEffect } from 'react';
 import { Accordion } from 'react-bootstrap';
-import { getWheelsetItems } from '../../../services/bikeBuilderService';
+import { getFrameItems } from '../../../services/bikeBuilderService';
 
-const Wheelset = () => {
+const Frame = ({ onAddToBuild }) => {
     const [items, setItems] = useState([]);
 
     const fetchItems = async () => {
         try {
-            const data = await getWheelsetItems();
+            const data = await getFrameItems();
             setItems(data);
         } catch (error) {
-            console.error("Error fetching wheelset items:", error);
+            console.error("Error fetching frame items:", error);
         }
     };
 
@@ -21,10 +21,10 @@ const Wheelset = () => {
     return (
         <div className="parts-container">
             {items.map((item) => (
-                <div className="parts-card" key={item.wheelset_id}>
+                <div className="parts-card" key={item.frame_id}>
                     <div className="item-image">
                         {item.item_image ? (
-                            <img src={`data:image/png;base64,${item.item_image}`} alt="Wheelset" />
+                            <img src={`data:image/png;base64,${item.item_image}`} alt="frame" />
                         ) : (
                             <p>No Image Available</p>
                         )}
@@ -40,66 +40,69 @@ const Wheelset = () => {
                         <Accordion.Item eventKey="1">
                             <Accordion.Header>Tech Specs</Accordion.Header>
                             <Accordion.Body>
+
                                 <div className='specs-container'>
-                                    Hub - Rotor Type: {item.hub_rotor_type}
+                                    Purpose: {item.purpose}
                                 </div>
 
                                 <div className='specs-container'>
-                                    Hub - Cassette Type: {item.hub_cassette_type}
+                                    Frame Size: {item.frame_size}
                                 </div>
 
                                 <div className='specs-container'>
-                                    Hub Holes: {item.hub_holes}
+                                    Head Tube Type: {item.head_tube_type}
                                 </div>
 
                                 <div className='specs-container'>
-                                    Front Hub Width: {item.front_hub_width}
+                                    Head Tube Upper Diameter: {item.head_tube_upper_diameter}
                                 </div>
 
                                 <div className='specs-container'>
-                                    Front Hub - Axle Type: {item.front_hub_axle_type}
+                                    Head Tube Lower Diameter: {item.head_tube_lower_diameter}
                                 </div>
 
                                 <div className='specs-container'>
-                                    Front Hub - Axle Diameter: {item.front_hub_axle_diameter}
+                                    Seatpost Diameter: {item.seatpost_diameter}
                                 </div>
 
                                 <div className='specs-container'>
-                                    Rear Hub Width: {item.rear_hub_width}
+                                    Frame Axle Type: {item.axle_type}
                                 </div>
 
                                 <div className='specs-container'>
-                                    Rear Hub - Axle Type: {item.rear_hub_axle_type}
+                                    Frame Axle Diameter: {item.axle_diameter}
                                 </div>
 
                                 <div className='specs-container'>
-                                    Rear Hub - Axle Diameter: {item.rear_hub_axle_diameter}
+                                    Frame Bottom Bracket Type: {item.bottom_bracket_type}
                                 </div>
 
                                 <div className='specs-container'>
-                                    Rear Hub Speed: {item.rear_hub_speed}
+                                    Frame Bottom Bracket Width: {item.bottom_bracket_width}
                                 </div>
 
                                 <div className='specs-container'>
-                                    Tire Size: {item.tire_size}
+                                    Frame Rotor Size: {item.rotor_size}
                                 </div>
 
                                 <div className='specs-container'>
-                                    Tire Width: {item.tire_width}
+                                    Frame Max Tire Width: {item.max_tire_width}
                                 </div>
 
                                 <div className='specs-container'>
-                                    Rim Spokes: {item.rim_spokes}
+                                    Material: {item.material}
                                 </div>
                             </Accordion.Body>
                         </Accordion.Item>
                     </Accordion>
 
-                    <button className="add-to-build">Add to Build</button>
+                    <button className="add-to-build" onClick={() => onAddToBuild(item)}>
+                        Add to Build
+                    </button>
                 </div>
             ))}
         </div>
     );
 };
 
-export default Wheelset;
+export default Frame;

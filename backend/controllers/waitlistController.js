@@ -49,6 +49,7 @@ const addFrame = async (req, res) => {
         bottom_bracket_width,
         rotor_size,
         max_tire_width,
+        rear_hub_width,
         material,
     } = req.body;
 
@@ -60,11 +61,11 @@ const addFrame = async (req, res) => {
                 item_id, description, purpose, frame_size, head_tube_type, 
                 head_tube_upper_diameter, head_tube_lower_diameter, 
                 seatpost_diameter, axle_type, axle_diameter, 
-                bottom_bracket_type, bottom_bracket_width, 
-                rotor_size, max_tire_width, material, image
+                bottom_bracket_type, bottom_bracket_width, rotor_size, 
+                max_tire_width, rear_hub_width,  material, image
             ) VALUES (
                 $1, $2, $3, $4, $5, $6, $7, $8, $9, 
-                $10, $11, $12, $13, $14, $15, $16
+                $10, $11, $12, $13, $14, $15, $16, $17
             ) RETURNING *;
         `;
 
@@ -83,6 +84,7 @@ const addFrame = async (req, res) => {
             bottom_bracket_width,
             rotor_size,
             max_tire_width,
+            rear_hub_width,
             material,
             image
         ];
@@ -112,7 +114,6 @@ const addFork = async (req, res) => {
         waitlist_item_id,
         item_id,
         description,
-        fork_type,
         fork_size,
         fork_tube_type,
         fork_tube_upper_diameter,
@@ -123,6 +124,7 @@ const addFork = async (req, res) => {
         suspension_type,
         rotor_size,
         max_tire_width,
+        front_hub_width,
         material
     } = req.body;
 
@@ -131,10 +133,10 @@ const addFork = async (req, res) => {
     try {
         const query = `
             INSERT INTO fork (
-                item_id, description, fork_type, fork_size, fork_tube_type, 
+                item_id, description, fork_size, fork_tube_type, 
                 fork_tube_upper_diameter, fork_tube_lower_diameter, 
                 fork_travel, axle_type, axle_diameter, suspension_type, 
-                rotor_size, max_tire_width, material, image
+                rotor_size, max_tire_width, front_hub_width, material, image
             ) VALUES (
                 $1, $2, $3, $4, $5, $6, $7, $8, $9, 
                 $10, $11, $12, $13, $14, $15
@@ -144,7 +146,6 @@ const addFork = async (req, res) => {
         const values = [
             item_id,
             description,
-            fork_type,
             fork_size,
             fork_tube_type,
             fork_tube_upper_diameter,
@@ -155,6 +156,7 @@ const addFork = async (req, res) => {
             suspension_type,
             rotor_size,
             max_tire_width,
+            front_hub_width,
             material,
             image
         ];

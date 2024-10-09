@@ -9,7 +9,6 @@ const ForkForm = ({ waitlistItemID, itemID, itemName, itemPrice, onClose, refres
     const [name, setName] = useState('');
     const [price, setPrice] = useState('');
     const [description, setDescription] = useState('');
-    const [forkType, setForkType] = useState('');
     const [forkSize, setForkSize] = useState('');
     const [forkTubeType, setForkTubeType] = useState('');
     const [ftUpperDiameter, setFtUpperDiameter] = useState('');
@@ -20,6 +19,7 @@ const ForkForm = ({ waitlistItemID, itemID, itemName, itemPrice, onClose, refres
     const [suspensionType, setSuspensionType] = useState('');
     const [rotorSize, setRotorSize] = useState('');
     const [maxTireWidth, setMaxTireWidth] = useState('');
+    const [frontHubWidth, setFrontHubWidth] = useState('');
     const [material, setMaterial] = useState('');
     const [selectedFile, setSelectedFile] = useState(null);
 
@@ -37,7 +37,6 @@ const ForkForm = ({ waitlistItemID, itemID, itemName, itemPrice, onClose, refres
         formData.append('waitlist_item_id', waitlistItemID);
         formData.append('item_id', itemID);
         formData.append('description', description);
-        formData.append('fork_type', forkType);
         formData.append('fork_size', forkSize);
         formData.append('fork_tube_type', forkTubeType);
         formData.append('fork_tube_upper_diameter', ftUpperDiameter);
@@ -48,6 +47,7 @@ const ForkForm = ({ waitlistItemID, itemID, itemName, itemPrice, onClose, refres
         formData.append('suspension_type', suspensionType);
         formData.append('rotor_size', rotorSize);
         formData.append('max_tire_width', maxTireWidth);
+        formData.append('front_hub_width', frontHubWidth);
         formData.append('material', material);
         if (selectedFile) {
             formData.append('image', selectedFile);
@@ -61,7 +61,6 @@ const ForkForm = ({ waitlistItemID, itemID, itemName, itemPrice, onClose, refres
 
             // Reset Form
             setDescription('');
-            setForkType("");
             setForkSize('');
             setForkTubeType('');
             setFtUpperDiameter('');
@@ -71,6 +70,7 @@ const ForkForm = ({ waitlistItemID, itemID, itemName, itemPrice, onClose, refres
             setSuspensionType('');
             setRotorSize('');
             setMaxTireWidth('');
+            setFrontHubWidth('');
             setMaterial('');
             setSelectedFile(null);
             onClose();
@@ -142,22 +142,6 @@ const ForkForm = ({ waitlistItemID, itemID, itemName, itemPrice, onClose, refres
                     placeholder="Enter item description"
                     required
                 />
-            </div>
-
-            <div className="dropdown-container d-flex justify-content-between">
-                <div className="title">Fork Type</div>
-                <select
-                    className="dropdown"
-                    id="fork-type"
-                    name="forkType"
-                    value={forkType}
-                    onChange={(e) => setForkType(e.target.value)}
-                    required
-                >
-                    <option value="">Select Type</option>
-                    <option value="Suspension">Suspension</option>
-                    <option value="Rigid">Rigid</option>
-                </select>
             </div>
 
             <div className="dropdown-container d-flex justify-content-between">
@@ -242,12 +226,11 @@ const ForkForm = ({ waitlistItemID, itemID, itemName, itemPrice, onClose, refres
                     <option value="120mm to 160mm">120mm to 160mm</option>
                     <option value="150mm to 180mm">150mm to 180mm</option>
                     <option value="180mm to 200mm">180mm to 200mm</option>
-                    <option value="N/A (Rigid)">N/A (Rigid)</option>
                 </select>
             </div>
 
             <div className="dropdown-container d-flex justify-content-between">
-                <div className="title">Axle Type</div>
+                <div className="title">Fork Axle Type</div>
                 <select
                     className="dropdown"
                     id="axle-type"
@@ -263,7 +246,7 @@ const ForkForm = ({ waitlistItemID, itemID, itemName, itemPrice, onClose, refres
             </div>
 
             <div className="dropdown-container d-flex justify-content-between">
-                <div className="title">Axle Diameter</div>
+                <div className="title">Fork Axle Diameter</div>
                 <select
                     className="dropdown"
                     id="axle-diameter"
@@ -280,7 +263,7 @@ const ForkForm = ({ waitlistItemID, itemID, itemName, itemPrice, onClose, refres
             </div>
 
             <div className="dropdown-container d-flex justify-content-between">
-                <div className="title">Suspension Type</div>
+                <div className="title">Fork Suspension Type</div>
                 <select
                     className="dropdown"
                     id="suspension-type"
@@ -297,7 +280,7 @@ const ForkForm = ({ waitlistItemID, itemID, itemName, itemPrice, onClose, refres
             </div>
 
             <div className="dropdown-container d-flex justify-content-between">
-                <div className="title">Rotor Size</div>
+                <div className="title">Fork Rotor Size</div>
                 <select
                     className="dropdown"
                     id="rotor-size"
@@ -314,7 +297,7 @@ const ForkForm = ({ waitlistItemID, itemID, itemName, itemPrice, onClose, refres
             </div>
 
             <div className="dropdown-container d-flex justify-content-between">
-                <div className="title">Max Tire Width</div>
+                <div className="title">Fork Max Tire Width</div>
                 <select
                     className="dropdown"
                     id="max-tire-width"
@@ -329,6 +312,22 @@ const ForkForm = ({ waitlistItemID, itemID, itemName, itemPrice, onClose, refres
                     <option value='2.4"'>2.4"</option>
                     <option value='2.6"'>2.6"</option>
                     <option value='2.8"'>2.8"</option>
+                </select>
+            </div>
+
+            <div className="dropdown-container d-flex justify-content-between">
+                <div className="title">Front Hub Width</div>
+                <select
+                    className="dropdown"
+                    id="front-hub-width"
+                    name="frontHubWidth"
+                    value={frontHubWidth}
+                    onChange={(e) => setFrontHubWidth(e.target.value)}
+                    required
+                >
+                    <option value="">Select Width</option>
+                    <option value="100mm (Front)">100mm (Front)</option>
+                    <option value="110mm (Boost Front)">110mm (Boost Front)</option>
                 </select>
             </div>
 

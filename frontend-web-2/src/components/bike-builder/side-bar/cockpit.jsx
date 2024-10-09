@@ -1,16 +1,16 @@
 import React, { useState, useEffect } from 'react';
 import { Accordion } from 'react-bootstrap';
-import { getForkItems } from '../../../services/bikeBuilderService';
+import { getCockpitItems } from '../../../services/bikeBuilderService';
 
-const Fork = () => {
+const Cockpit = ({ onAddToBuild }) => {
     const [items, setItems] = useState([]);
 
     const fetchItems = async () => {
         try {
-            const data = await getForkItems();
+            const data = await getCockpitItems();
             setItems(data);
         } catch (error) {
-            console.error("Error fetching fork items:", error);
+            console.error("Error fetching cockpit items:", error);
         }
     };
 
@@ -21,7 +21,7 @@ const Fork = () => {
     return (
         <div className="parts-container">
             {items.map((item) => (
-                <div className="parts-card" key={item.fork_id}>
+                <div className="parts-card" key={item.cockpit_id}>
                     <div className="item-image">
                         {item.item_image ? (
                             <img src={`data:image/png;base64,${item.item_image}`} alt="frame" />
@@ -41,61 +41,59 @@ const Fork = () => {
                             <Accordion.Header>Tech Specs</Accordion.Header>
                             <Accordion.Body>
                                 <div className='specs-container'>
-                                    Fork Type: {item.fork_type}
+                                    Handlebar Length: {item.handlebar_length}
                                 </div>
 
                                 <div className='specs-container'>
-                                    Fork Size: {item.fork_size}
+                                    Handlebar Clamp Diameter: {item.handlebar_clamp_diameter}
                                 </div>
 
                                 <div className='specs-container'>
-                                    Fork Tube Type: {item.fork_tube_type}
+                                    Handlebar Type: {item.handlebar_type}
                                 </div>
 
                                 <div className='specs-container'>
-                                    Fork Tube Upper Diameter: {item.fork_tube_upper_diameter}
+                                    Stem Clamp Diameter: {item.stem_clamp_diameter}
                                 </div>
 
                                 <div className='specs-container'>
-                                    Fork Tube Lower Diameter: {item.fork_tube_lower_diameter}
+                                    Stem Length: {item.stem_length}
                                 </div>
 
                                 <div className='specs-container'>
-                                    Fork Travel: {item.fork_travel}
+                                    Stem Angle: {item.stem_angle}
                                 </div>
 
                                 <div className='specs-container'>
-                                    Axle Type: {item.axle_type}
+                                    Stem Fork Diameter: {item.stem_fork_diameter}
                                 </div>
 
                                 <div className='specs-container'>
-                                    Axle Diameter: {item.axle_diameter}
+                                    Headset Type: {item.headset_type}
                                 </div>
 
                                 <div className='specs-container'>
-                                    Suspension Type: {item.suspension_type}
+                                    Headset Cup Type: {item.headset_cup_type}
                                 </div>
 
                                 <div className='specs-container'>
-                                    Rotor Size: {item.rotor_size}
+                                    Headset Upper Diameter: {item.headset_upper_diameter}
                                 </div>
 
                                 <div className='specs-container'>
-                                    Max Tire Width: {item.max_tire_width}
-                                </div>
-
-                                <div className='specs-container'>
-                                    Material: {item.material}
+                                    Headset Lower Diameter: {item.headset_lower_diameter}
                                 </div>
                             </Accordion.Body>
                         </Accordion.Item>
                     </Accordion>
 
-                    <button className="add-to-build">Add to Build</button>
+                    <button className="add-to-build" onClick={() => onAddToBuild(item)}>
+                        Add to Build
+                    </button>
                 </div>
             ))}
         </div>
     );
 };
 
-export default Fork;
+export default Cockpit;

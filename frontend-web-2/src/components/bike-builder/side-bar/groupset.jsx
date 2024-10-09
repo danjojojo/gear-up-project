@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Accordion } from 'react-bootstrap';
 import { getGroupsetItems } from '../../../services/bikeBuilderService';
 
-const Groupset = () => {
+const Groupset = ({ onAddToBuild }) => {
     const [items, setItems] = useState([]);
 
     const fetchItems = async () => {
@@ -93,7 +93,9 @@ const Groupset = () => {
                         </Accordion.Item>
                     </Accordion>
 
-                    <button className="add-to-build">Add to Build</button>
+                    <button className="add-to-build" onClick={() => onAddToBuild(item)}>
+                        Add to Build
+                    </button>
                 </div>
             ))}
         </div>

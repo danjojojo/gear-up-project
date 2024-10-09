@@ -21,6 +21,7 @@ const FrameForm = ({ waitlistItemID, itemID, itemName, itemPrice, onClose, refre
     const [bottomBracketWidth, setBottomBracketWidth] = useState('');
     const [rotorSize, setRotorSize] = useState('');
     const [maxTireWidth, setMaxTireWidth] = useState('');
+    const [rearHubWidth, setRearHubWidth] = useState('');
     const [material, setMaterial] = useState('');
     const [selectedFile, setSelectedFile] = useState(null);
 
@@ -50,6 +51,7 @@ const FrameForm = ({ waitlistItemID, itemID, itemName, itemPrice, onClose, refre
         formData.append('bottom_bracket_width', bottomBracketWidth);
         formData.append('rotor_size', rotorSize);
         formData.append('max_tire_width', maxTireWidth);
+        formData.append('rear_hub_width', rearHubWidth);
         formData.append('material', material);
         if (selectedFile) {
             formData.append('image', selectedFile);
@@ -75,6 +77,7 @@ const FrameForm = ({ waitlistItemID, itemID, itemName, itemPrice, onClose, refre
             setBottomBracketWidth('');
             setRotorSize('');
             setMaxTireWidth('');
+            setRearHubWidth('');
             setMaterial('');
             setSelectedFile(null);
             onClose();
@@ -104,8 +107,8 @@ const FrameForm = ({ waitlistItemID, itemID, itemName, itemPrice, onClose, refre
                 <div className="del-btn">
                     <img src={del}
                         alt="Delete"
-                        className="del-icon" 
-                        onClick={() => deleteItem(waitlistItemID)}/>
+                        className="del-icon"
+                        onClick={() => deleteItem(waitlistItemID)} />
                 </div>
             </div>
 
@@ -160,6 +163,7 @@ const FrameForm = ({ waitlistItemID, itemID, itemName, itemPrice, onClose, refre
                 >
                     <option value="">Select Purpose</option>
                     <option value="Cross-country (XC)">Cross-country (XC)</option>
+                    <option value="Trail">Trail</option>
                     <option value="Enduro">Enduro</option>
                     <option value="Downhill (DH)">Downhill (DH)</option>
                 </select>
@@ -355,6 +359,24 @@ const FrameForm = ({ waitlistItemID, itemID, itemName, itemPrice, onClose, refre
                     <option value='2.4"'>2.4"</option>
                     <option value='2.6"'>2.6"</option>
                     <option value='2.8"'>2.8"</option>
+                </select>
+            </div>
+
+            <div className="dropdown-container d-flex justify-content-between">
+                <div className="title">Rear Hub Width</div>
+                <select
+                    className="dropdown"
+                    id="rear-hub-width"
+                    name="rearHubWidth"
+                    value={rearHubWidth}
+                    onChange={(e) => setRearHubWidth(e.target.value)}
+                    required
+                >
+                    <option value="">Select Width</option>
+                    <option value="135mm (Rear)">135mm (Rear)</option>
+                    <option value="142mm (Rear)">142mm (Rear)</option>
+                    <option value="148mm (Boost Rear)">148mm (Boost Rear)</option>
+                    <option value="150mm (Downhill)">150mm (Downhill)</option>
                 </select>
             </div>
 

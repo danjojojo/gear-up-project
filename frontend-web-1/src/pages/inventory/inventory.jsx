@@ -153,6 +153,7 @@ const Inventory = () => {
             resetForm();
             fetchDashboardData();
             fetchItems();
+            setDisplayItem(true);
         } catch (error) {
             alert("An error occurred while adding the item");
         }

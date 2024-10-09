@@ -362,6 +362,7 @@ const updateFrameItem = async (req, res) => {
             bottom_bracket_width,
             rotor_size,
             max_tire_width,
+            rear_hub_width,
             material,
         } = req.body;
 
@@ -383,10 +384,11 @@ const updateFrameItem = async (req, res) => {
                 bottom_bracket_width = $11,
                 rotor_size = $12,
                 max_tire_width = $13,
-                material = $14,
-                image = $15,
-                date_updated = $16
-            WHERE frame_id = $17
+                rear_hub_width = $14,
+                material = $15,
+                image = $16,
+                date_updated = $17
+            WHERE frame_id = $18
             RETURNING *;
         `;
 
@@ -404,6 +406,7 @@ const updateFrameItem = async (req, res) => {
             bottom_bracket_width,
             rotor_size,
             max_tire_width,
+            rear_hub_width,
             material,
             item_image,
             new Date(),
@@ -425,7 +428,6 @@ const updateForkItem = async (req, res) => {
         const { id } = req.params;
         const {
             description,
-            fork_type,
             fork_size,
             fork_tube_type,
             fork_tube_upper_diameter,
@@ -436,6 +438,7 @@ const updateForkItem = async (req, res) => {
             suspension_type,
             rotor_size,
             max_tire_width,
+            front_hub_width,
             material,
         } = req.body;
 
@@ -445,17 +448,17 @@ const updateForkItem = async (req, res) => {
             UPDATE fork
             SET 
                 description = $1,
-                fork_type = $2,
-                fork_size = $3,
-                fork_tube_type = $4,
-                fork_tube_upper_diameter = $5,
-                fork_tube_lower_diameter = $6,
-                fork_travel = $7,
-                axle_type = $8,
-                axle_diameter = $9,
-                suspension_type = $10,
-                rotor_size = $11,
-                max_tire_width= $12,
+                fork_size = $2,
+                fork_tube_type = $3,
+                fork_tube_upper_diameter = $4,
+                fork_tube_lower_diameter = $5,
+                fork_travel = $6,
+                axle_type = $7,
+                axle_diameter = $8,
+                suspension_type = $9,
+                rotor_size = $10,
+                max_tire_width = $11,
+                front_hub_width = $12,
                 material = $13,
                 image = $14,
                 date_updated = $15
@@ -465,7 +468,6 @@ const updateForkItem = async (req, res) => {
 
         const values = [
             description,
-            fork_type,
             fork_size,
             fork_tube_type,
             fork_tube_upper_diameter,
@@ -476,6 +478,7 @@ const updateForkItem = async (req, res) => {
             suspension_type,
             rotor_size,
             max_tire_width,
+            front_hub_width,
             material,
             item_image,
             new Date(),

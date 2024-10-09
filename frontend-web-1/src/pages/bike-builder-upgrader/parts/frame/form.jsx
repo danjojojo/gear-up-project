@@ -27,6 +27,7 @@ const Form = ({ selectedItem, setSelectedItem, setItems, refreshWaitlist, onClos
     const [bottomBracketWidth, setBottomBracketWidth] = useState('');
     const [rotorSize, setRotorSize] = useState('');
     const [maxTireWidth, setMaxTireWidth] = useState('');
+    const [rearHubWidth, setRearHubWidth] = useState('');
     const [material, setMaterial] = useState('');
     const [isEditing, setIsEditing] = useState(false);
     const [itemImage, setItemImage] = useState(null)
@@ -68,6 +69,7 @@ const Form = ({ selectedItem, setSelectedItem, setItems, refreshWaitlist, onClos
             setBottomBracketWidth(selectedItem.bottom_bracket_width || '');
             setRotorSize(selectedItem.rotor_size || '');
             setMaxTireWidth(selectedItem.max_tire_width || '');
+            setRearHubWidth(selectedItem.rear_hub_width || '');
             setMaterial(selectedItem.material || '');
             setItemImage(imageBase64);
             setOriginalItem({ ...selectedItem });
@@ -96,6 +98,7 @@ const Form = ({ selectedItem, setSelectedItem, setItems, refreshWaitlist, onClos
         updatedData.append('bottom_bracket_width', bottomBracketWidth);
         updatedData.append('rotor_size', rotorSize);
         updatedData.append('max_tire_width', maxTireWidth);
+        updatedData.append('rear_hub_width', rearHubWidth);
         updatedData.append('material', material);
 
         if (selectedFile) {
@@ -315,6 +318,7 @@ const Form = ({ selectedItem, setSelectedItem, setItems, refreshWaitlist, onClos
                 >
                     <option value="">Select Purpose</option>
                     <option value="Cross-country (XC)">Cross-country (XC)</option>
+                    <option value="Trail">Trail</option>
                     <option value="Enduro">Enduro</option>
                     <option value="Downhill (DH)">Downhill (DH)</option>
                 </select>
@@ -521,6 +525,25 @@ const Form = ({ selectedItem, setSelectedItem, setItems, refreshWaitlist, onClos
                     <option value='2.4"'>2.4"</option>
                     <option value='2.6"'>2.6"</option>
                     <option value='2.8"'>2.8"</option>
+                </select>
+            </div>
+
+            <div className="dropdown-container d-flex justify-content-between">
+                <div className="title">Rear Hub Width</div>
+                <select
+                    className="dropdown"
+                    id="rear-hub-width"
+                    name="rearHubWidth"
+                    value={rearHubWidth}
+                    onChange={(e) => setRearHubWidth(e.target.value)}
+                    required
+                    disabled={!isEditing}
+                >
+                    <option value="">Select Width</option>
+                    <option value="135mm (Rear)">135mm (Rear)</option>
+                    <option value="142mm (Rear)">142mm (Rear)</option>
+                    <option value="148mm (Boost Rear)">148mm (Boost Rear)</option>
+                    <option value="150mm (Downhill)">150mm (Downhill)</option>
                 </select>
             </div>
 

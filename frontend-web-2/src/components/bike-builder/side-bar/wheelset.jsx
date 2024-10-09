@@ -1,16 +1,16 @@
 import React, { useState, useEffect } from 'react';
 import { Accordion } from 'react-bootstrap';
-import { getCockpitItems } from '../../../services/bikeBuilderService';
+import { getWheelsetItems } from '../../../services/bikeBuilderService';
 
-const Cockpit = () => {
+const Wheelset = ({ onAddToBuild }) => {
     const [items, setItems] = useState([]);
 
     const fetchItems = async () => {
         try {
-            const data = await getCockpitItems();
+            const data = await getWheelsetItems();
             setItems(data);
         } catch (error) {
-            console.error("Error fetching cockpit items:", error);
+            console.error("Error fetching wheelset items:", error);
         }
     };
 
@@ -21,10 +21,10 @@ const Cockpit = () => {
     return (
         <div className="parts-container">
             {items.map((item) => (
-                <div className="parts-card" key={item.cockpit_id}>
+                <div className="parts-card" key={item.wheelset_id}>
                     <div className="item-image">
                         {item.item_image ? (
-                            <img src={`data:image/png;base64,${item.item_image}`} alt="frame" />
+                            <img src={`data:image/png;base64,${item.item_image}`} alt="Wheelset" />
                         ) : (
                             <p>No Image Available</p>
                         )}
@@ -41,57 +41,67 @@ const Cockpit = () => {
                             <Accordion.Header>Tech Specs</Accordion.Header>
                             <Accordion.Body>
                                 <div className='specs-container'>
-                                    Handlebar Length: {item.handlebar_length}
+                                    Hub - Rotor Type: {item.hub_rotor_type}
                                 </div>
 
                                 <div className='specs-container'>
-                                    Handlebar Clamp Diameter: {item.handlebar_clamp_diameter}
+                                    Hub - Cassette Type: {item.hub_cassette_type}
                                 </div>
 
                                 <div className='specs-container'>
-                                    Handlebar Type: {item.handlebar_type}
+                                    Hub Holes: {item.hub_holes}
                                 </div>
 
                                 <div className='specs-container'>
-                                    Stem Clamp Diameter: {item.stem_clamp_diameter}
+                                    Front Hub Width: {item.front_hub_width}
                                 </div>
 
                                 <div className='specs-container'>
-                                    Stem Length: {item.stem_length}
+                                    Front Hub - Axle Type: {item.front_hub_axle_type}
                                 </div>
 
                                 <div className='specs-container'>
-                                    Stem Angle: {item.stem_angle}
+                                    Front Hub - Axle Diameter: {item.front_hub_axle_diameter}
                                 </div>
 
                                 <div className='specs-container'>
-                                    Stem Fork Diameter: {item.stem_fork_diameter}
+                                    Rear Hub Width: {item.rear_hub_width}
                                 </div>
 
                                 <div className='specs-container'>
-                                    Headset Type: {item.headset_type}
+                                    Rear Hub - Axle Type: {item.rear_hub_axle_type}
                                 </div>
 
                                 <div className='specs-container'>
-                                    Headset Cup Type: {item.headset_cup_type}
+                                    Rear Hub - Axle Diameter: {item.rear_hub_axle_diameter}
                                 </div>
 
                                 <div className='specs-container'>
-                                    Headset Upper Diameter: {item.headset_upper_diameter}
+                                    Rear Hub Speed: {item.rear_hub_speed}
                                 </div>
 
                                 <div className='specs-container'>
-                                    Headset Lower Diameter: {item.headset_lower_diameter}
+                                    Tire Size: {item.tire_size}
+                                </div>
+
+                                <div className='specs-container'>
+                                    Tire Width: {item.tire_width}
+                                </div>
+
+                                <div className='specs-container'>
+                                    Rim Spokes: {item.rim_spokes}
                                 </div>
                             </Accordion.Body>
                         </Accordion.Item>
                     </Accordion>
 
-                    <button className="add-to-build">Add to Build</button>
+                    <button className="add-to-build" onClick={() => onAddToBuild(item)}>
+                        Add to Build
+                    </button>
                 </div>
             ))}
         </div>
     );
 };
 
-export default Cockpit;
+export default Wheelset;

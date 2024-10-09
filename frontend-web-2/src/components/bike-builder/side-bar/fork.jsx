@@ -1,16 +1,16 @@
 import React, { useState, useEffect } from 'react';
 import { Accordion } from 'react-bootstrap';
-import { getFrameItems } from '../../../services/bikeBuilderService';
+import { getForkItems } from '../../../services/bikeBuilderService';
 
-const Frame = () => {
+const Fork = ({ onAddToBuild }) => {
     const [items, setItems] = useState([]);
 
     const fetchItems = async () => {
         try {
-            const data = await getFrameItems();
+            const data = await getForkItems();
             setItems(data);
         } catch (error) {
-            console.error("Error fetching frame items:", error);
+            console.error("Error fetching fork items:", error);
         }
     };
 
@@ -21,7 +21,7 @@ const Frame = () => {
     return (
         <div className="parts-container">
             {items.map((item) => (
-                <div className="parts-card" key={item.frame_id}>
+                <div className="parts-card" key={item.fork_id}>
                     <div className="item-image">
                         {item.item_image ? (
                             <img src={`data:image/png;base64,${item.item_image}`} alt="frame" />
@@ -40,53 +40,48 @@ const Frame = () => {
                         <Accordion.Item eventKey="1">
                             <Accordion.Header>Tech Specs</Accordion.Header>
                             <Accordion.Body>
-
                                 <div className='specs-container'>
-                                    Purpose: {item.purpose}
+                                    Fork Type: {item.fork_type}
                                 </div>
 
                                 <div className='specs-container'>
-                                    Frame Size: {item.frame_size}
+                                    Fork Size: {item.fork_size}
                                 </div>
 
                                 <div className='specs-container'>
-                                    Head Tube Type: {item.head_tube_type}
+                                    Fork Tube Type: {item.fork_tube_type}
                                 </div>
 
                                 <div className='specs-container'>
-                                    Head Tube Upper Diameter: {item.head_tube_upper_diameter}
+                                    Fork Tube Upper Diameter: {item.fork_tube_upper_diameter}
                                 </div>
 
                                 <div className='specs-container'>
-                                    Head Tube Lower Diameter: {item.head_tube_lower_diameter}
+                                    Fork Tube Lower Diameter: {item.fork_tube_lower_diameter}
                                 </div>
 
                                 <div className='specs-container'>
-                                    Seatpost Diameter: {item.seatpost_diameter}
+                                    Fork Travel: {item.fork_travel}
                                 </div>
 
                                 <div className='specs-container'>
-                                    Frame Axle Type: {item.axle_type}
+                                    Axle Type: {item.axle_type}
                                 </div>
 
                                 <div className='specs-container'>
-                                    Frame Axle Diameter: {item.axle_diameter}
+                                    Axle Diameter: {item.axle_diameter}
                                 </div>
 
                                 <div className='specs-container'>
-                                    Frame Bottom Bracket Type: {item.bottom_bracket_type}
+                                    Suspension Type: {item.suspension_type}
                                 </div>
 
                                 <div className='specs-container'>
-                                    Frame Bottom Bracket Width: {item.bottom_bracket_width}
+                                    Rotor Size: {item.rotor_size}
                                 </div>
 
                                 <div className='specs-container'>
-                                    Frame Rotor Size: {item.rotor_size}
-                                </div>
-
-                                <div className='specs-container'>
-                                    Frame Max Tire Width: {item.max_tire_width}
+                                    Max Tire Width: {item.max_tire_width}
                                 </div>
 
                                 <div className='specs-container'>
@@ -96,11 +91,13 @@ const Frame = () => {
                         </Accordion.Item>
                     </Accordion>
 
-                    <button className="add-to-build">Add to Build</button>
+                    <button className="add-to-build" onClick={() => onAddToBuild(item)}>
+                        Add to Build
+                    </button>
                 </div>
             ))}
         </div>
     );
 };
 
-export default Frame;
+export default Fork;
