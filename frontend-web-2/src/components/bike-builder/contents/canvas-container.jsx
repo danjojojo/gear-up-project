@@ -1,5 +1,7 @@
 import React, { useRef, useState, useEffect } from 'react';
 import { Stage, Layer, Image, Transformer } from 'react-konva';
+import useImage from 'use-image'; // Correct import from use-image
+import bikeguide from "../../../assets/images/bike-guide.png"; // Correct path for background image
 
 const CanvasContainer = ({
     frameImage, forkImage, groupsetImage, wheelsetImage, seatImage, cockpitImage,
@@ -7,6 +9,7 @@ const CanvasContainer = ({
 }) => {
     const transformerRef = useRef(null); // Reference for the transformer (for rotation)
     const [selectedPart, setSelectedPart] = useState(null); // To keep track of selected parts for rotation
+    const [backgroundImage] = useImage(bikeguide); // Correct usage of useImage for background
 
     // Function to ensure the drag stays within the canvas bounds
     const constrainDrag = (pos, imageWidth, imageHeight, stageWidth, stageHeight) => {
@@ -70,16 +73,15 @@ const CanvasContainer = ({
                             onMouseDown={confirmRotation}
                         >
                             <Layer>
-                                {/* Frame */}
-                                {frameImage && (
+                                {/* Background Image */}
+                                {backgroundImage && (
                                     <Image
-                                        image={frameImage}
-                                        x={partPositions.frame.x}
-                                        y={partPositions.frame.y}
-                                        draggable
-                                        dragBoundFunc={(pos) => constrainDrag(pos, frameImage.width, frameImage.height, stageWidth, stageHeight)}
-                                        onClick={(e) => setSelectedPart(e.target)}
-                                        onDragEnd={(e) => handleDragEnd("frame", e)}
+                                        image={backgroundImage}
+                                        x={(stageWidth - 600) / 2} // Centering horizontally
+                                        y={(stageHeight - 600) / 2} // Centering vertically
+                                        width={600}
+                                        height={600}
+                                        opacity={0.1}
                                     />
                                 )}
                                 {/* Fork */}
@@ -92,6 +94,29 @@ const CanvasContainer = ({
                                         dragBoundFunc={(pos) => constrainDrag(pos, forkImage.width, forkImage.height, stageWidth, stageHeight)}
                                         onClick={(e) => setSelectedPart(e.target)}
                                         onDragEnd={(e) => handleDragEnd("fork", e)}
+                                    />
+                                )}
+                                {seatImage && (
+                                    <Image
+                                        image={seatImage}
+                                        x={partPositions.seat.x}
+                                        y={partPositions.seat.y}
+                                        draggable
+                                        dragBoundFunc={(pos) => constrainDrag(pos, seatImage.width, seatImage.height, stageWidth, stageHeight)}
+                                        onClick={(e) => setSelectedPart(e.target)}
+                                        onDragEnd={(e) => handleDragEnd("seat", e)}
+                                    />
+                                )}
+                                {/* Frame */}
+                                {frameImage && (
+                                    <Image
+                                        image={frameImage}
+                                        x={partPositions.frame.x}
+                                        y={partPositions.frame.y}
+                                        draggable
+                                        dragBoundFunc={(pos) => constrainDrag(pos, frameImage.width, frameImage.height, stageWidth, stageHeight)}
+                                        onClick={(e) => setSelectedPart(e.target)}
+                                        onDragEnd={(e) => handleDragEnd("frame", e)}
                                     />
                                 )}
                                 {/* Groupset */}
@@ -131,17 +156,7 @@ const CanvasContainer = ({
                                     />
                                 )}
                                 {/* Seat */}
-                                {seatImage && (
-                                    <Image
-                                        image={seatImage}
-                                        x={partPositions.seat.x}
-                                        y={partPositions.seat.y}
-                                        draggable
-                                        dragBoundFunc={(pos) => constrainDrag(pos, seatImage.width, seatImage.height, stageWidth, stageHeight)}
-                                        onClick={(e) => setSelectedPart(e.target)}
-                                        onDragEnd={(e) => handleDragEnd("seat", e)}
-                                    />
-                                )}
+
                                 {/* Cockpit */}
                                 {cockpitImage && (
                                     <Image
