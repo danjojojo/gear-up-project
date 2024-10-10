@@ -5,19 +5,19 @@ import AuthLayout from '../../components/auth-layout/auth-layout';
 import './login.scss';
 
 const Login = () => {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [error, setError] = useState(null);
-  const { loginAdmin } = useContext(AuthContext);
+  const [email, setEmail] = useState('');  // State to hold the email input
+  const [password, setPassword] = useState('');  // State to hold the password input
+  const [error, setError] = useState(null);  // Local error handling state
+  const { loginAdmin, loading } = useContext(AuthContext);  // Get loading state from context
   const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      await loginAdmin(email, password);
-      navigate('/');
+      await loginAdmin(email, password);  // Pass navigate to redirect after login
+      navigate("/");
     } catch (err) {
-      setError('Login failed. Please check your credentials.');
+      setError('Login failed. Please check your credentials.');  // Handle login errors locally
     }
   };
 
@@ -32,8 +32,8 @@ const Login = () => {
                 type="email"
                 id="email"
                 placeholder="Enter your email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
+                value={email}  // Ensure value comes from state
+                onChange={(e) => setEmail(e.target.value)}  // Update state on change
                 required
               />
             </div>
@@ -43,14 +43,14 @@ const Login = () => {
                 type="password"
                 id="password"
                 placeholder="Enter your password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
+                value={password}  // Ensure value comes from state
+                onChange={(e) => setPassword(e.target.value)}  // Update state on change
                 required
               />
             </div>
-            {error && <p className="error">{error}</p>}
-            <button type="submit" className="submit-btn">
-              Login
+            {error && <p className="error">{error}</p>}  {/* Display local error message */}
+            <button type="submit" className="submit-btn" disabled={loading}>  {/* Disable button when loading */}
+              {loading ? 'Loading...' : 'Login'}  {/* Show loading text when loading */}
             </button>
           </form>
           <p className="toggle-text">

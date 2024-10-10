@@ -1,16 +1,19 @@
 .page-layout {
-    height: calc(100vh - 102px);
+    height: calc(100svh - 102px);
 
     .left-container,
     .right-container {
-        
+        height: 100%;
+
         .left-content,
         .right-content {
-            box-shadow: 2px 2px 10px 3px rgba(0, 0, 0, 0.1);
-            border-radius: 20px;
+            // box-shadow: 2px 2px 10px 3px rgba(0, 0, 0, 0.1);
+            // border-radius: 20px;
+            position: relative;
+            border-radius: 15px;
+            border: 1px solid #dee2e6;
+            background-color: white;
             height: 100%;
         }
     }
-
-
 }

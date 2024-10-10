@@ -5,26 +5,27 @@ import StaffRoutes from './routes/staff-routes';
 import Pages from './pages/pages';
 import { AuthProvider, AuthContext } from './context/auth-context';
 import { checkAdminExists } from './services/authService';
+import LoadingPage from './components/loading-page/loading-page';
 
 function App() {
   const [adminExists, setAdminExists] = useState(null);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchAdminStatus = async () => {
       try {
         const exists = await checkAdminExists();
         setAdminExists(exists);
+        setLoading(false);
       } catch (error) {
         console.error('Failed to check admin existence:', error);
+        setLoading(true);
       }
     };
-
     fetchAdminStatus();
   }, []);
 
-  if (adminExists === null) {
-    return <div>Loading...</div>; // Show a loading state while checking the admin status
-  }
+  if (loading) return <LoadingPage classStyle="loading-screen"/>
 
   return (
     <AuthProvider>
@@ -36,19 +37,27 @@ function App() {
 }
 
 const AuthRoutes = ({ adminExists }) => {
-  const { userRole } = useContext(AuthContext);
+  const { userRole, authenticated, loading } = useContext(AuthContext);
+
+  if(loading) return <LoadingPage classStyle="loading-screen"/>
 
   return (
     <Routes>
       {adminExists ? (
         <>
-          <Route path="login" element={<Pages.Login />} />
-          <Route path="login-pos" element={<Pages.LoginPOS />} />
+          <Route
+              path="login"
+              element={authenticated && userRole === "admin" ? <Navigate to="/" /> : <Pages.Login />}
+          />
+          <Route
+              path="login-pos"
+              element={authenticated && userRole === "staff" ? <Navigate to="/" /> : <Pages.LoginPOS />}
+          />
           <Route path="set-up-account" element={<Navigate to="/login" />} />
           <Route path="*" element={
-            userRole === 'admin' ? (
+            authenticated && userRole === 'admin' ? (
               <AdminRoutes />
-            ) : userRole === 'staff' ? (
+            ) : authenticated && userRole === 'staff' ? (
               <StaffRoutes />
             ) : (
               <Navigate to="/login" />
