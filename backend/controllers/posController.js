@@ -6,7 +6,7 @@ require("dotenv").config();
 
 const getAllItems = async (req,res) => {
     try {
-      const { rows } = await pool.query("SELECT * FROM items WHERE status = 'active' ORDER BY stock_count DESC");
+      const { rows } = await pool.query("SELECT * FROM items WHERE status = true ORDER BY stock_count DESC");
       res.json({ items: rows });
     } catch (err) {
       res.status(500).json({ error: err.message });
@@ -15,7 +15,7 @@ const getAllItems = async (req,res) => {
 
 const getAllMechanics = async (req,res) => {
     try {
-      const { rows } = await pool.query("SELECT * FROM mechanics WHERE status = 'active' ORDER BY mechanic_name ASC");
+      const { rows } = await pool.query("SELECT * FROM mechanics WHERE status = true ORDER BY mechanic_name ASC");
       res.json({ mechanics: rows });
     } catch (err) {
       res.status(500).json({ error: err.message });
