@@ -1,33 +1,42 @@
 import React, { useRef, useState, useEffect } from 'react';
-import { Stage, Layer, Image } from 'react-konva';
+import { Stage, Layer, Image, Transformer } from 'react-konva';
 
 const CanvasContainer = ({
     frameImage, forkImage, groupsetImage, wheelsetImage, seatImage, cockpitImage,
     partPositions, handleDragEnd, budget, buildStatsPrice
 }) => {
-    const canvasRef = useRef(null); // To reference the canvas container
-    const [canvasSize, setCanvasSize] = useState({ width: 900, height: 600 });
+    const transformerRef = useRef(null); // Reference for the transformer (for rotation)
+    const [selectedPart, setSelectedPart] = useState(null); // To keep track of selected parts for rotation
 
-    // Function to update the canvas size based on the container size
-    const updateCanvasSize = () => {
-        if (canvasRef.current) {
-            const { offsetWidth, offsetHeight } = canvasRef.current;
-            setCanvasSize({
-                width: offsetWidth,
-                height: offsetHeight
-            });
+    // Function to ensure the drag stays within the canvas bounds
+    const constrainDrag = (pos, imageWidth, imageHeight, stageWidth, stageHeight) => {
+        const newX = Math.max(0, Math.min(pos.x, stageWidth - imageWidth));
+        const newY = Math.max(0, Math.min(pos.y, stageHeight - imageHeight));
+        return { x: newX, y: newY };
+    };
+
+    // Confirm rotation by clicking outside the selected part
+    const confirmRotation = (e) => {
+        const clickedOnEmptySpace = e.target === e.target.getStage();
+        if (clickedOnEmptySpace) {
+            setSelectedPart(null); // Unselect part
+            if (transformerRef.current) {
+                transformerRef.current.nodes([]);
+            }
         }
     };
 
-    // Add event listener to window resize
+    // Handle rotation
     useEffect(() => {
-        window.addEventListener('resize', updateCanvasSize);
-        updateCanvasSize(); // Set the initial size
+        if (selectedPart && transformerRef.current) {
+            transformerRef.current.nodes([selectedPart]);
+            transformerRef.current.getLayer().batchDraw();
+        }
+    }, [selectedPart]);
 
-        return () => {
-            window.removeEventListener('resize', updateCanvasSize);
-        };
-    }, []);
+    // Fixed canvas width and height (adjustable)
+    const stageWidth = 900;
+    const stageHeight = 600;
 
     return (
         <div className="bike-content d-flex">
@@ -53,9 +62,13 @@ const CanvasContainer = ({
                     </div>
                 </div>
 
-                <div className="canvas-container" ref={canvasRef}>
+                <div className="canvas-container">
                     <div className="canvas-content">
-                        <Stage width={canvasSize.width} height={canvasSize.height}>
+                        <Stage
+                            width={stageWidth}
+                            height={stageHeight}
+                            onMouseDown={confirmRotation}
+                        >
                             <Layer>
                                 {/* Frame */}
                                 {frameImage && (
@@ -64,6 +77,8 @@ const CanvasContainer = ({
                                         x={partPositions.frame.x}
                                         y={partPositions.frame.y}
                                         draggable
+                                        dragBoundFunc={(pos) => constrainDrag(pos, frameImage.width, frameImage.height, stageWidth, stageHeight)}
+                                        onClick={(e) => setSelectedPart(e.target)}
                                         onDragEnd={(e) => handleDragEnd("frame", e)}
                                     />
                                 )}
@@ -74,6 +89,8 @@ const CanvasContainer = ({
                                         x={partPositions.fork.x}
                                         y={partPositions.fork.y}
                                         draggable
+                                        dragBoundFunc={(pos) => constrainDrag(pos, forkImage.width, forkImage.height, stageWidth, stageHeight)}
+                                        onClick={(e) => setSelectedPart(e.target)}
                                         onDragEnd={(e) => handleDragEnd("fork", e)}
                                     />
                                 )}
@@ -84,6 +101,8 @@ const CanvasContainer = ({
                                         x={partPositions.groupset.x}
                                         y={partPositions.groupset.y}
                                         draggable
+                                        dragBoundFunc={(pos) => constrainDrag(pos, groupsetImage.width, groupsetImage.height, stageWidth, stageHeight)}
+                                        onClick={(e) => setSelectedPart(e.target)}
                                         onDragEnd={(e) => handleDragEnd("groupset", e)}
                                     />
                                 )}
@@ -94,6 +113,8 @@ const CanvasContainer = ({
                                         x={partPositions.frontWheel.x}
                                         y={partPositions.frontWheel.y}
                                         draggable
+                                        dragBoundFunc={(pos) => constrainDrag(pos, wheelsetImage.width, wheelsetImage.height, stageWidth, stageHeight)}
+                                        onClick={(e) => setSelectedPart(e.target)}
                                         onDragEnd={(e) => handleDragEnd("frontWheel", e)}
                                     />
                                 )}
@@ -104,6 +125,8 @@ const CanvasContainer = ({
                                         x={partPositions.rearWheel.x}
                                         y={partPositions.rearWheel.y}
                                         draggable
+                                        dragBoundFunc={(pos) => constrainDrag(pos, wheelsetImage.width, wheelsetImage.height, stageWidth, stageHeight)}
+                                        onClick={(e) => setSelectedPart(e.target)}
                                         onDragEnd={(e) => handleDragEnd("rearWheel", e)}
                                     />
                                 )}
@@ -114,6 +137,8 @@ const CanvasContainer = ({
                                         x={partPositions.seat.x}
                                         y={partPositions.seat.y}
                                         draggable
+                                        dragBoundFunc={(pos) => constrainDrag(pos, seatImage.width, seatImage.height, stageWidth, stageHeight)}
+                                        onClick={(e) => setSelectedPart(e.target)}
                                         onDragEnd={(e) => handleDragEnd("seat", e)}
                                     />
                                 )}
@@ -124,9 +149,14 @@ const CanvasContainer = ({
                                         x={partPositions.cockpit.x}
                                         y={partPositions.cockpit.y}
                                         draggable
+                                        dragBoundFunc={(pos) => constrainDrag(pos, cockpitImage.width, cockpitImage.height, stageWidth, stageHeight)}
+                                        onClick={(e) => setSelectedPart(e.target)}
                                         onDragEnd={(e) => handleDragEnd("cockpit", e)}
                                     />
                                 )}
+
+                                <Transformer ref={transformerRef} />
+
                             </Layer>
                         </Stage>
                     </div>

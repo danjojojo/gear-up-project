@@ -8,7 +8,7 @@
     background-position: center;
     background-color: rgba(0, 0, 0, 0.5);
     background-blend-mode: multiply;
-    
+
     &::before {
         content: "";
         position: absolute;
@@ -24,9 +24,19 @@
         font-size: 70px;
         position: relative;
         z-index: 2;
-        top: 10%;
+        top: 15%;
         left: 5%;
-        font-family: "Poppins", sans-serif;
+        font-family: "poppins";
         color: white !important;
+    }
+
+    p {
+        font-size: 16px;
+        position: relative;
+        z-index: 2;
+        top: 15%;
+        left: 5%;
+        color: white !important;
+        font-weight: lighter;
     }
 }
