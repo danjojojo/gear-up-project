@@ -400,6 +400,12 @@ const Inventory = () => {
         setIsAddingStock(false);
     };
 
+    const PesoFormat = new Intl.NumberFormat("en-US", {
+        style: "currency",
+        currency: "PHP",
+    });
+
+
     return (
         <div className="inventory p-3">
             <PageLayout
@@ -548,7 +554,7 @@ const Inventory = () => {
                                         >
                                             <div className="item-name fw-bold">{item.item_name}</div>
                                             <div className="item-category">{item.category_name}</div>
-                                            <div className="item-price">₱ {item.item_price}</div>
+                                            <div className="item-price"> {PesoFormat.format(item.item_price)}</div>
                                             <div className="item-date">
                                                 {new Date(item.date_created).toLocaleDateString()}
                                             </div>

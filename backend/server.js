@@ -26,23 +26,23 @@ const port = process.env.PORT || 5000;
 // app.use(cors());
 
 // Apply CORS configuration
-app.use(cors({
-  origin: 'http://localhost:3000',  // Specify the frontend URL
-  credentials: true,  // Allow cookies (credentials) to be sent
-}));
-
-// const allowedOrigins = ['https://my-frontend.com', 'https://staging.my-frontend.com'];
-
 // app.use(cors({
-//   origin: function (origin, callback) {
-//     if (!origin || allowedOrigins.indexOf(origin) !== -1) {
-//       callback(null, true);
-//     } else {
-//       callback(new Error('Not allowed by CORS'));
-//     }
-//   },
-//   credentials: true,
+//   origin: 'http://localhost:3000',  // Specify the frontend URL
+//   credentials: true,  // Allow cookies (credentials) to be sent
 // }));
+
+const allowedOrigins = ['http://localhost:3000', 'http://localhost:3001'];
+
+app.use(cors({
+  origin: function (origin, callback) {
+    if (!origin || allowedOrigins.indexOf(origin) !== -1) {
+      callback(null, true);
+    } else {
+      callback(new Error('Not allowed by CORS'));
+    }
+  },
+  credentials: true,
+}));
 
 app.use(express.json());
 app.use(cookieParser());

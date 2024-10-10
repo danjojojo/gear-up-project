@@ -25,7 +25,7 @@ function App() {
     fetchAdminStatus();
   }, []);
 
-  if (loading) return <LoadingPage classStyle="loading-screen"/>
+  if (loading) return <LoadingPage classStyle="loading-screen" />
 
   return (
     <AuthProvider>
@@ -38,20 +38,20 @@ function App() {
 
 const AuthRoutes = ({ adminExists }) => {
   const { userRole, authenticated, loading } = useContext(AuthContext);
-
-  if(loading) return <LoadingPage classStyle="loading-screen"/>
+  console.log(authenticated);
+  if (loading) return <LoadingPage classStyle="loading-screen" />
 
   return (
     <Routes>
       {adminExists ? (
         <>
           <Route
-              path="login"
-              element={authenticated && userRole === "admin" ? <Navigate to="/" /> : <Pages.Login />}
+            path="login"
+            element={authenticated && userRole === "admin" ? <Navigate to="/" /> : <Pages.Login />}
           />
           <Route
-              path="login-pos"
-              element={authenticated && userRole === "staff" ? <Navigate to="/" /> : <Pages.LoginPOS />}
+            path="login-pos"
+            element={authenticated && userRole === "staff" ? <Navigate to="/" /> : <Pages.LoginPOS />}
           />
           <Route path="set-up-account" element={<Navigate to="/login" />} />
           <Route path="*" element={
