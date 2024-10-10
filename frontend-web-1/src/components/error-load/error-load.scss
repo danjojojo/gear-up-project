@@ -1,0 +1,57 @@
+.error-screen {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: #f8f9fa;
+    /* Light background color */
+    z-index: 9999;
+    /* Make sure it's above everything else */
+    font-size: 24px;
+    color: #000;
+}
+
+.error-in-page{
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: calc(100vw + 250px);
+    height: 100vh;
+    font-size: 15px;
+    text-align: center;
+    
+    
+    .title{
+        margin-top: 10px;
+        font-size: 25px;
+        font-weight: 700;
+    }
+}
+
+.error-in-page i, .error-screen i{
+    font-size: 2rem;
+}
+
+// @keyframes spin {
+//     from {
+//         transform: rotate(0deg);
+//     }
+
+//     to {
+//         transform: rotate(360deg);
+//     }
+// }
+
+@media screen and (max-width: 900px) {
+    .in-page{
+        width: 100vw;
+    }
+}

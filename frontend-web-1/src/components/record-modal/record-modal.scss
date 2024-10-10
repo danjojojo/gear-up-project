@@ -1,0 +1,65 @@
+.record-modal {
+    height: 90vh;
+    overflow-y: auto;
+    scrollbar-width: thin;
+    
+    .custom-content {
+        padding: 15px !important;
+
+        .info {
+            h4 {
+                font-weight: bold !important;
+            }
+
+            p {
+                margin: 0 !important;
+            }
+        }
+
+        .subtotal {
+            display: flex !important;
+            flex-direction: column !important;
+            justify-content: center !important;
+            align-items: center !important;
+            border-bottom: 1px solid #dee2e6 !important;
+
+            .value {
+                font-size: 1.5rem !important;
+                font-weight: 700 !important;
+                margin: 0 !important;
+            }
+
+            .label {
+                font-size: 1.1rem !important;
+                color: grey !important;
+                margin: 0 !important;
+                padding-bottom: 10px !important;
+            }
+        }
+
+        .items {
+            .item {
+                margin: 10px 0 !important;
+
+                .top {
+                    display: flex !important;
+                    justify-content: space-between !important;
+
+                    p {
+                        margin: 0 !important;
+
+                        &.total-price {
+                            font-weight: 700 !important;
+                        }
+                    }
+                }
+
+                .bottom {
+                    p {
+                        color: grey !important;
+                    }
+                }
+            }
+        }
+    }
+}

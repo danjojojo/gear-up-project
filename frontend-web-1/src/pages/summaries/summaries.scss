@@ -1,3 +1,17 @@
+$normal-bg-color: #f8f9fa;
+$normal-border-color: #dee2e6;
+$active-bg-color: white;
+$active-text-color: rgb(65, 65, 65);
+$error-border-color: #ce6868;
+$inactive-text-color: grey;
+$qty-bg-color: #a3a3a3;
+$qty-text-color: white;
+$button-bg-color: #9e9e9e;
+$subheading-text-color: #606060;
+$font-size: clamp(0.9em, 1.2vw, 1.1em);
+$button-success: #9C9B9B;
+$button-fail: #dee2e6;
+
 .summaries {
     .left-content {
 
@@ -6,35 +20,258 @@
             height: 100%;
 
             .upper-container {
-                height: 40%;
+                height: 55%;
 
                 .left-container {
-                    box-shadow: 2px 2px 10px 3px rgba(0, 0, 0, 0.1);
+                    // box-shadow: 2px 2px 10px 3px rgba(0, 0, 0, 0.1);
+                    border: 1px solid #dee2e6;
+                    background-color: white;
                     height: 96%;
-                    border-radius: 20px;
+                    border-radius: 15px;
                     width: 60%;
                     margin: 5px;
+
+                    .summary-content{
+                        padding: 20px;
+
+                        .header{
+                            display: flex;
+                            justify-content: space-between;
+
+                            h4{
+                                font-weight: 700;
+                            }
+
+                            select {
+                                padding: 3px;
+                                width: fit-content;
+                                background-color: $normal-bg-color;
+                                border: 1px solid $normal-border-color;
+                                font-size: $font-size;
+                                border-radius: 7px;
+                                margin-right: 10px;
+                            }
+                        }
+
+                        .date{
+                            margin-bottom: 20px;
+                        }
+
+                        .four{
+                            display: flex;
+                            flex-direction: column;
+                            margin-top: 30px;
+
+                            .green, .red, .net{
+                                display: flex;
+                                justify-content: space-between;
+                                margin: 3px 15px;
+                                font-size: 1.1em;
+
+                                p{
+                                    margin: 0;
+                                }
+
+                                .right{
+                                    text-align: right;
+                                   
+                                }
+                            }
+
+                            .green, .red{
+                                .left{
+                                    color: grey;
+                                }
+                            }
+
+                            .green{
+                                .right{
+                                    color: green;
+                                }
+                            }
+
+                            .red{
+                                .right{
+                                    color: red;
+                                }
+                            }
+
+                            .net{
+                                border-top: 2px solid #dee2e6;
+                                margin-top: 10px;
+                                padding-top: 10px;
+                                .left, .right{
+                                    font-size: 1.2em;
+                                }
+
+                                .right{
+                                    font-weight: 700;
+
+                                    &.green{
+                                        color: green;
+                                    }
+
+                                    &.red{
+                                        color: red;
+                                    }
+                                }
+                            }
+                        }
+
+                        .message{
+                            background-color: $normal-bg-color;
+                            border: 1px solid $normal-border-color;
+                            text-align: center;
+                            border-radius: 7px;
+                            
+                            p{
+                                margin: 0;
+                            }
+                        }
+                    }
 
                 }
 
                 .right-container {
-                    box-shadow: 2px 2px 10px 3px rgba(0, 0, 0, 0.1);
+                    // box-shadow: 2px 2px 10px 3px rgba(0, 0, 0, 0.1);
+                    border: 1px solid #dee2e6;
+                    background-color: white;
                     height: 96%;
-                    border-radius: 20px;
+                    border-radius: 15px;
                     width: 40%;
                     margin: 5px;
-                    padding-top: 30px;
+                    padding: 10px;
+
+                    .react-datepicker {
+                        width: 100%;
+                        height: 100%;
+                        /* Full width of container */
+                        border: none;
+                        font-size: 1em;
+                    }
+                
+                    .react-datepicker__month-container {
+                        width: 100%;
+                    }
+                
+                    .react-datepicker__header {
+                        background-color: white;
+                    }
+                
+                    .react-datepicker__day {
+                        margin: 1%;
+                    }
+
+                    .react-datepicker__current-month {
+                        font-size: 1em;
+                    }
+
+                    .react-datepicker__day-name {
+                        font-size: 0.9em;
+                        text-transform: uppercase;
+                        margin: 1%;
+                    }
+                
+                    .react-datepicker__today-button {
+                        background-color: white;
+                        border-radius: 15px;
+                        border: 1px solid #dee2e6;
+                        padding: 5px;
+                        width: fit-content;
+                        margin: auto;
+                    }
                 }
             }
 
             .lower-container {
-                height: 60%;
+                height: 45%;
                 padding: 5px;
 
                 .content {
-                    box-shadow: 2px 2px 10px 3px rgba(0, 0, 0, 0.1);
+                    // box-shadow: 2px 2px 10px 3px rgba(0, 0, 0, 0.1);
+                    border: 1px solid #dee2e6;
+                    background-color: white;
                     height: 100%;
-                    border-radius: 20px;
+                    border-radius: 15px;
+                    padding: 10px;
+
+                    .no-records {
+                            height: 100%;
+                            display: flex;
+                            justify-content: center;
+                            align-items: center;
+                            text-align: center;
+                        }
+
+                    .list{
+                        height: 100%;
+                        overflow-y: auto;
+                        scrollbar-width: none;
+                        padding: 10px;
+
+                        .list-item{
+                            display: flex;
+                            // gap: 10px;
+                            margin-bottom: 9px;
+                            border-radius: 4px;
+                            padding: 7px 10px;
+                            background-color: $normal-bg-color;
+                            border: 1px solid $normal-border-color;
+                            cursor: pointer;
+                            font-size: 1em;
+
+                            div{
+                                // border: 1px solid black;
+
+                                p, i{
+                                    margin: 0;
+                                }
+
+                                i{
+                                    font-size: 1em;
+                                    padding: 2px;
+                                    width: 20px;
+                                }
+                            }
+
+                            .left, .right{
+                                display: flex;
+                            }
+
+                            .left{
+                                gap: 50px;
+                                width: fit-content;
+
+                                .name{
+                                    font-weight: 700;
+                                }
+                            }
+
+                            .mid{
+                                margin-left: auto;
+                                font-weight: 700;
+                            }
+
+                            .right{
+                                margin-left: auto;
+
+                                .amount{
+                                    margin-right: 10px;
+                                    // font-style: italic;
+                                    padding: 1px 10px;
+                                    background-color: $button-success;
+                                    border-radius: 4px;
+                                    color: white;
+                                }
+
+                                .date{
+                                    width: 120px;
+                                    margin-left: auto;
+                                    text-align: right;
+                                }
+                            }
+                        }
+                    }
 
                 }
             }
@@ -43,6 +280,124 @@
 
     }
 
+    .right-content{
+        .rightmost-content{
+            height: 100%;
+            overflow-y: auto;
+            scrollbar-width: none;
+            .content{
+                display: flex;
+                flex-direction: column;
+                .top{
+                    height: auto;
+                    // border: 1px solid black;
 
+                    .nav{
+                        display: flex;
+                        justify-content: space-between;
+                        align-items: center;
+
+                        i{
+                            cursor: pointer;
+                        }
+                    }
+    
+                    h4{
+                        font-weight: 700;
+                    }
+    
+                    p{
+                        margin-bottom: 5px;
+                    }
+                }
+                
+                .bottom{    
+                    width: 100%;
+    
+                    .total{
+                        display: flex;
+                        flex-direction: column;
+                        align-items: center;
+                        justify-content: center;
+    
+                        p{
+                            margin: 0;
+                            color: grey;
+                        }
+    
+                        .value{
+                            font-weight: 700;
+                        }
+                    }
+    
+                    .items{
+                        border-top: 2px solid $normal-border-color;
+                        padding-top: 10px;
+                        margin-top: 10px;
+                        
+                        .item{
+                            margin-bottom: 10px;
+                            display: flex;
+                            justify-content: space-between;
+                            padding: 5px;
+                            // margin: 5px;
+                        
+                            .left{
+                                .qty-unit-price{
+                                    color: grey
+                                }
+                            }
+                            
+                            .total-price{
+                                font-weight: 700;
+                            }
+    
+                            p {
+                                margin: 0;
+                            }
+    
+                            &.selected{
+                                // box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); // Adjusted box-shadow to be more prominent
+                                // margin: 5px;
+                                border: 2px solid $normal-border-color;
+                                border-radius: 4px;
+                                scroll-behavior: smooth;
+                            }
+                        }
+                    }
+
+                    img{
+                        width: 100%;
+                        cursor: pointer;
+                        border-radius: 4px;
+                        border: 1px solid $normal-border-color;
+                    }
+    
+                }
+                .total-paid-change{
+                    border-top: 2px solid $normal-border-color;
+                    padding: 10px 5px;
+                    display: flex;
+                    flex-direction: column;
+                    height: auto;
+    
+                    .total-cost, .paid, .change{
+                        display: flex;
+                        justify-content: space-between;
+    
+                        p{
+                            margin-bottom: 5px;
+                        }
+                    }
+    
+                    .total-cost{
+                        p{
+                            font-weight: 700;
+                        }
+                    }
+                }
+            }
+        }
+    }
 
 }

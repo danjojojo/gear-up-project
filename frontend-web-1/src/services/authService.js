@@ -1,5 +1,4 @@
 import api from './api';
-import Cookies from 'js-cookie';
 
 // Check if admin exists
 export const checkAdminExists = async () => {
@@ -8,6 +7,17 @@ export const checkAdminExists = async () => {
     return response.data.exists;
   } catch (error) {
     console.error('Error checking admin existence:', error);
+    throw error;
+  }
+};
+
+// Check if any pos user exists
+export const checkPosExists = async () => {
+  try {
+    const response = await api.get("/auth/pos-check");
+    return response.data;
+  } catch (error) {
+    console.error("Error checking pos existence:", error);
     throw error;
   }
 };
@@ -28,8 +38,6 @@ export const login = async (email, password) => {
   try {
     const response = await api.post('/auth/login', { email, password });
     // Store tokens and role in cookies
-    Cookies.set('token', response.data.token, { httpOnly: true, secure: true, sameSite: 'Strict' });
-    Cookies.set('userRole', response.data.role, { httpOnly: true, secure: true, sameSite: 'Strict' });
     return response.data;
   } catch (error) {
     console.error('Error logging in:', error);
@@ -38,15 +46,34 @@ export const login = async (email, password) => {
 };
 
 // Login staff
-export const loginPOS = async (password) => {
+export const loginPOS = async (id, password) => {
   try {
-    const response = await api.post('/auth/login-pos', { password });
+    const response = await api.post('/auth/login-pos', { id, password });
     // Store tokens and role in cookies
-    Cookies.set('pos_token', response.data.token, { httpOnly: true, secure: true, sameSite: 'Strict' });
-    Cookies.set('userRole', response.data.role, { httpOnly: true, secure: true, sameSite: 'Strict' });
     return response.data;
   } catch (error) {
     console.error('Error logging in POS:', error);
     throw error;
   }
 };
+
+// Get user role
+export const getMyRole = async () => {
+  try {
+    const response = await api.get('/auth/me');
+    return response.data.role;
+  } catch (error) {
+    console.error('Error getting role:', error);
+    throw error;
+  }
+}
+
+// Logout user
+export const logoutUser = async () => {
+  try {
+    await api.post('/auth/logout');
+  } catch (error) {
+    console.error('Error logging out:', error);
+    throw error;
+  }
+}

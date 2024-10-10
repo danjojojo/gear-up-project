@@ -1,0 +1,319 @@
+$normal-bg-color: #f8f9fa;
+$normal-border-color: #dee2e6;
+$active-bg-color: white;
+$active-text-color: rgb(65, 65, 65);
+$error-border-color: #ce6868;
+$inactive-text-color: grey;
+$qty-bg-color: #a3a3a3;
+$qty-text-color: white;
+$button-bg-color: #9e9e9e;
+$subheading-text-color: #606060;
+$font-size: clamp(0.9em, 1.2vw, 1.1em);
+
+.receipts {
+    .left-content {
+        .receipts-container{
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+            .receipts-nav {
+                display: flex;
+                flex-direction: column;
+                height: auto;
+
+                .date-picker {
+                    border: none;
+                    cursor: pointer;
+                    font-size: 20px;
+                    font-weight: 700;
+                    margin-bottom: 10px;
+                    background-color: white;
+                }
+
+                .search-sorting {
+                    display: flex;
+                    flex-direction: row;
+                    justify-content: space-between;
+                    margin-bottom: 10px;
+
+                    .search-bar {
+                        background-color: $normal-bg-color;
+                        border: 1px solid $normal-border-color;
+                        display: flex;
+                        align-items: center;
+                        border-radius: 7px;
+                        padding: 3px;
+                        width: 100%;
+                        margin-right: 5px;
+                        margin-bottom: 0;
+
+                        input {
+                            width: 100%;
+                            border-radius: 5px;
+                            border: 1px solid $normal-border-color;
+                            padding: 5px;
+                            font-size: $font-size;
+                        }
+                    }
+
+                    .sorting {
+                        display: flex;
+                        padding: 3px;
+                        width: fit-content;
+                        background-color: $normal-bg-color;
+                        border: 1px solid $normal-border-color;
+                        font-size: $font-size;
+                        border-radius: 7px;
+                        margin-right: 5px;
+
+                        button {
+                            border-radius: 5px;
+                            padding: 5px 10px;
+                            background-color: $normal-bg-color;
+                            color: $inactive-text-color;
+                            border: none;
+                            cursor: pointer;
+
+                            &.active {
+                                background-color: $active-bg-color;
+                                color: $active-text-color;
+                                border: 1px solid $normal-border-color;
+                            }
+                        }
+                    }
+                }
+            }
+
+            .list {
+                display: flex;
+                flex-direction: column;
+                flex-grow: 1;
+                overflow-y: auto !important;
+                scrollbar-width: none;
+
+                .empty-list {
+                    display: flex;
+                    justify-content: center;
+                    align-items: center;
+                    height: 100%;
+                    font-size: 1rem;
+                    color: $subheading-text-color;
+                }
+
+                .list-item {
+                    margin-bottom: 9px;
+                    border-radius: 4px;
+                    padding: 10px;
+                    background-color: $normal-bg-color;
+                    border: 1px solid $normal-border-color;
+                    width: 100%;
+                    cursor: pointer;
+                    font-size: $font-size;
+
+                    .list-item-content {
+                        display: flex;
+                        justify-content: space-between;
+                        flex-direction: row;
+                        align-items: center;
+
+                        p {
+                            margin: 0;
+                        }
+
+                        .list-item-info {
+                            display: flex;
+                            flex-direction: column;
+                            border: 1px solid blac;
+
+                            .time {
+                                text-align: right;
+                                font-size: 1rem;
+                                color: $subheading-text-color;
+                            }
+
+                            .cost {
+                                background-color: $qty-bg-color;
+                                color: $qty-text-color;
+                                border-radius: 2px;
+                                padding: 0 5px;
+                                text-align: right;
+                                width: fit-content;
+                                margin-left: auto;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    .right-content {
+        h4 {
+            font-weight: 700;
+        }
+
+        .receipt-container {
+            height: 100%;
+
+            .receipt-nav {
+                display: flex;
+                justify-content: space-between;
+
+                .print-close {
+                    margin-left: 10px;
+                    fill: $subheading-text-color;
+                    cursor: pointer;
+
+                    :hover {
+                        fill: black;
+                    }
+                }
+            }
+
+            .receipt-details-info-header {
+                display: flex;
+                flex-direction: column;
+                justify-content: space-between;
+                font-size: $font-size;
+
+                p {
+                    margin: 0 !important;
+                }
+
+                .total {
+                    display: flex;
+                    flex-direction: column;
+                    justify-content: center;
+                    text-align: center;
+                    margin: 10px 0;
+                    padding: 5px;
+
+                    p:nth-child(1) {
+                        font-size: 1.5rem;
+                        font-weight: 700;
+                    }
+
+                    p:nth-child(2) {
+                        color: $inactive-text-color;
+                    }
+                }
+
+            }
+
+            @media screen and (max-width: 1024px) {
+                .receipt-details-info-content {
+                    height: 30svh !important;
+                }
+            }
+
+            .receipt-details-info-content {
+                border-top: 1px solid $normal-border-color;
+                margin-bottom: 15px;
+                height: 35svh;
+                overflow-y: auto;
+
+                .receipt-details-item {
+                    display: flex;
+                    flex-direction: column;
+                    margin-top: 10px;
+                    font-size: $font-size;
+
+                    .item-detail-top {
+                        display: flex;
+                        justify-content: space-between;
+
+                        .total-price {
+                            font-weight: 700;
+                        }
+                    }
+
+                    .item-detail-bottom {
+                        display: flex;
+
+                        p {
+                            font-size: 1rem;
+                            color: $inactive-text-color;
+                        }
+                    }
+
+                    p {
+                        margin: 0;
+                    }
+
+                }
+            }
+
+            .total-paid-change {
+                display: flex;
+                flex-direction: column;
+                border-top: 1px solid $normal-border-color;
+                padding-top: 15px;
+                margin-top: auto;
+                font-size: $font-size;
+
+                div {
+                    display: flex;
+                    flex-direction: row;
+                    justify-content: space-between;
+                    align-items: center;
+
+                    p {
+                        margin: 5px 0;
+                    }
+
+                    p:nth-child(1) {
+                        font-weight: 700;
+                    }
+                }
+
+                div:nth-child(1) {
+                    p:nth-child(2) {
+                        font-weight: 700;
+                    }
+                }
+            }
+        }
+    }
+}
+
+.print-only {
+    display: none;
+}
+
+.receipts-container-close {
+    display: none;
+}
+
+.receipt-container-close {
+    display: none;
+}
+
+.right-container-close {
+    display: none;
+}
+
+@media print {
+    @page {
+        size: A4;
+        /* You can use A4, Letter, etc. */
+        margin: 10mm;
+        /* Adjust margins as needed */
+    }
+
+    body * {
+        visibility: hidden;
+    }
+
+    #print-area,
+    #print-area * {
+        visibility: visible;
+    }
+
+    #print-area {
+        border: 1px solid black;
+        position: absolute;
+        top: 0;
+        left: 0;
+        padding: 10px;
+    }
+}

@@ -1,0 +1,327 @@
+$normal-bg-color: #f8f9fa;
+$normal-border-color: #dee2e6;
+$active-bg-color: white;
+$active-text-color: rgb(65, 65, 65);
+$error-border-color: #ce6868;
+$inactive-text-color: grey;
+$qty-bg-color: #a3a3a3;
+$qty-text-color: white;
+$button-bg-color: #9e9e9e;
+$subheading-text-color: #606060;
+$font-size: clamp(0.9em, 1.2vw, 1.1em);
+
+.expenses{
+    .left-content{
+        .expenses-container{
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+
+            .nav{
+                display: flex;
+                flex-direction: column;
+                height: auto;
+
+                .date-picker{
+                    border: none;
+                    cursor: pointer;
+                    font-size: 20px;
+                    font-weight: 700;
+                    margin-bottom: 10px;
+                    background-color: white;
+                }
+
+                .add-expense {
+                    width: 100%;
+                    margin-top: 5px;
+                    margin-bottom: 15px;
+                    padding: 8px;
+                    font-size: 1em;
+                    background-color: #9C9B9B;
+                    color: #ffffff;
+                    border: none;
+                    border-radius: 5px;
+                    cursor: pointer;
+
+                    &:hover {
+                        background-color: #B0B0B0;
+                    }
+
+                    &.error {
+                        cursor: not-allowed;
+                        background-color: #d0a2a2;
+                        text-align: center;
+                    }
+                }
+            }
+
+            .empty-list {
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                height: 100%;
+                font-size: 1rem;
+                color: $subheading-text-color;
+            }
+
+            .list{
+                display: flex;
+                flex-grow: 1;
+                flex-direction: column;
+                overflow-y: auto !important;
+
+                .list-item {
+                    margin-bottom: 9px;
+                    border-radius: 4px;
+                    padding: 10px;
+                    background-color: $normal-bg-color;
+                    border: 1px solid $normal-border-color;
+                    width: 100%;
+                    cursor: pointer;
+                    font-size: $font-size;
+            
+                    .list-item-content {
+                        display: flex;
+                        justify-content: space-between;
+                        flex-direction: row;
+                        align-items: center;
+            
+                        p {
+                            margin: 0;
+                        }
+            
+                        .list-item-info {
+                            display: flex;
+                            flex-direction: column;
+                            border: 1px solid blac;
+            
+                            .time {
+                                text-align: right;
+                                font-size: 1rem;
+                                color: $subheading-text-color;
+                            }
+            
+                            .cost {
+                                background-color: $qty-bg-color;
+                                color: $qty-text-color;
+                                border-radius: 2px;
+                                padding: 0 5px;
+                                text-align: right;
+                                width: fit-content;
+                                margin-left: auto;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+    }
+
+    .right-content{
+
+        .expense-container{
+            .expense-details-container{
+                display: flex;
+                flex-direction: column;
+
+                .nav{
+                    display: flex;
+                    justify-content: space-between;
+                    align-items: center;
+
+                    h4{
+                        font-weight: 700;
+                    }
+
+                    i{
+                        cursor: pointer;
+                        color: grey;
+                    }
+                    i:hover{
+                        color: black;
+                    }
+
+                    .edit-nav{
+                        i:nth-child(1){
+                            margin-right: 10px;
+                        }
+                    }
+                }
+
+                form{
+                    display: flex;
+                    flex-direction: column;
+                    
+                    .form-input{
+                        display: flex;
+                        flex-direction: column;
+                        margin: 15px 0 0 0;
+
+                        .select-nav{
+                            display: flex;
+                            flex-direction: row;
+                            justify-content: space-between;
+
+                            label, p{
+                                font-size: 1em;
+                                margin: 5px 0;
+                            }
+
+                            p:hover{
+                                cursor: pointer;
+                                text-decoration: underline;
+                            }
+                        }
+
+                        label{
+                            font-size: 1em;
+                            margin: 5px 0;
+                        }
+                    
+                        select, input {
+                            width: 100%;
+                            padding: 10px;
+                            font-size: 0.9rem;
+                            border: 1px solid #ddd;
+                            border-radius: 5px;
+                        }
+
+                        .radio-buttons{
+                            // border: 1px solid black;
+                            display: flex;
+                            flex-direction: row;
+                            gap: 2%;
+
+                            .expense-name{
+                                margin: 0;
+                            }
+                            
+                            p{
+                                padding: 5px 15px;
+                                border: 1px solid #ddd;
+                                border-radius: 100px;
+                                cursor: pointer;
+
+                                &.selected{
+                                    color: white;
+                                    background-color: #9C9B9B;
+                                    border: 1px solid #9C9B9B;
+                                }
+                            }
+                        }
+
+                        .error{
+                            color: red;
+                            margin: 2px;
+                            font-size: 0.9rem;
+                        }
+                        
+                        .upload-image{
+                            padding: 20px 10px;
+                            border: 2px dashed #ddd;
+                            border-radius: 5px;
+                            width: 100%;
+                            display: flex;
+                            flex-direction: column;
+                            justify-content: center;
+                            height: 100%;
+                            text-align: center;
+                            cursor: pointer;
+
+                            .title, .subtitle, i{
+                                margin: auto 0;
+                            }
+
+                            .title{
+                                font-weight: 700;
+                            }
+
+                            .subtitle{
+                                font-size: 0.9em;
+                                color:#B0B0B0;
+                            }
+
+                            &:hover{
+                                background-color: #f9f9f9;
+                            }
+                        }
+
+                        .img-preview{
+                            padding: 10px;
+                            border: 1px solid #ddd;
+                            border-radius: 5px;
+                            width: 100%;
+                            display: flex;
+                            flex-direction: column;
+                            
+                            img{
+                                object-fit: cover;
+                                height: 25svh;
+                                width: 100%;
+                                margin: 0 auto;
+                                cursor: pointer;
+                            }
+
+                            .remove-img{
+                                width: 100%;
+                                margin-top: 10px;
+                                padding: 8px;
+                                font-size: 1em;
+                                background-color: rgb(217, 87, 87);
+                                color: #ffffff;
+                                border: none;
+                                border-radius: 5px;
+                                cursor: pointer;
+                            
+                                &:hover {
+                                    background-color: #953b3b;
+                                }
+                            }
+                        }
+                    }
+
+                    .submit-btn {
+                        width: 100%;
+                        margin-top: 10px;
+                        padding: 8px;
+                        font-size: 1em;
+                        background-color: #9C9B9B;
+                        color: #ffffff;
+                        border: none;
+                        border-radius: 5px;
+                        cursor: pointer;
+
+                        &:hover {
+                            background-color: #B0B0B0;
+                        }
+                        
+                        &.error{
+                            cursor: not-allowed;
+                            background-color: #d0a2a2;
+                            text-align: center;
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+.right-container-close{
+    display: none;
+}
+
+.expenses-container-close{
+    display: none;
+}
+
+.img-preview {
+
+    img {
+        object-fit: cover;
+        height: 100%;
+        width: 100%;
+        margin: 0 auto;
+    }
+}

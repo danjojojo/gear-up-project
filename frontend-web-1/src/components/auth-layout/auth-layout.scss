@@ -2,7 +2,7 @@
     display: flex;
     justify-content: center;
     align-items: center;
-    height: 100vh;
+    height: 100svh;
     background-color: #D9D9D9;
 
     .auth-container {
@@ -25,5 +25,23 @@
             border-radius: 0 20px 20px 0;
             background-color: #9C9B9B;
         }
+    }
+}
+
+@media screen and (max-width: 768px) {
+    .auth-layout {
+        padding: 10px;
+    }
+
+    .auth-container {
+        flex-direction: column;
+    }
+
+    .left-container {
+        border-radius: 20px !important;
+    }
+
+    .right-container {
+        display: none;
     }
 }

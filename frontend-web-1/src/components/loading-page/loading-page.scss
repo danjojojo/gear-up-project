@@ -1,0 +1,50 @@
+.loading-screen {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: #f8f9fa;
+    /* Light background color */
+    z-index: 9999;
+    /* Make sure it's above everything else */
+    font-size: 24px;
+    color: #000;
+}
+
+.loading-in-page{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: calc(100vw + 250px);
+    height: 100vh;
+    font-size: 50px;
+}
+
+.loading-in-page, .loading-screen i{
+    opacity: 0.2;
+    font-size: 3rem;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    from {
+        transform: rotate(0deg);
+    }
+
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+@media screen and (max-width: 900px) {
+    .loading-in-page{
+        width: 100vw;
+    }
+}
