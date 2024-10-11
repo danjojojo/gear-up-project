@@ -314,7 +314,7 @@ const getLeaderBoards = async (req, res) => {
         return res.status(401).json({ error: "No token provided " });
     }
 
-    const { reference } = req.query;
+    const { reference, start, end } = req.query;
 
     switch (reference) {
         case 'sales':
@@ -323,11 +323,47 @@ const getLeaderBoards = async (req, res) => {
                     SELECT item_name, SUM(item_qty) AS item_qty
                         FROM sales_items SI
                         JOIN items I ON SI.item_id = I.item_id
+                        WHERE si.date_created::date BETWEEN $1 AND $2
                         GROUP BY item_name, item_qty
                         ORDER BY SUM(item_qty) DESC
                     LIMIT 10;
                 `;
+                const values = [start, end];
 
+                const { rows } = await pool.query(query, values);
+                res.json({ leaderBoards: rows });
+            } catch (error) {
+                res.status(500).json({ error: error.message });
+            }
+            break;
+        case 'labor':
+            try {
+                const query = `
+                    SELECT mechanic_name as item_name, SUM(service_price) as item_qty
+                        FROM sales_mechanics SM
+                        JOIN mechanics me ON SM.mechanic_id = me.mechanic_id
+                        WHERE sm.date_created::date BETWEEN $1 AND $2
+                        GROUP BY mechanic_name
+                        ORDER BY SUM(service_price) DESC
+                    LIMIT 10;
+                `;
+                const values = [start, end];
+
+                const { rows } = await pool.query(query, values);
+                res.json({ leaderBoards: rows });
+            } catch (error) {
+                res.status(500).json({ error: error.message });
+            }
+            break;
+        case 'expenses':
+            try {
+                const query = `
+                    SELECT expense_name as item_name, SUM(expense_amount) as item_qty
+                        FROM expenses e
+                    GROUP BY expense_name
+                    ORDER BY SUM(expense_amount) DESC
+                `;
+                
                 const { rows } = await pool.query(query);
                 res.json({ leaderBoards: rows });
             } catch (error) {

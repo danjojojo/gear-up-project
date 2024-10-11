@@ -9,6 +9,7 @@ const AdminRoutes = () => (
             <Route index element={<Pages.Dashboard />} />
             <Route path="pos-users" element={<Pages.POSUsers />} />
             <Route path="inventory" element={<Pages.Inventory />} />
+            <Route path="mechanics" element={<Pages.Mechanics />} />
             <Route path="summaries" element={<Pages.Summaries />} />
             <Route path="reports" element={<Pages.Reports />} />
             <Route path="records">

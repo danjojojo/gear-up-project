@@ -151,7 +151,7 @@ const Summaries = () => {
     function handleNoRecords(){
         return (
             <div className='no-records'>
-                <p>No records found</p>
+                <p>No recorded sales, labor, and expenses.</p>
             </div>
         )
     }

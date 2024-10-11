@@ -123,14 +123,12 @@ const POSUsers = () => {
         );
         setAllActivePosUsers(activePosUsers);
     }    
-
     const getAllInactivePosUsers = (allPosUsers) => {
         const inactivePosUsers = allPosUsers.filter((posUser) => 
             posUser.pos_status === 'inactive'
         );
         setAllInactivePosUsers(inactivePosUsers);
     }
-
     const getPosUsersFromDB = async () => {
         try {
             const { posUsers } = await getPosUsers();
@@ -386,7 +384,7 @@ const POSUsers = () => {
         <div className='pos-users p-3'>
             <PageLayout
                 leftContent=
-                {<div>
+                {<div className='pos-users-container'>
                     <MyVerticallyCenteredModalResponse
 						show={modalResponseShow}
 						onHide={() => {
@@ -428,6 +426,11 @@ const POSUsers = () => {
                             Add POS User
                         </button>
                     </div>
+                    <div className="columns">
+                        <p>Name</p>
+                        <p>Date created</p>
+                        <p>Status</p>
+                    </div>
                     <div className="list">
                         {tab === 'active' && allActivePosUsers.length === 0 &&
                             <div className='empty-list'>
@@ -448,6 +451,7 @@ const POSUsers = () => {
                                     >
                                     <div className="list-item-content">
                                         <p>{posUser.pos_name}</p>
+                                        <p>{moment(posUser.date_created).format("LL")}</p>
                                         <p className={
                                             posUser.pos_status === 'active' ? 'active' : 'inactive'
                                         }
@@ -465,6 +469,7 @@ const POSUsers = () => {
                                     >
                                     <div className="list-item-content">
                                         <p>{posUser.pos_name}</p>
+                                        <p>{moment(posUser.date_created).format("LL")}</p>
                                         <p className={
                                             posUser.pos_status === 'active' ? 'active' : 'inactive'
                                         }
@@ -626,7 +631,7 @@ const POSUsers = () => {
                                     ></i>
                                 </div>
                             </div>
-                            <p className='updated'>Created {moment(selectedPosUser.date_updated).format("lll")}</p>
+                            <p className='updated'>Last updated {moment(selectedPosUser.date_updated).format("lll")}</p>
                             <div className="change"
                                 onClick={()=>{
                                     handleInteractPosUser(selectedPosUser, 'edit-name');
