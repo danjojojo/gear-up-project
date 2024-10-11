@@ -9,7 +9,6 @@ const BikeBuilder = () => {
     const [showBudgetStep, setShowBudgetStep] = useState(true);
     const [isSettingBudget, setIsSettingBudget] = useState(false);
     const [budget, setBudget] = useState("");
-    const [step, setStep] = useState(1);
     const [selectedParts, setSelectedParts] = useState({
         frame: null,
         fork: null,
@@ -29,13 +28,28 @@ const BikeBuilder = () => {
         seat: { x: 100, y: 100 },
         cockpit: { x: 100, y: 100 },
     });
+    const hitRegions = {
+        frame: { x: 230, y: 145, width: 370, height: 270 },
+        fork: { x: 485, y: 100, width: 200, height: 300 },
+        groupset: { x: 210, y: 290, width: 300, height: 150 },
+        frontWheel: { x: 503, y: 225, width: 250, height: 250 },
+        rearWheel: { x: 145, y: 225, width: 250, height: 250 },
+        seat: { x: 280, y: 100, width: 150, height: 210 },
+        cockpit: { x: 505, y: 90, width: 100, height: 100 }
+    };
+
+    const [currentPart, setCurrentPart] = useState("frame"); // Tracks the current part being worked on
+    const [lockedParts, setLockedParts] = useState([]);
+    const [isHitRegionCorrect, setIsHitRegionCorrect] = useState(false); // New state to track if part is in the hit region
 
     // Handle the Back Button and Reset Everything
     const handleReset = () => {
         setShowBudgetStep(true);  // Show budget step again
         setIsSettingBudget(false);
         setBudget("");            // Reset the budget
-        setStep(1);               // Reset to first step
+        setLockedParts([]);       // Clear locked parts
+        setIsHitRegionCorrect(false);  // Reset hit region status
+        setCurrentPart("frame");  // Reset to the first part
         setSelectedParts({        // Reset all selected parts
             frame: null,
             fork: null,
@@ -63,15 +77,40 @@ const BikeBuilder = () => {
     };
 
     const proceedToNextPart = () => {
-        if (buildStatsPrice <= budget || !budget) {
-            setStep((prevStep) => prevStep + 1);
+        if (isHitRegionCorrect) {
+            if (buildStatsPrice <= budget || !budget) {
+                // Lock the part now, since the user is proceeding
+                setLockedParts((prev) => [...prev, currentPart]);
+
+                setIsHitRegionCorrect(false);
+
+                // Move to the next part manually
+                switch (currentPart) {
+                    case "frame": setCurrentPart("fork"); break;
+                    case "fork": setCurrentPart("groupset"); break;
+                    case "groupset": setCurrentPart("wheelset"); break;
+                    case "wheelset": setCurrentPart("seat"); break;
+                    case "seat": setCurrentPart("cockpit"); break;
+                    case "cockpit": break; // Last part, no further parts to move to
+                    default: break;
+                }
+            } else {
+                alert("You cannot proceed. The total price exceeds your budget.");
+            }
         } else {
-            alert("You cannot proceed. The total price exceeds your budget.");
+            alert("Please place the current part in the correct position before proceeding.");
         }
     };
 
     const goBackToPreviousPart = () => {
-        setStep((prevStep) => Math.max(1, prevStep - 1));
+        switch (currentPart) {
+            case "fork": setCurrentPart("frame"); break;
+            case "groupset": setCurrentPart("fork"); break;
+            case "wheelset": setCurrentPart("groupset"); break;
+            case "seat": setCurrentPart("wheelset"); break;
+            case "cockpit": setCurrentPart("seat"); break;
+            default: break;
+        }
     };
 
     const handleAddToBuild = (partType, item) => {
@@ -94,13 +133,6 @@ const BikeBuilder = () => {
         }));
     };
 
-    const handleDragEnd = (partType, e) => {
-        setPartPositions((prev) => ({
-            ...prev,
-            [partType]: { x: e.target.x(), y: e.target.y() }
-        }));
-    };
-
     // Load base64 images
     const frameImage = useBase64Image(selectedParts.frame?.item_image);
     const forkImage = useBase64Image(selectedParts.fork?.item_image);
@@ -109,15 +141,35 @@ const BikeBuilder = () => {
     const seatImage = useBase64Image(selectedParts.seat?.item_image);
     const cockpitImage = useBase64Image(selectedParts.cockpit?.item_image);
 
-    const isPartSelectedForCurrentStep = () => {
-        switch (step) {
-            case 1: return !!selectedParts.frame;
-            case 2: return !!selectedParts.fork;
-            case 3: return !!selectedParts.groupset;
-            case 4: return !!selectedParts.wheelset;
-            case 5: return !!selectedParts.seat;
-            case 6: return !!selectedParts.cockpit;
-            default: return false;
+    const isPartSelectedForCurrentPart = () => {
+        console.log("Selected part:", selectedParts[currentPart]);
+        console.log("Is hit region correct:", isHitRegionCorrect);
+        return !!selectedParts[currentPart] && isHitRegionCorrect;
+    };
+
+    const isInHitRegion = (partType, pos) => {
+        const region = hitRegions[partType];
+        return (
+            pos.x >= region.x &&
+            pos.x <= region.x + region.width &&
+            pos.y >= region.y &&
+            pos.y <= region.y + region.height
+        );
+    };
+
+    // Handle dragging the part and check if it hits the hit region
+    const handleDragEnd = (partType, e) => {
+        setPartPositions((prev) => ({
+            ...prev,
+            [partType]: { x: e.target.x(), y: e.target.y() }
+        }));
+
+        const pos = { x: e.target.x(), y: e.target.y() };
+        if (isInHitRegion(partType, pos)) {
+            setIsHitRegionCorrect(true); // Part is correctly placed
+            // Don't lock the part yet, wait for "Proceed"
+        } else {
+            setIsHitRegionCorrect(false); // Part is not correctly placed
         }
     };
 
@@ -134,13 +186,14 @@ const BikeBuilder = () => {
             ) : (
                 <div className="builder-container d-flex">
                     <BuilderSidebar
-                        step={step}
+                        currentPart={currentPart}
                         goBackToPreviousPart={goBackToPreviousPart}
                         proceedToNextPart={proceedToNextPart}
-                        isPartSelectedForCurrentStep={isPartSelectedForCurrentStep}
+                        isPartSelectedForCurrentPart={isPartSelectedForCurrentPart}
                         handleAddToBuild={handleAddToBuild}
                         handleReset={handleReset}
                         selectedParts={selectedParts}
+                        lockedParts={lockedParts}
                     />
                     <CanvasContainer
                         frameImage={frameImage}
@@ -153,6 +206,9 @@ const BikeBuilder = () => {
                         handleDragEnd={handleDragEnd}
                         budget={budget}
                         buildStatsPrice={buildStatsPrice}
+                        hitRegions={hitRegions}
+                        currentPart={currentPart}
+                        lockedParts={lockedParts}
                     />
                 </div>
             )}

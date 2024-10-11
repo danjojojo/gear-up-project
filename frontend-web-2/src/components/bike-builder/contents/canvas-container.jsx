@@ -1,11 +1,11 @@
 import React, { useRef, useState, useEffect } from 'react';
-import { Stage, Layer, Image, Transformer } from 'react-konva';
+import { Stage, Layer, Image, Transformer, Rect } from 'react-konva';
 import useImage from 'use-image'; // Correct import from use-image
 import bikeguide from "../../../assets/images/bike-guide.png"; // Correct path for background image
 
 const CanvasContainer = ({
     frameImage, forkImage, groupsetImage, wheelsetImage, seatImage, cockpitImage,
-    partPositions, handleDragEnd, budget, buildStatsPrice
+    partPositions, handleDragEnd, budget, buildStatsPrice, hitRegions, currentPart, lockedParts
 }) => {
     const transformerRef = useRef(null); // Reference for the transformer (for rotation)
     const [selectedPart, setSelectedPart] = useState(null); // To keep track of selected parts for rotation
@@ -84,6 +84,42 @@ const CanvasContainer = ({
                                         opacity={0.1}
                                     />
                                 )}
+                                {currentPart === "wheelset" ? (
+                                    <>
+                                        {/* Front Wheel Hit Region */}
+                                        <Rect
+                                            x={hitRegions.frontWheel.x}
+                                            y={hitRegions.frontWheel.y}
+                                            width={hitRegions.frontWheel.width}
+                                            height={hitRegions.frontWheel.height}
+                                            stroke="green"
+                                            strokeWidth={2}
+                                            dash={[10, 5]} // Dashed line for visualizing hit region
+                                        />
+                                        {/* Rear Wheel Hit Region */}
+                                        <Rect
+                                            x={hitRegions.rearWheel.x}
+                                            y={hitRegions.rearWheel.y}
+                                            width={hitRegions.rearWheel.width}
+                                            height={hitRegions.rearWheel.height}
+                                            stroke="green"
+                                            strokeWidth={2}
+                                            dash={[10, 5]} // Dashed line for visualizing hit region
+                                        />
+                                    </>
+                                ) : (
+                                    hitRegions[currentPart] && (
+                                        <Rect
+                                            x={hitRegions[currentPart].x}
+                                            y={hitRegions[currentPart].y}
+                                            width={hitRegions[currentPart].width}
+                                            height={hitRegions[currentPart].height}
+                                            stroke="green"
+                                            strokeWidth={2}
+                                            dash={[10, 5]} // Dashed line for visualizing hit region
+                                        />
+                                    )
+                                )}
                                 {/* Fork */}
                                 {forkImage && (
                                     <Image
@@ -95,7 +131,7 @@ const CanvasContainer = ({
                                         onClick={(e) => setSelectedPart(e.target)}
                                         onDragEnd={(e) => handleDragEnd("fork", e)}
                                     />
-                                )}
+                                )} 
                                 {seatImage && (
                                     <Image
                                         image={seatImage}
@@ -113,7 +149,7 @@ const CanvasContainer = ({
                                         image={frameImage}
                                         x={partPositions.frame.x}
                                         y={partPositions.frame.y}
-                                        draggable
+                                        draggable={!lockedParts.includes("frame")}
                                         dragBoundFunc={(pos) => constrainDrag(pos, frameImage.width, frameImage.height, stageWidth, stageHeight)}
                                         onClick={(e) => setSelectedPart(e.target)}
                                         onDragEnd={(e) => handleDragEnd("frame", e)}

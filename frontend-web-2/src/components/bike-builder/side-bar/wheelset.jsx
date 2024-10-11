@@ -14,7 +14,7 @@ const Wheelset = ({ onAddToBuild, selectedFrame, selectedFork, selectedGroupset 
                 const filteredWheelsets = data.filter(item => {
                     const isCassetteTypeMatch = item.hub_cassette_type === selectedGroupset.cassette_type;
                     const isHubSpeedMatch = item.rear_hub_speed === selectedGroupset.cassette_speed;
-                    const isRotorMountTypeMatch = item.rotor_mount_type === selectedGroupset.hub_rotor_type;
+                    const isRotorMountTypeMatch = item.hub_rotor_type === selectedGroupset.rotor_mount_type;
 
                     const isRearHubWidthMatch = item.rear_hub_width === selectedFrame.rear_hub_width;
                     const isFrontHubWidthMatch = item.front_hub_width === selectedFork.front_hub_width;

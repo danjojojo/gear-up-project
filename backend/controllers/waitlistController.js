@@ -1,4 +1,5 @@
 const pool = require('../config/db');
+const { v4: uuidv4 } = require("uuid");
 require('dotenv').config();
 
 // Get waitlist items
@@ -53,23 +54,25 @@ const addFrame = async (req, res) => {
         material,
     } = req.body;
 
+    const frame_id = "frame-" + uuidv4(); 
     const image = req.file ? req.file.buffer : null;
 
     try {
         const query = `
             INSERT INTO frame (
-                item_id, description, purpose, frame_size, head_tube_type, 
+                frame_id, item_id, description, purpose, frame_size, head_tube_type, 
                 head_tube_upper_diameter, head_tube_lower_diameter, 
                 seatpost_diameter, axle_type, axle_diameter, 
                 bottom_bracket_type, bottom_bracket_width, rotor_size, 
                 max_tire_width, rear_hub_width,  material, image
             ) VALUES (
                 $1, $2, $3, $4, $5, $6, $7, $8, $9, 
-                $10, $11, $12, $13, $14, $15, $16, $17
+                $10, $11, $12, $13, $14, $15, $16, $17, $18
             ) RETURNING *;
         `;
 
         const values = [
+            frame_id,
             item_id,
             description,
             purpose,
@@ -128,22 +131,24 @@ const addFork = async (req, res) => {
         material
     } = req.body;
 
+    const fork_id = "fork-" + uuidv4(); 
     const image = req.file ? req.file.buffer : null;
 
     try {
         const query = `
             INSERT INTO fork (
-                item_id, description, fork_size, fork_tube_type, 
+                fork_id, item_id, description, fork_size, fork_tube_type, 
                 fork_tube_upper_diameter, fork_tube_lower_diameter, 
                 fork_travel, axle_type, axle_diameter, suspension_type, 
                 rotor_size, max_tire_width, front_hub_width, material, image
             ) VALUES (
                 $1, $2, $3, $4, $5, $6, $7, $8, $9, 
-                $10, $11, $12, $13, $14, $15
+                $10, $11, $12, $13, $14, $15, $16
             ) RETURNING *;
         `;
 
         const values = [
+            fork_id,
             item_id,
             description,
             fork_size,
@@ -200,23 +205,25 @@ const addGroupset = async (req, res) => {
         rotor_size,
     } = req.body;
 
+    const groupset_id = "groupset-" + uuidv4(); 
     const image = req.file ? req.file.buffer : null;
 
     try {
         const query = `
             INSERT INTO groupset (
-                item_id, description, chainring_speed, crank_arm_length,
+                groupset_id, item_id, description, chainring_speed, crank_arm_length,
                 front_derailleur_speed, rear_derailleur_speed, cassette_type,
                 cassette_speed, chain_speed, bottom_bracket_type,
                 bottom_bracket_width, brake_type, rotor_mount_type, rotor_size, 
                 image
             ) VALUES (
                 $1, $2, $3, $4, $5, $6, $7, $8, $9, 
-                $10, $11, $12, $13, $14, $15
+                $10, $11, $12, $13, $14, $15, $16
             ) RETURNING *;
         `;
 
         const values = [
+            groupset_id,
             item_id,
             description,
             chainring_speed,
@@ -274,22 +281,24 @@ const addWheelset = async (req, res) => {
         rim_spokes,
     } = req.body;
 
+    const wheelset_id = "wheelset-" + uuidv4(); 
     const image = req.file ? req.file.buffer : null;
 
     try {
         const query = `
             INSERT INTO wheelset (
-                item_id, description, hub_rotor_type, hub_cassette_type, 
+                wheelset_id, item_id, description, hub_rotor_type, hub_cassette_type, 
                 hub_holes, front_hub_width, front_hub_axle_type, front_hub_axle_diameter, 
                 rear_hub_width, rear_hub_axle_type, rear_hub_axle_diameter, rear_hub_speed, 
                 tire_size, tire_width, rim_spokes, image
             ) VALUES (
                 $1, $2, $3, $4, $5, $6, $7, $8, $9, 
-                $10, $11, $12, $13, $14, $15, $16
+                $10, $11, $12, $13, $14, $15, $16, $17
             ) RETURNING *;
         `;
 
         const values = [
+            wheelset_id,
             item_id,
             description,
             hub_rotor_type,
@@ -339,19 +348,21 @@ const addSeat = async (req, res) => {
         saddle_material,
     } = req.body;
 
+    const seat_id = "seat-" + uuidv4(); 
     const image = req.file ? req.file.buffer : null;
 
     try {
         const query = `
             INSERT INTO seat (
-                item_id, description, seatpost_diameter, seatpost_length, 
+                seat_id, item_id, description, seatpost_diameter, seatpost_length, 
                 seat_clamp_type, saddle_material, image
             ) VALUES (
-                $1, $2, $3, $4, $5, $6, $7
+                $1, $2, $3, $4, $5, $6, $7, $8
             ) RETURNING *;
         `;
 
         const values = [
+            seat_id,
             item_id,
             description,
             seatpost_diameter,
@@ -399,23 +410,25 @@ const addCockpit = async (req, res) => {
         headset_lower_diameter,
     } = req.body;
 
+    const cockpit_id = "cockpit-" + uuidv4(); 
     const image = req.file ? req.file.buffer : null;
 
     try {
         const query = `
             INSERT INTO cockpit (
-                item_id, description, handlebar_length,
+                cockpit_id, item_id, description, handlebar_length,
                 handlebar_clamp_diameter, handlebar_type,
                 stem_clamp_diameter, stem_length, stem_angle,
                 stem_fork_diameter, headset_type, headset_cup_type, 
                 headset_upper_diameter, headset_lower_diameter, image
             ) VALUES (
                 $1, $2, $3, $4, $5, $6, $7, $8, $9, 
-                $10, $11, $12, $13, $14
+                $10, $11, $12, $13, $14, $15
             ) RETURNING *;
         `;
 
         const values = [
+            cockpit_id,
             item_id,
             description,
             handlebar_length,
@@ -465,20 +478,22 @@ const addHeadset = async (req, res) => {
         weight,
     } = req.body;
 
+    const headset_id = "headset-" + uuidv4(); 
     const image = req.file ? req.file.buffer : null;
 
     try {
         const query = `
             INSERT INTO headset (
-                item_id, description, headset_type, headset_upper_diameter, 
+                headset_id, item_id, description, headset_type, headset_upper_diameter, 
                 headset_lower_diameter, headset_cup_type, material, weight, 
                 image
             ) VALUES (
-                $1, $2, $3, $4, $5, $6, $7, $8, $9
+                $1, $2, $3, $4, $5, $6, $7, $8, $9, $10
             ) RETURNING *;
         `;
 
         const values = [
+            headset_id,
             item_id,
             description,
             headset_type,
@@ -522,19 +537,21 @@ const addHandlebar = async (req, res) => {
         weight,
     } = req.body;
 
+    const handlebar_id = "handlebar-" + uuidv4(); 
     const image = req.file ? req.file.buffer : null;
 
     try {
         const query = `
             INSERT INTO handlebar (
-                item_id, description, handlebar_length, handlebar_clamp_diameter, 
+                handlebr_id, item_id, description, handlebar_length, handlebar_clamp_diameter, 
                 handlebar_type, material, weight, image
             ) VALUES (
-                $1, $2, $3, $4, $5, $6, $7, $8
+                $1, $2, $3, $4, $5, $6, $7, $8, $9
             ) RETURNING *;
         `;
 
         const values = [
+            handlebar_id,
             item_id,
             description,
             handlebar_length,
@@ -577,19 +594,21 @@ const addStem = async (req, res) => {
         weight,
     } = req.body;
 
+    const stem_id = "stem-" + uuidv4(); 
     const image = req.file ? req.file.buffer : null;
 
     try {
         const query = `
             INSERT INTO stem (
-                item_id, description, stem_clamp_diameter, stem_length, 
+                stem_id, item_id, description, stem_clamp_diameter, stem_length, 
                 stem_angle, material, weight, image
             ) VALUES (
-                $1, $2, $3, $4, $5, $6, $7, $8
+                $1, $2, $3, $4, $5, $6, $7, $8, $9
             ) RETURNING *;
         `;
 
         const values = [
+            stem_id,
             item_id,
             description,
             stem_clamp_diameter,
@@ -634,20 +653,22 @@ const addHubs = async (req, res) => {
         weight,
     } = req.body;
 
+    const hub_id = "hub-" + uuidv4(); 
     const image = req.file ? req.file.buffer : null;
 
     try {
         const query = `
             INSERT INTO hubs (
-                item_id, description, hub_type, hub_speed, 
+                hub_id, item_id, description, hub_type, hub_speed, 
                 hub_holes, axle_type, rotor_type, material, 
                 weight, image
             ) VALUES (
-                $1, $2, $3, $4, $5, $6, $7, $8, $9, $10
+                $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11
             ) RETURNING *;
         `;
 
         const values = [
+            hub_id,
             item_id,
             description,
             hub_type,

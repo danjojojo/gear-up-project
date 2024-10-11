@@ -5,16 +5,17 @@ import Groupset from '../side-bar/groupset';
 import Wheelset from '../side-bar/wheelset';
 import Seat from '../side-bar/seat';
 import Cockpit from '../side-bar/cockpit';
-import backbutton from "../../../assets/icons/back-button.png"
+import backbutton from "../../../assets/icons/back-button.png";
 
 const BuilderSidebar = ({
-    step,
+    currentPart, // Now we use currentPart instead of step
     goBackToPreviousPart,
     proceedToNextPart,
-    isPartSelectedForCurrentStep,
+    isPartSelectedForCurrentPart, // Updated to use currentPart instead of step
     handleAddToBuild,
     handleReset,
-    selectedParts
+    selectedParts,
+    lockedParts // Added lockedParts to disable button logic
 }) => (
     <div className="bike-parts-sidebar">
         <div className="upper-container">
@@ -23,20 +24,29 @@ const BuilderSidebar = ({
                 <img src={backbutton} alt="back-button" />
             </div>
             <div className="part-title">
-                {step === 1 && "Choose Frame"}
-                {step === 2 && "Choose Fork"}
-                {step === 3 && "Choose Groupset"}
-                {step === 4 && "Choose Wheelset"}
-                {step === 5 && "Choose Seat"}
-                {step === 6 && "Choose Cockpit"}
+                {currentPart === "frame" && "Choose Frame"}
+                {currentPart === "fork" && "Choose Fork"}
+                {currentPart === "groupset" && "Choose Groupset"}
+                {currentPart === "wheelset" && "Choose Wheelset"}
+                {currentPart === "seat" && "Choose Seat"}
+                {currentPart === "cockpit" && "Choose Cockpit"}
             </div>
 
             <div className="btn-container">
-                <button className="btn-1" onClick={goBackToPreviousPart}>Go Back</button>
+                {/* Disable the Back button if the current part is locked */}
+                <button
+                    className="btn-1"
+                    onClick={goBackToPreviousPart}
+                    disabled={lockedParts.includes(currentPart)} // Disable if the current part is locked
+                >
+                    Go Back
+                </button>
+
+                {/* Disable the Proceed button if the current part is not selected or is locked */}
                 <button
                     className="btn-2"
                     onClick={proceedToNextPart}
-                    disabled={!isPartSelectedForCurrentStep()}
+                    disabled={!isPartSelectedForCurrentPart() || lockedParts.includes(currentPart)} // Disable if part is not selected or locked
                 >
                     Proceed
                 </button>
@@ -44,21 +54,20 @@ const BuilderSidebar = ({
         </div>
 
         <div className="lower-container">
-            {step === 1 &&
-                <Frame onAddToBuild={(item) =>
-                    handleAddToBuild("frame", item)}
-                />
-            }
+            {/* Render part-specific components based on currentPart */}
+            {currentPart === "frame" && (
+                <Frame onAddToBuild={(item) => handleAddToBuild("frame", item)} />
+            )}
 
-            {step === 2 &&
-                <Fork onAddToBuild={(item) =>
-                    handleAddToBuild("fork", item)}
+            {currentPart === "fork" && (
+                <Fork
+                    onAddToBuild={(item) => handleAddToBuild("fork", item)}
                     selectedFramePurpose={selectedParts.frame?.purpose}
                     selectedFrame={selectedParts.frame}
                 />
-            }
+            )}
 
-            {step === 3 && (
+            {currentPart === "groupset" && (
                 <Groupset
                     onAddToBuild={(item) => handleAddToBuild("groupset", item)}
                     selectedFrame={selectedParts.frame}
@@ -66,7 +75,7 @@ const BuilderSidebar = ({
                 />
             )}
 
-            {step === 4 && (
+            {currentPart === "wheelset" && (
                 <Wheelset
                     onAddToBuild={(item) => handleAddToBuild("wheelset", item)}
                     selectedFrame={selectedParts.frame}
@@ -74,14 +83,15 @@ const BuilderSidebar = ({
                     selectedGroupset={selectedParts.groupset}
                 />
             )}
-            {step === 5 && (
+
+            {currentPart === "seat" && (
                 <Seat
                     onAddToBuild={(item) => handleAddToBuild("seat", item)}
                     selectedFrame={selectedParts.frame}
                 />
             )}
 
-            {step === 6 && (
+            {currentPart === "cockpit" && (
                 <Cockpit
                     onAddToBuild={(item) => handleAddToBuild("cockpit", item)}
                     selectedFrame={selectedParts.frame}
