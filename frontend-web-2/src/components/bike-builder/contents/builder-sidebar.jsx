@@ -37,7 +37,7 @@ const BuilderSidebar = ({
                 <button
                     className="btn-1"
                     onClick={goBackToPreviousPart}
-                    disabled={lockedParts.includes(currentPart)} // Disable if the current part is locked
+                    disabled={currentPart === "frame"} // Disable only if at the first part
                 >
                     Go Back
                 </button>

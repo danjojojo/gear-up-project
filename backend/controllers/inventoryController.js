@@ -113,7 +113,6 @@ const addItem = async (req, res) => {
         const newItem = result.rows[0];
         const waitlistID = "waitlist-" + uuidv4();
 
-        // Insert into waitlist if add_to_bike_builder is true
         if (itemAddToBikeBuilder) {
             const waitlistQuery = `
                 INSERT INTO waitlist (waitlist_item_id, item_id)
@@ -125,7 +124,12 @@ const addItem = async (req, res) => {
                 newItem.item_id
             ];
 
-            await pool.query(waitlistQuery, waitlistValues);
+            try {
+                const waitlistResult = await pool.query(waitlistQuery, waitlistValues);
+                console.log('Inserted into waitlist:', waitlistResult.rows[0]);
+            } catch (error) {
+                console.error('Error inserting into waitlist:', error);
+            }
         }
 
         // Fetch updated list of items
@@ -339,15 +343,17 @@ const updateItem = async (req, res) => {
         const currentWaitlistResult = await pool.query(currentWaitlistQuery, [id]);
 
         const isCurrentlyInWaitlist = currentWaitlistResult.rows.length > 0;
+        const waitlistID = "waitlist-" + uuidv4();
 
         if (itemAddToBikeBuilder && !isCurrentlyInWaitlist) {
             // Add to waitlist if not already present
             const waitlistQuery = `
-                INSERT INTO waitlist (item_id)
-                VALUES ($1)
+               INSERT INTO waitlist (waitlist_item_id, item_id)
+                VALUES ($1, $2)
                 RETURNING *`;
 
             const waitlistValues = [
+                waitlistID,
                 updatedItem.item_id
             ];
 
