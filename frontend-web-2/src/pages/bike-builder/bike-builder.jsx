@@ -20,13 +20,13 @@ const BikeBuilder = () => {
     const [buildStatsPrice, setBuildStatsPrice] = useState(0); // Store the total price
 
     const [partPositions, setPartPositions] = useState({
-        frame: { x: 100, y: 100 },
-        fork: { x: 100, y: 100 },
-        frontWheel: { x: 100, y: 100 },  // Separate position for front wheel
-        rearWheel: { x: 150, y: 100 },   // Separate position for rear wheel
-        groupset: { x: 100, y: 100 },
-        seat: { x: 100, y: 100 },
-        cockpit: { x: 100, y: 100 },
+        frame: { x: 0, y: 0 },
+        fork: { x: 0, y: 0 },
+        frontWheel: { x: 0, y: 0 },
+        rearWheel: { x: 0, y: 0 },
+        groupset: { x: 0, y: 0 },
+        seat: { x: 0, y: 0 },
+        cockpit: { x: 0, y: 0 },
     });
     const hitRegions = {
         frame: { x: 230, y: 180, width: 350, height: 220, rotation: -5 },
@@ -60,13 +60,13 @@ const BikeBuilder = () => {
         });
         setBuildStatsPrice(0);    // Reset total price
         setPartPositions({        // Reset part positions
-            frame: { x: 100, y: 100 },
-            fork: { x: 100, y: 100 },
-            frontWheel: { x: 100, y: 100 },
-            rearWheel: { x: 150, y: 100 },
-            groupset: { x: 100, y: 100 },
-            seat: { x: 100, y: 100 },
-            cockpit: { x: 100, y: 100 },
+            frame: { x: 0, y: 0 },
+            fork: { x: 0, y: 0 },
+            frontWheel: { x: 0, y: 0 },
+            rearWheel: { x: 0, y: 0 },
+            groupset: { x: 0, y: 0 },
+            seat: { x: 0, y: 0 },
+            cockpit: { x: 0, y: 0 },
         });
     };
 
@@ -89,13 +89,13 @@ const BikeBuilder = () => {
 
         // Reset all part positions to their default (initial) positions
         setPartPositions({
-            frame: { x: 100, y: 100 },
-            fork: { x: 100, y: 100 },
-            frontWheel: { x: 100, y: 100 },
-            rearWheel: { x: 150, y: 100 },
-            groupset: { x: 100, y: 100 },
-            seat: { x: 100, y: 100 },
-            cockpit: { x: 100, y: 100 }
+            frame: { x: 0, y: 0 },
+            fork: { x: 0, y: 0 },
+            frontWheel: { x: 0, y: 0 },
+            rearWheel: { x: 0, y: 0 },
+            groupset: { x: 0, y: 0 },
+            seat: { x: 0, y: 0 },
+            cockpit: { x: 0, y: 0 },
         });
 
         // Reset the build stats price to zero
@@ -305,27 +305,27 @@ const BikeBuilder = () => {
             let updatedPositions = { ...prevPositions };
 
             // Reset current part's position
-            updatedPositions[partType] = { x: 100, y: 100 }; // Default position for each part
+            updatedPositions[partType] = { x: 0, y: 0 }; // Default position for each part
 
             // Reset dependent parts' positions
             switch (partType) {
                 case "frame":
-                    updatedPositions.fork = { x: 100, y: 100 };
-                    updatedPositions.groupset = { x: 100, y: 100 };
-                    updatedPositions.frontWheel = { x: 100, y: 100 };
-                    updatedPositions.rearWheel = { x: 150, y: 100 };
-                    updatedPositions.seat = { x: 100, y: 100 };
-                    updatedPositions.cockpit = { x: 100, y: 100 };
+                    updatedPositions.fork = { x: 0, y: 0 };
+                    updatedPositions.groupset = { x: 0, y: 0 };
+                    updatedPositions.frontWheel = { x: 0, y: 0 };
+                    updatedPositions.rearWheel = { x: 0, y: 0 };
+                    updatedPositions.seat = { x: 0, y: 0 };
+                    updatedPositions.cockpit = { x: 0, y: 0 };
                     break;
                 case "fork":
-                    updatedPositions.groupset = { x: 100, y: 100 };
-                    updatedPositions.frontWheel = { x: 100, y: 100 };
-                    updatedPositions.rearWheel = { x: 150, y: 100 };
-                    updatedPositions.cockpit = { x: 100, y: 100 };
+                    updatedPositions.groupset = { x: 0, y: 0 };
+                    updatedPositions.frontWheel = { x: 0, y: 0 };
+                    updatedPositions.rearWheel = { x: 0, y: 0 };
+                    updatedPositions.cockpit = { x: 0, y: 0 };
                     break;
                 case "groupset":
-                    updatedPositions.frontWheel = { x: 100, y: 100 };
-                    updatedPositions.rearWheel = { x: 150, y: 100 };
+                    updatedPositions.frontWheel = { x: 0, y: 0 };
+                    updatedPositions.rearWheel = { x: 0, y: 0 };
                     break;
                 case "wheelset":
                     // No dependent part reset needed
@@ -339,6 +339,8 @@ const BikeBuilder = () => {
 
             return updatedPositions;
         });
+        
+        setIsHitRegionCorrect(false);
     };
 
 
@@ -443,6 +445,7 @@ const BikeBuilder = () => {
                         currentPart={currentPart}
                         lockedParts={lockedParts}
                         resetBuild={resetBuild}
+                        partPrice={selectedParts}
                     />
                 </div>
             )}

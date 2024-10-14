@@ -11,7 +11,13 @@ const BudgetContainer = ({ isSettingBudget, budget, setBudget, handleProceed, se
                         id="budgetInput"
                         type="text"
                         value={budget}
-                        onChange={(e) => setBudget(e.target.value)}
+                        onChange={(e) => {
+                            const value = e.target.value;
+                            // Allow empty input or valid numbers (>= 0)
+                            if (value === "" || (!isNaN(Number(value)) && Number(value) >= 0)) {
+                                setBudget(value === "" ? "" : Number(value)); // Keep empty string or valid numeric value
+                            }
+                        }}
                         placeholder="Enter your budget"
                     />
                     <button className="btn-2" onClick={handleProceed}>

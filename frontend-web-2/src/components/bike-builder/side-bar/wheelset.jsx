@@ -48,6 +48,11 @@ const Wheelset = ({ onAddToBuild, selectedFrame, selectedFork, selectedGroupset 
         }
     }, [selectedFrame, selectedFork, selectedGroupset]);
 
+    const PesoFormat = new Intl.NumberFormat("en-US", {
+        style: "currency",
+        currency: "PHP",
+    });
+
     return (
         <div className="parts-container">
             {items.map((item) => (
@@ -60,7 +65,7 @@ const Wheelset = ({ onAddToBuild, selectedFrame, selectedFork, selectedGroupset 
                         )}
                     </div>
                     <div className="item-name">{item.item_name}</div>
-                    <div className="item-price">₱ {item.item_price}</div>
+                    <div className="item-price">{PesoFormat.format(item.item_price)}</div>
 
                     <Accordion>
                         <Accordion.Item eventKey="0">

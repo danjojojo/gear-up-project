@@ -5,13 +5,17 @@ import bikeguide from "../../../assets/images/bike-guide.png"; // Correct path f
 import reset from "../../../assets/icons/reset.png";
 
 const CanvasContainer = ({
-    frameImage, forkImage, groupsetImage, wheelsetImage, seatImage, cockpitImage,
+    partPrice, frameImage, forkImage, groupsetImage, wheelsetImage, seatImage, cockpitImage,
     partPositions, handleDragEnd, budget, buildStatsPrice, hitRegions, currentPart,
     lockedParts, resetBuild
 }) => {
     const transformerRef = useRef(null); // Reference for the transformer (for rotation)
     const [selectedPart, setSelectedPart] = useState(null); // To keep track of selected parts for rotation
     const [backgroundImage] = useImage(bikeguide); // Correct usage of useImage for background
+
+
+    // Define the steps in order
+    const steps = ["frame", "fork", "groupset", "wheelset", "seat", "cockpit"];
 
     // Function to ensure the drag stays within the canvas bounds
     const constrainDrag = (pos, imageWidth, imageHeight, stageWidth, stageHeight) => {
@@ -65,6 +69,11 @@ const CanvasContainer = ({
     const stageWidth = 900;
     const stageHeight = 600;
 
+    const PesoFormat = new Intl.NumberFormat("en-US", {
+        style: "currency",
+        currency: "PHP",
+    });
+
     return (
         <div className="bike-content d-flex">
             <div className="left-container">
@@ -79,7 +88,7 @@ const CanvasContainer = ({
                             )}
                             <div className="price">
                                 Build Stats <br />
-                                Total Price: ₱ {buildStatsPrice}
+                                Total Price: {PesoFormat.format(buildStatsPrice)}
                             </div>
                         </div>
                     </div>
@@ -152,7 +161,6 @@ const CanvasContainer = ({
                                         )
                                     )
                                 )}
-                                {/* Cockpit */}
                                 {cockpitImage && (
                                     <Image
                                         name="cockpit"
@@ -163,7 +171,7 @@ const CanvasContainer = ({
                                         width={46}
                                         draggable={selectedPart?.name() === 'cockpit' && !lockedParts.includes("cockpit")}
                                         listening={!lockedParts.includes("cockpit")}
-                                        dragBoundFunc={(pos) => constrainDrag(pos, cockpitImage.width, cockpitImage.height, stageWidth, stageHeight)}
+                                        dragBoundFunc={(pos) => constrainDrag(pos, 46, 39, stageWidth, stageHeight)} // Correct dimensions for cockpit
                                         onClick={(e) => setSelectedPart(e.target)}
                                         onDragEnd={(e) => handleDragEnd("cockpit", e)}
                                     />
@@ -179,11 +187,12 @@ const CanvasContainer = ({
                                         width={97}
                                         draggable={selectedPart?.name() === 'fork' && !lockedParts.includes("fork")}
                                         listening={!lockedParts.includes("fork")}
-                                        dragBoundFunc={(pos) => constrainDrag(pos, forkImage.width, forkImage.height, stageWidth, stageHeight)}
+                                        dragBoundFunc={(pos) => constrainDrag(pos, 97, 251, stageWidth, stageHeight)} // Correct dimensions for fork
                                         onClick={(e) => setSelectedPart(e.target)}
                                         onDragEnd={(e) => handleDragEnd("fork", e)}
                                     />
                                 )}
+                                {/* Seat */}
                                 {seatImage && (
                                     <Image
                                         name="seat"
@@ -194,7 +203,7 @@ const CanvasContainer = ({
                                         width={96}
                                         draggable={selectedPart?.name() === 'seat' && !lockedParts.includes("seat")}
                                         listening={!lockedParts.includes("seat")}
-                                        dragBoundFunc={(pos) => constrainDrag(pos, seatImage.width, seatImage.height, stageWidth, stageHeight)}
+                                        dragBoundFunc={(pos) => constrainDrag(pos, 96, 154, stageWidth, stageHeight)} // Correct dimensions for seat
                                         onClick={(e) => setSelectedPart(e.target)}
                                         onDragEnd={(e) => handleDragEnd("seat", e)}
                                     />
@@ -210,7 +219,7 @@ const CanvasContainer = ({
                                         width={340}
                                         draggable={selectedPart?.name() === 'frame' && !lockedParts.includes("frame")}
                                         listening={!lockedParts.includes("frame")}
-                                        dragBoundFunc={(pos) => constrainDrag(pos, frameImage.width, frameImage.height, stageWidth, stageHeight)}
+                                        dragBoundFunc={(pos) => constrainDrag(pos, 340, 214, stageWidth, stageHeight)} // Correct dimensions for frame
                                         onClick={(e) => setSelectedPart(e.target)}
                                         onDragEnd={(e) => handleDragEnd("frame", e)}
                                     />
@@ -226,7 +235,7 @@ const CanvasContainer = ({
                                         width={240}
                                         draggable={selectedPart?.name() === 'groupset' && !lockedParts.includes("groupset")}
                                         listening={!lockedParts.includes("groupset")}
-                                        dragBoundFunc={(pos) => constrainDrag(pos, groupsetImage.width, groupsetImage.height, stageWidth, stageHeight)}
+                                        dragBoundFunc={(pos) => constrainDrag(pos, 240, 92, stageWidth, stageHeight)} // Correct dimensions for groupset
                                         onClick={(e) => setSelectedPart(e.target)}
                                         onDragEnd={(e) => handleDragEnd("groupset", e)}
                                     />
@@ -242,7 +251,7 @@ const CanvasContainer = ({
                                         width={240}
                                         draggable={selectedPart?.name() === 'frontWheel' && !lockedParts.includes("frontWheel")}
                                         listening={!lockedParts.includes("frontWheel")}
-                                        dragBoundFunc={(pos) => constrainDrag(pos, wheelsetImage.width, wheelsetImage.height, stageWidth, stageHeight)}
+                                        dragBoundFunc={(pos) => constrainDrag(pos, 240, 240, stageWidth, stageHeight)} // Correct dimensions for front wheel
                                         onClick={(e) => setSelectedPart(e.target)}
                                         onDragEnd={(e) => handleDragEnd("frontWheel", e)}
                                     />
@@ -258,26 +267,76 @@ const CanvasContainer = ({
                                         width={240}
                                         draggable={selectedPart?.name() === 'rearWheel' && !lockedParts.includes("rearWheel")}
                                         listening={!lockedParts.includes("rearWheel")}
-                                        dragBoundFunc={(pos) => constrainDrag(pos, wheelsetImage.width, wheelsetImage.height, stageWidth, stageHeight)}
+                                        dragBoundFunc={(pos) => constrainDrag(pos, 240, 240, stageWidth, stageHeight)} // Correct dimensions for rear wheel
                                         onClick={(e) => setSelectedPart(e.target)}
                                         onDragEnd={(e) => handleDragEnd("rearWheel", e)}
                                     />
                                 )}
-                                {/* Seat */}
+
 
                                 <Transformer
                                     ref={transformerRef}
-                                    enabledAnchors={["rotate"]} // Only allow rotation
+                                    rotateEnabled={true}
+                                    resizeEnabled={false}
+                                    anchorSize={8}
                                 />
 
                             </Layer>
                         </Stage>
+
+                        <div className="step-progress-bar">
+                            {steps.map((step, index) => (
+                                <div key={index} className={`step ${step === currentPart ? 'active' : ''}`}>
+                                    <div className="oblong"></div>
+                                </div>
+                            ))}
+                        </div>
+
+
                     </div>
                 </div>
             </div>
 
             <div className="right-container">
-                <div className="guide-container"></div>
+                <div className="guide-container">
+                    <div className="content-container">
+
+                    </div>
+                </div>
+                <div className="summary-container">
+                    <div className="content-container">
+                        <div className='part-price'>
+                            <div className='price'>
+                                Frame:  {PesoFormat.format(partPrice?.frame?.item_price || 0)}
+                            </div>
+                        </div>
+                        <div className='part-price'>
+                            <div className='price'>
+                                Fork:  {PesoFormat.format(partPrice?.fork?.item_price || 0)}
+                            </div>
+                        </div>
+                        <div className='part-price'>
+                            <div className='price'>
+                                Groupset:  {PesoFormat.format(partPrice?.groupset?.item_price || 0)}
+                            </div>
+                        </div>
+                        <div className='part-price'>
+                            <div className='price'>
+                                Wheelset:  {PesoFormat.format(partPrice?.wheelset?.item_price || 0)}
+                            </div>
+                        </div>
+                        <div className='part-price'>
+                            <div className='price'>
+                                Seat:  {PesoFormat.format(partPrice?.seat?.item_price || 0)}
+                            </div>
+                        </div>
+                        <div className='part-price'>
+                            <div className='price'>
+                                Cockpit:  {PesoFormat.format(partPrice?.cockpit?.item_price || 0)}
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     );
