@@ -6,6 +6,7 @@
     background-color: #f8f9fa; // Light gray background
     border-right: 1px solid #dee2e6; // Border on the right side
     padding: 15px; // Padding inside the sidebar
+    z-index: 1000;
 
     .nav {
         display: flex;

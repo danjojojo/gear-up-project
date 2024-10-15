@@ -12,7 +12,7 @@ const getPosUsers = async (req, res) => {
         const query = `
             SELECT pos_id, pos_name, pos_status, date_created, date_updated 
             FROM pos_users
-            ORDER BY pos_name ASC;
+            ORDER BY date_created DESC;
         `
         const { rows } = await pool.query(query);
         res.status(201).json({ posUsers: rows});
@@ -61,7 +61,7 @@ const editPosUserName = async (req, res) => {
 
         const query = `
             UPDATE pos_users
-            SET pos_name = $1
+            SET pos_name = $1, date_updated = NOW()
             WHERE pos_id = $2
         `
 
@@ -84,7 +84,7 @@ const editPosUserPassword = async (req, res) => {
         const hashedPassword = await bcrypt.hash(password, 10);
         const query = `
             UPDATE pos_users
-            SET pos_password = $1
+            SET pos_password = $1, date_updated = NOW()
             WHERE pos_id = $2
         `
         const values = [hashedPassword, id];
@@ -103,7 +103,7 @@ const editPosUserStatus = async (req, res) => {
         console.log(status);
         const query = `
             UPDATE pos_users
-            SET pos_status = $1
+            SET pos_status = $1, date_updated = NOW()
             WHERE pos_id = $2
         `
         const values = [status, id];

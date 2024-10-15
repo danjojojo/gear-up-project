@@ -12,41 +12,29 @@ $font-size: clamp(0.9em, 1.2vw, 1.1em);
 $button-success: #9C9B9B;
 $button-fail: #dee2e6;
 
-.pos-users{
-
-    .status-tabs {
-        button {
-            padding: 10px 15px;
-            font-size: 1em;
-            background-color: #9C9B9B;
-            color: #ffffff;
-            border: none;
-            border-radius: 7px;
-            cursor: pointer;
-        
-            &:hover {
-                background-color: #B0B0B0;
-            }
-        }
-    }
+.mechanics {
 
     .left-content{
-        .pos-users-container{
+        .mechanics-container{
+            height: 100%;
             display: flex;
             flex-direction: column;
-            height: 100%;
-        
-            .pos-users-nav{
+
+            .nav{
                 height: auto;
                 display: flex;
                 flex-direction: row;
+                align-items: center;
+                width: 100%;
+                margin-bottom: 10px;
                 gap: 5px;
                 
-                .search-sorting {
+                .search-sorting{
                     display: flex;
-                    margin-bottom: 15px;
+                    align-items: center;
                     flex-grow: 1;
-            
+                    gap: 5px;
+                    
                     .search-bar {
                         background-color: $normal-bg-color;
                         border: 1px solid $normal-border-color;
@@ -55,7 +43,7 @@ $button-fail: #dee2e6;
                         border-radius: 7px;
                         padding: 3px;
                         flex-grow: 1;
-            
+                        
                         input {
                             width: 100%;
                             border-radius: 5px;
@@ -64,35 +52,66 @@ $button-fail: #dee2e6;
                             font-size: $font-size;
                         }
                     }
+
+                    .sort-tabs {
+                        display: flex;
+                        padding: 3px;
+                        width: fit-content;
+                        background-color: $normal-bg-color;
+                        border: 1px solid $normal-border-color;
+                        font-size: $font-size;
+                        border-radius: 7px;
+                        
+                        button {
+                            border-radius: 5px;
+                            padding: 5px 10px;
+                            background-color: $normal-bg-color;
+                            color: $inactive-text-color;
+                            border: none;
+                            cursor: pointer;
+                            
+                            &.active {
+                                background-color: $active-bg-color;
+                                color: $active-text-color;
+                                border: 1px solid $normal-border-color;
+                            }
+                        }
+                    }
                 }
 
-                .add-pos-user {
-                    width: 20%;
-                    margin-bottom: 15px;
-                    padding: 5px;
+                .add-mechanic{
+                    padding: 10px 15px;
                     font-size: 1em;
                     background-color: #9C9B9B;
                     color: #ffffff;
                     border: none;
-                    border-radius: 5px;
+                    border-radius: 7px;
                     cursor: pointer;
-
+                
                     &:hover {
                         background-color: #B0B0B0;
                     }
+                }
 
-                    &.error {
-                        cursor: not-allowed;
-                        background-color: #d0a2a2;
-                        text-align: center;
+                .archive-mechanic{
+                    padding: 10px 15px;
+                    font-size: 1em;
+                    background-color: #9C9B9B;
+                    color: #ffffff;
+                    border: none;
+                    border-radius: 7px;
+                    cursor: pointer;
+                
+                    &:hover {
+                        background-color: #B0B0B0;
                     }
                 }
             }
 
-            .columns{
+            .columns {
                 height: auto;
                 display: flex;
-                // justify-content: space-between;
+                justify-content: space-between;
                 border: 1px solid $normal-border-color;
                 margin-bottom: 10px;
                 padding: 5px 10px;
@@ -100,26 +119,26 @@ $button-fail: #dee2e6;
                 text-transform: uppercase;
                 font-size: 0.9em;
 
-                p{
+                p {
                     margin: 0;
                     color: $subheading-text-color;
                     // border: 1px solid black;
-                    width: 33.3%;
                     
-                    &:nth-child(3){
+
+                    &:nth-child(2) {
                         display: flex;
                         align-items: center;
                         justify-content: center;
+                        text-align: right;
                     }
                 }
             }
-            
-            .list {
-                display: flex;
-                flex-direction: column;
+
+            .list{
                 flex-grow: 1;
-                overflow-y: auto !important;
-                
+                overflow-y: auto;
+                scrollbar-width: none;
+
                 .empty-list {
                     display: flex;
                     justify-content: center;
@@ -128,7 +147,7 @@ $button-fail: #dee2e6;
                     font-size: 1rem;
                     color: $subheading-text-color;
                 }
-                
+            
                 .list-item {
                     margin-bottom: 9px;
                     border-radius: 4px;
@@ -138,21 +157,23 @@ $button-fail: #dee2e6;
                     width: 100%;
                     cursor: pointer;
                     font-size: $font-size;
-                    
+            
                     .list-item-content {
                         display: flex;
-                        // justify-content: space-between;
-                        flex-direction: row;
+                        justify-content: space-between;
                         align-items: center;
                         // border: 1px solid black;
-                        
+            
                         p {
                             // border: 1px solid black;
                             margin: 0;
-                            width: 33.3%;
-                        }
 
-                        .inactive{
+                            &:nth-child(2) {
+                                text-align: right;
+                            }
+                        }
+            
+                        .inactive {
                             display: flex;
                             align-items: center;
                             justify-content: center;
@@ -165,8 +186,8 @@ $button-fail: #dee2e6;
                             font-size: 0.9rem;
                             text-transform: capitalize;
                         }
-                        
-                        .active{
+            
+                        .active {
                             display: flex;
                             align-items: center;
                             justify-content: center;
@@ -186,8 +207,39 @@ $button-fail: #dee2e6;
     }
 
     .right-content{
-        .pos-user-details-container{
-            .pos-user-nav {
+        .mechanic-details-container{
+
+            .container-content {
+                height: 25%;
+                padding: 5px;
+        
+                .main-content {
+                    // box-shadow: 2px 2px 10px 3px rgba(0, 0, 0, 0.1);
+                    // background-color: $normal-bg-color;
+                    border: 1px solid $normal-border-color;
+                    border-radius: 12px;
+                    height: 100%;
+                    padding: 24px;
+                    align-content: center;
+        
+                    .number {
+                        display: flex;
+                        justify-content: center;
+                        font-size: 2em;
+                        font-weight: bold;
+                    }
+        
+                    .title {
+                        display: flex;
+                        justify-content: center;
+                        font-size: 1.2em;
+                        color: grey;
+                    }
+        
+                }
+            }
+            
+            .nav {
                 display: flex;
                 justify-content: space-between;
                 align-items: center;
@@ -211,14 +263,14 @@ $button-fail: #dee2e6;
                     }
                 }
             }
-
-            .updated{
+        
+            .updated {
                 margin-top: 10px;
                 text-align: left;
                 font-style: italic;
             }
-            
-            .guide{
+        
+            .guide {
                 margin-top: 10px;
                 text-align: left;
                 font-style: italic;
@@ -226,13 +278,13 @@ $button-fail: #dee2e6;
                 border-radius: 10px;
                 border: 1px solid #dee2e6;
                 background-color: white;
-
-                ul{
+        
+                ul {
                     margin: 0;
                 }
             }
-
-            .change{
+        
+            .change {
                 display: flex;
                 flex-direction: row;
                 margin: 15px 0 0 0;
@@ -243,26 +295,26 @@ $button-fail: #dee2e6;
                 border-radius: 5px;
                 justify-content: space-between;
                 cursor: pointer;
-
-                p{
+        
+                p {
                     margin: 0;
                 }
             }
-
+        
             form {
                 display: flex;
                 flex-direction: column;
-
+        
                 .form-input {
                     display: flex;
                     flex-direction: column;
                     margin: 10px 0 0 0;
-
+        
                     label {
                         font-size: 1em;
                         margin: 5px 0;
                     }
-
+        
                     input {
                         width: 100%;
                         padding: 10px;
@@ -270,21 +322,21 @@ $button-fail: #dee2e6;
                         border: 1px solid #ddd;
                         border-radius: 5px;
                     }
-
+        
                     .error {
                         color: red;
                         margin: 2px;
                         margin-bottom: 0px;
                         font-size: 0.9rem;
                     }
-
+        
                     .success {
                         color: green;
                         margin: 2px;
                         margin-bottom: 0px;
                         font-size: 0.9rem;
                     }
-
+        
                     .upload-image {
                         padding: 20px 10px;
                         border: 2px dashed #ddd;
@@ -296,27 +348,27 @@ $button-fail: #dee2e6;
                         height: 100%;
                         text-align: center;
                         cursor: pointer;
-
+        
                         .title,
                         .subtitle,
                         i {
                             margin: auto 0;
                         }
-
+        
                         .title {
                             font-weight: 700;
                         }
-
+        
                         .subtitle {
                             font-size: 0.9em;
                             color: #B0B0B0;
                         }
-
+        
                         &:hover {
                             background-color: #f9f9f9;
                         }
                     }
-
+        
                     .img-preview {
                         padding: 10px;
                         border: 1px solid #ddd;
@@ -324,7 +376,7 @@ $button-fail: #dee2e6;
                         width: 100%;
                         display: flex;
                         flex-direction: column;
-
+        
                         img {
                             object-fit: cover;
                             height: 25svh;
@@ -332,7 +384,7 @@ $button-fail: #dee2e6;
                             margin: 0 auto;
                             cursor: pointer;
                         }
-
+        
                         .remove-img {
                             width: 100%;
                             margin-top: 10px;
@@ -343,33 +395,33 @@ $button-fail: #dee2e6;
                             border: none;
                             border-radius: 5px;
                             cursor: pointer;
-
+        
                             &:hover {
                                 background-color: #953b3b;
                             }
                         }
                     }
-
+        
                 }
-
-                .show-password{
+        
+                .show-password {
                     display: flex;
                     align-self: start;
                     height: fit-content;
                     margin-top: 10px;
                     margin-bottom: 0px;
-
-                    input{
+        
+                    input {
                         width: 10%;
                         margin-right: 10px;
                     }
-                    
-                    span{
+        
+                    span {
                         width: 100%;
                     }
-
+        
                 }
-
+        
                 .submit-btn {
                     width: 100%;
                     margin-top: 30px;
@@ -380,11 +432,11 @@ $button-fail: #dee2e6;
                     border: none;
                     border-radius: 5px;
                     cursor: pointer;
-
+        
                     &:hover {
                         background-color: $button-success;
                     }
-
+        
                     &.error {
                         cursor: not-allowed;
                         background-color: $button-fail;
@@ -392,6 +444,7 @@ $button-fail: #dee2e6;
                     }
                 }
             }
+        
             .submit-btn {
                 width: 100%;
                 margin-top: 50px;
@@ -402,11 +455,11 @@ $button-fail: #dee2e6;
                 border: none;
                 border-radius: 5px;
                 cursor: pointer;
-
+        
                 &:hover {
                     background-color: $button-success;
                 }
-
+        
                 &.error {
                     cursor: not-allowed;
                     background-color: $button-fail;

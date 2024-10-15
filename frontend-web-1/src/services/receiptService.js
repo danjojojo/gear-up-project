@@ -30,12 +30,34 @@ export const getReceiptItems = async (receiptSaleId) => {
     }
 }
 
-export const getReceiptMechanics = async (receiptSaleId) => {
+export const staffVoidReceipt = async (receiptId) => {
     try {
-        const response = await api.get(`/receipt/get-receipt-mechanics/${receiptSaleId}`);
+        const response = await api.put(`/receipt/void-receipt/${receiptId}`);
         return response.data;
     } catch (error) {
-        console.error("Error retrieving receipts", error);
+        console.error("Error voiding receipt", error);
+        throw error;
+    }
+}
+
+export const adminVoidReceipt = async (receiptId, retrievedReceiptItems) => {
+    try {
+        const response = await api.put(`/receipt/admin-void-receipt/${receiptId}`, {
+            items: retrievedReceiptItems
+        });
+        return response.data;
+    } catch (error) {
+        console.error("Error voiding receipt", error);
+        throw error;
+    }
+}
+
+export const cancelVoidReceipt = async (receiptId) => {
+    try {
+        const response = await api.put(`/receipt/cancel-void-receipt/${receiptId}`);
+        return response.data;
+    } catch (error) {
+        console.error("Error cancelling void receipt", error);
         throw error;
     }
 }

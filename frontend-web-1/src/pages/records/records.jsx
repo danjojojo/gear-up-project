@@ -29,7 +29,9 @@ const Records = () => {
     const handleTabChange = (value) => {
         if (selectedRecord !== value) {
             setSelectedRecord(value);
-            setStartDate(nowDate);  // Avoid calling setStartDate unless necessary
+            setStartDate(nowDate); 
+            setStartLeaderboardDate(nowDate);
+            setEndLeaderboardDate(nowDate);
             navigate(`/records/${value}`);
         }
     };
@@ -37,9 +39,11 @@ const Records = () => {
     const todayDate = new Date();
     const nowDate = moment(todayDate).format("YYYY-MM-DD");
     const [startDate, setStartDate] = useState(moment(todayDate).format("YYYY-MM-DD"));
-    const [salesStartDate, setSalesStartDate] = useState(todayDate);
-    const [laborStartDate, setLaborStartDate] = useState(todayDate);
-    const [expensesStartDate, setExpensesStartDate] = useState(todayDate);
+    const [startLeaderboardDate, setStartLeaderboardDate] = useState(moment(todayDate).format("YYYY-MM-DD"));
+    const [endLeaderboardDate, setEndLeaderboardDate] = useState(moment(todayDate).format("YYYY-MM-DD"));
+    const salesStartDate = todayDate;
+    const laborStartDate = todayDate;
+    const expensesStartDate = todayDate;
 
     const [loading, setLoading] = useState(true);
     const [errorLoad, setErrorLoad] = useState(false);
@@ -60,6 +64,7 @@ const Records = () => {
     const [modalSubtotal, setModalSubtotal] = useState(0);
     const [innerRecords, setInnerRecords] = useState([]);
     const [leaderboard, setLeaderboard] = useState([]);
+    const [selectedLBfilter, setSelectedLBfilter] = useState('calendar');
 
     const defaultSelectValue = 'all';
 
@@ -143,9 +148,9 @@ const Records = () => {
         }
     }
 
-    const handleLeaderboard = async (selectedRecord) => {
+    const handleLeaderboard = async (selectedRecord, start, end) => {
         try {
-            const { leaderBoards } = await getLeaderBoards(selectedRecord);
+            const { leaderBoards } = await getLeaderBoards(selectedRecord, start, end);
             setLeaderboard(leaderBoards);
             setTimeout(() => {
                 setLoading(false);
@@ -166,7 +171,6 @@ const Records = () => {
 
     useEffect(() => {
         handleHighlightDates(selectedRecord);
-        handleLeaderboard(selectedRecord);
     },[selectedRecord])    
 
     function handleChangePOSUser(value){
@@ -187,6 +191,16 @@ const Records = () => {
         )
     }
 
+    function handleNoLeadberboardData(){
+        const today = moment(todayDate).format("YYYY-MM-DD") === startDate ? "today" : "on this day";
+        return (
+            <div className='no-records'>
+                {selectedRecord === 'sales' && <p>There were no items sold {today}.</p>}
+                {selectedRecord === 'labor' && <p>No rendered service {today}.</p>}
+            </div>
+        )
+    }
+
     function handleRecordModal(recordValue) {
         const selectRecord = selectedRecord;
         console.log(selectRecord, recordValue.record_id);
@@ -197,6 +211,49 @@ const Records = () => {
         setModalSubtotal(PesoFormat.format(recordValue.record_total_amount)); 
         handleInnerRecords(selectRecord, recordValue.record_id);
     }
+
+    function handleLeaderBoardFilter(value){
+        setSelectedLBfilter(value);
+        switch(value){
+            case 'today':
+                setStartLeaderboardDate(moment(todayDate).format("YYYY-MM-DD"));
+                setEndLeaderboardDate(moment(todayDate).format("YYYY-MM-DD"));
+                break;
+            case 'week':
+                setStartLeaderboardDate(moment(todayDate).startOf('week').add(1, 'days').format("YYYY-MM-DD"));
+                setEndLeaderboardDate(moment(todayDate).format("YYYY-MM-DD"));
+                break;
+            case 'month':
+                setStartLeaderboardDate(moment(todayDate).startOf('month').format("YYYY-MM-DD"));
+                setEndLeaderboardDate(moment(todayDate).format("YYYY-MM-DD"));
+                break;
+            case 'calendar':
+                setStartLeaderboardDate(moment(startDate).format("YYYY-MM-DD"));
+                setEndLeaderboardDate(moment(startDate).format("YYYY-MM-DD"));
+                break;
+            default:
+                setStartLeaderboardDate(moment("20240101").format("YYYY-MM-DD"));
+                setEndLeaderboardDate(moment(todayDate).format("YYYY-MM-DD"));
+                break;
+        }
+    }
+
+    function selectLBFilter(){
+        return (
+            <select name="" id="" className='filter' onChange={(e) => handleLeaderBoardFilter(e.target.value)}>
+                <option value="calendar">Calendar</option>
+                <option value="week">This week</option>
+                <option value="month">This month</option>
+                <option value="all">All time</option>
+            </select>
+        )
+    }
+
+    useEffect(() => {
+        handleLeaderboard(selectedRecord, startLeaderboardDate, endLeaderboardDate);
+        console.log(startLeaderboardDate, endLeaderboardDate);
+    }, [selectedRecord, startLeaderboardDate, endLeaderboardDate])
+
     const [modalShow, setModalShow] = useState(false);
 
     if(loading) return <LoadingPage classStyle={"loading-in-page"}/>
@@ -290,11 +347,16 @@ const Records = () => {
                                                 selected={salesStartDate}
                                                 onChange={(date) => {
                                                     setStartDate(moment(date).format("YYYY-MM-DD"))
+                                                    if(selectedLBfilter === 'calendar'){   
+                                                        setStartLeaderboardDate(moment(date).format("YYYY-MM-DD"));
+                                                        setEndLeaderboardDate(moment(date).format("YYYY-MM-DD"));
+                                                    }
                                                 }}
                                                 maxDate={todayDate}
                                                 calendarClassName='calendar'
                                                 todayButton="Today"
                                                 highlightDates={highlightedDates}
+                                                calendarStartDay={1}
                                                 inline
                                             />
                                         </div>
@@ -304,22 +366,16 @@ const Records = () => {
                                         <div className='content'>
                                             <div className="leaderboard">
                                                 <div className="nav">
-                                                    <h4>Top 10 Items</h4>
-                                                    <select name="" id="" className='filter'>
-                                                        <option value="">Today</option>
-                                                        <option value="">This week</option>
-                                                        <option value="">This month</option>
-                                                        <option value="">Dry season</option>
-                                                        <option value="">Rainy season</option>
-                                                        <option value="">All time</option>
-                                                    </select>
+                                                    <h4>Top Items</h4>
+                                                    {selectLBFilter()}
                                                 </div>
                                                 <div className="columns">
                                                     <div className="rank">Rank</div>
                                                     <div className="name">Product</div>
-                                                    <div className="count">Count</div>
+                                                    <div className="count">SOLD</div>
                                                 </div>
                                                 <div className="list">
+                                                    {leaderboard.length === 0 ? handleNoLeadberboardData() : null}
                                                     {leaderboard.map((leader, index) => (
                                                         <div className="item" key={index}>
                                                             {index < 3 && <div className="rank">
@@ -394,6 +450,10 @@ const Records = () => {
                                                 selected={laborStartDate}
                                                 onChange={(date) => {
                                                     setStartDate(moment(date).format("YYYY-MM-DD"))
+                                                    if(selectedLBfilter === 'calendar'){   
+                                                        setStartLeaderboardDate(moment(date).format("YYYY-MM-DD"));
+                                                        setEndLeaderboardDate(moment(date).format("YYYY-MM-DD"));
+                                                    }
                                                 }}
                                                 maxDate={todayDate}
                                                 calendarClassName='calendar'
@@ -405,9 +465,33 @@ const Records = () => {
                                     </div>
 
                                     <div className='right-container'>
-                                        <div className='title'>Select a date to see records</div>
+                                        <div className='title'>Mechanic Leaderboard</div>
                                         <div className='content'>
-
+                                            <div className="leaderboard">
+                                                <div className="nav">
+                                                    <h4>Top Mechanics</h4>
+                                                    {selectLBFilter()}
+                                                </div>
+                                                <div className="columns">
+                                                    <div className="rank">Rank</div>
+                                                    <div className="name">Mechanic</div>
+                                                    <div className="count">Earned</div>
+                                                </div>
+                                                <div className="list">
+                                                    {leaderboard.length === 0 ? handleNoLeadberboardData() : null}
+                                                    {leaderboard.map((leader, index) => (
+                                                        <div className="item" key={index}>
+                                                            {index < 3 && <div className="rank">
+                                                                <p>{index + 1}</p>
+                                                                <i className="fa-solid fa-certificate"></i>
+                                                            </div>}
+                                                            {index >= 3 && <div className="rank">{index + 1}</div>}
+                                                            <div className="name">{leader.item_name}</div>
+                                                            <div className="count">{PesoFormat.format(leader.item_qty)}</div>
+                                                        </div>
+                                                    ))}
+                                                </div>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
@@ -481,9 +565,32 @@ const Records = () => {
                                     </div>
 
                                     <div className='right-container'>
-                                        <div className='title'>Select a date to see records</div>
+                                        <div className='title'>Expenses Leaderboard</div>
                                         <div className='content'>
-
+                                            <div className="leaderboard">
+                                                <div className="nav">
+                                                    <h4>All Expenses</h4>
+                                                </div>
+                                                <div className="columns">
+                                                    <div className="rank">Rank</div>
+                                                    <div className="name">Expense</div>
+                                                    <div className="count">Amount</div>
+                                                </div>
+                                                <div className="list">
+                                                    {leaderboard.length === 0 ? handleNoLeadberboardData() : null}
+                                                    {leaderboard.map((leader, index) => (
+                                                        <div className="item" key={index}>
+                                                            {index < 3 && <div className="rank">
+                                                                <p>{index + 1}</p>
+                                                                <i className="fa-solid fa-certificate"></i>
+                                                            </div>}
+                                                            {index >= 3 && <div className="rank">{index + 1}</div>}
+                                                            <div className="name">{leader.item_name}</div>
+                                                            <div className="count">{PesoFormat.format(leader.item_qty)}</div>
+                                                        </div>
+                                                    ))}
+                                                </div>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
@@ -502,7 +609,7 @@ const Records = () => {
                             <p>Total Earned <strong>{PesoFormat.format(dashboard1Data)}</strong></p>
                         </div>
                         <div className="pos-users">
-                            <select name="" id="" onChange={(e) => handleChangePOSUser(e.target.value)} defaultValue={defaultSelectValue}> 
+                            <select name="" id="" onChange={(e) => handleChangePOSUser(e.target.value)} defaultValue={'all'}> 
                                 <option value="all">All users</option>
                                 {distinctPOSUsers.map((posUser, index) => (
                                     <option key={index} value={posUser}>{posUser}</option>

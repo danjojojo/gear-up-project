@@ -5,6 +5,7 @@ import LoadingPage from '../../components/loading-page/loading-page';
 import { getPosUsers, addPosUser, editPosUserName, editPosUserPassword, editPosUserStatus } from '../../services/posUsersService';
 import moment from 'moment';
 import {Modal, Button} from 'react-bootstrap';
+import SearchBar from "../../components/search-bar/search-bar";
 
 const POSUsers = () => {
     const [loading, setLoading] = useState(true);
@@ -23,6 +24,7 @@ const POSUsers = () => {
     const [allPosUsers, setAllPosUsers] = useState([]);
     const [allActivePosUsers, setAllActivePosUsers] = useState([]);
     const [allInactivePosUsers, setAllInactivePosUsers] = useState([]);
+    const [retrievedPosUsers, setRetrievedPosUsers] = useState([]);
     const [selectedPosUser, setSelectedPosUser] = useState([]);
 
     const [openPosUserView, setOpenPosUserView] = useState(false);
@@ -44,6 +46,8 @@ const POSUsers = () => {
     const [functionKey, setFunctionKey] = useState('');
     const [statusChange, setStatusChange] = useState('');
     const [tab, setTab] = useState('active');
+
+    const posStatus = tab === 'active' ? 'active' : 'inactive';
 
     function MyVerticallyCenteredModalResponse(props) {
 		return (
@@ -136,8 +140,7 @@ const POSUsers = () => {
             const { posUsers } = await getPosUsers();
             setTab(tab);
             setAllPosUsers(posUsers);
-            getAllActivePosUsers(posUsers);
-            getAllInactivePosUsers(posUsers);
+            setRetrievedPosUsers(posUsers);
             console.log(posUsers);
             setTimeout(() => {
                 setLoading(false);
@@ -234,6 +237,7 @@ const POSUsers = () => {
                 setEditPosUserNameView(false);
                 setEditPosUserPassView(false);
                 setAddPosUserView(false);
+                resetPosUserInputs();
                 break;
             case 'close':
                 setSelectedPosUser([]);
@@ -380,13 +384,25 @@ const POSUsers = () => {
         getPosUsersFromDB();
     }, [])
 
+    const [searchTerm, setSearchTerm] = useState("");
+
+    const handleSearch = (value) => {
+        setSearchTerm(value);
+        if(value === ""){
+            setRetrievedPosUsers(allPosUsers);
+        } else {
+            const searchResults = allPosUsers.filter((posUser) => posUser.pos_name.toLowerCase().includes(value.toLowerCase()));
+            setRetrievedPosUsers(searchResults);
+        }
+    }   
+
     if(loading) return <LoadingPage classStyle={"loading-in-page"}/>
 
     return (
         <div className='pos-users p-3'>
             <PageLayout
                 leftContent=
-                {<div>
+                {<div className='pos-users-container'>
                     <MyVerticallyCenteredModalResponse
 						show={modalResponseShow}
 						onHide={() => {
@@ -399,80 +415,75 @@ const POSUsers = () => {
 						onConfirm={functionKeyAction}
 					/>
                     <div className="pos-users-nav">
-                        <div className="status-tabs">
-                            <button
-                                className={tab === "active" ? "active" : ""}
-                                onClick={() => {
-                                    setTab("active")
-                                    handleInteractPosUser([], 'close');
-                                }}
-                                >
-                                Active
-                            </button>
-                            <button
-                                className={tab === "inactive" ? "active" : ""}
-                                onClick={() => {
-                                    setTab("inactive")
-                                    handleInteractPosUser([], 'close');
-                                }}
-                            >
-                                Inactive
-                            </button>
-                        </div>
                         <button 
                             className="add-pos-user"
                             onClick={() => {
                                 handleInteractPosUser([], 'add');
                             }}
                         >
-                            Add POS User
+                            Add POS User +
                         </button>
+                        <div className="search-sorting">
+                            <SearchBar
+                                value={searchTerm}
+                                onChange={(e) => {
+                                    handleSearch(e.target.value);
+                                    setSearchTerm(e.target.value)
+                                }}
+                                placeholder='Search POS user'
+                            />
+                        </div>
+                        <div className="status-tabs">
+                            {tab === "active" && 
+                                <button
+                                    onClick={() => {
+                                        setTab("inactive")
+                                        handleInteractPosUser([], 'close');
+                                    }}
+                                    >
+                                    View Archived
+                                </button>
+                            }
+                            {tab === "inactive" && 
+                                <button
+                                    onClick={() => {
+                                        setTab("active")
+                                        handleInteractPosUser([], 'close');
+                                    }}
+                                    >
+                                    View Active
+                                </button>
+                            }
+                            
+                        </div>
+                    </div>
+                    <div className="columns">
+                        <p>Name</p>
+                        <p>Date created</p>
+                        <p>Status</p>
                     </div>
                     <div className="list">
-                        {tab === 'active' && allActivePosUsers.length === 0 &&
-                            <div className='empty-list'>
-                                <p>No active POS Users.</p>
-                            </div>
-                        }
-                        {tab === 'inactive' && allInactivePosUsers.length === 0 &&
-                            <div className='empty-list'>
-                                <p>No inactive POS Users.</p>
-                            </div>
-                        }
-                        {tab === 'active' && allActivePosUsers.map((posUser, index) => {
-                            return(
-                                <div key={index} className="list-item" 
-                                        onClick={()=>{
-                                            handleInteractPosUser(posUser, 'open');
-                                        }}
-                                    >
-                                    <div className="list-item-content">
-                                        <p>{posUser.pos_name}</p>
-                                        <p className={
-                                            posUser.pos_status === 'active' ? 'active' : 'inactive'
-                                        }
-                                        >{posUser.pos_status}</p>
-                                    </div>
+                        {retrievedPosUsers.filter((posUser) => posUser.pos_status === posStatus).map((posUser, index) => (
+                            <div key={index} className="list-item" 
+                                    onClick={()=>{
+                                        handleInteractPosUser(posUser, 'open');
+                                    }}
+                                >
+                                <div className="list-item-content">
+                                    <p>{posUser.pos_name}</p>
+                                    <p>{moment(posUser.date_created).format("LL")}</p>
+                                    <p className={
+                                        posUser.pos_status === 'active' ? 'active' : 'inactive'
+                                    }
+                                    >{posUser.pos_status}</p>
                                 </div>
-                            )
-                        })}
-                        {tab === 'inactive' && allInactivePosUsers.map((posUser, index) => {
-                            return(
-                                <div key={index} className="list-item" 
-                                        onClick={()=>{
-                                            handleInteractPosUser(posUser, 'open');
-                                        }}
-                                    >
-                                    <div className="list-item-content">
-                                        <p>{posUser.pos_name}</p>
-                                        <p className={
-                                            posUser.pos_status === 'active' ? 'active' : 'inactive'
-                                        }
-                                        >{posUser.pos_status}</p>
-                                    </div>
-                                </div>
-                            )
-                        })}
+                            </div>
+                        ))}
+                        {retrievedPosUsers.filter((posUser) => posUser.pos_status === posStatus).length === 0 && (
+                            <div className='empty-list'>
+                                <p>No {posStatus} POS Users.</p>
+                            </div>
+                        )}
                     </div>
                 </div>}
 
@@ -626,23 +637,27 @@ const POSUsers = () => {
                                     ></i>
                                 </div>
                             </div>
-                            <p className='updated'>Created {moment(selectedPosUser.date_updated).format("lll")}</p>
-                            <div className="change"
-                                onClick={()=>{
-                                    handleInteractPosUser(selectedPosUser, 'edit-name');
-                                }}
-                            >
-                                <p>Change name</p>
-                                <i className="fa-solid fa-arrow-right"></i>
-                            </div>
-                            <div className="change"
-                                onClick={()=>{
-                                    handleInteractPosUser(selectedPosUser, 'edit-pass');
-                                }}
-                            >
-                                <p>Change password</p>
-                                <i className="fa-solid fa-arrow-right"></i>
-                            </div>
+                            <p className='updated'>Last updated {moment(selectedPosUser.date_updated).format("lll")}</p>
+                            {selectedPosUser.pos_status === 'active' &&
+                            <>
+                                <div className="change"
+                                    onClick={()=>{
+                                        handleInteractPosUser(selectedPosUser, 'edit-name');
+                                    }}
+                                >
+                                    <p>Change name</p>
+                                    <i className="fa-solid fa-arrow-right"></i>
+                                </div>
+                                <div className="change"
+                                    onClick={()=>{
+                                        handleInteractPosUser(selectedPosUser, 'edit-pass');
+                                    }}
+                                >
+                                    <p>Change password</p>
+                                    <i className="fa-solid fa-arrow-right"></i>
+                                </div>
+                            </>
+                            }
                             <div className="change"
                                 onClick={()=>{
                                     handleInteractPosUser(selectedPosUser, 'edit-status');
