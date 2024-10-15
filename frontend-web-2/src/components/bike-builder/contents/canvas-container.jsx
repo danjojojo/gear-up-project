@@ -6,14 +6,13 @@ import reset from "../../../assets/icons/reset.png";
 
 const CanvasContainer = ({
     partPrice, frameImage, forkImage, groupsetImage, wheelsetImage, seatImage, cockpitImage,
-    partPositions, handleDragEnd, budget, buildStatsPrice, hitRegions, currentPart,
-    lockedParts, resetBuild
+    partPositions, setPartPositions, handleDragEnd, budget, buildStatsPrice, hitRegions, currentPart,
+    lockedParts, resetBuild, captureCallback
 }) => {
     const transformerRef = useRef(null); // Reference for the transformer (for rotation)
     const [selectedPart, setSelectedPart] = useState(null); // To keep track of selected parts for rotation
     const [backgroundImage] = useImage(bikeguide); // Correct usage of useImage for background
-
-
+    const stageRef = useRef(null);
     // Define the steps in order
     const steps = ["frame", "fork", "groupset", "wheelset", "seat", "cockpit"];
 
@@ -74,6 +73,19 @@ const CanvasContainer = ({
         currency: "PHP",
     });
 
+    useEffect(() => {
+        // If a captureCallback function is provided, assign the captureBuildImage function to it
+        if (captureCallback) {
+            captureCallback.current = captureBuildImage;
+        }
+    }, [captureCallback]);
+
+    // Function to capture the current canvas as an image
+    const captureBuildImage = () => {
+        const stage = stageRef.current; // Get the stage reference
+        return stage.toDataURL();  // Convert the current canvas to a base64 image
+    };
+
     return (
         <div className="bike-content d-flex">
             <div className="left-container">
@@ -102,6 +114,7 @@ const CanvasContainer = ({
                     <div className="canvas-content">
                         <img src={reset} alt="reset" onClick={resetBuild} />
                         <Stage
+                            ref={stageRef}
                             width={stageWidth}
                             height={stageHeight}
                             onMouseDown={confirmRotation}
@@ -161,19 +174,21 @@ const CanvasContainer = ({
                                         )
                                     )
                                 )}
-                                {cockpitImage && (
+                                {/* Front Wheel */}
+                                {wheelsetImage && (
                                     <Image
-                                        name="cockpit"
-                                        image={cockpitImage}
-                                        x={partPositions.cockpit.x}
-                                        y={partPositions.cockpit.y}
-                                        height={39}
-                                        width={46}
-                                        draggable={selectedPart?.name() === 'cockpit' && !lockedParts.includes("cockpit")}
-                                        listening={!lockedParts.includes("cockpit")}
-                                        dragBoundFunc={(pos) => constrainDrag(pos, 46, 39, stageWidth, stageHeight)} // Correct dimensions for cockpit
+                                        name="frontWheel"
+                                        image={wheelsetImage}
+                                        x={partPositions.frontWheel.x}
+                                        y={partPositions.frontWheel.y}
+                                        rotation={partPositions.frontWheel.rotation}
+                                        height={240}
+                                        width={240}
+                                        draggable={selectedPart?.name() === 'frontWheel' && !lockedParts.includes("frontWheel")}
+                                        listening={!lockedParts.includes("frontWheel")}
+                                        dragBoundFunc={(pos) => constrainDrag(pos, 240, 240, stageWidth, stageHeight)} // Correct dimensions for front wheel
                                         onClick={(e) => setSelectedPart(e.target)}
-                                        onDragEnd={(e) => handleDragEnd("cockpit", e)}
+                                        onDragEnd={(e) => handleDragEnd("frontWheel", e)}
                                     />
                                 )}
                                 {/* Fork */}
@@ -183,6 +198,7 @@ const CanvasContainer = ({
                                         image={forkImage}
                                         x={partPositions.fork.x}
                                         y={partPositions.fork.y}
+                                        rotation={partPositions.fork.rotation}
                                         height={251}
                                         width={97}
                                         draggable={selectedPart?.name() === 'fork' && !lockedParts.includes("fork")}
@@ -192,6 +208,22 @@ const CanvasContainer = ({
                                         onDragEnd={(e) => handleDragEnd("fork", e)}
                                     />
                                 )}
+                                {cockpitImage && (
+                                    <Image
+                                        name="cockpit"
+                                        image={cockpitImage}
+                                        x={partPositions.cockpit.x}
+                                        y={partPositions.cockpit.y}
+                                        rotation={partPositions.cockpit.rotation}
+                                        height={39}
+                                        width={46}
+                                        draggable={selectedPart?.name() === 'cockpit' && !lockedParts.includes("cockpit")}
+                                        listening={!lockedParts.includes("cockpit")}
+                                        dragBoundFunc={(pos) => constrainDrag(pos, 46, 39, stageWidth, stageHeight)} // Correct dimensions for cockpit
+                                        onClick={(e) => setSelectedPart(e.target)}
+                                        onDragEnd={(e) => handleDragEnd("cockpit", e)}
+                                    />
+                                )}
                                 {/* Seat */}
                                 {seatImage && (
                                     <Image
@@ -199,6 +231,7 @@ const CanvasContainer = ({
                                         image={seatImage}
                                         x={partPositions.seat.x}
                                         y={partPositions.seat.y}
+                                        rotation={partPositions.seat.rotation}
                                         height={154}
                                         width={96}
                                         draggable={selectedPart?.name() === 'seat' && !lockedParts.includes("seat")}
@@ -215,6 +248,7 @@ const CanvasContainer = ({
                                         image={frameImage}
                                         x={partPositions.frame.x}
                                         y={partPositions.frame.y}
+                                        rotation={partPositions.frame.rotation}
                                         height={214}
                                         width={340}
                                         draggable={selectedPart?.name() === 'frame' && !lockedParts.includes("frame")}
@@ -224,38 +258,6 @@ const CanvasContainer = ({
                                         onDragEnd={(e) => handleDragEnd("frame", e)}
                                     />
                                 )}
-                                {/* Groupset */}
-                                {groupsetImage && (
-                                    <Image
-                                        name="groupset"
-                                        image={groupsetImage}
-                                        x={partPositions.groupset.x}
-                                        y={partPositions.groupset.y}
-                                        height={92}
-                                        width={240}
-                                        draggable={selectedPart?.name() === 'groupset' && !lockedParts.includes("groupset")}
-                                        listening={!lockedParts.includes("groupset")}
-                                        dragBoundFunc={(pos) => constrainDrag(pos, 240, 92, stageWidth, stageHeight)} // Correct dimensions for groupset
-                                        onClick={(e) => setSelectedPart(e.target)}
-                                        onDragEnd={(e) => handleDragEnd("groupset", e)}
-                                    />
-                                )}
-                                {/* Front Wheel */}
-                                {wheelsetImage && (
-                                    <Image
-                                        name="frontWheel"
-                                        image={wheelsetImage}
-                                        x={partPositions.frontWheel.x}
-                                        y={partPositions.frontWheel.y}
-                                        height={240}
-                                        width={240}
-                                        draggable={selectedPart?.name() === 'frontWheel' && !lockedParts.includes("frontWheel")}
-                                        listening={!lockedParts.includes("frontWheel")}
-                                        dragBoundFunc={(pos) => constrainDrag(pos, 240, 240, stageWidth, stageHeight)} // Correct dimensions for front wheel
-                                        onClick={(e) => setSelectedPart(e.target)}
-                                        onDragEnd={(e) => handleDragEnd("frontWheel", e)}
-                                    />
-                                )}
                                 {/* Rear Wheel */}
                                 {wheelsetImage && (
                                     <Image
@@ -263,6 +265,7 @@ const CanvasContainer = ({
                                         image={wheelsetImage}
                                         x={partPositions.rearWheel.x}
                                         y={partPositions.rearWheel.y}
+                                        rotation={partPositions.rearWheel.rotation}
                                         height={240}
                                         width={240}
                                         draggable={selectedPart?.name() === 'rearWheel' && !lockedParts.includes("rearWheel")}
@@ -272,7 +275,23 @@ const CanvasContainer = ({
                                         onDragEnd={(e) => handleDragEnd("rearWheel", e)}
                                     />
                                 )}
-
+                                {/* Groupset */}
+                                {groupsetImage && (
+                                    <Image
+                                        name="groupset"
+                                        image={groupsetImage}
+                                        x={partPositions.groupset.x}
+                                        y={partPositions.groupset.y}
+                                        rotation={partPositions.groupset.rotation}
+                                        height={92}
+                                        width={240}
+                                        draggable={selectedPart?.name() === 'groupset' && !lockedParts.includes("groupset")}
+                                        listening={!lockedParts.includes("groupset")}
+                                        dragBoundFunc={(pos) => constrainDrag(pos, 240, 92, stageWidth, stageHeight)} // Correct dimensions for groupset
+                                        onClick={(e) => setSelectedPart(e.target)}
+                                        onDragEnd={(e) => handleDragEnd("groupset", e)}
+                                    />
+                                )}
 
                                 <Transformer
                                     ref={transformerRef}

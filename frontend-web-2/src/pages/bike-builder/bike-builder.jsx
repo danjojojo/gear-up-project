@@ -1,11 +1,13 @@
 import "./bike-builder.scss";
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import BudgetContainer from "../../components/bike-builder/contents/budget-container";
 import BuilderSidebar from "../../components/bike-builder/contents/builder-sidebar";
 import CanvasContainer from "../../components/bike-builder/contents/canvas-container";
+import BuildSummary from "../../components/bike-builder/contents/summary-container"
 import useBase64Image from "../../hooks/useImage";
 
 const BikeBuilder = () => {
+    const [isBuildFinalized, setIsBuildFinalized] = useState(false);
     const [showBudgetStep, setShowBudgetStep] = useState(true);
     const [isSettingBudget, setIsSettingBudget] = useState(false);
     const [budget, setBudget] = useState("");
@@ -20,27 +22,30 @@ const BikeBuilder = () => {
     const [buildStatsPrice, setBuildStatsPrice] = useState(0); // Store the total price
 
     const [partPositions, setPartPositions] = useState({
-        frame: { x: 0, y: 0 },
-        fork: { x: 0, y: 0 },
-        frontWheel: { x: 0, y: 0 },
-        rearWheel: { x: 0, y: 0 },
-        groupset: { x: 0, y: 0 },
-        seat: { x: 0, y: 0 },
-        cockpit: { x: 0, y: 0 },
+        frame: { x: 0, y: 0, rotation: 0 },
+        fork: { x: 0, y: 0, rotation: 0 },
+        frontWheel: { x: 0, y: 0, rotation: 0 },
+        rearWheel: { x: 0, y: 0, rotation: 0 },
+        groupset: { x: 0, y: 0, rotation: 0 },
+        seat: { x: 0, y: 0, rotation: 0 },
+        cockpit: { x: 0, y: 0, rotation: 0 },
     });
+
     const hitRegions = {
-        frame: { x: 230, y: 180, width: 350, height: 220, rotation: -5 },
-        fork: { x: 528, y: 135, width: 110, height: 263, rotation: -5 },
-        groupset: { x: 230, y: 325, width: 253, height: 105 },
-        frontWheel: { x: 508, y: 240, width: 260, height: 250 },
-        rearWheel: { x: 138, y: 240, width: 260, height: 250 },
-        seat: { x: 290, y: 148, width: 110, height: 165, rotation: -5 },
-        cockpit: { x: 520, y: 100, width: 65, height: 55 }
+        frame: { x: 230, y: 180, width: 345, height: 222, rotation: -5 },
+        fork: { x: 530, y: 140, width: 105, height: 258, rotation: -5 },
+        groupset: { x: 235, y: 330, width: 248, height: 100 },
+        frontWheel: { x: 508, y: 245, width: 250, height: 250 },
+        rearWheel: { x: 145, y: 245, width: 250, height: 250 },
+        seat: { x: 292, y: 162, width: 105, height: 163, rotation: -6 },
+        cockpit: { x: 527, y: 112, width: 55, height: 50 }
     };
 
     const [currentPart, setCurrentPart] = useState("frame"); // Tracks the current part being worked on
     const [lockedParts, setLockedParts] = useState([]);
     const [isHitRegionCorrect, setIsHitRegionCorrect] = useState(false); // New state to track if part is in the hit region
+    const [finalBuildImage, setFinalBuildImage] = useState(null);
+    const captureImageRef = useRef(null);
 
     // Handle the Back Button and Reset Everything ( when going back )
     const handleReset = () => {
@@ -60,13 +65,13 @@ const BikeBuilder = () => {
         });
         setBuildStatsPrice(0);    // Reset total price
         setPartPositions({        // Reset part positions
-            frame: { x: 0, y: 0 },
-            fork: { x: 0, y: 0 },
-            frontWheel: { x: 0, y: 0 },
-            rearWheel: { x: 0, y: 0 },
-            groupset: { x: 0, y: 0 },
-            seat: { x: 0, y: 0 },
-            cockpit: { x: 0, y: 0 },
+            frame: { x: 0, y: 0, rotation: 0 },
+            fork: { x: 0, y: 0, rotation: 0 },
+            frontWheel: { x: 0, y: 0, rotation: 0 },
+            rearWheel: { x: 0, y: 0, rotation: 0 },
+            groupset: { x: 0, y: 0, rotation: 0 },
+            seat: { x: 0, y: 0, rotation: 0 },
+            cockpit: { x: 0, y: 0, rotation: 0 },
         });
     };
 
@@ -74,6 +79,29 @@ const BikeBuilder = () => {
         if (!isSettingBudget || (isSettingBudget && budget)) {
             setShowBudgetStep(false);
         }
+    };
+
+    const handleFinalizeBuild = () => {
+        const buildImage = captureImageRef.current(); // Call the captureBuildImage from CanvasContainer
+        setFinalBuildImage(buildImage); // Store the captured image
+        setIsBuildFinalized(true);
+    };
+
+    // Function to go back to the build state (part selection)
+    const goBackToBuild = () => {
+        setIsBuildFinalized(false);  // Reset the finalization state
+        setCurrentPart("cockpit");  // Set the current part to "cockpit"
+
+        // Unlock cockpit and lock all previous parts
+        setLockedParts((prevLockedParts) => {
+            let updatedLockedParts = [...prevLockedParts];
+
+            // Lock all parts before "cockpit"
+            updatedLockedParts = [...updatedLockedParts, "frame", "fork", "groupset", "frontWheel", "rearWheel", "seat"];
+
+            // Unlock cockpit
+            return updatedLockedParts.filter(part => part !== "cockpit");
+        });
     };
 
     const resetBuild = () => {
@@ -89,13 +117,13 @@ const BikeBuilder = () => {
 
         // Reset all part positions to their default (initial) positions
         setPartPositions({
-            frame: { x: 0, y: 0 },
-            fork: { x: 0, y: 0 },
-            frontWheel: { x: 0, y: 0 },
-            rearWheel: { x: 0, y: 0 },
-            groupset: { x: 0, y: 0 },
-            seat: { x: 0, y: 0 },
-            cockpit: { x: 0, y: 0 },
+            frame: { x: 0, y: 0, rotation: 0 },
+            fork: { x: 0, y: 0, rotation: 0 },
+            frontWheel: { x: 0, y: 0, rotation: 0 },
+            rearWheel: { x: 0, y: 0, rotation: 0 },
+            groupset: { x: 0, y: 0, rotation: 0 },
+            seat: { x: 0, y: 0, rotation: 0 },
+            cockpit: { x: 0, y: 0, rotation: 0 },
         });
 
         // Reset the build stats price to zero
@@ -130,7 +158,7 @@ const BikeBuilder = () => {
                     case "groupset": nextPart = "wheelset"; break;
                     case "wheelset": nextPart = "seat"; break;
                     case "seat": nextPart = "cockpit"; break;
-                    case "cockpit": nextPart = ""; break; // Last part, no further parts to move to
+                    case "cockpit": nextPart = "finalize"; break; // Finalize Build step
                     default: break;
                 }
 
@@ -187,8 +215,12 @@ const BikeBuilder = () => {
                 newCurrentPart = "seat";
                 partToUnlock = "seat";
                 break;
-            default:
+            case "finalize": // If in finalize, go back to cockpit
+                newCurrentPart = "cockpit";
+                partToUnlock = "cockpit";
                 break;
+            default:
+                return;
         }
 
         if (newCurrentPart) {
@@ -305,27 +337,27 @@ const BikeBuilder = () => {
             let updatedPositions = { ...prevPositions };
 
             // Reset current part's position
-            updatedPositions[partType] = { x: 0, y: 0 }; // Default position for each part
+            updatedPositions[partType] = { x: 0, y: 0, rotation: 0 }; // Default position for each part
 
             // Reset dependent parts' positions
             switch (partType) {
                 case "frame":
-                    updatedPositions.fork = { x: 0, y: 0 };
-                    updatedPositions.groupset = { x: 0, y: 0 };
-                    updatedPositions.frontWheel = { x: 0, y: 0 };
-                    updatedPositions.rearWheel = { x: 0, y: 0 };
-                    updatedPositions.seat = { x: 0, y: 0 };
-                    updatedPositions.cockpit = { x: 0, y: 0 };
+                    updatedPositions.fork = { x: 0, y: 0, rotation: 0 };
+                    updatedPositions.groupset = { x: 0, y: 0, rotation: 0 };
+                    updatedPositions.frontWheel = { x: 0, y: 0, rotation: 0 };
+                    updatedPositions.rearWheel = { x: 0, y: 0, rotation: 0 };
+                    updatedPositions.seat = { x: 0, y: 0, rotation: 0 };
+                    updatedPositions.cockpit = { x: 0, y: 0, rotation: 0 };
                     break;
                 case "fork":
-                    updatedPositions.groupset = { x: 0, y: 0 };
-                    updatedPositions.frontWheel = { x: 0, y: 0 };
-                    updatedPositions.rearWheel = { x: 0, y: 0 };
-                    updatedPositions.cockpit = { x: 0, y: 0 };
+                    updatedPositions.groupset = { x: 0, y: 0, rotation: 0 };
+                    updatedPositions.frontWheel = { x: 0, y: 0, rotation: 0 };
+                    updatedPositions.rearWheel = { x: 0, y: 0, rotation: 0 };
+                    updatedPositions.cockpit = { x: 0, y: 0, rotation: 0 };
                     break;
                 case "groupset":
-                    updatedPositions.frontWheel = { x: 0, y: 0 };
-                    updatedPositions.rearWheel = { x: 0, y: 0 };
+                    updatedPositions.frontWheel = { x: 0, y: 0, rotation: 0 };
+                    updatedPositions.rearWheel = { x: 0, y: 0, rotation: 0 };
                     break;
                 case "wheelset":
                     // No dependent part reset needed
@@ -339,7 +371,7 @@ const BikeBuilder = () => {
 
             return updatedPositions;
         });
-        
+
         setIsHitRegionCorrect(false);
     };
 
@@ -380,17 +412,17 @@ const BikeBuilder = () => {
 
     // Handle dragging the part and check if it hits the hit region
     const handleDragEnd = (partType, e) => {
-        const newPos = { x: e.target.x(), y: e.target.y() };
+        const newPos = { x: e.target.x(), y: e.target.y(), rotation: e.target.rotation() };
 
         setPartPositions((prev) => ({
             ...prev,
             [partType]: newPos
         }));
 
+        // Logic to check if part is in the hit region (unchanged)
         if (partType === "frontWheel" || partType === "rearWheel") {
             const frontWheelPos = partType === "frontWheel" ? newPos : partPositions["frontWheel"];
             const rearWheelPos = partType === "rearWheel" ? newPos : partPositions["rearWheel"];
-
             const frontWheelHit = isInHitRegion("frontWheel", frontWheelPos);
             const rearWheelHit = isInHitRegion("rearWheel", rearWheelPos);
 
@@ -410,44 +442,57 @@ const BikeBuilder = () => {
 
     return (
         <div className="bike-builder-container">
-            {showBudgetStep ? (
-                <BudgetContainer
-                    isSettingBudget={isSettingBudget}
-                    budget={budget}
-                    setBudget={setBudget}
-                    handleProceed={handleProceed}
-                    setIsSettingBudget={setIsSettingBudget}
+            {isBuildFinalized ? (
+                // Render BuildSummary if build is finalized
+                <BuildSummary
+                    selectedParts={selectedParts}
+                    buildStatsPrice={buildStatsPrice}
+                    finalBuildImage={finalBuildImage}
+                    goBackToBuild={goBackToBuild}
                 />
             ) : (
-                <div className="builder-container d-flex">
-                    <BuilderSidebar
-                        currentPart={currentPart}
-                        goBackToPreviousPart={goBackToPreviousPart}
-                        proceedToNextPart={proceedToNextPart}
-                        isPartSelectedForCurrentPart={isPartSelectedForCurrentPart}
-                        handleAddToBuild={handleAddToBuild}
-                        handleReset={handleReset}
-                        selectedParts={selectedParts}
-                        lockedParts={lockedParts}
-                    />
-                    <CanvasContainer
-                        frameImage={frameImage}
-                        forkImage={forkImage}
-                        groupsetImage={groupsetImage}
-                        wheelsetImage={wheelsetImage}
-                        seatImage={seatImage}
-                        cockpitImage={cockpitImage}
-                        partPositions={partPositions}
-                        handleDragEnd={handleDragEnd}
+                showBudgetStep ? (
+                    <BudgetContainer
+                        isSettingBudget={isSettingBudget}
                         budget={budget}
-                        buildStatsPrice={buildStatsPrice}
-                        hitRegions={hitRegions}
-                        currentPart={currentPart}
-                        lockedParts={lockedParts}
-                        resetBuild={resetBuild}
-                        partPrice={selectedParts}
+                        setBudget={setBudget}
+                        handleProceed={handleProceed}
+                        setIsSettingBudget={setIsSettingBudget}
                     />
-                </div>
+                ) : (
+                    <div className="builder-container d-flex">
+                        <BuilderSidebar
+                            currentPart={currentPart}
+                            goBackToPreviousPart={goBackToPreviousPart}
+                            proceedToNextPart={proceedToNextPart}
+                            isPartSelectedForCurrentPart={isPartSelectedForCurrentPart}
+                            handleAddToBuild={handleAddToBuild}
+                            handleReset={handleReset}
+                            selectedParts={selectedParts}
+                            lockedParts={lockedParts}
+                            handleFinalizeBuild={handleFinalizeBuild} // Pass the finalize handler to sidebar
+                        />
+                        <CanvasContainer
+                            captureCallback={captureImageRef}
+                            frameImage={frameImage}
+                            forkImage={forkImage}
+                            groupsetImage={groupsetImage}
+                            wheelsetImage={wheelsetImage}
+                            seatImage={seatImage}
+                            cockpitImage={cockpitImage}
+                            partPositions={partPositions}
+                            setPartPositions={setPartPositions}
+                            handleDragEnd={handleDragEnd}
+                            budget={budget}
+                            buildStatsPrice={buildStatsPrice}
+                            hitRegions={hitRegions}
+                            currentPart={currentPart}
+                            lockedParts={lockedParts}
+                            resetBuild={resetBuild}
+                            partPrice={selectedParts}
+                        />
+                    </div>
+                )
             )}
         </div>
     );
