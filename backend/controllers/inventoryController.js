@@ -29,13 +29,13 @@ const getDashboardData = async (req, res) => {
         // Query to get the total stock value
         const stockValueQuery = 'SELECT SUM(item_price * stock_count) FROM items WHERE status = true';
         const stockValueResult = await pool.query(stockValueQuery);
-        const stockValue = parseFloat(stockValueResult.rows[0].sum) || 0;
+        const stockValue = Number(stockValueResult.rows[0].sum) || 0;
 
         res.status(200).json({
             totalItems,
             lowStockItems,
             stockCounts,
-            stockValue: `₱ ${stockValue.toFixed(2)}`
+            stockValue: stockValue
         });
     } catch (error) {
         console.error('Error fetching dashboard data:', error);

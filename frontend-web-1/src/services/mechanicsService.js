@@ -23,3 +23,27 @@ export const addMechanic = async (mechanicData) => {
         throw error;
     }
 }
+
+export const editMechanic = async (mechanicID, mechanicData) => {
+    try {
+        const response = await api.put(`/mechanics/edit-mechanic/${mechanicID}`, mechanicData, {
+            headers: {
+                'Content-Type': 'multipart/form-data',
+            }
+        });
+        return response.data;
+    } catch (error) {
+        console.error('Error editing mechanic', error); 
+        throw error;
+    }
+}
+
+export const changeMechanicStatus = async (mechanicID, mechanicStatus) => {
+    try {
+        const response = await api.put(`/mechanics/change-mechanic-status/${mechanicID}`, {status : mechanicStatus});
+        return response.data;
+    } catch (error) {
+        console.error('Error archiving mechanic', error);
+        throw error;
+    }
+}

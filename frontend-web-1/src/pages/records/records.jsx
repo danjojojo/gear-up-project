@@ -609,7 +609,7 @@ const Records = () => {
                             <p>Total Earned <strong>{PesoFormat.format(dashboard1Data)}</strong></p>
                         </div>
                         <div className="pos-users">
-                            <select name="" id="" onChange={(e) => handleChangePOSUser(e.target.value)} defaultValue={defaultSelectValue}> 
+                            <select name="" id="" onChange={(e) => handleChangePOSUser(e.target.value)} defaultValue={'all'}> 
                                 <option value="all">All users</option>
                                 {distinctPOSUsers.map((posUser, index) => (
                                     <option key={index} value={posUser}>{posUser}</option>

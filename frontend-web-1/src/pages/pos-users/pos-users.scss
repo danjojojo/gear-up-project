@@ -15,28 +15,17 @@ $button-fail: #dee2e6;
 .pos-users{
 
     .status-tabs {
-        display: flex;
-        padding: 3px;
-        width: fit-content;
-        background-color: $normal-bg-color;
-        border: 1px solid $normal-border-color;
-        font-size: $font-size;
-        border-radius: 7px;
-        margin-bottom: 15px;
-        margin-right: 10px;
-
         button {
-            border-radius: 5px;
-            padding: 5px 10px;
-            background-color: $normal-bg-color;
-            color: $inactive-text-color;
+            padding: 10px 15px;
+            font-size: 1em;
+            background-color: #9C9B9B;
+            color: #ffffff;
             border: none;
+            border-radius: 7px;
             cursor: pointer;
-
-            &.active {
-                background-color: $active-bg-color;
-                color: $active-text-color;
-                border: 1px solid $normal-border-color;
+        
+            &:hover {
+                background-color: #B0B0B0;
             }
         }
     }
@@ -51,12 +40,12 @@ $button-fail: #dee2e6;
                 height: auto;
                 display: flex;
                 flex-direction: row;
+                gap: 5px;
                 
                 .search-sorting {
                     display: flex;
-                    flex-direction: row;
-                    justify-content: space-between;
-                    margin-bottom: 10px;
+                    margin-bottom: 15px;
+                    flex-grow: 1;
             
                     .search-bar {
                         background-color: $normal-bg-color;
@@ -65,50 +54,22 @@ $button-fail: #dee2e6;
                         align-items: center;
                         border-radius: 7px;
                         padding: 3px;
-                        width: 100%;
-                        margin-right: 5px;
-                        margin-bottom: 0;
+                        flex-grow: 1;
             
                         input {
                             width: 100%;
                             border-radius: 5px;
-                            border: 1px solid $normal-border-color;
-                            padding: 5px;
-                            font-size: $font-size;
-                        }
-                    }
-            
-                    .sorting {
-                        display: flex;
-                        padding: 3px;
-                        width: fit-content;
-                        background-color: $normal-bg-color;
-                        border: 1px solid $normal-border-color;
-                        font-size: $font-size;
-                        border-radius: 7px;
-                        margin-right: 5px;
-            
-                        button {
-                            border-radius: 5px;
+                            // border: 1px solid $normal-border-color;
                             padding: 5px 10px;
-                            background-color: $normal-bg-color;
-                            color: $inactive-text-color;
-                            border: none;
-                            cursor: pointer;
-            
-                            &.active {
-                                background-color: $active-bg-color;
-                                color: $active-text-color;
-                                border: 1px solid $normal-border-color;
-                            }
+                            font-size: $font-size;
                         }
                     }
                 }
 
                 .add-pos-user {
-                    width: 100%;
+                    width: 20%;
                     margin-bottom: 15px;
-                    padding: 8px;
+                    padding: 5px;
                     font-size: 1em;
                     background-color: #9C9B9B;
                     color: #ffffff;

@@ -1,9 +1,11 @@
-// Middleware to check the user's role
-const checkRole = (requiredRole) => {
+// Middleware to check if the user's role is among the allowed roles
+const checkRole = (...allowedRoles) => {
   return (req, res, next) => {
     const { role } = req.user; 
+    console.log('Checking role... 2')
+    console.log(allowedRoles.includes(role));
 
-    if (role !== requiredRole) {
+    if (!allowedRoles.includes(role)) {
       return res.status(403).json({ message: 'Forbidden: Insufficient privileges' });
     }
 

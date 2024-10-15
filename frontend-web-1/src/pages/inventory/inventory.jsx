@@ -17,6 +17,8 @@ import { addItem, displayItems, dashboardData, getItemDetails, updateItem } from
 import { base64ToFile } from "../../utility/imageUtils";
 import { archiveItem, restoreItem, deleteItem } from "../../services/inventoryService";
 import ImagePreviewModal from "../../components/image-preview-modal/image-preview";
+import LoadingPage from '../../components/loading-page/loading-page';
+import ErrorLoad from '../../components/error-load/error-load';
 
 const Inventory = () => {
     // State management
@@ -55,7 +57,7 @@ const Inventory = () => {
         totalItems: 0,
         lowStockItems: 0,
         stockCounts: 0,
-        stockValue: "₱ 0",
+        stockValue: 0,
     });
 
     const [showModal, setShowModal] = useState(false);
@@ -69,6 +71,9 @@ const Inventory = () => {
     const [showFilter, setShowFilter] = useState(false);
     const [showSort, setShowSort] = useState(false);
     const showMiddleSection = showFilter || showSort;
+
+    const [loading, setLoading] = useState(true);
+    const [errorLoad, setErrorLoad] = useState(false);
 
     // Assuming items is an array of item objects
     const filteredItems = items.filter(item =>
@@ -113,8 +118,16 @@ const Inventory = () => {
             });
 
             setItems(sortedItems);
+            setTimeout(() => {
+                setLoading(false);
+                setErrorLoad(false);   
+            }, 1000);
         } catch (error) {
             console.error("Error fetching items:", error);
+            setTimeout(() => {
+                setLoading(false);
+                setErrorLoad(true);   
+            }, 1000);
         }
     }, [displayItem, selectedCategory, selectedStockCount, sortCriteria, sortOrder]);
 
@@ -405,6 +418,8 @@ const Inventory = () => {
         currency: "PHP",
     });
 
+    if(loading) return <LoadingPage classStyle={"loading-in-page"}/>
+    if(errorLoad) return <ErrorLoad classStyle={"error-in-page"}/>
 
     return (
         <div className="inventory p-3">
@@ -419,6 +434,7 @@ const Inventory = () => {
                             <SearchBar
                                 value={searchTerm}
                                 onChange={(e) => setSearchTerm(e.target.value)}
+                                placeholder='Search item'
                             />
 
                             {/* Toggle filter visibility */}
@@ -433,11 +449,11 @@ const Inventory = () => {
 
                             {showArchived ? (
                                 <button className="active" onClick={handleActiveItemClick}>
-                                    Active Items
+                                    View Active
                                 </button>
                             ) : (
                                 <button className="archive" onClick={handleArchiveItemClick}>
-                                    Archived Items
+                                    View Archived
                                 </button>
                             )}
                         </div>
@@ -516,74 +532,82 @@ const Inventory = () => {
                         )}
 
                         <div className="lower-container">
-                            <div className="lower-content">
-                                <div className="item-container-title d-flex p-4 bg-secondary ">
-                                    <div className="item-name fw-bold text-light">Item Name</div>
+                            <div className="item-container-title d-flex">
+                                <div className="item-name">Item Name</div>
 
-                                    <div className="item-category fw-bold text-light">
-                                        Category
-                                    </div>
-
-                                    <div className="item-price fw-bold text-light">
-                                        Price
-                                    </div>
-
-                                    <div className="item-date fw-bold text-light">
-                                        Date Added
-                                    </div>
-
-                                    <div className="item-stocks fw-bold text-light">
-                                        Stock
-                                    </div>
-
-                                    <div className="item-stock-status fw-bold text-light">
-                                        Status
-                                    </div>
+                                <div className="item-category">
+                                    Category
                                 </div>
 
+                                <div className="item-price">
+                                    Price
+                                </div>
+
+                                <div className="item-date">
+                                    Date Added
+                                </div>
+
+                                <div className="item-stocks">
+                                    Stock
+                                </div>
+
+                                <div className="item-stock-status">
+                                    Status
+                                </div>
+                            </div>
+                            <div className="lower-content">
                                 {filteredItems.length === 0 ? (
                                     <div className="no-items-message">
                                         {displayItem === false ? 'No archived items' : 'No active items'}
                                     </div>
                                 ) : (
-                                    filteredItems.map((item) => (
-                                        <div
-                                            key={item.item_id}
-                                            className="item-container d-flex p-4"
-                                            onClick={() => handleItemClick(item)}
-                                        >
-                                            <div className="item-name fw-bold">{item.item_name}</div>
-                                            <div className="item-category">{item.category_name}</div>
-                                            <div className="item-price"> {PesoFormat.format(item.item_price)}</div>
-                                            <div className="item-date">
-                                                {new Date(item.date_created).toLocaleDateString()}
-                                            </div>
-                                            <div className="item-stocks">{item.stock_count}</div>
-                                            <div className="item-stock-status">
-                                                <div
-                                                    className="status-container"
-                                                    style={{
-                                                        backgroundColor:
-                                                            item.stock_count === 0
-                                                                ? "#DA7777" // No stock
-                                                                : item.low_stock_alert && item.stock_count <= item.low_stock_count
-                                                                    ? "#DABE77" // Low stock
-                                                                    : "#77DA87", // In stock
-                                                    }}
-                                                >
-                                                    {item.low_stock_alert
-                                                        ? item.stock_count === 0
-                                                            ? "No stock"
-                                                            : item.stock_count <= item.low_stock_count
-                                                                ? "Low stock"
-                                                                : "In stock"
-                                                        : item.stock_count === 0
-                                                            ? "No stock"
-                                                            : "In stock"}
-                                                </div>
+                                filteredItems.map((item) => (
+                                    <div
+                                        key={item.item_id}
+                                        className="item-container d-flex"
+                                        onClick={() => handleItemClick(item)}
+                                    >
+                                        <div className="item-name">
+                                            {item.item_name}
+                                        </div>
+                                        <div className="item-category">
+                                            {item.category_name}
+                                        </div>
+                                        <div className="item-price"> 
+                                            {PesoFormat.format(item.item_price)}
+                                        </div>
+                                        <div className="item-date">
+                                            {new Date(item.date_created).toLocaleDateString()}
+                                        </div>
+                                        <div className="item-stocks">
+                                            {item.stock_count}
+                                        </div>
+                                        <div className="item-stock-status">
+                                            <div
+                                                className="status-container"
+                                                style={{
+                                                    backgroundColor:
+                                                        item.stock_count === 0
+                                                            ? "#DA7777" // No stock
+                                                            : item.low_stock_alert && item.stock_count <= item.low_stock_count
+                                                                ? "#DABE77" // Low stock
+                                                                : "#77DA87", // In stock
+                                                }}
+                                            >
+                                                {item.low_stock_alert
+                                                    ? item.stock_count === 0
+                                                        ? "No stock"
+                                                        : item.stock_count <= item.low_stock_count
+                                                            ? "Low stock"
+                                                            : "In stock"
+                                                    : item.stock_count === 0
+                                                        ? "No stock"
+                                                        : "In stock"}
+                                                
                                             </div>
                                         </div>
-                                    ))
+                                    </div>
+                                ))
                                 )}
                             </div>
                         </div>
@@ -1131,7 +1155,7 @@ const Inventory = () => {
 
                                     <div className="container-content">
                                         <div className="main-content">
-                                            <div className="number">{data.stockValue}</div>
+                                            <div className="number">{PesoFormat.format(data.stockValue)}</div>
                                             <div className="title">Stock Value</div>
                                         </div>
                                     </div>

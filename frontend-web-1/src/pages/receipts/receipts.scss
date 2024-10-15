@@ -35,6 +35,7 @@ $font-size: clamp(0.9em, 1.2vw, 1.1em);
                     flex-direction: row;
                     justify-content: space-between;
                     margin-bottom: 10px;
+                    gap: 10px;
 
                     .search-bar {
                         background-color: $normal-bg-color;
@@ -43,15 +44,14 @@ $font-size: clamp(0.9em, 1.2vw, 1.1em);
                         align-items: center;
                         border-radius: 7px;
                         padding: 3px;
-                        width: 100%;
-                        margin-right: 5px;
-                        margin-bottom: 0;
-
+                        flex-grow: 1;
+                        
                         input {
+                            border: none;
                             width: 100%;
                             border-radius: 5px;
-                            border: 1px solid $normal-border-color;
-                            padding: 5px;
+                            // border: 1px solid $normal-border-color;
+                            padding: 5px 10px;
                             font-size: $font-size;
                         }
                     }
@@ -64,7 +64,6 @@ $font-size: clamp(0.9em, 1.2vw, 1.1em);
                         border: 1px solid $normal-border-color;
                         font-size: $font-size;
                         border-radius: 7px;
-                        margin-right: 5px;
 
                         button {
                             border-radius: 5px;
@@ -91,6 +90,28 @@ $font-size: clamp(0.9em, 1.2vw, 1.1em);
                 overflow-y: auto !important;
                 scrollbar-width: none;
 
+                .pos-users {
+                    padding: 5px 0;
+                    margin-bottom: 15px;
+                    display: flex;
+                    align-items: center;
+                    gap: 5px;
+                    
+                    p{
+                        margin: 0;
+                    }
+            
+                    select {
+                        padding: 3px;
+                        width: fit-content;
+                        background-color: $normal-bg-color;
+                        border: 1px solid $normal-border-color;
+                        font-size: $font-size;
+                        border-radius: 7px;
+                        margin-right: 10px;
+                    }
+                }
+
                 .empty-list {
                     display: flex;
                     justify-content: center;
@@ -113,32 +134,108 @@ $font-size: clamp(0.9em, 1.2vw, 1.1em);
                     .list-item-content {
                         display: flex;
                         justify-content: space-between;
-                        flex-direction: row;
-                        align-items: center;
 
                         p {
                             margin: 0;
                         }
 
-                        .list-item-info {
+                        .left {
                             display: flex;
                             flex-direction: column;
-                            border: 1px solid blac;
+                            gap: 10px;
 
-                            .time {
-                                text-align: right;
-                                font-size: 1rem;
-                                color: $subheading-text-color;
+                            .sender {
+                                display: flex;
+                                align-items: center;
+                                
+                                p:nth-child(1) {
+                                    background-color: $button-bg-color;
+                                    color: $qty-text-color;
+                                    width: fit-content;
+                                    border-radius: 100px;
+                                    font-size: 0.8rem;
+                                    padding: 0px 10px;
+                                    margin: 0;
+                                    margin-top: 5px;
+                                }
+                                .void-request {
+                                    width: fit-content;
+                                    margin-left: 10px;
+                                    font-size: 0.8rem;
+                                    text-transform: uppercase;
+                                    background-color: #ffbc11;
+                                    color: #332d2d;
+                                    padding: 0px 10px;
+                                    border-radius: 100px;
+                                    margin-top: 5px;
+                                }
+                                .void-approved {
+                                    width: fit-content;
+                                    margin-left: 10px;
+                                    font-size: 0.8rem;
+                                    text-transform: uppercase;
+                                    background-color: #ce6868;
+                                    color: white;
+                                    padding: 0px 10px;
+                                    border-radius: 100px;
+                                    margin-top: 5px;
+                                }
                             }
 
-                            .cost {
-                                background-color: $qty-bg-color;
-                                color: $qty-text-color;
-                                border-radius: 2px;
-                                padding: 0 5px;
-                                text-align: right;
-                                width: fit-content;
+                            .name {
+                                .void-request {
+                                    width: fit-content;
+                                    margin-top: 10px;
+                                    font-size: 0.8rem;
+                                    text-transform: uppercase;
+                                    background-color: #ffbc11;
+                                    color: #332d2d;
+                                    padding: 0px 10px;
+                                    border-radius: 100px;
+                                }
+                                .void-approved {
+                                    width: fit-content;
+                                    
+                                    font-size: 0.8rem;
+                                    text-transform: uppercase;
+                                    background-color: #ce6868;
+                                    color: white;
+                                    padding: 0px 10px;
+                                    border-radius: 100px;
+                                }
+
+                                p {
+                                    margin: 0;
+                                }
+                            }
+                        }
+
+                        .right {
+                            display: flex;
+                            flex-direction: column;
+                            
+                            .time {
+                                color: $subheading-text-color;
                                 margin-left: auto;
+                        
+                                p {
+                                    padding: 2px;
+                                    margin: 0;
+                                }
+                            }
+
+                            .total {
+                                color: $active-text-color;
+                                width: fit-content;
+                                border-radius: 2px;
+                                margin-left: auto;
+
+                                p {
+                                    margin: 0;
+                                    padding: 2px;
+                                    text-align: right;
+                                    font-weight: 700;
+                                }
                             }
                         }
                     }
@@ -148,128 +245,193 @@ $font-size: clamp(0.9em, 1.2vw, 1.1em);
     }
 
     .right-content {
+
         h4 {
             font-weight: 700;
         }
 
         .receipt-container {
+            display: flex;
+            flex-direction: column;
             height: 100%;
+            overflow-y: auto;
+            scrollbar-width: none;
 
             .receipt-nav {
+                height: auto;
                 display: flex;
                 justify-content: space-between;
 
                 .print-close {
-                    margin-left: 10px;
-                    fill: $subheading-text-color;
+                    color: $subheading-text-color;
                     cursor: pointer;
 
+                    i{
+                        margin-left: 10px;
+                        font-size: 1.3em;
+                    }
+
                     :hover {
-                        fill: black;
+                        color: black;
                     }
                 }
             }
-
-            .receipt-details-info-header {
+            .receipt-details-info{
                 display: flex;
                 flex-direction: column;
-                justify-content: space-between;
-                font-size: $font-size;
 
-                p {
-                    margin: 0 !important;
-                }
-
-                .total {
+                .receipt-details-info-header {
+                    height: auto;
                     display: flex;
                     flex-direction: column;
-                    justify-content: center;
-                    text-align: center;
-                    margin: 10px 0;
-                    padding: 5px;
-
-                    p:nth-child(1) {
-                        font-size: 1.5rem;
-                        font-weight: 700;
-                    }
-
-                    p:nth-child(2) {
-                        color: $inactive-text-color;
-                    }
-                }
-
-            }
-
-            @media screen and (max-width: 1024px) {
-                .receipt-details-info-content {
-                    height: 30svh !important;
-                }
-            }
-
-            .receipt-details-info-content {
-                border-top: 1px solid $normal-border-color;
-                margin-bottom: 15px;
-                height: 35svh;
-                overflow-y: auto;
-
-                .receipt-details-item {
-                    display: flex;
-                    flex-direction: column;
-                    margin-top: 10px;
+                    justify-content: space-between;
                     font-size: $font-size;
+    
+                    p {
+                        margin: 0 !important;
+                    }
 
-                    .item-detail-top {
+                    .name{
+                        margin-bottom: 10px !important;
+                    }
+
+                    .voided {
+                        text-align: center;
+                        margin: 0 auto;
+                        width: 100%;
+                        background-color: rgba(255, 187, 15, 0.4);
+                        color: black;
+                        border-radius: 5px;
+                        padding: 5px;
+                        font-size: 1rem;
+                    }
+    
+                    .total {
                         display: flex;
-                        justify-content: space-between;
-
-                        .total-price {
+                        flex-direction: column;
+                        justify-content: center;
+                        text-align: center;
+                        margin: 10px 0;
+                        padding: 5px;
+    
+                        p:nth-child(1) {
+                            font-size: 1.5rem;
                             font-weight: 700;
                         }
-                    }
-
-                    .item-detail-bottom {
-                        display: flex;
-
-                        p {
-                            font-size: 1rem;
+    
+                        p:nth-child(2) {
                             color: $inactive-text-color;
                         }
                     }
-
-                    p {
-                        margin: 0;
+    
+                }
+    
+                .receipt-details-info-content {
+                    flex-grow: 1;
+                    border-top: 1px solid $normal-border-color;
+                    margin-bottom: 15px;
+                    overflow-y: auto;
+    
+                    .receipt-details-item {
+                        margin-top: 10px;
+                        display: flex;
+                        justify-content: space-between;
+                        font-size: $font-size;
+                        // margin: 5px;
+                    
+                        .left {
+                            .qty-unit-price {
+                                color: grey
+                            }
+                        }
+                    
+                        .total-price {
+                            font-weight: 700;
+                        }
+                    
+                        p {
+                            margin: 0;
+                        }
+                    
+                        &.selected {
+                            // box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); // Adjusted box-shadow to be more prominent
+                            // margin: 5px;
+                            border: 2px solid $normal-border-color;
+                            border-radius: 4px;
+                            scroll-behavior: smooth;
+                        }
+    
                     }
-
+                }
+    
+                .total-paid-change {
+                    height: auto;
+                    display: flex;
+                    flex-direction: column;
+                    border-top: 1px solid $normal-border-color;
+                    padding-top: 15px;
+                    margin-top: auto;
+                    font-size: $font-size;
+    
+                    div {
+                        display: flex;
+                        flex-direction: row;
+                        justify-content: space-between;
+                        align-items: center;
+    
+                        p {
+                            margin: 5px 0;
+                        }
+    
+                        p:nth-child(1) {
+                            font-weight: 700;
+                        }
+                    }
+    
+                    div:nth-child(1) {
+                        p:nth-child(2) {
+                            font-weight: 700;
+                        }
+                    }
                 }
             }
-
-            .total-paid-change {
+            .void-refund{
                 display: flex;
-                flex-direction: column;
-                border-top: 1px solid $normal-border-color;
-                padding-top: 15px;
+                gap: 5px;
                 margin-top: auto;
-                font-size: $font-size;
 
-                div {
-                    display: flex;
-                    flex-direction: row;
-                    justify-content: space-between;
-                    align-items: center;
+                p{
+                    text-align: center;
+                    margin: 0 auto;
+                    width: 100%;
+                    background-color: #cfcfcf;
+                    color: white;
+                    border-radius: 5px;
+                    padding: 5px;
 
-                    p {
-                        margin: 5px 0;
-                    }
-
-                    p:nth-child(1) {
-                        font-weight: 700;
-                    }
                 }
 
-                div:nth-child(1) {
-                    p:nth-child(2) {
-                        font-weight: 700;
-                    }
+                button{
+                    margin-top: 30px;
+                    width: 100%;
+                }
+
+                button:nth-child(1){
+                    background-color: #ce6868;
+                    color: white;
+                    border: none;
+                    border-radius: 5px;
+                    padding: 5px;
+                    cursor: pointer;
+                }
+
+                button:nth-child(2){
+                    background-color: #9e9e9e;
+                    color: white;
+                    border: none;
+                    border-radius: 5px;
+                    padding: 5px;
+                    cursor: pointer;
                 }
             }
         }
@@ -293,27 +455,54 @@ $font-size: clamp(0.9em, 1.2vw, 1.1em);
 }
 
 @media print {
-    @page {
-        size: A4;
-        /* You can use A4, Letter, etc. */
-        margin: 10mm;
-        /* Adjust margins as needed */
-    }
-
+    /* Hide everything except the print area */
     body * {
         visibility: hidden;
     }
 
+    /* Ensure print area and its contents are visible */
     #print-area,
     #print-area * {
         visibility: visible;
     }
 
+    .print-only{
+        position: absolute;
+        left: 0;
+        width: 100%;
+    }
+    
+    /* Center the print area on the page */
     #print-area {
-        border: 1px solid black;
+        display: block;
+        font-size: 0.9rem;
+        width: 100%;
+        padding: 10px;
+        font-size: 12px;
+        height: auto;
+    }
+
+    @page {
+        size: 50mm auto;
+    }
+
+    .right-container {
         position: absolute;
         top: 0;
         left: 0;
-        padding: 10px;
+        width: 100%;
+        display: flex;
+        flex-direction: column;
+        height: 100% !important;
+        z-index: 5000;
+        
+        .left-content,
+        .right-content {
+            display: flex;
+            flex-direction: column-reverse;
+            width: 100%;
+            border: 1px solid black;
+            height: 100% !important;
+        }
     }
 }

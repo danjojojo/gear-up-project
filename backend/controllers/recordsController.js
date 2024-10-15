@@ -15,11 +15,14 @@ const getDashboardData = async (req, res) => {
             try {
                 const query = `
                     SELECT 
-                        SUM(CASE WHEN DATE(date_created) = $1 THEN item_total_price ELSE 0 END) AS sales_today,
-                        SUM(CASE WHEN DATE(date_created) = $1 THEN item_qty ELSE 0 END) AS sold_today,
-                        SUM(item_total_price) AS total_sales,
-                        SUM(item_qty) AS total_sold
-                    FROM sales_items;
+                        SUM(CASE WHEN DATE(si.date_created) = $1 THEN item_total_price ELSE 0 END) AS sales_today,
+                        SUM(CASE WHEN DATE(si.date_created) = $1 THEN item_qty ELSE 0 END) AS sold_today,
+                        SUM(si.item_total_price) AS total_sales,
+                        SUM(si.item_qty) AS total_sold
+                    FROM sales_items SI
+                    JOIN sales S ON SI.sale_id = S.sale_id
+                    WHERE s.status = true;
+                    ;
                 `;
                 const values = [date];
                 const { rows } = await pool.query(query, values);
@@ -39,11 +42,13 @@ const getDashboardData = async (req, res) => {
             try {
                 const query = `
                     SELECT 
-                        COUNT(CASE WHEN DATE(date_created) = $1 THEN sale_service_id ELSE NULL END) AS rendered_today,
-                        SUM(CASE WHEN DATE(date_created) = $1 THEN service_price ELSE 0 END) AS earned_today,
-                        COUNT(sale_service_id) AS total_rendered,
-                        SUM(service_price) AS total_earned
-                    FROM sales_mechanics;
+                        COUNT(CASE WHEN DATE(sm.date_created) = $1 THEN sale_service_id ELSE NULL END) AS rendered_today,
+                        SUM(CASE WHEN DATE(sm.date_created) = $1 THEN service_price ELSE 0 END) AS earned_today,
+                        COUNT(sm.sale_service_id) AS total_rendered,
+                        SUM(sm.service_price) AS total_earned
+                    FROM sales_mechanics SM
+                    JOIN sales S ON SI.sale_id = S.sale_id
+                    WHERE s.status = true;
                 `;
                 const values = [date];
                 const { rows } = await pool.query(query, values);
@@ -108,7 +113,7 @@ const getRecords = async (req, res) => {
                         JOIN pos_users P ON R.pos_id = P.pos_id
                         JOIN sales S ON R.sale_id = S.sale_id
                         JOIN sales_items SI ON SI.sale_id = S.sale_id
-                        WHERE DATE(R.date_created) = $1
+                        WHERE DATE(R.date_created) = $1 AND S.status = true
                     GROUP BY R.receipt_name, P.pos_name, R.date_created, R.sale_id
                     ORDER BY R.date_created DESC
                 `;
@@ -130,7 +135,7 @@ const getRecords = async (req, res) => {
                         JOIN pos_users P ON R.pos_id = P.pos_id
                         JOIN sales S ON R.sale_id = S.sale_id
                         JOIN sales_mechanics SM ON SM.sale_id = S.sale_id
-                        WHERE DATE(R.date_created) = $1
+                        WHERE DATE(R.date_created) = $1 AND S.status = true
                     GROUP BY R.receipt_name, P.pos_name, R.date_created, R.sale_id
                     ORDER BY R.date_created DESC
                 `;
@@ -187,6 +192,7 @@ const getHighlightDates = async (req, res) => {
                         FROM receipts R
                         JOIN sales S ON R.sale_id = S.sale_id
                         JOIN sales_items SI ON SI.sale_id = S.sale_id
+                        WHERE S.status = true
                     GROUP BY DATE(R.date_created)
                 `;
                 const { rows } = await pool.query(query);
@@ -205,6 +211,7 @@ const getHighlightDates = async (req, res) => {
                         FROM receipts R
                         JOIN sales S ON R.sale_id = S.sale_id
                         JOIN sales_mechanics SM ON SM.sale_id = S.sale_id
+                        WHERE S.status = true
                     GROUP BY DATE(R.date_created)
                 `;
                 const { rows } = await pool.query(query);
@@ -323,7 +330,8 @@ const getLeaderBoards = async (req, res) => {
                     SELECT item_name, SUM(item_qty) AS item_qty
                         FROM sales_items SI
                         JOIN items I ON SI.item_id = I.item_id
-                        WHERE si.date_created::date BETWEEN $1 AND $2
+                        JOIN sales S ON SI.sale_id = S.sale_id
+                        WHERE si.date_created::date BETWEEN $1 AND $2 AND S.status = true
                         GROUP BY item_name, item_qty
                         ORDER BY SUM(item_qty) DESC
                     LIMIT 10;
@@ -342,7 +350,8 @@ const getLeaderBoards = async (req, res) => {
                     SELECT mechanic_name as item_name, SUM(service_price) as item_qty
                         FROM sales_mechanics SM
                         JOIN mechanics me ON SM.mechanic_id = me.mechanic_id
-                        WHERE sm.date_created::date BETWEEN $1 AND $2
+                        JOIN sales S ON SM.sale_id = S.sale_id
+                        WHERE sm.date_created::date BETWEEN $1 AND $2 AND S.status = true
                         GROUP BY mechanic_name
                         ORDER BY SUM(service_price) DESC
                     LIMIT 10;

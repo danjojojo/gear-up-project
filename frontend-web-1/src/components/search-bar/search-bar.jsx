@@ -3,7 +3,7 @@ import './search-bar.scss';
 import searchIcon from '../../assets/icons/search.png';
 import exitIcon from "../../assets/icons/exit.png";
 
-const SearchBar = ({ value, onChange }) => {
+const SearchBar = ({ value, onChange, placeholder }) => {
   const [showExitIcon, setShowExitIcon] = useState(false);
 
   // Function to handle input change
@@ -24,7 +24,7 @@ const SearchBar = ({ value, onChange }) => {
         type="text" 
         value={value}
         onChange={handleInputChange}
-        placeholder="Search item"
+        placeholder={placeholder}
       />
       {showExitIcon ? (
         <img 
