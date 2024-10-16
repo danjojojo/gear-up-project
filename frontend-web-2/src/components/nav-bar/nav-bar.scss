@@ -17,6 +17,7 @@
     }
 
     .lower-nav {
+        color: white;
         display: flex;
         align-items: center;
         gap: 3rem;
@@ -25,7 +26,7 @@
         padding-left: 100px;
         padding-right: 100px;
         height: 100px;
-        background-color: #D9D9D9;
+        background-color: #205375;
         h2 {
             margin: 0;
         }
@@ -33,7 +34,7 @@
         .nav-link {
             text-decoration: none;
             font-size: 20px;
-            color: black;
+            color: white;
         }
 
         .add-to-cart {

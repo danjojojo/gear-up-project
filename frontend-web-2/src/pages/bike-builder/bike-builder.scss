@@ -26,7 +26,6 @@
                 align-items: center;
 
                 label {
-                    font-family: "poppins";
                     font-size: 18px;
                     color: white;
                     display: block;
@@ -35,7 +34,7 @@
                 }
 
                 input {
-                    font-family: "poppins";
+
                     padding: 10px;
                     font-size: 16px;
                     margin-bottom: 20px;
@@ -50,7 +49,6 @@
                     height: 200px;
                     width: 500px;
                     font-size: 16px;
-                    font-family: "poppins";
                     background-color: #2E2E2E;
                     color: white;
                     border: none;
@@ -99,7 +97,6 @@
                     color: white;
                     cursor: pointer;
                     margin-left: 20px;
-                    font-family: "poppins";
                     font-size: 12px;
 
                     img {
@@ -109,9 +106,7 @@
                 }
 
                 .part-title {
-                    font-family: "poppins";
                     color: white;
-
                 }
 
                 .btn-container {
@@ -122,7 +117,6 @@
                         border-radius: 50px;
                         border: none;
                         cursor: pointer;
-                        font-family: "poppins";
                         font-size: 12px;
                     }
 
@@ -208,7 +202,7 @@
                             border-radius: 5px;
                             border: none;
                             cursor: pointer;
-                            font-family: "poppins";
+
                         }
                     }
                 }
@@ -242,20 +236,19 @@
 
             .left-container {
                 height: 100%;
-                width: 65%;
+                width: 70%;
                 background-color: white;
 
                 .budget-stat-container {
-                    height: 20%;
+                    height: 25%;
 
                     .budget {
-                        height: 100%;
-                        width: 50%;
+                        width: 45%;
                         padding: 20px 10px 20px 20px;
 
                         .content {
                             height: 100%;
-                            border: 1px solid #dee2e6;
+                            border: 1px solid #2E2E2E;
                             border-radius: 10px;
                             padding: 20px;
 
@@ -268,22 +261,105 @@
                         }
                     }
 
-                    .message {
+                    .message-container {
                         height: 100%;
-                        width: 50%;
+                        width: 55%;
                         padding: 20px 20px 20px 10px;
 
                         .content {
                             height: 100%;
-                            border: 1px solid #dee2e6;
+                            width: 100%;
+                            border: 1px solid #2E2E2E;
                             border-radius: 10px;
+                            padding: 20px;
+                            font-size: 14px;
+                            display: flex;
+                            flex-direction: column;
+                            justify-content: space-between;
+
+                            .upper-text {
+                                height: auto;
+                                display: flex;
+                                align-items: center;
+                                justify-content: center;
+                                text-align: center;
+                                padding: 10px 0;
+                            }
+
+                            .lower-text {
+                                height: auto;
+                                display: flex;
+                                align-items: center;
+                                justify-content: space-between;
+                                /* Arrows and text are spaced evenly */
+                                text-align: justify;
+                                position: relative;
+
+                                .text-slide {
+                                    flex: 1;
+                                    display: flex;
+                                    align-items: center;
+                                    justify-content: center;
+                                    text-align: center;
+                                    line-height: 1.5;
+                                    padding: 0 10px;
+                                    /* Add padding to prevent text from touching arrows */
+                                }
+
+                                .back-slide,
+                                .proceed-slide {
+                                    border: none;
+                                    background-color: transparent;
+                                    cursor: pointer;
+                                }
+
+                                .back-slide {
+                                    margin-right: 10px;
+
+                                    img {
+                                        width: 20px;
+                                        height: 20px;
+                                    }
+                                }
+
+                                .proceed-slide {
+                                    margin-left: 10px;
+
+                                    img {
+                                        width: 20px;
+                                        height: 20px;
+                                    }
+                                }
+                            }
+
+                            .btn-container,
+                            .btn-container-2 {
+                                height: auto;
+                                display: flex;
+                                justify-content: space-between;
+                                margin-top: 20px;
+
+                                button {
+                                    border: none;
+                                    text-decoration: underline;
+                                    background-color: white;
+                                    font-weight: bold;
+                                    color: #2E2E2E;
+                                    cursor: pointer;
+                                    padding: 0;
+                                }
+                            }
+
+                            .btn-container-2 {
+                                justify-content: flex-end;
+                            }
                         }
                     }
                 }
 
                 .canvas-container {
                     width: 100%;
-                    height: 80%;
+                    height: 75%;
                     padding: 0 20px 20px 20px;
 
                     .canvas-content {
@@ -291,7 +367,7 @@
                         position: relative;
                         width: 100%;
                         height: 100%;
-                        border: 1px solid #dee2e6;
+                        border: 1px solid #2E2E2E;
                         border-radius: 10px;
                         display: flex;
                         justify-content: center;
@@ -324,7 +400,7 @@
 
                         .oblong {
                             width: 65px;
-                            height: 20px;
+                            height: 15px;
                             border-radius: 30px;
                             border: 2px solid #f89728;
                             background-color: transparent;
@@ -344,27 +420,39 @@
 
             .right-container {
                 height: 100%;
-                width: 35%;
+                width: 30%;
                 background-color: white;
 
                 .guide-container {
                     padding: 20px 20px 10px 0;
-                    height: 50%;
+                    height: 33%;
 
                     .content-container {
                         height: 100%;
-                        border: 1px solid #dee2e6;
+                        border: 1px solid #2E2E2E;
                         border-radius: 10px;
+                        display: flex;
+                        align-items: center;
+                        justify-content: center;
+
+
+                        img {
+                            border-radius: 20px;
+                            width: 100%;
+                            height: 100%;
+                            object-fit: contain;
+                        }
+
                     }
                 }
 
                 .summary-container {
                     padding: 10px 20px 20px 0;
-                    height: 50%;
+                    height: 67%;
 
                     .content-container {
                         height: 100%;
-                        border: 1px solid #dee2e6;
+                        border: 1px solid #2E2E2E;
                         border-radius: 10px;
                         padding: 10px;
 
@@ -377,7 +465,7 @@
                                 border: 1px solid #dee2e6;
                                 display: flex;
                                 align-items: center;
-                                padding: 10px;
+                                padding: 20px;
                                 font-size: 14px;
                                 border-radius: 5px;
                             }

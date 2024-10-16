@@ -82,15 +82,21 @@ const BikeBuilder = () => {
     };
 
     const handleFinalizeBuild = () => {
-        const buildImage = captureImageRef.current(); // Call the captureBuildImage from CanvasContainer
+        const buildImage = captureImageRef.current(); // Capture the build image from the canvas
         setFinalBuildImage(buildImage); // Store the captured image
-        setIsBuildFinalized(true);
+        setIsBuildFinalized(true); // Set the build as finalized
+
+        // Update the URL to add '/build-summary'
+        const currentUrl = new URL(window.location.href);
+        const newUrl = `${currentUrl.origin}${currentUrl.pathname}/build-summary`;
+        window.history.pushState({}, '', newUrl); // Update the URL without reloading the page
     };
+
 
     // Function to go back to the build state (part selection)
     const goBackToBuild = () => {
         setIsBuildFinalized(false);  // Reset the finalization state
-        setCurrentPart("cockpit");  // Set the current part to "cockpit"
+        setCurrentPart("cockpit");   // Set the current part to "cockpit"
 
         // Unlock cockpit and lock all previous parts
         setLockedParts((prevLockedParts) => {
@@ -102,7 +108,23 @@ const BikeBuilder = () => {
             // Unlock cockpit
             return updatedLockedParts.filter(part => part !== "cockpit");
         });
+
+        // Preserve the selected parts in the URL
+        const selectedPartsShortUUIDs = [];
+        for (const [partType, part] of Object.entries(selectedParts)) {
+            if (part && part.item_id) {
+                const shortUUID = shortenUUID(part.item_id);
+                selectedPartsShortUUIDs.push(`${partType}=${shortUUID}`);
+            }
+        }
+
+        // Maintain the URL with selected parts
+        const currentUrl = new URL(window.location.href);
+        const baseUrl = `${currentUrl.origin}${currentUrl.pathname.replace('/build-summary', '')}`;
+        const newUrl = `${baseUrl}?${selectedPartsShortUUIDs.join('&')}`;
+        window.history.pushState({}, '', newUrl);  // Update the URL without reloading
     };
+
 
     const resetBuild = () => {
         // Reset all selected parts to null (unselected)
@@ -138,7 +160,12 @@ const BikeBuilder = () => {
         // Optionally, set the current part back to the first part (e.g., frame)
         setCurrentPart("frame");
 
+        // Reset the URL by removing any query parameters
+        const currentUrl = new URL(window.location.href);
+        const baseUrl = `${currentUrl.origin}${currentUrl.pathname}`;
+        window.history.pushState({}, '', baseUrl); // Reset URL to remove query params
     };
+
 
     const proceedToNextPart = () => {
         if (isHitRegionCorrect || selectedParts[currentPart]) {  // If region is hit or part is already selected
@@ -257,8 +284,9 @@ const BikeBuilder = () => {
         }
     };
 
-
-
+    const shortenUUID = (uuid) => {
+        return uuid.substring(0, 8); // Take the first 8 characters of the UUID
+    };
 
     const handleAddToBuild = (partType, item) => {
         if (selectedParts[partType]?.item_id === item.item_id) {
@@ -309,14 +337,6 @@ const BikeBuilder = () => {
                     updatedParts.wheelset = null;
                     break;
 
-                case "wheelset":
-                    // No dependent part invalidation needed for wheelset
-                    break;
-
-                case "seat":
-                    // No dependent part invalidation needed for seat
-                    break;
-
                 default:
                     break;
             }
@@ -339,7 +359,7 @@ const BikeBuilder = () => {
             // Reset current part's position
             updatedPositions[partType] = { x: 0, y: 0, rotation: 0 }; // Default position for each part
 
-            // Reset dependent parts' positions
+            // Reset dependent parts' positions based on the current part
             switch (partType) {
                 case "frame":
                     updatedPositions.fork = { x: 0, y: 0, rotation: 0 };
@@ -359,12 +379,6 @@ const BikeBuilder = () => {
                     updatedPositions.frontWheel = { x: 0, y: 0, rotation: 0 };
                     updatedPositions.rearWheel = { x: 0, y: 0, rotation: 0 };
                     break;
-                case "wheelset":
-                    // No dependent part reset needed
-                    break;
-                case "seat":
-                    // No dependent part reset needed
-                    break;
                 default:
                     break;
             }
@@ -372,8 +386,42 @@ const BikeBuilder = () => {
             return updatedPositions;
         });
 
-        setIsHitRegionCorrect(false);
+        // Update the URL
+        const shortUUID = shortenUUID(item.item_id);
+        const currentUrl = new URL(window.location.href);
+        const params = new URLSearchParams(currentUrl.search);
+
+        // Set or update the selected part type in the URL
+        params.set(partType, shortUUID);
+
+        // Remove the dependent parts from the URL when they are invalidated
+        switch (partType) {
+            case "frame":
+                params.delete("fork");
+                params.delete("groupset");
+                params.delete("wheelset");
+                params.delete("seat");
+                params.delete("cockpit");
+                break;
+            case "fork":
+                params.delete("groupset");
+                params.delete("wheelset");
+                params.delete("cockpit");
+                break;
+            case "groupset":
+                params.delete("wheelset");
+                break;
+            default:
+                break;
+        }
+
+        // Update the URL without reloading the page
+        const updatedUrl = `${currentUrl.origin}${currentUrl.pathname}?${params.toString()}`;
+        window.history.pushState({}, '', updatedUrl);
+
+        setIsHitRegionCorrect(false); // Reset hit region correctness
     };
+
 
 
 
@@ -481,7 +529,6 @@ const BikeBuilder = () => {
                             seatImage={seatImage}
                             cockpitImage={cockpitImage}
                             partPositions={partPositions}
-                            setPartPositions={setPartPositions}
                             handleDragEnd={handleDragEnd}
                             budget={budget}
                             buildStatsPrice={buildStatsPrice}
@@ -489,7 +536,7 @@ const BikeBuilder = () => {
                             currentPart={currentPart}
                             lockedParts={lockedParts}
                             resetBuild={resetBuild}
-                            partPrice={selectedParts}
+                            partSelected={selectedParts}
                         />
                     </div>
                 )
