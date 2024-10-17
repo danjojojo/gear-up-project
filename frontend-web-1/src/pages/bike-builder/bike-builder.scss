@@ -1,0 +1,621 @@
+.bike-builder-container {
+    height: 100vh;
+
+    .budget-container {
+        background-color: #2E2E2E;
+        height: 100%;
+        width: 100%;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+
+        .budget-content {
+            background-color: #525252;
+            width: 1000px;
+            height: 600px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 20px;
+
+
+            .content {
+                display: flex;
+                justify-content: space-between;
+                flex-direction: column;
+                align-items: center;
+
+                label {
+                    font-size: 18px;
+                    color: white;
+                    display: block;
+                    margin-bottom: 10px;
+                    align-self: center;
+                }
+
+                input {
+
+                    padding: 10px;
+                    font-size: 16px;
+                    margin-bottom: 20px;
+                    border: none;
+                    border-radius: 5px;
+                    width: 500px;
+                    align-self: center;
+                }
+
+                .btn-1,
+                .btn-2 {
+                    height: 200px;
+                    width: 500px;
+                    font-size: 16px;
+                    background-color: #2E2E2E;
+                    color: white;
+                    border: none;
+                    border-radius: 5px;
+                    cursor: pointer;
+                    transition: background-color 0.3s ease;
+                    margin: 20px;
+
+                    &:hover {
+                        background-color: #666666;
+                    }
+                }
+
+                .btn-2 {
+                    height: 50px;
+                    margin: 0;
+                    width: 500px;
+                }
+
+            }
+
+        }
+
+    }
+
+
+
+    .builder-container {
+        height: 100%;
+
+        .bike-parts-sidebar {
+            width: 500px;
+            height: 100%;
+
+            .upper-container {
+                background-color: #2E2E2E;
+                height: 20%;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                flex-direction: column;
+                border-bottom: solid 1px white;
+
+                .back-button {
+                    align-self: flex-start;
+                    color: white;
+                    cursor: pointer;
+                    margin-left: 20px;
+                    font-size: 12px;
+
+                    img {
+                        height: 24px;
+                        width: 24px;
+                    }
+                }
+
+                .part-title {
+                    color: white;
+                }
+
+                .btn-container {
+                    button {
+                        height: 35px;
+                        width: 140px;
+                        margin: 15px;
+                        border-radius: 50px;
+                        border: none;
+                        cursor: pointer;
+                        font-size: 12px;
+                    }
+
+                    .btn-1 {
+                        background-color: #D9D9D9;
+                    }
+
+                    .btn-2 {
+                        background-color: #F9961F;
+                    }
+                }
+            }
+
+            .lower-container {
+                background-color: #2E2E2E;
+                height: 80%;
+                display: flex;
+                justify-content: center;
+                padding: 5px;
+                overflow: hidden;
+
+                .parts-container {
+                    height: 100%;
+                    background-color: #2E2E2E;
+                    width: 100%;
+                    overflow-y: auto;
+                    display: block;
+                    padding: 15px 15px 0 15px;
+                    scrollbar-color: #888 #2E2E2E;
+                    scrollbar-width: thin;
+
+                    .parts-card {
+                        background-color: white;
+                        border-radius: 20px;
+                        width: 100%;
+                        height: auto;
+                        margin-bottom: 15px;
+                        padding: 30px;
+
+                        .item-image {
+                            border-radius: 5px;
+                            height: 150px;
+                            padding: 15px;
+                            margin-bottom: 30px;
+
+                            img {
+                                width: 100%;
+                                height: 100%;
+                                object-fit: contain;
+                            }
+                        }
+
+                        .accordion {
+                            margin-bottom: 50px;
+
+                            .accordion-body {
+                                padding: 10px;
+
+                                .specs-container {
+                                    margin: 10px;
+                                    padding: 15px;
+                                    font-size: 14px;
+                                    border: solid 1px #dee2e6;
+                                }
+                            }
+                        }
+
+                        .item-name {
+                            margin-bottom: 15px;
+                            font-size: 20px;
+                        }
+
+                        .item-price {
+                            margin-bottom: 20px;
+                            font-size: 20px;
+                        }
+
+                        .add-to-build {
+                            background-color: #2E2E2E;
+                            color: white;
+                            height: 40px;
+                            width: 100%;
+                            border-radius: 5px;
+                            border: none;
+                            cursor: pointer;
+
+                        }
+                    }
+                }
+
+                .finalize-container {
+                    display: flex;
+                    justify-content: center;
+                    align-items: center;
+                    height: 100%;
+                    width: 100%;
+                    padding: 20px;
+
+                    .content {
+                        height: 100%;
+                        width: 100%;
+                        border: solid 1px white;
+                        border-radius: 20px;
+                        align-content: center;
+                        color: white;
+                        padding: 50px;
+                    }
+                }
+
+            }
+        }
+
+        .bike-content {
+            height: 100%;
+            width: 100%;
+            background-color: #F0F0F0;
+
+            .left-container {
+                height: 100%;
+                width: 70%;
+                background-color: white;
+
+                .budget-stat-container {
+                    height: 25%;
+
+                    .budget {
+                        width: 45%;
+                        padding: 20px 10px 20px 20px;
+
+                        .content {
+                            height: 100%;
+                            border: 1px solid #2E2E2E;
+                            border-radius: 10px;
+                            padding: 20px;
+
+                            .price {
+                                height: 100%;
+                                width: 50%;
+                                font-family: "poppins";
+                                font-size: 14px;
+                            }
+                        }
+                    }
+
+                    .message-container {
+                        height: 100%;
+                        width: 55%;
+                        padding: 20px 20px 20px 10px;
+
+                        .content {
+                            height: 100%;
+                            width: 100%;
+                            border: 1px solid #2E2E2E;
+                            border-radius: 10px;
+                            padding: 20px;
+                            font-size: 14px;
+                            display: flex;
+                            flex-direction: column;
+                            justify-content: space-between;
+
+                            .upper-text {
+                                height: auto;
+                                display: flex;
+                                align-items: center;
+                                justify-content: center;
+                                text-align: center;
+                                padding: 10px 0;
+                            }
+
+                            .lower-text {
+                                height: auto;
+                                display: flex;
+                                align-items: center;
+                                justify-content: space-between;
+                                /* Arrows and text are spaced evenly */
+                                text-align: justify;
+                                position: relative;
+
+                                .text-slide {
+                                    flex: 1;
+                                    display: flex;
+                                    align-items: center;
+                                    justify-content: center;
+                                    text-align: center;
+                                    line-height: 1.5;
+                                    padding: 0 10px;
+                                    /* Add padding to prevent text from touching arrows */
+                                }
+
+                                .back-slide,
+                                .proceed-slide {
+                                    border: none;
+                                    background-color: transparent;
+                                    cursor: pointer;
+                                }
+
+                                .back-slide {
+                                    margin-right: 10px;
+
+                                    img {
+                                        width: 20px;
+                                        height: 20px;
+                                    }
+                                }
+
+                                .proceed-slide {
+                                    margin-left: 10px;
+
+                                    img {
+                                        width: 20px;
+                                        height: 20px;
+                                    }
+                                }
+                            }
+
+                            .btn-container,
+                            .btn-container-2 {
+                                height: auto;
+                                display: flex;
+                                justify-content: space-between;
+                                margin-top: 20px;
+
+                                button {
+                                    border: none;
+                                    text-decoration: underline;
+                                    background-color: white;
+                                    font-weight: bold;
+                                    color: #2E2E2E;
+                                    cursor: pointer;
+                                    padding: 0;
+                                }
+                            }
+
+                            .btn-container-2 {
+                                justify-content: flex-end;
+                            }
+                        }
+                    }
+                }
+
+                .canvas-container {
+                    width: 100%;
+                    height: 75%;
+                    padding: 0 20px 20px 20px;
+
+                    .canvas-content {
+                        overflow: hidden;
+                        position: relative;
+                        width: 100%;
+                        height: 100%;
+                        border: 1px solid #2E2E2E;
+                        border-radius: 10px;
+                        display: flex;
+                        justify-content: center;
+                        align-items: center;
+
+                        img {
+                            position: absolute;
+                            top: 30px;
+                            right: 30px;
+                            width: 24px;
+                            height: 24px;
+                            z-index: 10;
+                            cursor: pointer;
+                        }
+
+                        .step-progress-bar {
+                            display: flex;
+                            justify-content: center;
+                            align-items: center;
+                            position: absolute;
+                            bottom: 20px;
+                            left: 50%;
+                            transform: translateX(-50%);
+                        }
+
+                        .step {
+                            display: flex;
+                            align-items: center;
+                        }
+
+                        .oblong {
+                            width: 65px;
+                            height: 15px;
+                            border-radius: 30px;
+                            border: 2px solid #f89728;
+                            background-color: transparent;
+                            margin: 0 10px;
+                            transition: background-color 0.3s ease, border-color 0.3s ease;
+                        }
+
+                        .step.active .oblong {
+                            background-color: #f89728;
+                            border-color: #f89728;
+                        }
+
+                    }
+
+                }
+            }
+
+            .right-container {
+                height: 100%;
+                width: 30%;
+                background-color: white;
+
+                .guide-container {
+                    padding: 20px 20px 10px 0;
+                    height: 33%;
+
+                    .content-container {
+                        height: 100%;
+                        border: 1px solid #2E2E2E;
+                        border-radius: 10px;
+                        display: flex;
+                        align-items: center;
+                        justify-content: center;
+
+
+                        img {
+                            border-radius: 20px;
+                            width: 100%;
+                            height: 100%;
+                            object-fit: contain;
+                        }
+
+                    }
+                }
+
+                .summary-container {
+                    padding: 10px 20px 20px 0;
+                    height: 67%;
+
+                    .content-container {
+                        height: 100%;
+                        border: 1px solid #2E2E2E;
+                        border-radius: 10px;
+                        padding: 10px;
+
+                        .part-price {
+                            height: 16.66%;
+                            padding: 10px;
+
+                            .price {
+                                height: 100%;
+                                border: 1px solid #dee2e6;
+                                display: flex;
+                                align-items: center;
+                                padding: 20px;
+                                font-size: 14px;
+                                border-radius: 5px;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+    }
+
+    .build-summary-container {
+        background-color: #2E2E2E;
+        height: 100%;
+        width: 100%;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+
+        .summary-content {
+            background-color: #525252;
+            width: 1000px;
+            max-width: 100%;
+            height: 600px;
+            border-radius: 20px;
+            padding: 10px;
+
+            .upper-container {
+                height: 80%;
+                display: flex;
+
+                .left-container {
+                    width: 55%;
+                    padding: 10px;
+
+                    .content {
+                        background-color: white;
+                        height: 100%;
+                        border-radius: 20px;
+
+                        img {
+                            width: 100%;
+                            height: 100%;
+                            object-fit: contain;
+                        }
+                    }
+
+                }
+
+                .right-container {
+                    width: 45%;
+                    padding: 10px;
+
+                    .title {
+                        font-size: 24px;
+                        color: white;
+                        font-weight: 700;
+                        height: 15%;
+                        display: flex;
+                        align-items: center;
+                    }
+
+                    .content {
+                        border: solid 2px white;
+                        height: 85%;
+                        border-radius: 20px;
+                        padding: 20px;
+
+                        .parts {
+                            border-bottom: solid 1px white;
+                            height: 16.66%;
+                            color: white;
+                            align-content: center;
+                            padding: 5px;
+
+                            .iprice {
+                                width: 100%;
+                                height: 50%;
+                                display: flex;
+                                align-items: center;
+                            }
+
+                            .iname {
+                                width: 100%;
+                                height: 50%;
+                                display: flex;
+                                align-items: center;
+                                font-size: 14px;
+                                font-weight: 100;
+                            }
+                        }
+
+                        .parts:last-child {
+                            border-bottom: none;
+                        }
+                    }
+                }
+            }
+
+            .lower-container {
+                height: 20%;
+                display: flex;
+
+                .left-container {
+                    width: 55%;
+                    padding: 10px;
+                    color: white;
+                    font-size: 24;
+                    align-content: center;
+
+                    .title {
+                        font-size: 24px;
+                        font-weight: 700;
+                    }
+
+                    .tprice {
+                        font-size: 32px;
+                        font-weight: 700;
+                    }
+                }
+
+                .right-container {
+                    width: 45%;
+                    padding: 10px;
+                    display: flex;
+                    align-items: end;
+                    justify-content: space-between;
+
+                    .back-button {
+                        margin-bottom: 10px;
+
+                        img {
+                            cursor: pointer;
+                        }
+                    }
+
+                    .add-to-cart {
+                        height: 50px;
+                        width: 360px;
+                        padding: 10px;
+                        border: none;
+                        border-radius: 10px;
+                        background-color: #2E2E2E;
+                        color: white;
+
+                    }
+                }
+            }
+        }
+
+    }
+
+}

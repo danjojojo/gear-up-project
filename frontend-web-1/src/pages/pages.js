@@ -27,6 +27,8 @@ import Expenses from './expenses/expenses.jsx';
 import Receipts from './receipts/receipts.jsx';
 import Mechanics from './mechanics/mechanics.jsx';
 
+import BikeBuilder from './bike-builder/bike-builder.jsx';
+
 const Pages = {
     // Not Found Page
     NotFound,
@@ -89,7 +91,10 @@ const Pages = {
     Receipts,
 
     // Mechanics Page
-    Mechanics
+    Mechanics,
+
+    // Bike Builder Preview Page
+    BikeBuilder
 };
 
 export default Pages;

@@ -22,6 +22,7 @@ const SideNav = ({ onNavClick, isAdmin }) => {
                         <Nav.Link as={Link} to="/waitlist" onClick={() => onNavClick('Waitlist')}>Waitlist</Nav.Link>
                         <Nav.Link as={Link} to="/bike-builder-upgrader" onClick={() => onNavClick('Bike Builder & Upgrader')}>Bike Builder & Upgrader</Nav.Link>
                         <Nav.Link as={Link} to="/orders" onClick={() => onNavClick('Orders')}>Orders</Nav.Link>
+                        <Nav.Link as={Link} to="/preview" onClick={() => onNavClick('Preview')}>Bike Builder Preview</Nav.Link>
                     </>
                 ) : (
                     <>
