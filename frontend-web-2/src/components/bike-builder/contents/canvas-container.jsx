@@ -187,6 +187,7 @@ const CanvasContainer = ({
                                         )
                                     )
                                 )}
+
                                 {/* Front Wheel */}
                                 {wheelsetImage && (
                                     <Image
@@ -204,6 +205,7 @@ const CanvasContainer = ({
                                         onDragEnd={(e) => handleDragEnd("frontWheel", e)}
                                     />
                                 )}
+
                                 {/* Fork */}
                                 {forkImage && (
                                     <Image
@@ -221,6 +223,7 @@ const CanvasContainer = ({
                                         onDragEnd={(e) => handleDragEnd("fork", e)}
                                     />
                                 )}
+
                                 {cockpitImage && (
                                     <Image
                                         name="cockpit"
@@ -237,6 +240,7 @@ const CanvasContainer = ({
                                         onDragEnd={(e) => handleDragEnd("cockpit", e)}
                                     />
                                 )}
+
                                 {/* Seat */}
                                 {seatImage && (
                                     <Image
@@ -254,6 +258,7 @@ const CanvasContainer = ({
                                         onDragEnd={(e) => handleDragEnd("seat", e)}
                                     />
                                 )}
+
                                 {/* Rear Wheel */}
                                 {wheelsetImage && (
                                     <Image
@@ -271,7 +276,32 @@ const CanvasContainer = ({
                                         onDragEnd={(e) => handleDragEnd("rearWheel", e)}
                                     />
                                 )}
-                                {/* Frame */}
+
+                                {/* Groupset Left Half (Behind Frame) */}
+                                {groupsetImage && (
+                                    <Image
+                                        name="groupset"
+                                        image={groupsetImage}
+                                        x={partPositions.groupset.x}
+                                        y={partPositions.groupset.y}
+                                        rotation={partPositions.groupset.rotation}
+                                        height={92}
+                                        width={100} // Left half width
+                                        crop={{
+                                            x: 0,  // Crop left half of the image
+                                            y: 0,
+                                            width: 100,
+                                            height: 92,
+                                        }}
+                                        draggable={selectedPart?.name() === 'groupset' && !lockedParts.includes("groupset")}
+                                        listening={!lockedParts.includes("groupset")}
+                                        dragBoundFunc={(pos) => constrainDrag(pos, 240, 92, stageWidth, stageHeight)}
+                                        onClick={(e) => setSelectedPart(e.target)}
+                                        onDragEnd={(e) => handleDragEnd("groupset", e)}
+                                    />
+                                )}
+
+                                {/* Frame (Over Left Half of Groupset) */}
                                 {frameImage && (
                                     <Image
                                         name="frame"
@@ -283,24 +313,31 @@ const CanvasContainer = ({
                                         width={340}
                                         draggable={selectedPart?.name() === 'frame' && !lockedParts.includes("frame")}
                                         listening={!lockedParts.includes("frame")}
-                                        dragBoundFunc={(pos) => constrainDrag(pos, 340, 214, stageWidth, stageHeight)} // Correct dimensions for frame
+                                        dragBoundFunc={(pos) => constrainDrag(pos, 340, 214, stageWidth, stageHeight)}
                                         onClick={(e) => setSelectedPart(e.target)}
                                         onDragEnd={(e) => handleDragEnd("frame", e)}
                                     />
                                 )}
-                                {/* Groupset */}
+
+                                {/* Groupset Right Half (In Front of Frame) */}
                                 {groupsetImage && (
                                     <Image
                                         name="groupset"
                                         image={groupsetImage}
-                                        x={partPositions.groupset.x}
+                                        x={partPositions.groupset.x + 100}  // Offset right half to the right
                                         y={partPositions.groupset.y}
                                         rotation={partPositions.groupset.rotation}
                                         height={92}
-                                        width={240}
+                                        width={140} // Right half width
+                                        crop={{
+                                            x: 100,  // Crop right half of the image
+                                            y: 0,
+                                            width: 140,
+                                            height: 92,
+                                        }}
                                         draggable={selectedPart?.name() === 'groupset' && !lockedParts.includes("groupset")}
                                         listening={!lockedParts.includes("groupset")}
-                                        dragBoundFunc={(pos) => constrainDrag(pos, 240, 92, stageWidth, stageHeight)} // Correct dimensions for groupset
+                                        dragBoundFunc={(pos) => constrainDrag(pos, 240, 92, stageWidth, stageHeight)}
                                         onClick={(e) => setSelectedPart(e.target)}
                                         onDragEnd={(e) => handleDragEnd("groupset", e)}
                                     />
@@ -312,9 +349,9 @@ const CanvasContainer = ({
                                     resizeEnabled={false}
                                     anchorSize={8}
                                 />
-
                             </Layer>
                         </Stage>
+
 
                         <div className="step-progress-bar">
                             {steps.map((step, index) => (
