@@ -8,6 +8,7 @@ const getFrameItems = async (req, res) => {
                 f.*,
                 i.item_name,
                 i.item_price,
+                i.stock_count,
                 encode(f.image, 'base64') AS item_image
             FROM 
                 frame f
@@ -36,6 +37,7 @@ const getForkItems = async (req, res) => {
                 f.*,
                 i.item_name,
                 i.item_price,
+                i.stock_count,
                 encode(f.image, 'base64') AS item_image
             FROM 
                 fork f
@@ -64,6 +66,7 @@ const getGroupsetItems = async (req, res) => {
                 g.*,
                 i.item_name,
                 i.item_price,
+                i.stock_count,
                 encode(g.image, 'base64') AS item_image
                 FROM 
                     groupset g
@@ -92,6 +95,7 @@ const getWheelsetItems = async (req, res) => {
                 w.*,
                 i.item_name,
                 i.item_price,
+                i.stock_count,
                 encode(w.image, 'base64') AS item_image
                 FROM 
                     wheelset w
@@ -120,6 +124,7 @@ const getSeatItems = async (req, res) => {
                 s.*,
                 i.item_name,
                 i.item_price,
+                i.stock_count,
                 encode(s.image, 'base64') AS item_image
                 FROM 
                     seat s
@@ -148,6 +153,7 @@ const getCockpitItems = async (req, res) => {
                 c.*,
                 i.item_name,
                 i.item_price,
+                i.stock_count,
                 encode(c.image, 'base64') AS item_image
                 FROM 
                     cockpit c
