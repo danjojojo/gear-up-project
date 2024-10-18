@@ -60,7 +60,7 @@ $button-fail: #dee2e6;
                         .four{
                             display: flex;
                             flex-direction: column;
-                            margin-top: 30px;
+                            margin-top: 10px;
 
                             .green, .red, .net{
                                 display: flex;
@@ -343,19 +343,29 @@ $button-fail: #dee2e6;
                             justify-content: space-between;
                             padding: 5px;
                             // margin: 5px;
+                            p{
+                                margin: 0 !important;
+                            }
                         
                             .left{
                                 .qty-unit-price{
                                     color: grey
                                 }
+
+                                .refund-qty{
+                                    color: #ffbc11;
+                                }
                             }
                             
-                            .total-price{
-                                font-weight: 700;
-                            }
-    
-                            p {
-                                margin: 0;
+                            
+                            .right{
+                                text-align: right;
+                                .total-price{
+                                    font-weight: 700;
+                                }
+                                .refund-total {
+                                    color: #ffbc11;
+                                }
                             }
     
                             &.selected{

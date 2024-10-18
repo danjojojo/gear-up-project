@@ -14,17 +14,19 @@ const Records = () => {
     const [selectedRecord, setSelectedRecord] = useState('sales');
     const navigate = useNavigate();
     const location = useLocation();
+    const path = location.pathname.split('/')[2] || 'sales'; // Extract 'sales', 'labor', or 'expenses'
+    
 
     useEffect(() => {
-        const path = location.pathname.split('/')[2]; // Extract 'sales', 'labor', or 'expenses'
         if (path && ['sales', 'labor', 'expenses'].includes(path)) {
             setSelectedRecord(path);
+            navigate(`/records/${path}`);
         } else {
             // Default to 'sales' if the path is invalid
             setSelectedRecord('sales');
             navigate('/records/sales');
         }
-    }, [location.pathname, navigate]);
+    }, [path, navigate]);
 
     const handleTabChange = (value) => {
         if (selectedRecord !== value) {
@@ -75,7 +77,8 @@ const Records = () => {
 
     const handleDashboardData = async (selectedRecord, selectedDate) => {
         try {
-            const { d1, d2, d3, d4} = await getDashboardData(selectedRecord, selectedDate);
+            const sourcePath = path !== null ? path : selectedRecord;
+            const { d1, d2, d3, d4} = await getDashboardData(sourcePath, selectedDate);
             setDashboard1Data(d1);
             setDashboard2Data(d2);
             setDashboard3Data(d3);
@@ -94,10 +97,12 @@ const Records = () => {
     
     const handleRecords = async (selectedRecord, selectedDate) => {
         try {
-            const { records } = await getRecords(selectedRecord, selectedDate);
+            const sourcePath = path !== null ? path : selectedRecord;
+            const { records } = await getRecords(sourcePath, selectedDate);
             setRecords(records);
             setFilteredRecordsByPOSUser(records);
             setDistinctPOSUsers([...new Set(records.map((records) => records.pos_name))].sort());
+            
             // ...new Set() removes duplicates
             // ...new Set(records.map((records) => records.pos_name)) returns an array of unique POS names
             // .sort() sorts the array alphabetically
@@ -115,7 +120,8 @@ const Records = () => {
     
     const handleHighlightDates = async (selectedRecord) => {
         try {
-            const { dates } = await getHighlightDates(selectedRecord);
+            const sourcePath = path !== null ? path : selectedRecord;
+            const { dates } = await getHighlightDates(sourcePath);
             const formattedDates = dates.map((date) =>
                 moment(date.date_created).toDate()
             );
@@ -150,7 +156,8 @@ const Records = () => {
 
     const handleLeaderboard = async (selectedRecord, start, end) => {
         try {
-            const { leaderBoards } = await getLeaderBoards(selectedRecord, start, end);
+            const sourcePath = path !== null ? path : selectedRecord;
+            const { leaderBoards } = await getLeaderBoards(sourcePath, start, end);
             setLeaderboard(leaderBoards);
             setTimeout(() => {
                 setLoading(false);
@@ -618,7 +625,7 @@ const Records = () => {
                         </div>
                         <div className="list">
                             {filteredRecordsByPOSUser.length === 0 ? handleNoRecords() : null}
-                            {filteredRecordsByPOSUser.map((record, index) => (
+                            {filteredRecordsByPOSUser.filter((filRecord) => filRecord.record_total_amount > 0).map((record, index) => (
                                 <div className="item" key={index} onClick={() => handleRecordModal(record)}>
                                     <div className="top">
                                         <div className="sender">

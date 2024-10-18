@@ -144,7 +144,7 @@ const PointOfSales = () => {
       if (item.name === existingItem.name) {
         const newQty = Math.max(1, item.qty + value); // Prevent negative qty
         const newTotalPrice = newQty * item.price;
-        return { ...item, qty: newQty, total_price: newTotalPrice };
+        return { ...item, qty: newQty };
       }
       return item;
     });
@@ -619,7 +619,6 @@ const PointOfSales = () => {
                                 stock_count: retrievedItem.stock_count,
                                 qty: 1,
                                 price: retrievedItem.item_price,
-                                total_price: retrievedItem.item_price,
                               })
                             }
                           }
@@ -1071,10 +1070,7 @@ const PointOfSales = () => {
                                   min="1"
                                   onChange={(e) => {
                                     const newQty = Number(e.target.value);
-                                    if (
-                                      newQty >= 1 &&
-                                      newQty <= item.stock_count
-                                    ) {
+                                    if (newQty >= 1 && newQty <= item.stock_count) {
                                       updateItemQty(item, newQty - item.qty);
                                     }
                                   }} // Update qty based on input change

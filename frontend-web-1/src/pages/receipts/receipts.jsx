@@ -1,7 +1,17 @@
 import './receipts.scss'
 import ResponsivePageLayout from '../../components/responsive-page-layout/responsive-page-layout';
 import { useEffect, useState, forwardRef } from 'react';
-import { getPosReceipts, getReceiptItems, getReceiptDates, staffVoidReceipt, cancelVoidReceipt, adminVoidReceipt} from '../../services/receiptService';
+import { 
+  getPosReceipts, 
+  getReceiptItems, 
+  getReceiptDates, 
+  staffVoidReceipt, 
+  cancelVoidReceipt, 
+  adminVoidReceipt, 
+  refundReceipt, 
+  adminCancelRefundReceipt,
+  getReceiptsDashboard
+} from '../../services/receiptService';
 import moment from 'moment';
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
@@ -27,10 +37,19 @@ const Receipts = () => {
     const [receiptID, setReceiptID] = useState('');
     const [receiptStatus, setReceiptStatus] = useState('active');
     const [receiptVoidDate, setReceiptVoidDate] = useState('');
-    
+    const [dashboardData, setDashboardData] = useState([]);
+    const [showDashboardDataToday, setShowDashboardDataToday] = useState(true);
+
+    // VIEWS
+    const [refundView, setRefundView] = useState(false);
+
+    // REFUND
+    const [refundItems, setRefundItems] = useState({});
+    const [refundItemsDetails, setRefundItemsDetails] = useState([]);
+
     // DATE FOR REACT-DATEPICKER
     const [startDate, setStartDate] = useState(moment(todayDate).format("YYYY-MM-DD"));
-
+    const nowDate = moment(todayDate).format("YYYY-MM-DD");
     // SEARCH VALUE
     const [searchValue, setSearchValue] = useState("");
 
@@ -88,6 +107,15 @@ const Receipts = () => {
             setLoading(true);
         }
     }
+    const handleGetReceiptsDashboard = async(startDate) => {
+      try{
+        const { dashboard } = await getReceiptsDashboard(startDate);
+        setDashboardData(dashboard[0]);
+        console.log(dashboard[0]);
+      } catch (err) {
+        console.error('Error retrieving receipts', err);
+      }
+    }
     const getDates = async () =>{
       try {
         const { dates } = await getReceiptDates();
@@ -112,23 +140,33 @@ const Receipts = () => {
     const handleVoidReceipt = async () => {
       try {
         if(userRole === 'staff'){
-          const {status, dateVoided} = await staffVoidReceipt(receiptID);
+          const {status, dateRequested} = await staffVoidReceipt(receiptID);
+          if(status === 'error'){
+            setModalRefundErrorShow(true);
+            setModalVoidShow(false);
+            return;
+          } 
           setReceiptStatus(status);
-          setReceiptVoidDate(moment(dateVoided).format("LLL"));
+          setReceiptVoidDate(moment(dateRequested).format("LLL"));
           console.log("Receipt voided");
-          setModalShow(false);
+          setModalVoidShow(false);
           await getReceipts(startDate);
         } else if(userRole === 'admin'){
           const retrievedItems = retrievedReceiptItems.filter((item) => item.record_type === 'item'); 
           const {status, dateVoided} = await adminVoidReceipt(receiptID, retrievedItems);
+          if(status === 'error'){
+            setModalRefundErrorShow(true);
+            setModalVoidShow(false);
+            return;
+          }
           setReceiptStatus(status);
           setReceiptVoidDate(moment(dateVoided).format("LLL"));
           console.log("Receipt voided");
-          setModalShow(false);
+          setModalVoidShow(false);
           await getReceipts(startDate);
         }
       } catch (error) {
-        console.error("Error voiding receipt", error);
+          console.error("Error voiding receipt:", error.message);
       }
     }
     const handleCancelVoidReceipt = async (receiptIDValue) => {
@@ -139,6 +177,46 @@ const Receipts = () => {
         await getReceipts(startDate);
       } catch (error) {
         console.error("Error voiding receipt", error);
+      }
+    }
+    const handleRefundReceipt = async () => {
+      setModalRefundShow(false)
+      setRefundView(false);
+      setRefundItems({});
+      setRefundItemsDetails([]);
+      setReceiptDetails([]);
+      console.log("Refund receipt");
+      try {
+        await refundReceipt(receiptDetails.receipt_id, receiptDetails.sale_id, refundItemsDetails);
+        await getReceipts(startDate);
+      } catch (error) {
+        console.error("Error refunding receipt", error);
+      }
+    }
+    const handleCancelRefundReceipt = async () => {
+      try {
+        if(userRole === 'admin'){
+          console.log("Cancel refund receipt");
+          console.log(receiptDetails.receipt_id);
+          const retrievedItems = retrievedReceiptItems.filter((item) => item.record_type === 'item'); 
+          const {status, dateVoided} = await adminCancelRefundReceipt(receiptID, receiptDetails.original_receipt_name, retrievedItems);
+          setReceiptStatus(status);
+          setReceiptVoidDate(moment(dateVoided).format("LLL"));
+          console.log("Receipt voided");
+          setModalCancelRefundShow(false);
+          await getReceipts(startDate);
+        } else {
+          console.log("Cancel refund receipt");
+          console.log(receiptDetails.receipt_id);
+          const {status, dateRequested} = await staffVoidReceipt(receiptID);
+          setReceiptStatus(status);
+          setReceiptVoidDate(moment(dateRequested).format("LLL"));
+          console.log("Receipt voided");
+          setModalCancelRefundShow(false);
+          await getReceipts(startDate);
+        }
+      } catch (error) {
+        console.error("Error cancelling refund receipt", error);
       }
     }
 
@@ -199,7 +277,6 @@ const Receipts = () => {
           }
       }
     }
-
     function showReceiptByAmount(sortValue){
       let sortedReceipts;
       if(sortValue === "asc"){
@@ -239,6 +316,7 @@ const Receipts = () => {
     // GET RECEIPTS ON PAGE LOAD
     useEffect(() => {
       getReceipts(startDate);
+      handleGetReceiptsDashboard(startDate);
     }, [startDate]);
 
     // GET DATES ON PAGE LOAD
@@ -252,7 +330,47 @@ const Receipts = () => {
       window.addEventListener("resize", handleResize);
     }, [isVisible]);
 
-    function MyVerticallyCenteredModalConfirmation({ onHide, onConfirm, ...props }) {
+    function handleRefundQty(itemId, qtyValue){
+      try {
+        const updatedRefundItemsDetails = refundItemsDetails.map((refundItem) => {
+          if(refundItem.id === itemId && qtyValue > 0){
+            return { ...refundItem, qty: qtyValue};
+          } else if (refundItem.id === itemId && qtyValue <= 0) {
+            return { ...refundItem, qty: qtyValue};
+          }
+          return refundItem;
+        })
+        setRefundItemsDetails(updatedRefundItemsDetails);
+      } catch (error) {
+        console.log("Error updating refund qty", error);
+      }
+    }
+
+    const handleCheckboxChange = (item) => {
+      setRefundItems((prevState) => ({
+        ...prevState,
+        [item.item_id]: !prevState[item.item_id]
+      }));
+
+      if(!refundItems[item.item_id]){
+        setRefundItemsDetails(oldArray => [...oldArray,{
+          id: item.item_id,
+          qty: item.refund_qty > 0 ? item.qty - item.refund_qty : item.qty,
+          stock_count: item.item_stock_count,
+          unit_price: item.item_unit_price,
+        }]);
+      } 
+      else {
+        setRefundItemsDetails(refundItemsDetails.filter((refundItem) => refundItem.id !== item.item_id));
+      }
+    }
+
+    useEffect(() => {
+      console.log(refundItems);
+      console.log(refundItemsDetails);
+    }, [refundItems, refundItemsDetails]);
+
+    function VoidConfirmation({ onHide, onConfirm, ...props }) {
       return (
         <Modal
           {...props}
@@ -266,10 +384,10 @@ const Receipts = () => {
             </Modal.Title>
           </Modal.Header>
           <Modal.Body>
-            {userRole === 'staff' && <p>Are you sure you want to void this receipt? If yes, admin's approval will be required.</p>}
+            {userRole === 'staff' && <p>Are you sure you want to cancel this receipt? If yes, admin's approval will be required.</p>}
             {userRole === 'admin' && 
             <div>
-              <p>Are you sure you want to void this receipt?</p>
+              <p>Are you sure you want to cancel this receipt?</p>
               <ul>
                 <li>Items will be returned to stock.</li>
                 <li>Receipt will not be accounted in records and reports.</li>
@@ -293,8 +411,107 @@ const Receipts = () => {
       );
     }
 
+    function RefundConfirmation({ onHide, onConfirm, ...props }) {
+      return (
+        <Modal
+          {...props}
+          size="md"
+          aria-labelledby="contained-modal-title-vcenter"
+          centered
+        >
+          <Modal.Header closeButton onClick={onHide}>
+            <Modal.Title id="contained-modal-title-vcenter">
+              Confirmation
+            </Modal.Title>
+          </Modal.Header>
+          <Modal.Body>
+            {userRole === 'staff' && 
+            <div>
+              <p>Are you sure you want to refund these items?</p>
+            </div>
+            }
+          </Modal.Body>
+          <Modal.Footer>
+            <Button variant="secondary" onClick={() => {
+                onHide();
+            }}>
+              Cancel
+            </Button>
+            <Button variant="primary" onClick={() => {
+                onConfirm();
+              }}>
+              Confirm
+            </Button>
+          </Modal.Footer>
+        </Modal>
+      );
+    }
+
+    function RefundError({ ...props }) {
+      return (
+        <Modal
+          {...props}
+          size="md"
+          aria-labelledby="contained-modal-title-vcenter"
+          centered
+        >
+          <Modal.Header closeButton>
+            <Modal.Title id="contained-modal-title-vcenter">
+              Message
+            </Modal.Title>
+          </Modal.Header>
+          <Modal.Body>
+            <p>Refunded receipts must be cancelled first.</p>
+          </Modal.Body>
+        </Modal>
+      );
+    }
+    function CancelRefundConfirmation({ onHide, onConfirm, ...props }) {
+      return (
+        <Modal
+          {...props}
+          size="md"
+          aria-labelledby="contained-modal-title-vcenter"
+          centered
+        >
+          <Modal.Header closeButton onClick={onHide}>
+            <Modal.Title id="contained-modal-title-vcenter">
+              Confirmation
+            </Modal.Title>
+          </Modal.Header>
+          <Modal.Body>
+            {userRole === 'staff' && <p>Are you sure you want to cancel this refund? If yes, admin's approval will be required.</p>}
+            {userRole === 'admin' && 
+            <div>
+              <p>Are you sure you want to cancel this refund?</p>
+              <ul>
+                <li>Items will be deducted from stock.</li>
+                <li>Receipt will not be accounted in records and reports.</li>
+              </ul>
+            </div>
+            }
+          </Modal.Body>
+          <Modal.Footer>
+            <Button variant="secondary" onClick={() => {
+                onConfirm();
+            }}>
+              Confirm
+            </Button>
+            <Button variant="primary" onClick={() => {
+                onHide();
+              }}>
+              Cancel
+            </Button>
+          </Modal.Footer>
+        </Modal>
+      );
+    }
+
     const [searchTerm, setSearchTerm] = useState('');
-    const [modalShow, setModalShow] = useState(false);
+    const [modalVoidShow, setModalVoidShow] = useState(false);
+    const [modalRefundShow, setModalRefundShow] = useState(false);
+    const [modalCancelRefundShow, setModalCancelRefundShow] = useState(false);
+    const [modalRefundErrorShow, setModalRefundErrorShow] = useState(false);
 
     // DISPLAY LOADING IF SHIT AINT WORKING
     if(loading) return <LoadingPage classStyle="loading-in-page"/>
@@ -306,10 +523,24 @@ const Receipts = () => {
           rightContainer={rightContainerStyle}
           leftContent={
             <div className={receiptsContainer}>
-              <MyVerticallyCenteredModalConfirmation
-                show={modalShow}
-                onHide={() => setModalShow(false)}
+              <VoidConfirmation
+                show={modalVoidShow}
+                onHide={() => setModalVoidShow(false)}
                 onConfirm={handleVoidReceipt}
+              />
+              <RefundConfirmation
+                show={modalRefundShow}
+                onHide={() => setModalRefundShow(false)}
+                onConfirm={handleRefundReceipt}
+              />
+              <CancelRefundConfirmation
+                show={modalCancelRefundShow}
+                onHide={() => setModalCancelRefundShow(false)}
+                onConfirm={handleCancelRefundReceipt}
+              />
+              <RefundError
+                show={modalRefundErrorShow}
+                onHide={() => setModalRefundErrorShow(false)}
               />
               <div className="receipts-nav">
                 <DatePicker
@@ -320,6 +551,8 @@ const Receipts = () => {
                       moment(date).format("YYYY-MM-DD")
                     );
                     setReceiptDetails([]);
+                    setRefundView(false);
+                    setShowDashboardDataToday(true);
                   }}
                   dateFormat="MMMM d, yyyy"
                   maxDate={new Date()}
@@ -372,17 +605,17 @@ const Receipts = () => {
                   </div>
                 </div>
               </div>
+              {userRole === 'admin' && 
+              <div className="pos-users">
+                  <p>Filter by:</p> 
+                  <select name="" id="" onChange={(e) => handleChangePOSUser(e.target.value)} defaultValue={'all'}> 
+                      <option value="all">All users</option>
+                      {distinctPOSUsers.map((posUser, index) => (
+                          <option key={index} value={posUser}>{posUser}</option>
+                      ))}
+                  </select>
+              </div>}
               <div className="list">
-                {userRole === 'admin' && 
-                <div className="pos-users">
-                    <p>Filter by:</p> 
-                    <select name="" id="" onChange={(e) => handleChangePOSUser(e.target.value)} defaultValue={'all'}> 
-                        <option value="all">All users</option>
-                        {distinctPOSUsers.map((posUser, index) => (
-                            <option key={index} value={posUser}>{posUser}</option>
-                        ))}
-                    </select>
-                </div>}
                 {filteredReceipts.length === 0 &&
                   (startDate === moment(todayDate).format("YYYY-MM-DD") ? (
                     <div className="empty-list">
@@ -405,21 +638,32 @@ const Receipts = () => {
                           setRightContainerStyle("right-container");
                           setReceiptStatus(receipt.status);
                           closeReceipts();
+                          setRefundView(false);
                         }}
                       >
                         <div className="list-item-content">
                           <div className="left">
                               {userRole === 'admin' && 
-                              <div className="sender">
-                                  <p>{receipt.pos_name}</p>
-                                  {receipt.status === 'pending' && <p className='void-request'>Void requested</p>}
-                                  {receipt.status === 'voided' && <p className='void-approved'>Receipt voided</p>}
-                              </div>
+                              <>
+                                <div className="sender">
+                                    <div className="userIcon-name">
+                                      <i className="fa-solid fa-user"></i>
+                                      <p>{receipt.pos_name}</p>
+                                    </div>
+                                </div>
+                              </>
                               }
                               <div className="name">
-                                  <p>{receipt.receipt_name}</p>
-                                  {userRole === 'staff' && <p className='void-request'>{receipt.status === 'pending' && 'Void requested'}</p>}
-                                  {userRole === 'staff' && <p className='void-approved'>{receipt.status === 'voided' && 'Receipt voided'}</p>}
+                                    <p className='receipt-name'>{receipt.receipt_name}</p>
+                                  <div className='name-row'>
+                                    <p className={receipt.receipt_type}>{receipt.receipt_type === 'refund' ? receipt.receipt_type + ' ' + receipt.original_receipt_name : receipt.receipt_type }</p>
+                                    {receipt.status === 'pending' &&
+                                    <p className='void-request'>Cancel Requested</p>
+                                    }
+                                    {receipt.status === 'voided' &&
+                                    <p className='void-approved'>Cancelled</p>
+                                    }
+                                  </div>
                               </div>
                           </div>
                           <div className="right">
@@ -439,108 +683,287 @@ const Receipts = () => {
           }
           rightContent={
             <div className="receipt-container">
-              <div className="receipt-nav">
-                <h4>Receipt Details</h4>
-                {receiptDetails.length !== 0 && (
-                  <div className="print-close">
-                    {receiptDetails.status !== 'voided' && 
-                    <i className="fa-solid fa-print"
-                      onClick={() => {
-                        window.print();
-                      }}
-                    ></i>}
-                    <i className="fa-solid fa-xmark"
-                      onClick={() => {
-                        setReceiptDetails([]);
-                        closeReceiptDetails();
-                      }}
-                    ></i>
+              {(receiptDetails.length === 0 && userRole === 'staff') && (
+                <>
+                  <div className="receipt-nav">
+                      <h4>Receipt Details</h4>
                   </div>
-                )}
-              </div>
-              {receiptDetails.length === 0 && (
-                <p>Select a receipt to view details.</p>
+                  <p>Select a receipt to view details.</p>
+                </>
               )}
-              {receiptDetails.length !== 0 && (
-                <div className="receipt-details-info">
-                  <div className="receipt-details-info-header">
-                    <p>{receiptDetails.receipt_name}</p>
-                    <p>
-                      {moment(receiptDetails.date_created).format("LL")} -{" "}
-                      {moment(receiptDetails.date_created).format("LT")}
-                    </p>
-                    <p className='name'>{receiptDetails.pos_name}</p>
-                    {receiptStatus === 'voided' && <p className='voided'>Receipt voided on {receiptVoidDate || moment(receiptDetails.date_updated).format("LLL")}.</p>}
-                    <div className="total">
-                      <p>{PesoFormat.format(receiptDetails.receipt_total_cost)}</p>
-                      <p>Total</p>
+              {(receiptDetails.length === 0 && userRole === 'admin') && (
+                <>
+                  <div className="container-content" onClick={() => setShowDashboardDataToday(!showDashboardDataToday)}>
+                      {showDashboardDataToday && 
+                      <div className="main-content">
+                          <div className="number">{dashboardData.receipts_today}</div>
+                          <div className="title">Receipts {startDate === nowDate ? 'Today' : ' this day'}</div>
+                      </div>
+                      }
+                      {!showDashboardDataToday && 
+                      <div className="main-content">
+                          <div className="number">{dashboardData.receipts_total}</div>
+                          <div className="title">Receipts Total</div>
+                      </div>
+                      }
+                  </div>
+
+                  <div className="container-content" onClick={() => setShowDashboardDataToday(!showDashboardDataToday)}>
+                      {showDashboardDataToday && 
+                      <div className="main-content">
+                          <div className="number">{dashboardData.sale_receipts_today}</div>
+                          <div className="title">Sale {startDate === nowDate ? 'Today' : ' this day'}</div>
+                      </div>}
+                      {!showDashboardDataToday && 
+                      <div className="main-content">
+                          <div className="number">{dashboardData.sale_receipts_total}</div>
+                          <div className="title">Sale Total</div>
+                      </div>}
+                  </div>
+
+                  <div className="container-content" onClick={() => setShowDashboardDataToday(!showDashboardDataToday)}>
+                      {showDashboardDataToday && 
+                      <div className="main-content">
+                          <div className="number">{dashboardData.refund_receipts_today}</div>
+                          <div className="title">Refunds {startDate === nowDate ? 'Today' : ' this day'}</div>
+                      </div>}
+                      {!showDashboardDataToday && 
+                      <div className="main-content">
+                          <div className="number">{dashboardData.refund_receipts_total}</div>
+                          <div className="title">Refunds Total</div>
+                      </div>}
+                  </div>
+
+                  <div className="container-content" onClick={() => setShowDashboardDataToday(!showDashboardDataToday)}>
+                      {showDashboardDataToday && <div className="main-content">
+                          <div className="number">{dashboardData.cancelled_receipts_today}</div>
+                          <div className="title">Cancelled {startDate === nowDate ? 'Today' : ' this day'}</div>
+                      </div>}
+                      {!showDashboardDataToday && <div className="main-content">
+                          <div className="number">{dashboardData.cancelled_receipts_total}</div>
+                          <div className="title">Cancelled Total</div>
+                      </div>}
+                  </div>
+                </>
+              )}
+              {(!refundView && receiptDetails.length !== 0) && (
+                <>
+                  <div className="receipt-nav">
+                    <h4>Receipt Details</h4>
+                    <div className="print-close">
+                      {receiptDetails.status !== 'voided' && 
+                      <i className="fa-solid fa-print"
+                        onClick={() => {
+                          window.print();
+                        }}
+                      ></i>}
+                      <i className="fa-solid fa-xmark"
+                        onClick={() => {
+                          setReceiptDetails([]);
+                          closeReceiptDetails();
+                        }}
+                      ></i>
                     </div>
                   </div>
-                  <div className="receipt-details-info-content">
-                    {retrievedReceiptItems.length > 0 &&
-                      retrievedReceiptItems.map((item, itemIndex) => {
+                  <div className="receipt-details-info">
+                    <div className="receipt-details-info-header">
+                      <p>{receiptDetails.receipt_name}</p>
+                      {receiptDetails.receipt_type === 'refund' && <p className='original-receipt'>Refund {receiptDetails.original_receipt_name}</p>}
+                      <p>
+                        {moment(receiptDetails.date_created).format("LL")} -{" "}
+                        {moment(receiptDetails.date_created).format("LT")}
+                      </p>
+                      <p className='name'>{receiptDetails.pos_name}</p>
+                      {receiptStatus === 'pending' && <p className='voided'>Cancel requested on {receiptVoidDate || moment(receiptDetails.date_updated).format("LLL")}.</p>}
+                      {receiptStatus === 'voided' && <p className='voided'>Receipt voided on {receiptVoidDate || moment(receiptDetails.date_updated).format("LLL")}.</p>}
+                      <div className="total">
+                        <p>{PesoFormat.format(receiptDetails.receipt_total_cost)}</p>
+                        <p>Total</p>
+                      </div>
+                    </div>
+                    <div className="receipt-details-info-content">
+                      {retrievedReceiptItems.length > 0 &&
+                        retrievedReceiptItems.map((item, itemIndex) => {
+                          return (
+                            <div className='receipt-details-item' key={itemIndex}> 
+                                <div className="left">    
+                                    <p className="name">{item.item_name}</p>
+                                    {item.record_type === 'item' && <p className="qty-unit-price">{item.qty} x {item.item_unit_price}</p>}
+                                    {item.record_type === 'mechanic' && <p className="qty-unit-price">Mechanic Service</p>}
+                                </div>
+                                <p className='total-price'>{PesoFormat.format(item.item_total_price)}</p>
+                            </div>
+                          );
+                        })}
+                    </div>
+                    <div className="total-paid-change">
+                      <div className="total">
+                        <p>Total</p>
+                        <p>{PesoFormat.format(receiptDetails.receipt_total_cost)}
+                        </p>
+                      </div>
+                      <div className="paid">
+                        <p>Paid</p>
+                        <p>{PesoFormat.format(receiptDetails.receipt_paid_amount)}
+                        </p>
+                      </div>
+                      <div className="change">
+                        <p>Change</p>
+                        <p>
+                          {PesoFormat.format(receiptDetails.receipt_change)}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                  <div className="void-refund">
+                    {(userRole === 'staff' && receiptStatus === 'active') &&
+                      <>
+                        <button onClick={() => {
+                          setModalVoidShow(true);
+                          setReceiptID(receiptDetails.receipt_id);
+                        }}
+                        >Request Cancel</button>
+                        {receiptDetails.receipt_type === 'sale' && <button onClick={() => setRefundView(true)}
+                        >Refund</button>}
+                      </>
+                    }
+                    {(userRole === 'staff' && receiptStatus === 'pending') &&
+                      <>
+                        <p>Waiting for approval.</p>
+                      </>
+                    }
+                    {(userRole === 'admin' && receiptStatus === 'pending') &&
+                    <>
+                      <button onClick={() => {
+                        if(receiptDetails.receipt_type === 'refund'){
+                          setModalCancelRefundShow(true);
+                        } else {
+                          setModalVoidShow(true);
+                        }
+                        setReceiptID(receiptDetails.receipt_id);
+                      }}
+                      >Approve Cancel Request</button>
+                      <button onClick={() => handleCancelVoidReceipt(receiptDetails.receipt_id)}
+                      >Cancel</button>
+                    </>
+                    }
+                    {(userRole === 'admin' && receiptStatus === 'active') &&
+                    <>
+                      <button onClick={() => {
+                        if(receiptDetails.receipt_type === 'refund'){
+                          setModalCancelRefundShow(true);
+                        } else {
+                          setModalVoidShow(true);
+                        }
+                        setReceiptID(receiptDetails.receipt_id);
+                      }}
+                      >Cancel Receipt</button>
+                    </>
+                    }
+                  </div>
+                </>
+              )}
+              {(refundView) && (
+                <>
+                  <div className="receipt-nav">
+                    <h4>Refund Receipt</h4>
+                    <div className="print-close">
+                      <i className="fa-solid fa-xmark"
+                        onClick={() => {
+                          setRefundView(false);
+                          setRefundItems({});
+                          setRefundItemsDetails([]);
+                        }}
+                      ></i>
+                    </div>
+                  </div>
+                  <div className="receipt-details-info">
+                    <div className="receipt-details-info-content">
+                      {retrievedReceiptItems.filter((item) => item.record_type === 'item' && item.refund_qty !== item.qty).length === 0 &&
+                        <div className='refund-details-item'>
+                            <p>All items in this receipt were already refunded.</p>
+                        </div>
+                      }
+                      {retrievedReceiptItems.length > 0 &&
+                      retrievedReceiptItems.filter((item) => item.record_type === 'item').map((item, itemIndex) => {
                         return (
-                          <div className='receipt-details-item' key={itemIndex}> 
+                          <div className='refund-details-item' key={itemIndex}>
+                              <input
+                                type="checkbox"
+                                onChange={() => handleCheckboxChange(item)}  // Toggle the checkbox state
+                                disabled={item.refund_qty === item.qty ? true : false}
+                              />
                               <div className="left">    
-                                  <p className="name">{item.item_name}</p>
-                                  {item.record_type === 'item' && <p className="qty-unit-price">{item.qty} x {item.item_unit_price}</p>}
-                                  {item.record_type === 'mechanic' && <p className="qty-unit-price">Mechanic Service</p>}
+                                  <p className="name">{item.item_name} <span id='item-qty'>x {item.qty}</span></p>
+                                  {item.refund_qty > 0 && <p className="qty-unit-price">Refunded x {item.refund_qty}</p>}
+                                  {refundItems[item.item_id] &&                         
+                                    <div className='refund-input'>
+                                      <div className="refund-qty">
+                                        { refundItemsDetails.find((refundItem) => refundItem.id === item.item_id).qty >= 2 ?
+                                        <button
+                                          onClick={() => {
+                                            handleRefundQty(item.item_id, refundItemsDetails.find((refundItem) => refundItem.id === item.item_id).qty -1);
+                                          }}
+                                        >-</button> : 
+                                        <button className="no-decrease">-</button>
+                                        }
+                                        <input
+                                          type="number"
+                                          value={refundItemsDetails.find((refundItem) => refundItem.id === item.item_id).qty}
+                                          min={1}
+                                          onChange={(e) => {
+                                            const newQty = Number(e.target.value);
+                                            const referenceQty = item.refund_qty > 0 ? item.qty - item.refund_qty : item.qty;
+                                            if(newQty <= referenceQty){
+                                              handleRefundQty(item.item_id, e.target.value);
+                                            }
+                                          }}
+                                          />
+                                        { refundItemsDetails.find((refundItem) => refundItem.id === item.item_id).qty < (item.refund_qty > 0 ? item.qty - item.refund_qty : item.qty) ?
+                                        <button
+                                          onClick={() => {
+                                            handleRefundQty(item.item_id, refundItemsDetails.find((refundItem) => refundItem.id === item.item_id).qty + 1);
+                                          }}
+                                        >+</button> : 
+                                        <button className="no-decrease">+</button>
+                                        }
+                                        <p>Refund x {refundItemsDetails.find((refundItem) => refundItem.id === item.item_id).qty}</p>
+                                      </div>
+                                    </div>
+                                  }
                               </div>
-                              <p className='total-price'>{PesoFormat.format(item.item_total_price)}</p>
+                              <div className="total-price">
+                                {(() => {
+                                  const refundItem = refundItemsDetails.find(
+                                    (refundItem) => refundItem.id === item.item_id
+                                  );
+                                  return (
+                                    <p>
+                                      {PesoFormat.format((refundItem?.qty || 0) * item.item_unit_price)}
+                                    </p>
+                                  );
+                                })()}
+                              </div>
                           </div>
                         );
                       })}
-                  </div>
-                  <div className="total-paid-change">
-                    <div className="total">
-                      <p>Total</p>
-                      <p>{PesoFormat.format(receiptDetails.receipt_total_cost)}
-                      </p>
-                    </div>
-                    <div className="paid">
-                      <p>Paid</p>
-                      <p>{PesoFormat.format(receiptDetails.receipt_paid_amount)}
-                      </p>
-                    </div>
-                    <div className="change">
-                      <p>Change</p>
-                      <p>
-                        {PesoFormat.format(receiptDetails.receipt_change)}
-                      </p>
+                     
                     </div>
                   </div>
-                </div>
+                  {Object.values(refundItems).includes(true) ? (
+                      <div className="confirm-refund">
+                        <button
+                          onClick={() => setModalRefundShow(true)}
+                        >Confirm Refund</button>
+                      </div>
+                    ) : (
+                      <div className="cannot-refund">
+                        <p>Confirm Refund</p>
+                      </div>
+                    )
+                  }
+                </>
               )}
-              {receiptDetails.length !== 0 &&
-                <div className="void-refund">
-                  {(userRole === 'staff' && receiptStatus === 'active') &&
-                    <>
-                      <button onClick={() => {
-                        setModalShow(true);
-                        setReceiptID(receiptDetails.receipt_id);
-                      }}
-                      >Request Void</button>
-                      <button>Refund</button>
-                    </>
-                  }
-                  {(userRole === 'staff' && receiptStatus === 'pending') &&
-                    <>
-                      <p>Waiting for approval.</p>
-                    </>
-                  }
-                  {(userRole === 'admin' && receiptStatus === 'pending') &&
-                  <>
-                    <button onClick={() => {
-                      setModalShow(true);
-                      setReceiptID(receiptDetails.receipt_id);
-                    }}
-                    >Approve Void</button>
-                    <button onClick={() => handleCancelVoidReceipt(receiptDetails.receipt_id)}
-                    >Cancel</button>
-                  </>
-                  }
-                </div>
-              }
               {/* Hidden print area - to be fixed */}
               <div id="print-area" className="print-only">
                 {receiptDetails.length !== 0 && (
