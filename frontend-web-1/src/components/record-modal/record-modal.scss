@@ -55,8 +55,15 @@
                 }
 
                 .bottom {
+                    display: flex !important;
+                    justify-content: space-between !important;
+
                     p {
                         color: grey !important;
+                    }
+
+                    .refund-qty, .refund-total {
+                        color: #ffbc11 !important;
                     }
                 }
             }
