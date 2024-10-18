@@ -1,14 +1,14 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Accordion } from 'react-bootstrap';
 import { getFrameItems } from '../../../services/bikeBuilderService';
 import arrowUp from '../../../assets/icons/arrow-up.png';
-import arrowDown from '../../../assets/icons/arrow-down.png';
+import arrowDown from '../../../../assets/icons/arrow-down.png';
 
 const Frame = ({ onAddToBuild }) => {
     const [items, setItems] = useState([]);
     const [sortOrder, setSortOrder] = useState("asc"); // State to manage sort order
 
-    const fetchItems = useCallback(async () => {
+    const fetchItems = async () => {
         try {
             let data = await getFrameItems();
 
@@ -25,11 +25,11 @@ const Frame = ({ onAddToBuild }) => {
         } catch (error) {
             console.error("Error fetching frame items:", error);
         }
-    }, [sortOrder]); // Include sortOrder in the dependencies to update when sortOrder changes
+    };
 
     useEffect(() => {
         fetchItems();
-    }, [fetchItems]); // Properly include fetchItems
+    }, [sortOrder]); // Re-fetch items when the sort order changes
 
     const PesoFormat = new Intl.NumberFormat("en-US", {
         style: "currency",
@@ -40,7 +40,7 @@ const Frame = ({ onAddToBuild }) => {
         <div className="parts-container">
             <div className="sort-container">
                 <div className='sort-title'>
-                    Sort Price :
+                    Sort Price
                 </div>
                 <button
                     className="btn"

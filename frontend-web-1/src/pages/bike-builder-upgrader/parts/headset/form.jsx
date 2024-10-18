@@ -11,7 +11,7 @@ import { AuthContext } from "../../../../context/auth-context";
 import { updateHeadsetItem, archiveHeadsetItem, restoreHeadsetItem, deleteHeadsetItem } from "../../../../services/bbuService";
 import ImagePreviewModal from "../../../../components/image-preview-modal/image-preview";
 
-const Form = ({ selectedItem, setSelectedItem, setItems, refreshWaitlist, onClose, showArchived }) => {
+const Form = ({ selectedItem, setSelectedItem, setItems, refreshWaitlist, onClose, showArchived, isEditing, setIsEditing }) => {
     const [name, setName] = useState('');
     const [price, setPrice] = useState('');
     const [description, setDescription] = useState('');
@@ -21,7 +21,6 @@ const Form = ({ selectedItem, setSelectedItem, setItems, refreshWaitlist, onClos
     const [headsetCupType, setHeadsetCupType] = useState('');
     const [material, setMaterial] = useState('');
     const [weight, setWeight] = useState('');
-    const [isEditing, setIsEditing] = useState(false);
     const [itemImage, setItemImage] = useState(null)
     const [selectedFile, setSelectedFile] = useState(null);
     const [originalItem, setOriginalItem] = useState(null);
@@ -292,10 +291,8 @@ const Form = ({ selectedItem, setSelectedItem, setItems, refreshWaitlist, onClos
                     disabled={!isEditing}
                 >
                     <option value="">Select Type</option>
-                    <option value="Threadless">Threadless</option>
-                    <option value="Integrated">Integrated</option>
-                    <option value="Semi-Integrated">Semi-Integrated</option>
-                    <option value="External Cup">External Cup</option>
+                    <option value="Tapered">Tapered</option>
+                    <option value="Non-tapered">Non-tapered</option>
                 </select>
             </div>
 
@@ -311,9 +308,9 @@ const Form = ({ selectedItem, setSelectedItem, setItems, refreshWaitlist, onClos
                     disabled={!isEditing}
                 >
                     <option value="">Select Diameter</option>
-                    <option value='1 1/8" (28.6 mm)'>1 1/8" (28.6 mm)</option>
-                    <option value='1 1/4" (31.75 mm)'>1 1/4" (31.75 mm)</option>
-                    <option value='1.5" (38.1 mm)'>1.5" (38.1 mm)</option>
+                    <option value="44 mm">44 mm</option>
+                    <option value="49 mm">49 mm</option>
+                    <option value="55 mm">55 mm</option>
                 </select>
             </div>
 
@@ -329,9 +326,9 @@ const Form = ({ selectedItem, setSelectedItem, setItems, refreshWaitlist, onClos
                     disabled={!isEditing}
                 >
                     <option value="">Select Diameter</option>
-                    <option value='1.5" (38.1 mm)'>1.5" (38.1 mm)</option>
-                    <option value='1 1/4" (31.75 mm)'>1 1/4" (31.75 mm)</option>
-                    <option value='1 3/8" (34.9 mm)'>1 3/8" (34.9 mm)</option>
+                    <option value="44 mm">44 mm</option>
+                    <option value="55 mm">55 mm</option>
+                    <option value="56 mm">56 mm</option>
                 </select>
             </div>
 

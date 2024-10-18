@@ -19,6 +19,7 @@ const Stem = () => {
     const [sortOrder, setSortOrder] = useState("asc");
     const [searchTerm, setSearchTerm] = useState('');
     const [showSort, setShowSort] = useState(false);
+    const [isEditing, setIsEditing] = useState(false);
     const showMiddleSection = showSort;
 
 
@@ -75,6 +76,7 @@ const Stem = () => {
     // Handle click on an item
     const handleItemClick = (item) => {
         setSelectedItem(item);
+        setIsEditing(false)
     };
 
 
@@ -237,6 +239,8 @@ const Stem = () => {
                                 refreshWaitlist={refreshWaitlist}
                                 onClose={handleCloseView}
                                 showArchived={showArchived}
+                                isEditing={isEditing}
+                                setIsEditing={setIsEditing}
                             />
                         </div>
                     ) : (

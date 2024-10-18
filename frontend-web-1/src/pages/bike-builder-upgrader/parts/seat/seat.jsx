@@ -19,6 +19,7 @@ const Seat = () => {
     const [sortOrder, setSortOrder] = useState("asc");
     const [searchTerm, setSearchTerm] = useState('');
     const [showSort, setShowSort] = useState(false);
+    const [isEditing, setIsEditing] = useState(false);
     const showMiddleSection = showSort;
 
     const fetchItems = useCallback(async () => {
@@ -74,6 +75,7 @@ const Seat = () => {
     // Handle click on an item
     const handleItemClick = (item) => {
         setSelectedItem(item);
+        setIsEditing(false)
     };
 
 
@@ -236,6 +238,8 @@ const Seat = () => {
                                 refreshWaitlist={refreshWaitlist}
                                 onClose={handleCloseView}
                                 showArchived={showArchived}
+                                isEditing={isEditing}
+                                setIsEditing={setIsEditing}
                             />
                         </div>
                     ) : (

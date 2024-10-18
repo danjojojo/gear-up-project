@@ -11,7 +11,7 @@ import { AuthContext } from "../../../../context/auth-context";
 import { updateGroupsetItem, archiveGroupsetItem, restoreGroupsetItem, deleteGroupsetItem } from "../../../../services/bbuService";
 import ImagePreviewModal from "../../../../components/image-preview-modal/image-preview";
 
-const Form = ({ selectedItem, setSelectedItem, setItems, refreshWaitlist, onClose, showArchived }) => {
+const Form = ({ selectedItem, setSelectedItem, setItems, refreshWaitlist, onClose, showArchived, isEditing, setIsEditing }) => {
     const [name, setName] = useState('');
     const [price, setPrice] = useState('');
     const [description, setDescription] = useState('');
@@ -27,7 +27,6 @@ const Form = ({ selectedItem, setSelectedItem, setItems, refreshWaitlist, onClos
     const [brakeType, setBrakeType] = useState('');
     const [rotorMountType, setRotorMountType] = useState('');
     const [rotorSize, setRotorSize] = useState('');;
-    const [isEditing, setIsEditing] = useState(false);
     const [itemImage, setItemImage] = useState(null)
     const [selectedFile, setSelectedFile] = useState(null);
     const [originalItem, setOriginalItem] = useState(null);

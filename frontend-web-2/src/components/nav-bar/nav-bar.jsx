@@ -2,7 +2,11 @@ import "./nav-bar.scss"
 import React from "react";
 import { NavLink } from "react-router-dom";
 import addcart from "../../assets/icons/add-cart.png"
+import { useNavigate } from "react-router-dom";
+
 const Navbar = () => {
+
+    const navigate = useNavigate();
 
     return (
         <div className="nav-bar">
@@ -33,8 +37,8 @@ const Navbar = () => {
                     Bike Upgrader
                 </NavLink>
 
-                <button className="add-to-cart">
-                    <img src={addcart} alt="add-cart"/>
+                <button className="add-to-cart" onClick={() => navigate('/cart')}>
+                    <img src={addcart} alt="add-cart" />
                 </button>
             </div>
         </div >

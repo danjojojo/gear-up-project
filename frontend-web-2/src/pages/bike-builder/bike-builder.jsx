@@ -32,13 +32,13 @@ const BikeBuilder = () => {
     });
 
     const hitRegions = {
-        frame: { x: 230, y: 180, width: 345, height: 222, rotation: -5 },
-        fork: { x: 530, y: 140, width: 105, height: 258, rotation: -5 },
-        groupset: { x: 235, y: 330, width: 248, height: 100 },
-        frontWheel: { x: 508, y: 245, width: 250, height: 250 },
-        rearWheel: { x: 145, y: 245, width: 250, height: 250 },
-        seat: { x: 292, y: 162, width: 105, height: 163, rotation: -6 },
-        cockpit: { x: 527, y: 112, width: 55, height: 50 }
+        frame: { x: 306, y: 148, width: 311, height: 206 },
+        fork: { x: 576, y: 166, width: 42, height: 207, rotation: -25 },
+        groupset: { x: 292, y: 306, width: 116, height: 96 },
+        frontWheel: { x: 558, y: 211, width: 231, height: 231 },
+        rearWheel: { x: 211, y: 211, width: 231, height: 231 },
+        seat: { x: 362, y: 151, width: 96, height: 122, rotation: -4 },
+        cockpit: { x: 571, y: 118, width: 52, height: 45 }
     };
 
     const [currentPart, setCurrentPart] = useState("frame"); // Tracks the current part being worked on

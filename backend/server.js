@@ -18,6 +18,7 @@ const mechanicRoutes = require('./routers/mechanicsRouter');
 
 // web 2
 const bikeBuilderRouter = require('./routers/bikeBuilderRouter');
+const bikeUpgraderRouter = require('./routers/bikeUpgraderRouter');
 
 require('dotenv').config();
 
@@ -55,19 +56,17 @@ app.use('/auth', authRoutes);
 app.use('/inventory', inventoryRoutes);
 app.use('/waitlist', waitlistRoutes);
 app.use('/bike-builder-upgrader', bbuRoutes);
-
 app.use('/pos', posRoutes);
-
 app.use('/receipt', receiptRoutes);
 app.use('/expense', expenseRoutes);
 app.use('/pos-users', posUsersRoutes);
 app.use('/records', recordsRoutes);
 app.use('/summary', summaryRoutes);
-
 app.use('/mechanics', mechanicRoutes);
 
 // web 2
 app.use('/bike-builder', bikeBuilderRouter);
+app.use('/bike-upgrader', bikeUpgraderRouter);
 
 app.listen(port, () => {
     console.log(`Server running on port ${port}`);

@@ -11,7 +11,7 @@ import { AuthContext } from "../../../../context/auth-context";
 import { updateForkItem, archiveForkItem, restoreForkItem, deleteForkItem } from "../../../../services/bbuService";
 import ImagePreviewModal from "../../../../components/image-preview-modal/image-preview";
 
-const Form = ({ selectedItem, setSelectedItem, setItems, refreshWaitlist, onClose, showArchived }) => {
+const Form = ({ selectedItem, setSelectedItem, setItems, refreshWaitlist, onClose, showArchived, isEditing, setIsEditing }) => {
     const [name, setName] = useState('');
     const [price, setPrice] = useState('');
     const [description, setDescription] = useState('');
@@ -27,7 +27,6 @@ const Form = ({ selectedItem, setSelectedItem, setItems, refreshWaitlist, onClos
     const [maxTireWidth, setMaxTireWidth] = useState('');
     const [frontHubWidth, setFrontHubWidth] = useState('');
     const [material, setMaterial] = useState('');
-    const [isEditing, setIsEditing] = useState(false);
     const [itemImage, setItemImage] = useState(null)
     const [selectedFile, setSelectedFile] = useState(null);
     const [originalItem, setOriginalItem] = useState(null);

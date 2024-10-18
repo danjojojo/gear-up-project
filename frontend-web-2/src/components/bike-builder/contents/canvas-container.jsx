@@ -3,6 +3,7 @@ import { Stage, Layer, Image, Transformer, Rect } from 'react-konva';
 import useImage from 'use-image'; // Correct import from use-image
 import bikeguide from "../../../assets/images/bike-guide.png"; // Correct path for background image
 import reset from "../../../assets/icons/reset.png";
+import frame from "../../../assets/gif/0.frame.gif";
 import fork from "../../../assets/gif/1.fork.gif";
 import groupset from "../../../assets/gif/2.groupset.gif";
 import wheelset from "../../../assets/gif/3.wheelset.gif";
@@ -72,8 +73,8 @@ const CanvasContainer = ({
     }, [selectedPart, lockedParts]);
 
     // Fixed canvas width and height (adjustable)
-    const stageWidth = 800;
-    const stageHeight = 550;
+    const stageWidth = 1000;
+    const stageHeight = 570;
 
     const PesoFormat = new Intl.NumberFormat("en-US", {
         style: "currency",
@@ -135,11 +136,11 @@ const CanvasContainer = ({
                                 {backgroundImage && (
                                     <Image
                                         image={backgroundImage}
-                                        x={(stageWidth - 550) / 2}
-                                        y={(stageHeight - 550) / 2}
-                                        width={550}
-                                        height={550}
-                                        opacity={0.1}
+                                        x={(stageWidth - 570) / 2}
+                                        y={(stageHeight - 570) / 2}
+                                        width={570}
+                                        height={570}
+                                        opacity={0.6}
                                     />
                                 )}
                             </Layer>
@@ -196,11 +197,11 @@ const CanvasContainer = ({
                                         x={partPositions.frontWheel.x}
                                         y={partPositions.frontWheel.y}
                                         rotation={partPositions.frontWheel.rotation}
-                                        height={240}
-                                        width={240}
+                                        height={225}
+                                        width={225}
                                         draggable={selectedPart?.name() === 'frontWheel' && !lockedParts.includes("frontWheel")}
                                         listening={!lockedParts.includes("frontWheel")}
-                                        dragBoundFunc={(pos) => constrainDrag(pos, 240, 240, stageWidth, stageHeight)} // Correct dimensions for front wheel
+                                        dragBoundFunc={(pos) => constrainDrag(pos, 225, 225, stageWidth, stageHeight)} // Correct dimensions for front wheel
                                         onClick={(e) => setSelectedPart(e.target)}
                                         onDragEnd={(e) => handleDragEnd("frontWheel", e)}
                                     />
@@ -214,8 +215,8 @@ const CanvasContainer = ({
                                         x={partPositions.fork.x}
                                         y={partPositions.fork.y}
                                         rotation={partPositions.fork.rotation}
-                                        height={251}
-                                        width={97}
+                                        height={200}
+                                        width={35}
                                         draggable={selectedPart?.name() === 'fork' && !lockedParts.includes("fork")}
                                         listening={!lockedParts.includes("fork")}
                                         dragBoundFunc={(pos) => constrainDrag(pos, 97, 251, stageWidth, stageHeight)} // Correct dimensions for fork
@@ -249,11 +250,11 @@ const CanvasContainer = ({
                                         x={partPositions.seat.x}
                                         y={partPositions.seat.y}
                                         rotation={partPositions.seat.rotation}
-                                        height={154}
-                                        width={96}
+                                        height={116}
+                                        width={90}
                                         draggable={selectedPart?.name() === 'seat' && !lockedParts.includes("seat")}
                                         listening={!lockedParts.includes("seat")}
-                                        dragBoundFunc={(pos) => constrainDrag(pos, 96, 154, stageWidth, stageHeight)} // Correct dimensions for seat
+                                        dragBoundFunc={(pos) => constrainDrag(pos, 90, 116, stageWidth, stageHeight)} // Correct dimensions for seat
                                         onClick={(e) => setSelectedPart(e.target)}
                                         onDragEnd={(e) => handleDragEnd("seat", e)}
                                     />
@@ -267,11 +268,11 @@ const CanvasContainer = ({
                                         x={partPositions.rearWheel.x}
                                         y={partPositions.rearWheel.y}
                                         rotation={partPositions.rearWheel.rotation}
-                                        height={240}
-                                        width={240}
+                                        height={225}
+                                        width={225}
                                         draggable={selectedPart?.name() === 'rearWheel' && !lockedParts.includes("rearWheel")}
                                         listening={!lockedParts.includes("rearWheel")}
-                                        dragBoundFunc={(pos) => constrainDrag(pos, 240, 240, stageWidth, stageHeight)} // Correct dimensions for rear wheel
+                                        dragBoundFunc={(pos) => constrainDrag(pos, 225, 225, stageWidth, stageHeight)} // Correct dimensions for rear wheel
                                         onClick={(e) => setSelectedPart(e.target)}
                                         onDragEnd={(e) => handleDragEnd("rearWheel", e)}
                                     />
@@ -285,17 +286,17 @@ const CanvasContainer = ({
                                         x={partPositions.groupset.x}
                                         y={partPositions.groupset.y}
                                         rotation={partPositions.groupset.rotation}
-                                        height={92}
-                                        width={100} // Left half width
+                                        height={90} // The display height
+                                        width={110} // Adjusted width to half of 220
                                         crop={{
-                                            x: 0,  // Crop left half of the image
+                                            x: 0, // Crop starting from the left
                                             y: 0,
-                                            width: 100,
-                                            height: 92,
+                                            width: 250, // Crop to half of original 500 width
+                                            height: 214, // Use original height
                                         }}
                                         draggable={selectedPart?.name() === 'groupset' && !lockedParts.includes("groupset")}
                                         listening={!lockedParts.includes("groupset")}
-                                        dragBoundFunc={(pos) => constrainDrag(pos, 240, 92, stageWidth, stageHeight)}
+                                        dragBoundFunc={(pos) => constrainDrag(pos, 220, 90, stageWidth, stageHeight)}
                                         onClick={(e) => setSelectedPart(e.target)}
                                         onDragEnd={(e) => handleDragEnd("groupset", e)}
                                     />
@@ -309,11 +310,11 @@ const CanvasContainer = ({
                                         x={partPositions.frame.x}
                                         y={partPositions.frame.y}
                                         rotation={partPositions.frame.rotation}
-                                        height={214}
-                                        width={340}
+                                        height={200}
+                                        width={305}
                                         draggable={selectedPart?.name() === 'frame' && !lockedParts.includes("frame")}
                                         listening={!lockedParts.includes("frame")}
-                                        dragBoundFunc={(pos) => constrainDrag(pos, 340, 214, stageWidth, stageHeight)}
+                                        dragBoundFunc={(pos) => constrainDrag(pos, 305, 200, stageWidth, stageHeight)}
                                         onClick={(e) => setSelectedPart(e.target)}
                                         onDragEnd={(e) => handleDragEnd("frame", e)}
                                     />
@@ -324,20 +325,20 @@ const CanvasContainer = ({
                                     <Image
                                         name="groupset"
                                         image={groupsetImage}
-                                        x={partPositions.groupset.x + 100}  // Offset right half to the right
+                                        x={partPositions.groupset.x + 110} // Shift to the right for the second half
                                         y={partPositions.groupset.y}
                                         rotation={partPositions.groupset.rotation}
-                                        height={92}
-                                        width={140} // Right half width
+                                        height={90} // Same display height
+                                        width={110} // Adjusted width
                                         crop={{
-                                            x: 100,  // Crop right half of the image
+                                            x: 250, // Start from middle of original 500 width
                                             y: 0,
-                                            width: 140,
-                                            height: 92,
+                                            width: 250, // Crop the second half of the image
+                                            height: 214, // Use original height
                                         }}
                                         draggable={selectedPart?.name() === 'groupset' && !lockedParts.includes("groupset")}
                                         listening={!lockedParts.includes("groupset")}
-                                        dragBoundFunc={(pos) => constrainDrag(pos, 240, 92, stageWidth, stageHeight)}
+                                        dragBoundFunc={(pos) => constrainDrag(pos, 220, 90, stageWidth, stageHeight)}
                                         onClick={(e) => setSelectedPart(e.target)}
                                         onDragEnd={(e) => handleDragEnd("groupset", e)}
                                     />
@@ -370,6 +371,9 @@ const CanvasContainer = ({
                 <div className="guide-container">
                     <div className="content-container">
 
+                        {currentPart === "frame" && (
+                            <img src={frame} alt="frame-fork" />
+                        )}
                         {currentPart === "fork" && (
                             <img src={fork} alt="guide-fork" />
                         )}
