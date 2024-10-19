@@ -199,11 +199,36 @@ const CanvasContainer = ({
                                         rotation={partPositions.frontWheel.rotation}
                                         height={225}
                                         width={225}
+                                        opacity={selectedPart?.name() === 'frontWheel' ? 0.85 : 1} // Slight opacity change when selected
                                         draggable={selectedPart?.name() === 'frontWheel' && !lockedParts.includes("frontWheel")}
                                         listening={!lockedParts.includes("frontWheel")}
                                         dragBoundFunc={(pos) => constrainDrag(pos, 225, 225, stageWidth, stageHeight)} // Correct dimensions for front wheel
                                         onClick={(e) => setSelectedPart(e.target)}
-                                        onDragEnd={(e) => handleDragEnd("frontWheel", e)}
+                                        onDragStart={() => {
+                                            // Subtle highlight and scale when dragging starts
+                                            const part = partsLayerRef.current.findOne(".frontWheel");
+                                            part.to({
+                                                stroke: '#888', // Light gray border to highlight
+                                                strokeWidth: 1.5,
+                                                opacity: 0.9, // Slight fade effect
+                                                scaleX: 1.02, // Slightly increase scale
+                                                scaleY: 1.02,
+                                                duration: 0.1,
+                                            });
+                                        }}
+                                        onDragEnd={(e) => {
+                                            // Reset minimal effect when dragging ends
+                                            const part = partsLayerRef.current.findOne(".frontWheel");
+                                            part.to({
+                                                stroke: '', // Remove border
+                                                strokeWidth: 0,
+                                                opacity: 1, // Reset opacity
+                                                scaleX: 1, // Reset scale
+                                                scaleY: 1,
+                                                duration: 0.1,
+                                            });
+                                            handleDragEnd("frontWheel", e);
+                                        }}
                                     />
                                 )}
 
@@ -217,11 +242,36 @@ const CanvasContainer = ({
                                         rotation={partPositions.fork.rotation}
                                         height={200}
                                         width={35}
+                                        opacity={selectedPart?.name() === 'fork' ? 0.85 : 1} // Slight opacity change when selected
                                         draggable={selectedPart?.name() === 'fork' && !lockedParts.includes("fork")}
                                         listening={!lockedParts.includes("fork")}
                                         dragBoundFunc={(pos) => constrainDrag(pos, 97, 251, stageWidth, stageHeight)} // Correct dimensions for fork
                                         onClick={(e) => setSelectedPart(e.target)}
-                                        onDragEnd={(e) => handleDragEnd("fork", e)}
+                                        onDragStart={() => {
+                                            // Subtle highlight and scale when dragging starts
+                                            const part = partsLayerRef.current.findOne(".fork");
+                                            part.to({
+                                                stroke: '#888', // Light gray border to highlight
+                                                strokeWidth: 1.5,
+                                                opacity: 0.9, // Slight fade effect
+                                                scaleX: 1.02, // Slightly increase scale
+                                                scaleY: 1.02,
+                                                duration: 0.1,
+                                            });
+                                        }}
+                                        onDragEnd={(e) => {
+                                            // Reset minimal effect when dragging ends
+                                            const part = partsLayerRef.current.findOne(".fork");
+                                            part.to({
+                                                stroke: '', // Remove border
+                                                strokeWidth: 0,
+                                                opacity: 1, // Reset opacity
+                                                scaleX: 1, // Reset scale
+                                                scaleY: 1,
+                                                duration: 0.1,
+                                            });
+                                            handleDragEnd("fork", e);
+                                        }}
                                     />
                                 )}
 
@@ -234,11 +284,36 @@ const CanvasContainer = ({
                                         rotation={partPositions.cockpit.rotation}
                                         height={39}
                                         width={46}
+                                        opacity={selectedPart?.name() === 'cockpit' ? 0.85 : 1} // Slight opacity change when selected
                                         draggable={selectedPart?.name() === 'cockpit' && !lockedParts.includes("cockpit")}
                                         listening={!lockedParts.includes("cockpit")}
                                         dragBoundFunc={(pos) => constrainDrag(pos, 46, 39, stageWidth, stageHeight)} // Correct dimensions for cockpit
                                         onClick={(e) => setSelectedPart(e.target)}
-                                        onDragEnd={(e) => handleDragEnd("cockpit", e)}
+                                        onDragStart={() => {
+                                            // Subtle highlight and scale when dragging starts
+                                            const part = partsLayerRef.current.findOne(".cockpit");
+                                            part.to({
+                                                stroke: '#888', // Light gray border to highlight
+                                                strokeWidth: 1.5,
+                                                opacity: 0.9, // Slight fade effect
+                                                scaleX: 1.02, // Slightly increase scale
+                                                scaleY: 1.02,
+                                                duration: 0.1,
+                                            });
+                                        }}
+                                        onDragEnd={(e) => {
+                                            // Reset minimal effect when dragging ends
+                                            const part = partsLayerRef.current.findOne(".cockpit");
+                                            part.to({
+                                                stroke: '', // Remove border
+                                                strokeWidth: 0,
+                                                opacity: 1, // Reset opacity
+                                                scaleX: 1, // Reset scale
+                                                scaleY: 1,
+                                                duration: 0.1,
+                                            });
+                                            handleDragEnd("cockpit", e);
+                                        }}
                                     />
                                 )}
 
@@ -252,11 +327,36 @@ const CanvasContainer = ({
                                         rotation={partPositions.seat.rotation}
                                         height={116}
                                         width={90}
+                                        opacity={selectedPart?.name() === 'seat' ? 0.85 : 1} // Slight opacity change when selected
                                         draggable={selectedPart?.name() === 'seat' && !lockedParts.includes("seat")}
                                         listening={!lockedParts.includes("seat")}
                                         dragBoundFunc={(pos) => constrainDrag(pos, 90, 116, stageWidth, stageHeight)} // Correct dimensions for seat
                                         onClick={(e) => setSelectedPart(e.target)}
-                                        onDragEnd={(e) => handleDragEnd("seat", e)}
+                                        onDragStart={() => {
+                                            // Subtle highlight and scale when dragging starts
+                                            const part = partsLayerRef.current.findOne(".seat");
+                                            part.to({
+                                                stroke: '#888', // Light gray border to highlight
+                                                strokeWidth: 1.5,
+                                                opacity: 0.9, // Slight fade effect
+                                                scaleX: 1.02, // Slightly increase scale
+                                                scaleY: 1.02,
+                                                duration: 0.1,
+                                            });
+                                        }}
+                                        onDragEnd={(e) => {
+                                            // Reset minimal effect when dragging ends
+                                            const part = partsLayerRef.current.findOne(".seat");
+                                            part.to({
+                                                stroke: '', // Remove border
+                                                strokeWidth: 0,
+                                                opacity: 1, // Reset opacity
+                                                scaleX: 1, // Reset scale
+                                                scaleY: 1,
+                                                duration: 0.1,
+                                            });
+                                            handleDragEnd("seat", e);
+                                        }}
                                     />
                                 )}
 
@@ -270,11 +370,36 @@ const CanvasContainer = ({
                                         rotation={partPositions.rearWheel.rotation}
                                         height={225}
                                         width={225}
+                                        opacity={selectedPart?.name() === 'rearWheel' ? 0.85 : 1} // Slight opacity change when selected
                                         draggable={selectedPart?.name() === 'rearWheel' && !lockedParts.includes("rearWheel")}
                                         listening={!lockedParts.includes("rearWheel")}
                                         dragBoundFunc={(pos) => constrainDrag(pos, 225, 225, stageWidth, stageHeight)} // Correct dimensions for rear wheel
                                         onClick={(e) => setSelectedPart(e.target)}
-                                        onDragEnd={(e) => handleDragEnd("rearWheel", e)}
+                                        onDragStart={() => {
+                                            // Subtle highlight and scale when dragging starts
+                                            const part = partsLayerRef.current.findOne(".rearWheel");
+                                            part.to({
+                                                stroke: '#888', // Light gray border to highlight
+                                                strokeWidth: 1.5,
+                                                opacity: 0.9, // Slight fade effect
+                                                scaleX: 1.02, // Slightly increase scale
+                                                scaleY: 1.02,
+                                                duration: 0.1,
+                                            });
+                                        }}
+                                        onDragEnd={(e) => {
+                                            // Reset minimal effect when dragging ends
+                                            const part = partsLayerRef.current.findOne(".rearWheel");
+                                            part.to({
+                                                stroke: '', // Remove border
+                                                strokeWidth: 0,
+                                                opacity: 1, // Reset opacity
+                                                scaleX: 1, // Reset scale
+                                                scaleY: 1,
+                                                duration: 0.1,
+                                            });
+                                            handleDragEnd("rearWheel", e);
+                                        }}
                                     />
                                 )}
 
@@ -288,6 +413,7 @@ const CanvasContainer = ({
                                         rotation={partPositions.groupset.rotation}
                                         height={90} // The display height
                                         width={110} // Adjusted width to half of 220
+                                        opacity={selectedPart?.name() === 'groupset' ? 0.85 : 1} // Slight opacity change when selected
                                         crop={{
                                             x: 0, // Crop starting from the left
                                             y: 0,
@@ -298,7 +424,31 @@ const CanvasContainer = ({
                                         listening={!lockedParts.includes("groupset")}
                                         dragBoundFunc={(pos) => constrainDrag(pos, 220, 90, stageWidth, stageHeight)}
                                         onClick={(e) => setSelectedPart(e.target)}
-                                        onDragEnd={(e) => handleDragEnd("groupset", e)}
+                                        onDragStart={() => {
+                                            // Subtle highlight and scale when dragging starts
+                                            const part = partsLayerRef.current.findOne(".groupset");
+                                            part.to({
+                                                stroke: '#888', // Light gray border to highlight
+                                                strokeWidth: 1.5,
+                                                opacity: 0.9, // Slight fade effect
+                                                scaleX: 1.02, // Slightly increase scale
+                                                scaleY: 1.02,
+                                                duration: 0.1,
+                                            });
+                                        }}
+                                        onDragEnd={(e) => {
+                                            // Reset minimal effect when dragging ends
+                                            const part = partsLayerRef.current.findOne(".groupset");
+                                            part.to({
+                                                stroke: '', // Remove border
+                                                strokeWidth: 0,
+                                                opacity: 1, // Reset opacity
+                                                scaleX: 1, // Reset scale
+                                                scaleY: 1,
+                                                duration: 0.1,
+                                            });
+                                            handleDragEnd("groupset", e);
+                                        }}
                                     />
                                 )}
 
@@ -312,11 +462,36 @@ const CanvasContainer = ({
                                         rotation={partPositions.frame.rotation}
                                         height={200}
                                         width={305}
+                                        opacity={selectedPart?.name() === 'frame' ? 0.85 : 1} // Slight opacity change when selected
                                         draggable={selectedPart?.name() === 'frame' && !lockedParts.includes("frame")}
                                         listening={!lockedParts.includes("frame")}
                                         dragBoundFunc={(pos) => constrainDrag(pos, 305, 200, stageWidth, stageHeight)}
                                         onClick={(e) => setSelectedPart(e.target)}
-                                        onDragEnd={(e) => handleDragEnd("frame", e)}
+                                        onDragStart={() => {
+                                            // Subtle highlight and scale when dragging starts
+                                            const part = partsLayerRef.current.findOne(".frame");
+                                            part.to({
+                                                stroke: '#888', // Light gray border to highlight
+                                                strokeWidth: 1.5,
+                                                opacity: 0.9, // Slight fade effect
+                                                scaleX: 1.02, // Slightly increase scale
+                                                scaleY: 1.02,
+                                                duration: 0.1,
+                                            });
+                                        }}
+                                        onDragEnd={(e) => {
+                                            // Reset minimal effect when dragging ends
+                                            const part = partsLayerRef.current.findOne(".frame");
+                                            part.to({
+                                                stroke: '', // Remove border
+                                                strokeWidth: 0,
+                                                opacity: 1, // Reset opacity
+                                                scaleX: 1, // Reset scale
+                                                scaleY: 1,
+                                                duration: 0.1,
+                                            });
+                                            handleDragEnd("frame", e);
+                                        }}
                                     />
                                 )}
 
@@ -330,6 +505,7 @@ const CanvasContainer = ({
                                         rotation={partPositions.groupset.rotation}
                                         height={90} // Same display height
                                         width={110} // Adjusted width
+                                        opacity={selectedPart?.name() === 'groupset' ? 0.85 : 1} // Slight opacity change when selected
                                         crop={{
                                             x: 250, // Start from middle of original 500 width
                                             y: 0,
@@ -340,7 +516,31 @@ const CanvasContainer = ({
                                         listening={!lockedParts.includes("groupset")}
                                         dragBoundFunc={(pos) => constrainDrag(pos, 220, 90, stageWidth, stageHeight)}
                                         onClick={(e) => setSelectedPart(e.target)}
-                                        onDragEnd={(e) => handleDragEnd("groupset", e)}
+                                        onDragStart={() => {
+                                            // Subtle highlight and scale when dragging starts
+                                            const part = partsLayerRef.current.findOne(".groupset");
+                                            part.to({
+                                                stroke: '#888', // Light gray border to highlight
+                                                strokeWidth: 1.5,
+                                                opacity: 0.9, // Slight fade effect
+                                                scaleX: 1.02, // Slightly increase scale
+                                                scaleY: 1.02,
+                                                duration: 0.1,
+                                            });
+                                        }}
+                                        onDragEnd={(e) => {
+                                            // Reset minimal effect when dragging ends
+                                            const part = partsLayerRef.current.findOne(".groupset");
+                                            part.to({
+                                                stroke: '', // Remove border
+                                                strokeWidth: 0,
+                                                opacity: 1, // Reset opacity
+                                                scaleX: 1, // Reset scale
+                                                scaleY: 1,
+                                                duration: 0.1,
+                                            });
+                                            handleDragEnd("groupset", e);
+                                        }}
                                     />
                                 )}
 

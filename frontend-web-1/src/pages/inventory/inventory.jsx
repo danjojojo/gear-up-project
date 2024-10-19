@@ -958,10 +958,6 @@ const Inventory = () => {
                                                                 <option value="Wheelset">Wheelset</option>
                                                                 <option value="Seat">Seat</option>
                                                                 <option value="Cockpit">Cockpit</option>
-                                                                <option value="Headset">Headset</option>
-                                                                <option value="Handlebar">Handlebar</option>
-                                                                <option value="Stem">Stem</option>
-                                                                <option value="Hubs">Hubs</option>
                                                             </select>
                                                         </div>
                                                     )}
@@ -1173,10 +1169,6 @@ const Inventory = () => {
                                                     <option value="Wheelset">Wheelset</option>
                                                     <option value="Seat">Seat</option>
                                                     <option value="Cockpit">Cockpit</option>
-                                                    <option value="Headset">Headset</option>
-                                                    <option value="Handlebar">Handlebar</option>
-                                                    <option value="Stem">Stem</option>
-                                                    <option value="Hubs">Hubs</option>
                                                 </select>
                                             </div>
                                         )}

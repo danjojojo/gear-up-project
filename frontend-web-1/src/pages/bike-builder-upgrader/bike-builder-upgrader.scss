@@ -10,16 +10,14 @@
                 height: 33.33%;
 
                 .frame-container,
-                .fork-container,
-                .groupset-container,
-                .wheelset-container {
-                    width: 25%;
+                .fork-container {
+                    width: 50%;
                     padding: 5px;
                     cursor: pointer;
-                    transition: transform 0.3s ease;
+                    transition: transform 0.5s ease;
 
                     &:hover {
-                        transform: scale(1.03);
+                        transform: scale(1.01);
                     }
 
                     .content {
@@ -74,17 +72,15 @@
             .middle-container {
                 height: 33.33%;
 
-                .seat-container,
-                .cockpit-container,
-                .headset-container,
-                .handlebar-container {
-                    width: 25%;
+                .groupset-container,
+                .wheelset-container {
+                    width: 50%;
                     padding: 5px;
                     cursor: pointer;
-                    transition: transform 0.3s ease;
+                    transition: transform 0.5s ease;
 
                     &:hover {
-                        transform: scale(1.03);
+                        transform: scale(1.01);
                     }
 
                     .content {
@@ -139,15 +135,15 @@
             .lower-container {
                 height: 33.33%;
 
-                .stem-container,
-                .hubs-container {
-                    width: 25%;
+                .seat-container,
+                .cockpit-container {
+                    width: 50%;
                     padding: 5px;
                     cursor: pointer;
-                    transition: transform 0.3s ease;
+                    transition: transform 0.5s ease;
 
                     &:hover {
-                        transform: scale(1.03);
+                        transform: scale(1.01);
                     }
 
                     .content {
