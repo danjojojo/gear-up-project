@@ -103,18 +103,23 @@ const CanvasContainer = ({
             <div className="left-container">
                 <div className="budget-stat-container d-flex">
                     <div className="budget">
-                        <div className="content d-flex">
-                            {budget && (
+                        <div className="content">
+                            <div className='upper d-flex'>
+                                {budget && (
+                                    <div className="price">
+                                        <b>Your Budget</b> <br />
+                                        <span style={{ color: buildStatsPrice <= budget || !budget ? 'green' : 'red' }}>
+                                            Price:   {PesoFormat.format(budget)}
+                                        </span>
+                                    </div>
+                                )}
                                 <div className="price">
-                                    <b>Your Budget</b> <br />
-                                    <span style={{ color: buildStatsPrice <= budget || !budget ? 'green' : 'red' }}>
-                                        Price:   {PesoFormat.format(budget)}
-                                    </span>
+                                    <b>Build Stats</b> <br />
+                                    Total Price: {PesoFormat.format(buildStatsPrice)}
                                 </div>
-                            )}
-                            <div className="price">
-                                <b>Build Stats</b> <br />
-                                Total Price: {PesoFormat.format(buildStatsPrice)}
+                            </div>
+                            <div className='lower'>
+                                <span><b>Note: </b> Please select and drag the part exactly onto the highlighted hit region before proceeding.</span>
                             </div>
                         </div>
                     </div>
@@ -155,9 +160,12 @@ const CanvasContainer = ({
                                                     y={hitRegions.frontWheel.y}
                                                     width={hitRegions.frontWheel.width}
                                                     height={hitRegions.frontWheel.height}
-                                                    stroke="green"
-                                                    strokeWidth={2}
-                                                    dash={[10, 5]} // Dashed line for visualizing hit region
+                                                    stroke="#00CED1" // Vivid teal color
+                                                    strokeWidth={1.5} // Slightly thicker stroke for visibility
+                                                    dash={[4, 2]} // Subtle dotted line
+                                                    shadowColor="#00CED1" // Shadow in the same color
+                                                    shadowBlur={8} // Light glow effect
+                                                    shadowOpacity={0.4} // Slightly stronger opacity for the glow
                                                 />
                                             )}
                                             {/* Rear Wheel Hit Region */}
@@ -167,9 +175,12 @@ const CanvasContainer = ({
                                                     y={hitRegions.rearWheel.y}
                                                     width={hitRegions.rearWheel.width}
                                                     height={hitRegions.rearWheel.height}
-                                                    stroke="green"
-                                                    strokeWidth={2}
-                                                    dash={[10, 5]} // Dashed line for visualizing hit region
+                                                    stroke="#00CED1" // Vivid teal color
+                                                    strokeWidth={1.5} // Slightly thicker stroke for visibility
+                                                    dash={[4, 2]} // Subtle dotted line
+                                                    shadowColor="#00CED1" // Shadow in the same color
+                                                    shadowBlur={8} // Light glow effect
+                                                    shadowOpacity={0.4} // Slightly stronger opacity for the glow
                                                 />
                                             )}
                                         </>
@@ -180,14 +191,18 @@ const CanvasContainer = ({
                                                 y={hitRegions[selectedPart.name()].y}
                                                 width={hitRegions[selectedPart.name()].width}
                                                 height={hitRegions[selectedPart.name()].height}
-                                                stroke="green"
-                                                strokeWidth={2}
-                                                dash={[10, 5]} // Dashed line for visualizing hit region
+                                                stroke="#00CED1" // Vivid teal color
+                                                strokeWidth={1.5} // Slightly thicker stroke for visibility
+                                                dash={[4, 2]} // Subtle dotted line
+                                                shadowColor="#00CED1" // Shadow in the same color
+                                                shadowBlur={8} // Light glow effect
+                                                shadowOpacity={0.4} // Slightly stronger opacity for the glow
                                                 rotation={hitRegions[selectedPart.name()].rotation}
                                             />
                                         )
                                     )
                                 )}
+
 
                                 {/* Front Wheel */}
                                 {wheelsetImage && (
@@ -512,10 +527,9 @@ const CanvasContainer = ({
                                             width: 250, // Crop the second half of the image
                                             height: 214, // Use original height
                                         }}
-                                        draggable={selectedPart?.name() === 'groupset' && !lockedParts.includes("groupset")}
+                                        draggable={false}
                                         listening={!lockedParts.includes("groupset")}
                                         dragBoundFunc={(pos) => constrainDrag(pos, 220, 90, stageWidth, stageHeight)}
-                                        onClick={(e) => setSelectedPart(e.target)}
                                         onDragStart={() => {
                                             // Subtle highlight and scale when dragging starts
                                             const part = partsLayerRef.current.findOne(".groupset");
