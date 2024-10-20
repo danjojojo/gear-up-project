@@ -66,11 +66,11 @@ const BikeUpgrader = () => {
             frame: [
                 'forkTravel', // Fork travel -> Frame purpose
                 'forkSize', // Fork size -> Frame size
-                'forkTubeType', // Fork tube type -> Head tube
-                'forkAxleType', // Fork axle type -> Frame axle type
-                'forkAxleDiameter', // Fork axle diameter -> Frame axle diameter
-                'forkRotorSizes', // Fork rotor size -> Frame rotor size
-                'forkMaxTireWidth' // Fork max tire width -> Frame max tire width
+                'forkTubeType' // Fork tube type -> Head tube
+                // 'forkAxleType', // Fork axle type -> Frame axle type
+                // 'forkAxleDiameter', // Fork axle diameter -> Frame axle diameter
+                // 'forkRotorSizes', // Fork rotor size -> Frame rotor size
+                // 'forkMaxTireWidth' // Fork max tire width -> Frame max tire width
             ]
         },
         groupset: {
@@ -85,7 +85,7 @@ const BikeUpgrader = () => {
                 'rotorSize' // Rotor size -> Frame rotor size
             ],
             fork: [
-                'rotorSize' // Rotor size -> Fork rotor size
+                'forkRotorSize' // Rotor size -> Fork rotor size
             ]
         },
         wheelset: {
@@ -126,7 +126,7 @@ const BikeUpgrader = () => {
     // Form Options Matching Compatibility Specs
     const formOptions = {
         purpose: ["Cross-country (XC)", "Trail", "Enduro", "Downhill (DH)"],
-        frameSize: ["26\"", "27.5\"", "29\""],
+        frameSize: ['26"', '27.5"', '29"'],
         headTubeType: ["Non Tapered", "Tapered"],
         headTubeUpperDiameter: ["34mm", "44mm", "49mm", "55mm"],
         headTubeLowerDiameter: ["34mm", "44mm", "55mm", "56mm"],
@@ -136,18 +136,18 @@ const BikeUpgrader = () => {
         bottomBracketType: ["Threaded (BSA)", "Press-Fit (PF30, BB86, BB92)", "BB30"],
         bottomBracketWidth: ["68mm", "73mm (MTB)", "83mm (Downhill)", "86mm (Press-Fit)", "92mm (MTB)"],
         frameRotorSize: ["160mm", "180mm", "203mm"],
-        frameMaxTireWidth: ["2.1\"", "2.25\"", "2.4\"", "2.6\"", "2.8\""],
+        frameMaxTireWidth: ['2.1"', '2.25"', '2.4"', '2.6"', '2.8"'],
         rearHubWidth: ["135mm (Rear)", "142mm (Rear)", "148mm (Boost Rear)", "150mm (Downhill)"],
-        forkSize: ["26\"", "27.5\"", "29\""],
+        forkSize: ['26"', '27.5"', '29"'],
         forkTubeType: ["Non Tapered", "Tapered"],
-        forkTubeUpperDiameter: ["1 1/8\"", "1 1/4\"", "1.5\""],
-        forkTubeLowerDiameter: ["1 1/8\"", "1 1/4\"", "1.5\""],
+        forkTubeUpperDiameter: ['1 1/8"', '1 1/4"', '1.5"'],
+        forkTubeLowerDiameter: ['1 1/8"', '1 1/4"', '1.5"'],
         forkTravel: ["80mm to 120mm", "120mm to 160mm", "150mm to 180mm", "180mm to 200mm"],
         forkAxleType: ["Quick Release (QR)", "Thru-Axle"],
         forkAxleDiameter: ["9mm (QR)", "15mm (Thru-Axle)", "20mm (Thru-Axle)"],
         forkSuspensionType: ["Air", "Coil", "N/A (Rigid)"],
         forkRotorSize: ["160mm", "180mm", "203mm"],
-        forkMaxTireWidth: ["2.1\"", "2.25\"", "2.4\"", "2.6\"", "2.8\""],
+        forkMaxTireWidth: ['2.1"', '2.25"', '2.4"', '2.6"', '2.8"'],
         frontHubWidth: ["100mm (Front)", "110mm (Boost Front)"],
         chainringSpeed: ["Single (1x)", "Double (2x)", "Triple (3x)"],
         crankArmLength: ["165mm", "170mm", "175mm", "180mm"],
@@ -165,8 +165,8 @@ const BikeUpgrader = () => {
         rearHubAxleType: ["Quick Release (QR)", "Thru-Axle (TA)"],
         rearHubAxleDiameter: ["9mm (QR)", "12mm (Thru-Axle)", "15mm (Thru-Axle)", "20mm (Thru-Axle)"],
         rearHubSpeed: ["8-speed", "9-speed", "10-speed", "11-speed", "12-speed"],
-        tireSize: ["26\"", "27.5\"", "29\""],
-        tireWidth: ["1.9\"", "1.95\"", "2.0\"", "2.1\"", "2.125\"", "2.25\"", "2.4\"", "2.6\"", "2.8\""],
+        tireSize: ['26"', '27.5"', '29"'],
+        tireWidth: ['1.9"', '1.95"', '2.0"', '2.1"', '2.125"', '2.25"', '2.4"', '2.6"', '2.8"'],
         rimSpokes: ["28", "32", "36"],
         seatPostLength: ["300mm", "350mm", "400mm", "450mm"],
         seatClampType: ["Quick Release", "Bolt-On"],
@@ -177,7 +177,7 @@ const BikeUpgrader = () => {
         stemClampDiameter: ["25.4mm", "31.8mm", "35mm"],
         stemLength: ["60mm", "70mm", "80mm", "90mm", "100mm"],
         stemAngle: ["Negative", "Positive"],
-        stemForkDiameter: ["1 1/8\"", "1 1/4\"", "1.5\""],
+        stemForkDiameter: ['1 1/8"', '1 1/4"', '1.5"'],
         headsetType: ["Tapered", "Non-tapered"],
         headsetCupType: ["Integrated", "Non-integrated"],
         headsetUpperDiameter: ["44mm", "49mm", "55mm"],
@@ -290,6 +290,9 @@ const BikeUpgrader = () => {
             case 'frame':
                 const frameItems = await getFrameItems();
                 console.log(frameItems);
+                frameItems.filter(() => {
+
+                })
                 break;
             case 'fork':
                 const forkItems = await getForkItems();
@@ -390,44 +393,55 @@ const BikeUpgrader = () => {
             <div className="right-container">
                 <h4>{desiredPart === '' ? 'Parts' : desiredPart + 's'}</h4>
                 <div className="parts-container">
-                    <div className="specs-not-set">
+                    {/* <div className="specs-not-set">
                         <p>Enter your specifications and press <strong>Find Parts</strong>.</p>
-                    </div>
-                    {/* <div className="parts">
-                        <div className="part">
-                            <div className="part-image">
-                                <img src="https://via.placeholder.com/150" alt="part" />
-                            </div>
-                            <div className="part-details">
-                                <h5>Part Name</h5>
-                                <p>Part Description</p>
-                                <p>{PesoFormat.format(1000)}</p>
-                                <button>Add to cart</button>
-                            </div>
-                        </div>
-                        <div className="part">
-                            <div className="part-image">
-                                <img src="https://via.placeholder.com/150" alt="part" />
-                            </div>
-                            <div className="part-details">
-                                <h5>Part Name</h5>
-                                <p>Part Description</p>
-                                <p>{PesoFormat.format(1000)}</p>
-                                <button>Add to cart</button>
-                            </div>
-                        </div>
-                        <div className="part">
-                            <div className="part-image">
-                                <img src="https://via.placeholder.com/150" alt="part" />
-                            </div>
-                            <div className="part-details">
-                                <h5>Part Name</h5>
-                                <p>Part Description</p>
-                                <p>{PesoFormat.format(1000)}</p>
-                                <button>Add to cart</button>
-                            </div>
-                        </div>
                     </div> */}
+                    <div className="parts">
+                        <div className="part">
+                            <div className="part-image">
+                                <img src="https://via.placeholder.com/150" alt="part" />
+                            </div>
+                            <div className="part-details">
+                                <h5>Part Name</h5>
+                                <p>Part Description</p>
+                                <p>{PesoFormat.format(1000)}</p>
+                                <button>Add to cart</button>
+                            </div>
+                        </div>
+                        <div className="part">
+                            <div className="part-image">
+                                <img src="https://via.placeholder.com/150" alt="part" />
+                            </div>
+                            <div className="part-details">
+                                <h5>Part Name</h5>
+                                <p>Part Description</p>
+                                <p>{PesoFormat.format(1000)}</p>
+                                <button>Add to cart</button>
+                            </div>
+                        </div>
+                        <div className="part">
+                            <div className="part-image">
+                                <img src="https://via.placeholder.com/150" alt="part" />
+                            </div>
+                            <div className="part-details">
+                                <h5>Part Name</h5>
+                                <p>Part Description</p>
+                                <p>{PesoFormat.format(1000)}</p>
+                                <button>Add to cart</button>
+                            </div>
+                        </div>
+                        <div className="part">
+                            <div className="part-image">
+                                <img src="https://via.placeholder.com/150" alt="part" />
+                            </div>
+                            <div className="part-details">
+                                <h5>Part Name</h5>
+                                <p>Part Description</p>
+                                <p>{PesoFormat.format(1000)}</p>
+                                <button>Add to cart</button>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
