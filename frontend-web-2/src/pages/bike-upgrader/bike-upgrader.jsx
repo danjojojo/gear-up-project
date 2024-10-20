@@ -202,6 +202,7 @@ const BikeUpgrader = () => {
         setDesiredPart(desiredPartValue);
     }
 
+    // Nandito yung mga na columns and naset na specs ni user
     const handleSetSpecification = (field, value) => {
         if(dynamicFormFields.includes(field)) {
             setFormValues((prev) => ({
@@ -244,6 +245,8 @@ const BikeUpgrader = () => {
         // When ownedParts and desiredPart changes, get the formFields
         const fields = getFormFields(ownedParts, desiredPart);
         setDynamicFormFields(fields);
+        setFormValues({});
+        console.log('formValues', formValues);
     }, [ownedParts, desiredPart]);
 
     const renderDynamicForm = () => {
@@ -378,7 +381,10 @@ const BikeUpgrader = () => {
                     }
                 </div>
                 <div className="row-3">
-                    <button className="upgrade-part" onClick={handleFindParts}>Find parts</button>
+                    <button 
+                    className="upgrade-part" onClick={handleFindParts}
+                    disabled={Object.keys(formValues).length === 0 ? true : false}   
+                    >Find parts</button>
                 </div>
             </div>
             <div className="right-container">
