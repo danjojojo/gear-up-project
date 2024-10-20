@@ -1,5 +1,13 @@
 import "./bike-upgrader.scss"
 import React, {useState, useEffect } from "react";
+import {
+    getFrameItems,
+    getForkItems,
+    getGroupsetItems,
+    getWheelsetItems,
+    getSeatItems, 
+    getCockpitItems 
+} from "../../services/bikeBuilderService";
 
 const BikeUpgrader = () => {
     const ownedPartsSelection = [
@@ -273,8 +281,36 @@ const BikeUpgrader = () => {
         ));
     };
 
-    const handleFindParts = () => {
+    const handleFindParts = async () => {
         console.log(dynamicFormFields);
+        switch(desiredPart) {
+            case 'frame':
+                const frameItems = await getFrameItems();
+                console.log(frameItems);
+                break;
+            case 'fork':
+                const forkItems = await getForkItems();
+                console.log(forkItems);
+                break;
+            case 'groupset':
+                const groupsetItems = await getGroupsetItems();
+                console.log(groupsetItems);
+                break;
+            case 'wheelset':
+                const wheelsetItems = await getWheelsetItems();
+                console.log(wheelsetItems);
+                break;
+            case 'seat':
+                const seatItems = await getSeatItems();
+                console.log(seatItems);
+                break;
+            case 'cockpit':
+                const cockpitItems = await getCockpitItems();
+                console.log(cockpitItems);
+                break;
+            default:
+                break;
+        }
     }
 
     const PesoFormat = new Intl.NumberFormat("en-US", {
