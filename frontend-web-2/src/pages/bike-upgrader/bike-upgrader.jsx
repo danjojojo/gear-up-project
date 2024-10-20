@@ -206,7 +206,7 @@ const BikeUpgrader = () => {
         if(dynamicFormFields.includes(field)) {
             setFormValues((prev) => ({
                 ...prev,
-                [field]: value
+                [field.replace(/([a-z])([A-Z])/g, '$1_$2').toLowerCase()] : value
             }));
         }
     }
