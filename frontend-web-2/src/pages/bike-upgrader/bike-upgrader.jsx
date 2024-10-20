@@ -245,7 +245,7 @@ const BikeUpgrader = () => {
         // When ownedParts and desiredPart changes, get the formFields
         const fields = getFormFields(ownedParts, desiredPart);
         setDynamicFormFields(fields);
-        setFormValues({});
+        if(ownedParts.length === 0 || desiredPart === '') setFormValues({});
         console.log('formValues', formValues);
     }, [ownedParts, desiredPart]);
 
