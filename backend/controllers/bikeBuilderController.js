@@ -168,27 +168,47 @@ const getCockpitItems = async (req, res) => {
     }
 };
 
+function buildQuery(reference, filterCriteria) {
+    // Convert filterCriteria into SQL conditions
+    const conditions = Object.entries(filterCriteria)
+        .map(([key, value]) => {
+            // Wrap value in single quotes to ensure proper formatting
+            return `${key} = '${value}'`;
+        })
+        .join(" AND ");
+
+    // Construct the main query
+    const query = `
+        SELECT 
+            ${reference.charAt(0)}.*,
+            i.item_name,
+            i.item_price,
+            i.stock_count
+            encode(${reference.charAt(0)}.image, 'base64') AS item_image
+        FROM 
+            ${reference} ${reference.charAt(0)}
+        JOIN 
+            items i
+        ON 
+            ${reference.charAt(0)}.item_id = i.item_id
+        WHERE 
+            i.status = true 
+            AND $2.status = true
+            ${conditions ? `AND ${conditions}` : ''}
+    `;
+
+    return query;
+}
+
 const getAnyItems = async (req, res) => {
     try {
         const {reference} = req.params;
-        const firstLetter = reference.charAt(0).toUpperCase();
-        const query = `
-             SELECT 
-                $2.*,
-                i.item_name,
-                i.item_price,
-                encode(w.image, 'base64') AS item_image
-                FROM 
-                    $1 $2
-                JOIN 
-                    items i
-                ON 
-                    $2.item_id = i.item_id
-                WHERE 
-                    i.status = true 
-                    AND $2.status = true;
-        `
-        const { rows } = [reference, firstLetter];
+        const {filterValues} = req.query;
+
+        const query = buildQuery(reference, filterValues);
+        console.log(query);
+        const { rows } = await pool.query(query);
+        console.log(rows);
         res.status(200).json({ parts : rows});
     } catch (error) {
         res.status(500).json({ message: error.message})
