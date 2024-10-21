@@ -168,11 +168,39 @@ const getCockpitItems = async (req, res) => {
     }
 };
 
+const getAnyItems = async (req, res) => {
+    try {
+        const {reference} = req.params;
+        const firstLetter = reference.charAt(0).toUpperCase();
+        const query = `
+             SELECT 
+                $2.*,
+                i.item_name,
+                i.item_price,
+                encode(w.image, 'base64') AS item_image
+                FROM 
+                    $1 $2
+                JOIN 
+                    items i
+                ON 
+                    $2.item_id = i.item_id
+                WHERE 
+                    i.status = true 
+                    AND $2.status = true;
+        `
+        const { rows } = [reference, firstLetter];
+        res.status(200).json({ parts : rows});
+    } catch (error) {
+        res.status(500).json({ message: error.message})
+    }
+}
+
 module.exports = {
     getFrameItems,
     getForkItems,
     getGroupsetItems,
     getWheelsetItems,
     getSeatItems,
-    getCockpitItems
+    getCockpitItems,
+    getAnyItems
 };
