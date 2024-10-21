@@ -208,7 +208,7 @@
                             border-radius: 5px;
                             height: 150px;
                             padding: 15px;
-                            margin-bottom: 30px;
+                            margin-bottom: 15px;
 
                             img {
                                 width: 100%;
@@ -217,14 +217,35 @@
                             }
                         }
 
+                        .item-name {
+                            display: flex;
+                            align-content: center;
+                            justify-content: center;
+                            font-size: 20px !important;
+                            font-weight: 500;
+                            padding: 5px 0;
+                            border-bottom: solid 1px #D9D9D9;
+                            margin: 0 !important;
+                        }
+
+                        .item-price {
+                            display: flex;
+                            align-content: center;
+                            justify-content: center;
+                            font-size: 16px !important;
+                            font-weight: 300;
+                            padding: 10px;
+                            margin: 0 !important;
+                        }
+
                         .accordion {
-                            margin-bottom: 50px;
+                            margin-bottom: 30px;
 
                             .accordion-body {
-                                padding: 10px;
+                                padding: 20px;
 
                                 .specs-container {
-                                    margin: 10px;
+                                    margin-bottom: 10px;
                                     padding: 15px;
                                     font-size: 14px;
                                     border: solid 1px #dee2e6;

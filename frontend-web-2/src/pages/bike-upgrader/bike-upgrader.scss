@@ -5,10 +5,6 @@
     gap: 10px;
     background-color: #2E2E2E;
 
-    div {
-        border-radius: 15px;
-    }
-
     h4 {
         height: auto;
         font-weight: 600;
@@ -43,6 +39,7 @@
                     padding: 20px;
                     display: flex;
                     flex-direction: column;
+                    border-radius: 15px;
 
                     .owned-parts-selection {
                         flex-grow: 1;
@@ -87,6 +84,7 @@
                     background-color: #525252;
                     width: 100%;
                     padding: 20px;
+                    border-radius: 15px;
 
                     select {
                         width: 100%;
@@ -123,6 +121,7 @@
             display: flex;
             flex-direction: column;
             overflow-y: auto;
+            border-radius: 15px;
 
             .no-specs,
             .no-compatibility {
@@ -229,6 +228,7 @@
             overflow-y: auto;
             display: flex;
             flex-direction: column;
+            border-radius: 15px;
 
             .specs-not-set {
                 font-size: 1.5rem;
@@ -273,13 +273,14 @@
                     margin-bottom: 10px;
 
                     .part-image {
-                        height: 250px;
-                        width: 400px;
+                        height: 300px;
+                        width: 40%;
                         display: flex;
                         justify-content: center;
                         align-items: center;
-                        padding: 20px;
+                        padding: 50px;
                         background-color: white;
+                        border-radius: 10px;
 
                         img {
                             border-radius: 5px;
@@ -292,17 +293,86 @@
 
                     .part-details {
                         color: white;
+                        width: 60%;
+                        padding: 0 15px;
 
-                        button {
+                        .item-name {
+                            font-size: 20px;
+                            padding: 6px 0;
+                            font-weight: 600;
+                            display: flex;
+                            justify-content: center;
+                            align-content: center;
+                            border-bottom: solid 1px #dee2e65e;
+                        }
+
+                        .item-price {
+                            font-size: 16px;
+                            font-weight: 200;
+                            padding: 6px 0;
+                            display: flex;
+                            justify-content: center;
+                            align-content: center;
+                            border-bottom: solid 1px #dee2e65e;
+                        }
+
+                        .stock-status {
+                            padding: 7px;
+                            margin: 1px 0;
+                            border-radius: 20px;
+                            display: flex;
+                            justify-content: center;
+                            align-content: center;
+                            font-size: 14px;
+
+                            .text {
+                                padding: 6px;
+                                width: 200px;
+                                border-radius: 20px;
+                                display: flex;
+                                justify-content: center;
+                                align-content: center;
+                            }
+                        }
+
+                        .accordion {
+                            margin-bottom: 20px;
+                            width: 100%;
+                            border-radius: 0 !important;
+
+
+                            .accordion-collapse {
+
+
+                                .accordion-body {
+                                    padding: 20px;
+
+
+                                    .details-ctn {
+                                        margin-bottom: 10px;
+                                        padding: 15px;
+                                        font-size: 14px;
+                                        border: solid 1px #dee2e6;
+                                        border-radius: 5px !important;
+
+                                    }
+                                }
+                            }
+
+                        }
+
+                        .add-to-cart {
                             border: none;
-                            padding: 5px 10px;
-                            border-radius: 100px;
-                            background-color: #f9971f;
+                            padding: 10px;
+                            width: 100%;
+                            border-radius: 10px;
+                            background-color: #2E2E2E;
                             color: white;
                             cursor: pointer;
 
                             &:hover {
-                                background-color: #f9971fb9;
+                                background-color: #525252;
+
                             }
                         }
                     }
