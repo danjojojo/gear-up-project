@@ -87,7 +87,7 @@ const confirmSale = async (req, res) => {
           item.id,
           item.qty,
           item.price,
-          item.total_price
+          item.qty * item.price
         );
 
         updateItemsStockCount += `WHEN '${item.id}' THEN $${i + 1} `;

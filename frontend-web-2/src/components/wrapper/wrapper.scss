@@ -1,3 +1,14 @@
 .wrapper {
     height: 100vh;
+    display: flex;
+    flex-direction: column;
+
+    .nav-bar{
+        height: auto;
+    }
+
+    .content{
+        flex-grow: 1;
+        overflow: hidden;
+    }
 }

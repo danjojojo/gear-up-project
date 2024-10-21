@@ -59,7 +59,12 @@ export default function RecordModal({name, date, posName, subtotal, items, selec
                                     <p className="total-price">{PesoFormat.format(item.item_total_price)}</p>
                                 </div>
                                 <div className="bottom">
-                                    <p>{item.item_qty} x {PesoFormat.format(item.item_unit_price)}</p>
+                                    <p>{item.item_qty} x {PesoFormat.format(item.item_unit_price)} {}
+                                        <span className='refund-qty'> 
+                                            {item.refund_qty > 0 && 'Refunded' +  (item.refund_qty === item.item_qty ? ' All' : ' x' + item.refund_qty)}
+                                        </span>
+                                    </p>
+                                    {item.refund_qty > 0 && <p className='refund-total'>Now {PesoFormat.format((item.item_qty - item.refund_qty) * item.item_unit_price)}</p>}
                                 </div>
                             </div>
                         ))}

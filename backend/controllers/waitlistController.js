@@ -86,7 +86,7 @@ const addFrame = async (req, res) => {
             bottom_bracket_type,
             bottom_bracket_width,
             rotor_size,
-            max_tire_width,
+            Number(max_tire_width),
             rear_hub_width,
             material,
             image
@@ -160,7 +160,7 @@ const addFork = async (req, res) => {
             axle_diameter,
             suspension_type,
             rotor_size,
-            max_tire_width,
+            Number(max_tire_width),
             front_hub_width,
             material,
             image
@@ -312,7 +312,7 @@ const addWheelset = async (req, res) => {
             rear_hub_axle_diameter,
             rear_hub_speed,
             tire_size,
-            tire_width,
+            Number(tire_width),
             rim_spokes,
             image
         ];

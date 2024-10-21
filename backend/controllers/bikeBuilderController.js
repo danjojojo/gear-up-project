@@ -8,6 +8,7 @@ const getFrameItems = async (req, res) => {
                 f.*,
                 i.item_name,
                 i.item_price,
+                i.stock_count,
                 encode(f.image, 'base64') AS item_image
             FROM 
                 frame f
@@ -36,6 +37,7 @@ const getForkItems = async (req, res) => {
                 f.*,
                 i.item_name,
                 i.item_price,
+                i.stock_count,
                 encode(f.image, 'base64') AS item_image
             FROM 
                 fork f
@@ -64,6 +66,7 @@ const getGroupsetItems = async (req, res) => {
                 g.*,
                 i.item_name,
                 i.item_price,
+                i.stock_count,
                 encode(g.image, 'base64') AS item_image
                 FROM 
                     groupset g
@@ -92,6 +95,7 @@ const getWheelsetItems = async (req, res) => {
                 w.*,
                 i.item_name,
                 i.item_price,
+                i.stock_count,
                 encode(w.image, 'base64') AS item_image
                 FROM 
                     wheelset w
@@ -120,6 +124,7 @@ const getSeatItems = async (req, res) => {
                 s.*,
                 i.item_name,
                 i.item_price,
+                i.stock_count,
                 encode(s.image, 'base64') AS item_image
                 FROM 
                     seat s
@@ -148,6 +153,7 @@ const getCockpitItems = async (req, res) => {
                 c.*,
                 i.item_name,
                 i.item_price,
+                i.stock_count,
                 encode(c.image, 'base64') AS item_image
                 FROM 
                     cockpit c
@@ -168,11 +174,64 @@ const getCockpitItems = async (req, res) => {
     }
 };
 
+function buildQuery(reference, filterCriteria) {
+    // Convert filterCriteria into SQL conditions
+    const conditions = Object.entries(filterCriteria)
+        .map(([key, value]) => {
+            // Wrap value in single quotes to ensure proper formatting
+            if (key === 'tire_width') {
+                return `${key} <= ${value}`;
+            } else if (key === 'max_tire_width') {
+                return `${key} >= ${value}`;
+            } else {
+                return `${key} = '${value}'`;
+            }
+        })
+        .join(" AND ");
+
+    // Construct the main query
+    const query = `
+        SELECT 
+            ${reference.charAt(0)}.*,
+            i.item_name,
+            i.item_price,
+            i.stock_count,
+            encode(${reference.charAt(0)}.image, 'base64') AS item_image
+        FROM 
+            ${reference} ${reference.charAt(0)}
+        JOIN 
+            items i
+        ON 
+            ${reference.charAt(0)}.item_id = i.item_id
+        WHERE 
+            i.status = true 
+            AND  ${reference.charAt(0)}.status = true
+            ${conditions ? `AND ${conditions}` : ''}
+    `;
+
+    return query;
+}
+
+const getAnyItems = async (req, res) => {
+    try {
+        const { reference } = req.params;
+        const { filterValues } = req.query;
+        console.log(filterValues);
+        const query = buildQuery(reference, filterValues);
+        console.log(query);
+        const { rows } = await pool.query(query);
+        res.status(200).json({ parts: rows });
+    } catch (error) {
+        res.status(500).json({ message: error.message })
+    }
+}
+
 module.exports = {
     getFrameItems,
     getForkItems,
     getGroupsetItems,
     getWheelsetItems,
     getSeatItems,
-    getCockpitItems
+    getCockpitItems,
+    getAnyItems
 };

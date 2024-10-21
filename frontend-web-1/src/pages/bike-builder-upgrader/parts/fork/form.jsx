@@ -329,8 +329,8 @@ const Form = ({ selectedItem, setSelectedItem, setItems, refreshWaitlist, onClos
                     disabled={!isEditing}
                 >
                     <option value="">Select Type</option>
-                    <option value="Tapered">Tapered</option>
                     <option value="Non Tapered">Non Tapered</option>
+                    <option value="Tapered">Tapered</option>
                 </select>
             </div>
 
@@ -472,11 +472,11 @@ const Form = ({ selectedItem, setSelectedItem, setItems, refreshWaitlist, onClos
                     disabled={!isEditing}
                 >
                     <option value="">Select Width</option>
-                    <option value='2.1"'>2.1"</option>
-                    <option value='2.25"'>2.25"</option>
-                    <option value='2.4"'>2.4"</option>
-                    <option value='2.6"'>2.6"</option>
-                    <option value='2.8"'>2.8"</option>
+                    <option value='2.1'>2.1</option>
+                    <option value='2.25'>2.25</option>
+                    <option value='2.4'>2.4</option>
+                    <option value='2.6'>2.6</option>
+                    <option value='2.8'>2.8</option>
                 </select>
             </div>
 

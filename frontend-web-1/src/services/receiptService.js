@@ -61,3 +61,38 @@ export const cancelVoidReceipt = async (receiptId) => {
         throw error;
     }
 }
+
+export const refundReceipt = async (receiptId, receiptSaleId, refundData) => {
+    try {
+        const response = await api.post("/receipt/refund-receipt", {
+            receiptId, receiptSaleId, refundData
+        });
+        return response.data;
+    } catch (error) {
+        console.error("Error refunding receipt", error);
+        throw error;
+    }
+
+}
+
+export const adminCancelRefundReceipt = async (receiptId, originalReceiptName, retrievedReceiptItems) => {
+    try {
+        const response = await api.put(`/receipt/admin-cancel-refund-receipt/${receiptId}`, {
+            items: retrievedReceiptItems, originalReceiptName
+        });
+        return response.data;
+    } catch (error) {
+        console.error("Error cancelling refund receipt", error);
+        throw error;
+    }
+}
+
+export const getReceiptsDashboard = async (selectedDate) => {
+    try {
+        const response = await api.get(`receipt/get-receipts-dashboard?date=${selectedDate}`);
+        return response.data;
+    } catch (error) {
+        console.error("Error retrieving receipts dashboard data", error);
+        throw error;
+    }
+}

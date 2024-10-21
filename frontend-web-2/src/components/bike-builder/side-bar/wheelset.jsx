@@ -25,7 +25,7 @@ const Wheelset = ({ onAddToBuild, selectedFrame, selectedFork, selectedGroupset 
                 const isFrontHubAxleTypeMatch = item.front_hub_axle_type === selectedFork.axle_type;
 
                 const isTireSizeMatch = item.tire_size === selectedFrame.frame_size;
-                const isTireWidthMatch = item.tire_width === selectedFrame.max_tire_width;
+                const isTireWidthMatch = item.tire_width <= selectedFrame.max_tire_width;
 
                 // Return only if all conditions are met
                 return isCassetteTypeMatch &&

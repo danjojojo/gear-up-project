@@ -174,7 +174,32 @@ const Summaries = () => {
         } else{
             filteredRecords = summaryRecords.filter((record) => record.pos_name === selectedPOSUser && moment(record.date).format("YYYY-MM-DD") === startDate);
         }
-        const netSales = filteredRecords.filter((record) => record.record_type === 'items').reduce((acc, record) => acc + record.item_total_price, 0);
+        const netSales = 
+            filteredRecords
+            .filter((record) => record.record_type === 'items')
+            .reduce((acc, record) => {
+                const qty = record.item_qty || 0; // Default to 0 if undefined
+                const refundQty = record.refund_qty || 0; // Default to 0 if undefined
+                const itemTotalPrice = record.item_total_price || 0; // Default to 0 if undefined
+                const itemUnitPrice = record.item_unit_price || 0; // Default to 0 if undefined
+
+                // Log values to understand what's happening
+                console.log(`Processing Record:`, { qty, refundQty, itemTotalPrice, itemUnitPrice });
+
+                if (refundQty === 0) {
+                    // No refunds, add the total price
+                    return acc + itemTotalPrice;
+                } else if (refundQty === qty) {
+                    // Fully refunded, subtract the total price
+                    return acc + 0;
+                } else {
+                    // Partially refunded, calculate the net price of non-refunded items
+                    const nonRefundedValue = (qty - refundQty) * itemUnitPrice;
+                    return acc + nonRefundedValue;
+                }
+            }, 0); // Initial value of acc set to 0
+
+
         const netLabor = filteredRecords.filter((record) => record.record_type === 'mechanic').reduce((acc, record) => acc + record.item_total_price, 0);
         const netExpenses = filteredRecords.filter((record) => record.record_type === 'expense').reduce((acc, record) => acc + record.item_total_price, 0);
         setNetSales(netSales);
@@ -303,7 +328,7 @@ const Summaries = () => {
                             <div className='content'>
                                 <div className="list">
                                     {filteredRecordsByPOSUser.length === 0 && handleNoRecords()}
-                                    {filteredRecordsByPOSUser.map((record, index) => (
+                                    {filteredRecordsByPOSUser.filter(filRecord => filRecord.item_qty > filRecord.refund_qty).map((record, index) => (
                                         <div key={index} className="list-item" onClick={() => handleItemClick(record)}>
                                             <div className="left">
                                                 {record.record_type === 'items' && <i className="fa-solid fa-tag"></i>}
@@ -315,7 +340,7 @@ const Summaries = () => {
                                                 <p className='name'>{record.item_name}</p>
                                             </div>
                                             <div className="right">
-                                                <p className='amount'>{PesoFormat.format(record.item_total_price)}</p>
+                                                <p className='amount'>{PesoFormat.format((record.item_qty - record.refund_qty) * record.item_unit_price)}</p>
                                                 {moment(record.date).format("LL") === formattedDate ?
                                                     <p className='date'>{moment(record.date).startOf('minute').fromNow()}</p>
                                                     :
@@ -360,10 +385,16 @@ const Summaries = () => {
                                     <div className={selectedName === item.item_name ? "item selected" : "item"} key={index}> 
                                         <div className="left">    
                                             <p className="name">{item.item_name}</p>
-                                            {item.record_type === 'item' && <p className="qty-unit-price">{item.qty} x {item.item_unit_price}</p>}
+                                            {item.record_type === 'item' && 
+                                            <p className="qty-unit-price">{item.qty} x {item.item_unit_price}
+                                                <span className='refund-qty'> {item.refund_qty > 0 && 'Refunded x' + item.refund_qty}</span>
+                                            </p>}
                                             {item.record_type === 'mechanic' && <p className="qty-unit-price">Mechanic Service</p>}
                                         </div>
-                                        <p className='total-price'>{PesoFormat.format(item.item_total_price)}</p>
+                                        <div className="right">
+                                            <p className='total-price'>{PesoFormat.format(item.item_total_price)}</p>
+                                            {item.refund_qty > 0 && <p className='refund-total'>Now {PesoFormat.format((item.qty - item.refund_qty) * item.item_unit_price)}</p>}
+                                        </div>
                                     </div>    
                                 ))}
                             </div>

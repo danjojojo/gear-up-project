@@ -15,13 +15,35 @@ const getDashboardData = async (req, res) => {
             try {
                 const query = `
                     SELECT 
-                        SUM(CASE WHEN DATE(si.date_created) = $1 THEN item_total_price ELSE 0 END) AS sales_today,
-                        SUM(CASE WHEN DATE(si.date_created) = $1 THEN item_qty ELSE 0 END) AS sold_today,
-                        SUM(si.item_total_price) AS total_sales,
+                        SUM
+                        (
+                            CASE 
+                                WHEN DATE(si.date_created) = $1 AND si.refund_qty = 0 THEN si.item_total_price
+                                WHEN DATE(si.date_created) = $1 AND si.refund_qty = si.item_qty THEN 0
+                                WHEN DATE(si.date_created) = $1 AND si.refund_qty < si.item_qty THEN (si.item_qty - si.refund_qty) * si.item_unit_price 
+                            ELSE 0 
+                            END
+                        ) AS sales_today,
+                        SUM(
+                            CASE 
+                                WHEN DATE(si.date_created) = $1 AND si.refund_qty = 0 THEN item_qty 
+                                WHEN DATE(si.date_created) = $1 AND si.refund_qty = si.item_qty THEN 0
+                                WHEN DATE(si.date_created) = $1 AND si.refund_qty < si.item_qty THEN (si.item_qty - si.refund_qty)
+                            ELSE 0 
+                            END
+                        ) AS sold_today,
+                        SUM
+                        (
+                            CASE
+                                WHEN si.refund_qty = 0 THEN si.item_total_price
+                                WHEN si.refund_qty = si.item_qty THEN 0
+                            ELSE (si.item_qty - si.refund_qty) * si.item_unit_price
+                            END
+                        ) AS total_sales,
                         SUM(si.item_qty) AS total_sold
                     FROM sales_items SI
                     JOIN sales S ON SI.sale_id = S.sale_id
-                    WHERE s.status = true;
+                    WHERE s.status = true AND sale_item_type = 'sale';
                     ;
                 `;
                 const values = [date];
@@ -47,7 +69,7 @@ const getDashboardData = async (req, res) => {
                         COUNT(sm.sale_service_id) AS total_rendered,
                         SUM(sm.service_price) AS total_earned
                     FROM sales_mechanics SM
-                    JOIN sales S ON SI.sale_id = S.sale_id
+                    JOIN sales S ON SM.sale_id = S.sale_id
                     WHERE s.status = true;
                 `;
                 const values = [date];
@@ -108,12 +130,20 @@ const getRecords = async (req, res) => {
         case 'sales':
             try {
                 const query = `
-                    SELECT DISTINCT R.receipt_name AS record_name, SUM(SI.item_total_price) AS record_total_amount, P.pos_name, R.date_created, R.sale_id AS record_id
+                    SELECT DISTINCT R.receipt_name AS record_name, 
+                    SUM(
+                        CASE 
+                            WHEN si.refund_qty = 0 THEN si.item_total_price
+                            WHEN si.refund_qty = si.item_qty THEN 0
+                            ELSE (si.item_qty - si.refund_qty) * si.item_unit_price
+                        END
+                    ) 
+                    AS record_total_amount, P.pos_name, R.date_created, R.sale_id AS record_id
                         FROM receipts R
                         JOIN pos_users P ON R.pos_id = P.pos_id
                         JOIN sales S ON R.sale_id = S.sale_id
                         JOIN sales_items SI ON SI.sale_id = S.sale_id
-                        WHERE DATE(R.date_created) = $1 AND S.status = true
+                        WHERE DATE(R.date_created) = $1 AND S.status = true AND r.receipt_type = 'sale'
                     GROUP BY R.receipt_name, P.pos_name, R.date_created, R.sale_id
                     ORDER BY R.date_created DESC
                 `;
@@ -241,7 +271,7 @@ const getHighlightDates = async (req, res) => {
             break;
     
         default:
-            res.status(400).json({ error: "Invalid reference" });
+            res.status(400).json({ error: "Invalid reference"});
             break;
     }
 }
@@ -260,7 +290,7 @@ const getInnerRecords = async (req, res) => {
         case 'sales':
             try {
                 const query = `
-                   SELECT I.item_name, SI.item_qty, SI.item_unit_price, SI.item_total_price 
+                   SELECT I.item_name, SI.item_qty, SI.item_unit_price, SI.item_total_price, SI.refund_qty
                     FROM sales_items SI 
                     JOIN items I ON SI.item_id = I.item_id 
                    WHERE SI.sale_id = $1
@@ -327,13 +357,27 @@ const getLeaderBoards = async (req, res) => {
         case 'sales':
             try {
                 const query = `
-                    SELECT item_name, SUM(item_qty) AS item_qty
+                    SELECT item_name, 
+                    SUM(
+                        CASE 
+                            WHEN refund_qty = 0 THEN item_qty
+                            WHEN refund_qty = item_qty THEN 0
+                        ELSE (item_qty - refund_qty)
+                        END
+                    ) AS item_qty
                         FROM sales_items SI
                         JOIN items I ON SI.item_id = I.item_id
                         JOIN sales S ON SI.sale_id = S.sale_id
-                        WHERE si.date_created::date BETWEEN $1 AND $2 AND S.status = true
-                        GROUP BY item_name, item_qty
-                        ORDER BY SUM(item_qty) DESC
+                        WHERE si.date_created::date BETWEEN $1 AND $2 AND S.status = true AND Si.sale_item_type = 'sale'
+                        GROUP BY item_name
+                        HAVING SUM(
+                            CASE 
+                                WHEN refund_qty = 0 THEN item_qty
+                                WHEN refund_qty = item_qty THEN 0
+                                ELSE (item_qty - refund_qty)
+                            END
+                        ) > 0
+                        ORDER BY item_qty DESC
                     LIMIT 10;
                 `;
                 const values = [start, end];

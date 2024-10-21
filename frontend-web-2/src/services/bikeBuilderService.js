@@ -59,3 +59,16 @@ export const getCockpitItems = async () => {
         throw error;
     }
 };
+
+
+export const getAnyItems = async (desiredPart, filterValues) => {
+    try {
+        const response = await api.get(`/bike-builder/${desiredPart}`, {
+            params: { filterValues }
+        });
+        return response.data;
+    } catch (error) {
+        console.error(`Error fetching ${desiredPart} items:`, error);
+        throw error;
+    }
+};

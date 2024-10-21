@@ -132,10 +132,10 @@ const SeatForm = ({ waitlistItemID, itemID, itemName, itemPrice, onClose, refres
                     required
                 >
                     <option value="">Select Diameter</option>
-                    <option value="27.2 mm">27.2 mm</option>
-                    <option value="30.9 mm">30.9 mm</option>
-                    <option value="31.6 mm">31.6 mm</option>
-                    <option value="34.9 mm">34.9 mm</option>
+                    <option value="27.2mm">27.2mm</option>
+                    <option value="30.9mm">30.9mm</option>
+                    <option value="31.6mm">31.6mm</option>
+                    <option value="34.9mm">34.9mm</option>
                 </select>
             </div>
 
@@ -150,10 +150,10 @@ const SeatForm = ({ waitlistItemID, itemID, itemName, itemPrice, onClose, refres
                     required
                 >
                     <option value="">Select Length</option>
-                    <option value="300 mm">300 mm</option>
-                    <option value="350 mm">350 mm</option>
-                    <option value="400 mm">400 mm</option>
-                    <option value="450 mm">450 mm</option>
+                    <option value="300mm">300mm</option>
+                    <option value="350mm">350mm</option>
+                    <option value="400mm">400mm</option>
+                    <option value="450mm">450mm</option>
                 </select>
             </div>
 
