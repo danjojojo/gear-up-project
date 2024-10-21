@@ -395,9 +395,13 @@ $button-fail: #dee2e6;
         .form-container {
             height: 100%;
             padding: 5px;
+            overflow: hidden;
 
             .form-content {
-                height: 100%;
+                height: calc(100vh - 160px);
+                overflow-y: auto;
+                display: block;
+                padding-right: 15px;
 
                 .container-1 {
                     height: 6%;
@@ -481,7 +485,8 @@ $button-fail: #dee2e6;
                 }
 
                 .item-name,
-                .item-price {
+                .item-price,
+                .item-cost {
                     height: 10%;
                     align-content: center;
 

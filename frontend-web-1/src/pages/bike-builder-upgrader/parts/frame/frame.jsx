@@ -19,9 +19,10 @@ const Frame = () => {
     const [sortOrder, setSortOrder] = useState("asc");
     const [searchTerm, setSearchTerm] = useState('');
     const [showSort, setShowSort] = useState(false);
+    const [isEditing, setIsEditing] = useState(false);
     const showMiddleSection = showSort;
 
-    
+
     const fetchItems = useCallback(async () => {
         try {
             const data = await getFrameItems(displayItem);
@@ -75,6 +76,7 @@ const Frame = () => {
     // Handle click on an item
     const handleItemClick = (item) => {
         setSelectedItem(item);
+        setIsEditing(false)
     };
 
 
@@ -236,6 +238,8 @@ const Frame = () => {
                                 refreshWaitlist={refreshWaitlist}
                                 onClose={handleCloseView}
                                 showArchived={showArchived}
+                                isEditing={isEditing}
+                                setIsEditing={setIsEditing}
                             />
                         </div>
                     ) : (

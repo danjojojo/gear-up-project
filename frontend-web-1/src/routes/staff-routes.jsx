@@ -18,10 +18,6 @@ const StaffRoutes = () => (
                 <Route path="bike-builder-upgrader/parts/wheelset" element={<Pages.Wheelset />} />
                 <Route path="bike-builder-upgrader/parts/seat" element={<Pages.Seat />} />
                 <Route path="bike-builder-upgrader/parts/cockpit" element={<Pages.Cockpit />} />
-                <Route path="bike-builder-upgrader/parts/headset" element={<Pages.Headset />} />
-                <Route path="bike-builder-upgrader/parts/handlebar" element={<Pages.Handlebar />} />
-                <Route path="bike-builder-upgrader/parts/stem" element={<Pages.Stem />} />
-                <Route path="bike-builder-upgrader/parts/hubs" element={<Pages.Hubs />} />
             <Route path="orders" element={<Pages.Orders />} />
         </Route>
          <Route path="*" element={<Pages.NotFound />} />

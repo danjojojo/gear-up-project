@@ -11,7 +11,7 @@ import { AuthContext } from "../../../../context/auth-context";
 import { updateCockpitItem, archiveCockpitItem, restoreCockpitItem, deleteCockpitItem } from "../../../../services/bbuService";
 import ImagePreviewModal from "../../../../components/image-preview-modal/image-preview";
 
-const Form = ({ selectedItem, setSelectedItem, setItems, refreshWaitlist, onClose, showArchived }) => {
+const Form = ({ selectedItem, setSelectedItem, setItems, refreshWaitlist, onClose, showArchived, isEditing, setIsEditing }) => {
     const [name, setName] = useState('');
     const [price, setPrice] = useState('');
     const [description, setDescription] = useState('');
@@ -26,7 +26,6 @@ const Form = ({ selectedItem, setSelectedItem, setItems, refreshWaitlist, onClos
     const [headsetCupType, setHeadsetCupType] = useState('');
     const [headsetUpperDiameter, setHeadsetUpperDiameter] = useState('');
     const [headsetLowerDiameter, setHeadsetLowerDiameter] = useState('');
-    const [isEditing, setIsEditing] = useState(false);
     const [itemImage, setItemImage] = useState(null)
     const [selectedFile, setSelectedFile] = useState(null);
     const [originalItem, setOriginalItem] = useState(null);
@@ -307,10 +306,10 @@ const Form = ({ selectedItem, setSelectedItem, setItems, refreshWaitlist, onClos
                     disabled={!isEditing}
                 >
                     <option value="">Select Length</option>
-                    <option value="680 mm">680 mm</option>
-                    <option value="700 mm">700 mm</option>
-                    <option value="720 mm">720 mm</option>
-                    <option value="760 mm">760 mm</option>
+                    <option value="680mm">680mm</option>
+                    <option value="700mm">700mm</option>
+                    <option value="720mm">720mm</option>
+                    <option value="760mm">760mm</option>
                 </select>
             </div>
 
@@ -326,9 +325,9 @@ const Form = ({ selectedItem, setSelectedItem, setItems, refreshWaitlist, onClos
                     disabled={!isEditing}
                 >
                     <option value="">Select Diameter</option>
-                    <option value="25.4 mm">25.4 mm</option>
-                    <option value="31.8 mm">31.8 mm</option>
-                    <option value="35 mm">35 mm</option>
+                    <option value="25.4mm">25.4mm</option>
+                    <option value="31.8mm">31.8mm</option>
+                    <option value="35mm">35mm</option>
                 </select>
             </div>
 
@@ -362,9 +361,9 @@ const Form = ({ selectedItem, setSelectedItem, setItems, refreshWaitlist, onClos
                     disabled={!isEditing}
                 >
                     <option value="">Select Diameter</option>
-                    <option value="25.4 mm">25.4 mm</option>
-                    <option value="31.8 mm">31.8 mm</option>
-                    <option value="35 mm">35 mm</option>
+                    <option value="25.4mm">25.4mm</option>
+                    <option value="31.8mm">31.8mm</option>
+                    <option value="35mm">35mm</option>
                 </select>
             </div>
 
@@ -380,11 +379,11 @@ const Form = ({ selectedItem, setSelectedItem, setItems, refreshWaitlist, onClos
                     disabled={!isEditing}
                 >
                     <option value="">Select Length</option>
-                    <option value="60 mm">60 mm</option>
-                    <option value="70 mm">70 mm</option>
-                    <option value="80 mm">80 mm</option>
-                    <option value="90 mm">90 mm</option>
-                    <option value="100 mm">100 mm</option>
+                    <option value="60mm">60mm</option>
+                    <option value="70mm">70mm</option>
+                    <option value="80mm">80mm</option>
+                    <option value="90mm">90mm</option>
+                    <option value="100mm">100mm</option>
                 </select>
             </div>
 
@@ -435,8 +434,8 @@ const Form = ({ selectedItem, setSelectedItem, setItems, refreshWaitlist, onClos
                     disabled={!isEditing}
                 >
                     <option value="">Select Type</option>
+                    <option value="Non Tapered">Non Tapered</option>
                     <option value="Tapered">Tapered</option>
-                    <option value="Non-tapered">Non-tapered</option>
                 </select>
             </div>
 
@@ -470,8 +469,8 @@ const Form = ({ selectedItem, setSelectedItem, setItems, refreshWaitlist, onClos
                 >
                     <option value="">Select Diameter</option>
                     <option value="44mm">44mm</option>
+                    <option value="49mm">49mm</option>
                     <option value="55mm">55mm</option>
-                    <option value="56mm">56mm</option>
                 </select>
             </div>
 

@@ -55,19 +55,12 @@ app.use('/auth', authRoutes);
 app.use('/inventory', inventoryRoutes);
 app.use('/waitlist', waitlistRoutes);
 app.use('/bike-builder-upgrader', bbuRoutes);
-
 app.use('/pos', posRoutes);
-
 app.use('/receipt', receiptRoutes);
-
 app.use('/expense', expenseRoutes);
-
 app.use('/pos-users', posUsersRoutes);
-
 app.use('/records', recordsRoutes);
-
 app.use('/summary', summaryRoutes);
-
 app.use('/mechanics', mechanicRoutes);
 
 // web 2

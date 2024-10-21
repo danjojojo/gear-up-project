@@ -1,9 +1,10 @@
 import "./bike-upgrader.scss"
-import React, {useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import {
     getAnyItems
 } from "../../services/bikeBuilderService";
-import {Modal} from 'react-bootstrap';
+import { Modal } from 'react-bootstrap';
+import { compatibilitySpecs, formOptions } from "../../utils/compatibilityUtils";
 
 const BikeUpgrader = () => {
     const ownedPartsSelection = [
@@ -15,168 +16,6 @@ const BikeUpgrader = () => {
         'Cockpit'
     ]
 
-    // Compatibility Specifications
-    const compatibilitySpecs = {
-        frame: {
-            fork: [
-                'purpose', // Frame purpose -> Fork travel
-                'frameSize', // Frame size -> Fork size
-                'headTubeType', // Head tube -> Fork tube type
-                // 'frameAxleType', // Frame axle type -> Fork axle type
-                // 'frameAxleDiameter', // Frame axle diameter -> Fork axle diameter
-                // 'frameRotorSize', // Frame rotor size -> Fork rotor size
-                // 'frameMaxTireWidth' // Frame max tire width -> Fork max tire width
-            ],
-            groupset: [
-                'bottomBracketType', // Frame bottom bracket type -> Bottom bracket type
-                'bottomBracketWidth', // Frame bottom bracket width -> Bottom bracket width
-            ],
-            wheelset: [
-                'rearHubWidth', // Frame rear hub spacing -> Rear hub width
-                'frameAxleType', // Frame axle type -> Rear hub axle type
-                'frameSize', // Frame size -> Tire size
-                'maxTireWidth' // Frame max tire width -> Tire width
-            ],
-            seat: [
-                'seatPostDiameter' // Frame seat post diameter -> Seat post diameter
-            ],
-            cockpit: [
-                'headTubeType', // Headtube -> Headset type
-                'headTubeUpperDiameter', // Headtube upper dia -> Headset upper dia
-                'headTubeLowerDiameter' // Headtube lower dia -> Headset lower dia
-            ]
-        },
-        fork: {
-            wheelset: [
-                'frontHubWidth', // Fork hub spacing -> Front hub width
-                'forkAxleType', // Fork axle type -> Front hub axle type
-                'maxTireWidth' // Fork max tire width -> Frame max tire width
-            ],
-            cockpit: [
-                'forkTubeUpperDiameter' // Fork tube upper dia -> Stem fork diameter
-            ],
-            frame: [
-                'forkTravel', // Fork travel -> Frame purpose
-                'forkSize', // Fork size -> Frame size
-                'forkTubeType' // Fork tube type -> Head tube
-                // 'forkAxleType', // Fork axle type -> Frame axle type
-                // 'forkAxleDiameter', // Fork axle diameter -> Frame axle diameter
-                // 'forkRotorSizes', // Fork rotor size -> Frame rotor size
-                // 'forkMaxTireWidth' // Fork max tire width -> Frame max tire width
-            ]
-        },
-        groupset: {
-            wheelset: [
-                'cassetteType', // Cassette type -> Rear hub cassette type
-                'cassetteSpeed', // Cassette speed -> Rear hub speed
-                'rotorMountType' // Rotor mount type -> Hubs rotor mount type
-            ],
-            frame: [
-                'bottomBracketType', // Bottom bracket type -> Frame bottom bracket type
-                'bottomBracketWidth', // Bottom bracket width -> Frame bottom bracket width
-            ]
-        },
-        wheelset: {
-            frame: [
-                'rearHubWidth', // Rear hub width -> Frame rear hub spacing
-                'rearHubAxleType', // Rear hub axle type -> Frame axle type
-                'tireSize', // Tire size -> Frame size
-                'tireWidth' // Tire width -> Frame max tire width
-            ],
-            fork: [
-                'frontHubWidth', // Front hub width -> Fork hub spacing
-                'frontHubAxleType', // Front hub axle type -> Fork axle type
-                'tireWidth' // Fork max tire width -> Frame max tire width
-            ],
-            groupset: [
-                'hubCassetteType', // Rear hub cassette type -> Cassette type
-                'rearHubSpeed', // Rear hub speed -> Cassette speed
-                'hubRotorMountType' // Hubs rotor mount type -> Rotor mount type
-            ]
-        },
-        seat: {
-            frame: [
-                'seatPostDiameter' // Seat post diameter -> Frame seat post diameter
-            ]
-        },
-        cockpit: {
-            frame: [
-                'headsetType', // Headset type -> Headtube
-                'headsetUpperDiameter', // Headset upper diameter -> Headtube upper dia
-                'headsetLowerDiameter' // Headset lower diameter -> Headtube lower dia
-            ],
-            fork: [
-                'stemForkDiameter' // Stem fork diameter -> Fork tube upper dia
-            ]
-        }
-    };
-
-    // Form Options Matching Compatibility Specs
-    const formOptions = {
-        purpose: ["Cross-country (XC)", "Trail", "Enduro", "Downhill (DH)"],
-        frameSize: ['26"', '27.5"', '29"'],
-        headTubeType: ["Non Tapered", "Tapered"],
-        headTubeUpperDiameter: ["34mm", "44mm", "49mm", "55mm"],
-        headTubeLowerDiameter: ["34mm", "44mm", "55mm", "56mm"],
-        seatPostDiameter: ["27.2mm", "30.9mm", "31.6mm", "34.9mm"],
-        frameAxleType: ["Quick Release (QR)", "Thru-Axle"],
-        frameAxleDiameter: ["9mm (QR)", "12mm (Thru-Axle)", "15mm (Thru-Axle)", "20mm (Thru-Axle)"],
-        bottomBracketType: ["Threaded (BSA)", "Press-Fit (PF30, BB86, BB92)", "BB30"],
-        bottomBracketWidth: ["68mm", "73mm (MTB)", "83mm (Downhill)", "86mm (Press-Fit)", "92mm (MTB)"],
-        frameRotorSize: ["160mm", "180mm", "203mm"],
-        rearHubWidth: ["135mm (Rear)", "142mm (Rear)", "148mm (Boost Rear)", "150mm (Downhill)"],
-        
-        maxTireWidth: ['2.1"', '2.25"', '2.4"', '2.6"', '2.8"'],
-        
-        forkSize: ['26"', '27.5"', '29"'],
-        forkTubeType: ["Non Tapered", "Tapered"],
-        forkTubeUpperDiameter: ['1 1/8"', '1 1/4"', '1.5"'],
-        forkTubeLowerDiameter: ['1 1/8"', '1 1/4"', '1.5"'],
-        forkTravel: ["80mm to 120mm", "120mm to 160mm", "150mm to 180mm", "180mm to 200mm"],
-        forkAxleType: ["Quick Release (QR)", "Thru-Axle"],
-        forkAxleDiameter: ["9mm (QR)", "15mm (Thru-Axle)", "20mm (Thru-Axle)"],
-        forkSuspensionType: ["Air", "Coil", "N/A (Rigid)"],
-        forkRotorSize: ["160mm", "180mm", "203mm"],
-        frontHubWidth: ["100mm (Front)", "110mm (Boost Front)"],
-        
-        chainringSpeed: ["Single (1x)", "Double (2x)", "Triple (3x)"],
-        crankArmLength: ["165mm", "170mm", "175mm", "180mm"],
-        frontDerailleurSpeed: ["2-speed", "3-speed", "N/A (1x Chainring speed)"],
-        rearDerailleurSpeed: ["8-speed", "9-speed", "10-speed", "11-speed", "12-speed"],
-        cassetteType: ["Cassette", "Threaded Freewheel"],
-        cassetteSpeed: ["8-speed", "9-speed", "10-speed", "11-speed", "12-speed"],
-        chainSpeed: ["8-speed", "9-speed", "10-speed", "11-speed", "12-speed"],
-        rotorSize: ["160mm", "180mm", "203mm"],
-        rotorMountType: ["6-bolt", "Centerlock"],
-        
-        hubRotorMountType: ["6-bolt", "Centerlock"],
-        hubCassetteType: ["Cassette", "Threaded"],
-        hubHoles: ["28H", "32H", "36H"],
-        frontHubAxleType: ["Quick Release (QR)", "Thru-Axle (TA)"],
-        frontHubAxleDiameter: ["9mm (QR)", "12mm (Thru-Axle)", "15mm (Thru-Axle)", "20mm (Thru-Axle)"],
-        rearHubAxleType: ["Quick Release (QR)", "Thru-Axle (TA)"],
-        rearHubAxleDiameter: ["9mm (QR)", "12mm (Thru-Axle)", "15mm (Thru-Axle)", "20mm (Thru-Axle)"],
-        rearHubSpeed: ["8-speed", "9-speed", "10-speed", "11-speed", "12-speed"],
-        tireSize: ['26"', '27.5"', '29"'],
-        tireWidth: ['2.1"', '2.25"', '2.4"', '2.6"', '2.8"'],
-        rimSpokes: ["28", "32", "36"],
-        
-        seatPostLength: ["300mm", "350mm", "400mm", "450mm"],
-        seatClampType: ["Quick Release", "Bolt-On"],
-        saddleMaterial: ["Leather", "Synthetic", "Gel"],
-        handleBarLength: ["680mm", "700mm", "720mm", "760mm"],
-        handleBarClampDiameter: ["25.4mm", "31.8mm", "35mm"],
-        handleBarType: ["Flat", "Riser", "Drop"],
-        stemClampDiameter: ["25.4mm", "31.8mm", "35mm"],
-        stemLength: ["60mm", "70mm", "80mm", "90mm", "100mm"],
-        stemAngle: ["Negative", "Positive"],
-        stemForkDiameter: ['1 1/8"', '1 1/4"', '1.5"'],
-        headsetType: ["Tapered", "Non-tapered"],
-        headsetCupType: ["Integrated", "Non-integrated"],
-        headsetUpperDiameter: ["44mm", "49mm", "55mm"],
-        headsetLowerDiameter: ["44mm", "55mm", "56mm"]
-    };
-
     const [ownedParts, setOwnedParts] = useState([]);
     const [desiredPart, setDesiredPart] = useState('');
     const [dynamicFormFields, setDynamicFormFields] = useState([]);
@@ -184,12 +23,14 @@ const BikeUpgrader = () => {
     const [filterValues, setFilterValues] = useState({});
     const [items, setItems] = useState([]);
     const [findPartsClicked, setFindPartsClicked] = useState(false);
+    const [parts, setParts] = useState([]);
+    const [filteredParts, setFilteredParts] = useState([]);
 
     const handleOwnedPartSelected = (ownedPartsValue) => {
-        if(ownedParts.includes(ownedPartsValue)) {
+        if (ownedParts.includes(ownedPartsValue)) {
             setOwnedParts(ownedParts.filter(part => part !== ownedPartsValue));
             setFormValues((prev) => {
-                delete prev[ownedPartsValue.toLowerCase()]; 
+                delete prev[ownedPartsValue.toLowerCase()];
                 return prev;
             })
         } else {
@@ -199,6 +40,7 @@ const BikeUpgrader = () => {
             });
         }
         setFindPartsClicked(false);
+        setItems([]);
     }
 
     const handleDesiredPartChange = (desiredPartValue) => {
@@ -206,17 +48,18 @@ const BikeUpgrader = () => {
         setFormValues({});
         setDynamicFormFields(['']);
         setFindPartsClicked(false);
+        setItems([]);
     }
 
     // Nandito yung mga na columns and naset na specs ni user
     const handleSetSpecification = (field, value) => {
         Object.keys(formValues).map((part) => {
-            if(formValues[part].hasOwnProperty(field.replace(/([a-z])([A-Z])/g, '$1_$2').toLowerCase())) {
+            if (formValues[part].hasOwnProperty(field.replace(/([a-z])([A-Z])/g, '$1_$2').toLowerCase())) {
                 setFormValues((prev) => ({
                     ...prev,
-                    [part] : {
+                    [part]: {
                         ...prev[part],
-                        [field.replace(/([a-z])([A-Z])/g, '$1_$2').toLowerCase()] : value
+                        [field.replace(/([a-z])([A-Z])/g, '$1_$2').toLowerCase()]: value
                     }
                 }))
             }
@@ -226,35 +69,36 @@ const BikeUpgrader = () => {
     useEffect(() => {
         console.log(formValues);
         console.log(filterValues);
-    },[formValues, filterValues]);
+    }, [formValues, filterValues]);
 
     const getFormFields = (ownedParts, desiredPart) => {
         if (ownedParts.length === 0 || desiredPart === '') return [];
         // set formFields as Set to avoid dupes sa fields na hahanapin below
-        let formFields = new Set();
+        let formFields = new Array();
         ownedParts.forEach((part) => {
             // Check if part is a key in compatibilitySpecs
             // Check if desiredPart is a property of the key in compatibilitySpecs
-            if(!formValues[part]){
+            if (!formValues[part]) {
                 setFormValues((prev) => ({
                     ...prev,
-                    [part] : {}
+                    [part]: {}
                 }));
             }
 
             if (compatibilitySpecs[part] && compatibilitySpecs[part][desiredPart]) {
                 // If yes
-                formFields.add(part);
+                formFields.push(part);
                 compatibilitySpecs[part][desiredPart].forEach((field) => {
                     // Add the values of the desiredPart property to formFields
                     // Sample: compatibilitySpecs.frame.fork = ['purpose', 'frameSize', bla bla bla]
-                    formFields.add(field);
-                     if(!formValues[part]){
+                    // Check if field is already in formFields
+                    formFields.push(field);
+                    if (!formValues[part]) {
                         setFormValues((prev) => ({
                             ...prev,
-                            [part] : {
+                            [part]: {
                                 ...prev[part],
-                                [field.replace(/([a-z])([A-Z])/g, '$1_$2').toLowerCase()] : ''
+                                [field.replace(/([a-z])([A-Z])/g, '$1_$2').toLowerCase()]: ''
                             }
                         }))
                     }
@@ -263,7 +107,7 @@ const BikeUpgrader = () => {
         });
 
         // convert formFields na Set to Array
-        return Array.from(formFields);
+        return formFields;
     };
 
     useEffect(() => {
@@ -276,7 +120,7 @@ const BikeUpgrader = () => {
     const renderDynamicForm = () => {
         // render the dynamic form fields
         // values will be yung fields na nakuha from getFormFields
-        if(dynamicFormFields.length === 0) 
+        if (dynamicFormFields.length === 0)
             return (
                 <div className="no-compatibility">
                     <i className="fa-regular fa-square-minus"></i>
@@ -289,7 +133,7 @@ const BikeUpgrader = () => {
             <div key={index} className="form-field">
                 {/* yung formFields natin nakaset as camelCase */}
                 {/* this regex will get the words that has capital letters (/([A-Z])/g) tapos magdadagdag siya ng space before it (' $1') */}
-                {!ownedParts.includes(field) ? 
+                {!ownedParts.includes(field) ?
                     <>
                         <label>{field.replace(/([A-Z])/g, ' $1')}</label>
                         <select defaultValue={'none'} onChange={(e) => handleSetSpecification(field, e.target.value)}>
@@ -298,69 +142,90 @@ const BikeUpgrader = () => {
                             {formOptions[field] && formOptions[field].map((option, idx) => (
                                 // if so
                                 // render yung values from that property as options
-                                <option key={idx} value={idx+option}>{option}</option>
+                                <option key={idx} value={idx + option}>{option}</option>
                             ))}
                         </select>
                     </>
-                :   <h3 className="owned-part-name">{field}</h3>
+                    : <h3 className="owned-part-name">{field}</h3>
                 }
             </div>
         ));
     };
 
-    const handleFindParts = async () => {
-        // Get formValues
-        setFilterValues({});
-        Object.keys(formValues).map((value) => {
-            if(Object.values(formValues[value]).includes('')){
-                setShowModal(true);
-            } else {
-                const reverseCompatibility = compatibilitySpecs[desiredPart][value];
-                reverseCompatibility.forEach((reverseField, index) => {
-                    const key = reverseField.replace(/([a-z])([A-Z])/g, '$1_$2').toLowerCase();
-                    const originalValue = Object.values(formValues[value]);
-                    const filterValue = Object.values(formOptions[reverseField]);
-                    const filterValueByIndex = filterValue[originalValue[index].match(/^\d/)[0]];
-                    setFilterValues((prev) => ({
-                        ...prev,
-                        [key] : filterValueByIndex
-                    }))
-                })
-            }
-        })
-        
-        // console.log(Object.keys(filterValues).every(key => filterValues[key]));
-        const {items} = await getAnyItems(desiredPart);
-        const filteredItems = items.filter(item => {
-            return Object.keys(filterValues).every(key => item[key] === filterValues[key]);
-        })
-        setItems(filteredItems); 
-        setFindPartsClicked(true);
+    const [loading, setLoading] = useState(false);
+
+    const getParts = async (desiredPart, filterValues) => {
+        // console.log(desiredPart, filterValues);
+        // await getAnyItems(desiredPart, filterValues);
+        const { parts } = await getAnyItems(desiredPart, filterValues);
+        setLoading(true);
+        setTimeout(() => {
+            setLoading(false);
+        }, 1000);
+        setItems(parts);
     }
 
+    const handleFindParts = () => {
+        // Reset the filter values
+        setFilterValues({});
+        let finalFilterValues = {};
+
+        // Check if any part in formValues has an empty string, if so, show the modal and exit
+        const hasEmptyValues = Object.keys(formValues).some(value =>
+            Object.values(formValues[value]).includes('')
+        );
+
+        if (hasEmptyValues) {
+            setShowModal(true);
+            return; // Early exit to prevent further execution
+        }
+
+        // Proceed to build filter values if all fields are valid
+        Object.keys(formValues).forEach((value) => {
+            const reverseCompatibility = compatibilitySpecs[desiredPart][value];
+            reverseCompatibility.forEach((reverseField, index) => {
+                const key = reverseField.replace(/([a-z])([A-Z])/g, '$1_$2').toLowerCase();
+                const originalValue = Object.values(formValues[value]);
+                const filterValue = Object.values(formOptions[reverseField]);
+                const filterValueByIndex = filterValue[originalValue[index].match(/^\d/)[0]];
+                if (key === 'max_tire_width' || key === 'tire_width') {
+                    // removed number from the strin
+                    // get substring from index 1 to the end of originalValue[index]
+                    finalFilterValues[key] = originalValue[index].substring(1);
+                } else {
+                    finalFilterValues[key] = filterValueByIndex;
+                }
+            });
+        });
+
+        // Call getParts only when there are no empty values
+        getParts(desiredPart, finalFilterValues);
+        setFindPartsClicked(true);
+    };
+
     function FindPartsModalIncomplete(props) {
-		return (
-			<Modal
-			{...props}
-			size="md"
-			aria-labelledby="contained-modal-title-vcenter"
-			centered
-			>
-			<Modal.Header closeButton>
-				<Modal.Title id="contained-modal-title-vcenter">
-					Oops!
-				</Modal.Title>
-				</Modal.Header>
-				<Modal.Body>
-					Your set specifications are incomplete. Please fill out all fields to find parts.
-				</Modal.Body>
-			</Modal>
-		);
-	}
+        return (
+            <Modal
+                {...props}
+                size="md"
+                aria-labelledby="contained-modal-title-vcenter"
+                centered
+            >
+                <Modal.Header closeButton>
+                    <Modal.Title id="contained-modal-title-vcenter">
+                        Oops!
+                    </Modal.Title>
+                </Modal.Header>
+                <Modal.Body>
+                    Your set specifications are incomplete. Please fill out all fields to find parts.
+                </Modal.Body>
+            </Modal>
+        );
+    }
 
     const PesoFormat = new Intl.NumberFormat("en-US", {
-      style: "currency",
-      currency: "PHP",
+        style: "currency",
+        currency: "PHP",
     });
 
     const [showModal, setShowModal] = useState(false);
@@ -370,7 +235,7 @@ const BikeUpgrader = () => {
             <FindPartsModalIncomplete
                 show={showModal}
                 onHide={() => setShowModal(false)}
-            />            
+            />
             <div className="left-container">
                 <div className="row-1">
                     <div className="left">
@@ -381,14 +246,14 @@ const BikeUpgrader = () => {
                             <div className="owned-parts-selection">
                                 {ownedPartsSelection.map((part, index) => {
                                     return (
-                                        <button type="button" 
+                                        <button type="button"
                                             className={ownedParts.includes(part.toLowerCase()) ? 'owned-part selected' : 'owned-part'}
                                             key={index}
-                                            onClick={(e) => handleOwnedPartSelected((e.target.value).toLowerCase())} 
+                                            onClick={(e) => handleOwnedPartSelected((e.target.value).toLowerCase())}
                                             value={part.toLowerCase()}
-                                            disabled={desiredPart === part.toLowerCase() ? true : false }
+                                            disabled={desiredPart === part.toLowerCase() ? true : false}
                                         >{part}
-                                        {ownedParts.includes(part.toLowerCase()) && <span><i className="fa-solid fa-check" onClick={(e) => e.stopPropagation()}></i></span>}
+                                            {ownedParts.includes(part.toLowerCase()) && <span><i className="fa-solid fa-check" onClick={(e) => e.stopPropagation()}></i></span>}
                                         </button>
                                     )
                                 })}
@@ -404,7 +269,7 @@ const BikeUpgrader = () => {
                                     {ownedPartsSelection.map((part, index) => {
                                         return (
                                             <option value={part} key={index}
-                                                disabled={ownedParts.includes(part.toLowerCase()) ? true : false }
+                                                disabled={ownedParts.includes(part.toLowerCase()) ? true : false}
                                             >{part}
                                             </option>
                                         )
@@ -416,21 +281,21 @@ const BikeUpgrader = () => {
                 </div>
                 <div className="row-2">
                     <h4>Set your specifications</h4>
-                    {ownedParts.length === 0 || desiredPart === '' ? 
+                    {ownedParts.length === 0 || desiredPart === '' ?
                         <div className="no-specs">
                             <i className="fa-solid fa-bicycle"></i>
-                            <p>Select your owned parts and desired part to set your specifications.</p> 
+                            <p>Select your owned parts and desired part to set your specifications.</p>
                         </div>
-                    : 
+                        :
                         <div className="specs-container">
                             {renderDynamicForm()}
                         </div>
                     }
                 </div>
                 <div className="row-3">
-                    <button 
-                    className="upgrade-part" onClick={handleFindParts}
-                    disabled={Object.keys(formValues).length === 0 || dynamicFormFields.length === 0 ? true : false}   
+                    <button
+                        className="upgrade-part" onClick={handleFindParts}
+                        disabled={Object.keys(formValues).length === 0 || dynamicFormFields.length === 0 ? true : false}
                     >Find parts</button>
                 </div>
             </div>
@@ -438,13 +303,13 @@ const BikeUpgrader = () => {
                 <h4>{desiredPart === '' ? 'Parts' : desiredPart + 's'}</h4>
                 <div className="parts-container">
                     <div className="parts">
-                        {!findPartsClicked && <div className="specs-not-set">
+                        {!findPartsClicked && items.length === 0 && < div className="specs-not-set">
                             <p>Enter your specifications and press <strong>Find Parts</strong>.</p>
                         </div>}
-                        {findPartsClicked && items.length === 0 && 
-                        <div className="specs-not-set">
-                            <p>Sorry, we can't find any available parts for your bike's specifications.</p>
-                        </div>
+                        {!loading && findPartsClicked && items.length === 0 &&
+                            <div className="specs-not-set">
+                                <p>Sorry, we can't find any available parts for your bike's specifications.</p>
+                            </div>
                         }
                         {/* <div className="part">
                             <div className="part-image">
@@ -457,11 +322,20 @@ const BikeUpgrader = () => {
                                 <button>Add to cart</button>
                             </div>
                         </div> */}
-                        {findPartsClicked && items.length !== 0 && items.map((item, index) => {
+                        {!loading && findPartsClicked && items.length !== 0 && items.map((item, index) => {
                             return (
                                 <div className="part" key={index}>
                                     <div className="part-image">
-                                        <img src={`data:image/jpeg;base64,${item.item_image}`} alt="part" />
+                                        {item.item_image ? (
+                                            <img
+                                                src={`data:image/jpeg;base64,${item.item_image}`}
+                                                alt={item.item_name}
+                                            />
+                                        ) : (
+                                            <>
+                                                No image attached
+                                            </>
+                                        )}
                                     </div>
                                     <div className="part-details">
                                         <h5>{item.item_name}</h5>
@@ -472,10 +346,15 @@ const BikeUpgrader = () => {
                                 </div>
                             )
                         })}
+                        {loading && findPartsClicked &&
+                            <div className="loading">
+                                <i className="fa-solid fa-gear fa-spin"></i>
+                            </div>
+                        }
                     </div>
                 </div>
             </div>
-        </div>
+        </div >
     );
 
 };

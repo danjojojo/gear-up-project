@@ -17,10 +17,6 @@ import BikeBuilderUpgrader from './bike-builder-upgrader/bike-builder-upgrader.j
     import Wheelset from './bike-builder-upgrader/parts/wheelset/wheelset.jsx';
     import Seat from './bike-builder-upgrader/parts/seat/seat.jsx';
     import Cockpit from './bike-builder-upgrader/parts/cockpit/cockpit.jsx';
-    import Headset from './bike-builder-upgrader/parts/headset/headset.jsx';
-    import Handlebar from './bike-builder-upgrader/parts/handlebar/handlebar.jsx';
-    import Stem from './bike-builder-upgrader/parts/stem/stem.jsx';
-    import Hubs from './bike-builder-upgrader/parts/hubs/hubs.jsx';
 import Orders from './orders/orders.jsx';
 import PointOfSales from './point-of-sales/point-of-sales.jsx';
 import Expenses from './expenses/expenses.jsx';
@@ -71,10 +67,6 @@ const Pages = {
         Wheelset,
         Seat,
         Cockpit,
-        Headset,
-        Handlebar,
-        Stem,
-        Hubs,
 
     // Order Page
     Orders,

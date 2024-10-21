@@ -57,7 +57,7 @@ const AuthProvider = ({ children }) => {
         const role = await getMyRole();
         setUserRole(role);
         setAuthenticated(true);
-        window.location.reload();  // Reload the page only on successful login
+        // window.location.reload();  // Reload the page only on successful login
       } else {
         setError('Login failed. Please check your credentials.');
       }

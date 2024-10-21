@@ -11,7 +11,7 @@ import { AuthContext } from "../../../../context/auth-context";
 import { updateWheelsetItem, archiveWheelsetItem, restoreWheelsetItem, deleteWheelsetItem } from "../../../../services/bbuService";
 import ImagePreviewModal from "../../../../components/image-preview-modal/image-preview";
 
-const Form = ({ selectedItem, setSelectedItem, setItems, refreshWaitlist, onClose, showArchived }) => {
+const Form = ({ selectedItem, setSelectedItem, setItems, refreshWaitlist, onClose, showArchived, isEditing, setIsEditing }) => {
     const [name, setName] = useState('');
     const [price, setPrice] = useState('');
     const [description, setDescription] = useState('');
@@ -28,7 +28,6 @@ const Form = ({ selectedItem, setSelectedItem, setItems, refreshWaitlist, onClos
     const [tireSize, setTireSize] = useState('');
     const [tireWidth, setTireWidth] = useState('');
     const [rimSpokes, setRimSpokes] = useState('');
-    const [isEditing, setIsEditing] = useState(false);
     const [itemImage, setItemImage] = useState(null)
     const [selectedFile, setSelectedFile] = useState(null);
     const [originalItem, setOriginalItem] = useState(null);
@@ -512,15 +511,15 @@ const Form = ({ selectedItem, setSelectedItem, setItems, refreshWaitlist, onClos
                     disabled={!isEditing}
                 >
                     <option value="">Select Width</option>
-                    <option value='1.9"'>1.9"</option>
-                    <option value='1.95"'>1.95"</option>
-                    <option value='2.0"'>2.0"</option>
-                    <option value='2.1"'>2.1"</option>
-                    <option value='2.125"'>2.125"</option>
-                    <option value='2.25"'>2.25"</option>
-                    <option value='2.4"'>2.4"</option>
-                    <option value='2.6"'>2.6"</option>
-                    <option value='2.8"'>2.8"</option>
+                    <option value='1.9'>1.9</option>
+                    <option value='1.95'>1.95</option>
+                    <option value='2.0'>2.0</option>
+                    <option value='2.1'>2.1</option>
+                    <option value='2.125'>2.125</option>
+                    <option value='2.25'>2.25</option>
+                    <option value='2.4'>2.4</option>
+                    <option value='2.6'>2.6</option>
+                    <option value='2.8'>2.8</option>
                 </select>
             </div>
 

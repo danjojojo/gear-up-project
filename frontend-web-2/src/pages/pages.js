@@ -8,6 +8,8 @@ import Help from "./help/help";
 import BikeBuilder from "./bike-builder/bike-builder";
 import BikeUpgrader from "./bike-upgrader/bike-upgrader";
 
+import Cart from "./cart/cart";
+
 const Pages = {
 
     // Not Found Page
@@ -29,7 +31,10 @@ const Pages = {
     BikeBuilder,
 
     // Bike Upgrader Page
-    BikeUpgrader
+    BikeUpgrader,
+    
+    // Cart Page
+    Cart
 
 };
 

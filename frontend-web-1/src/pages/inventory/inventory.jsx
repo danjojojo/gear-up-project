@@ -32,6 +32,7 @@ const Inventory = () => {
     const [confirmedStock, setConfirmedStock] = useState(0);
     const [itemName, setItemName] = useState("");
     const [itemPrice, setItemPrice] = useState("");
+    const [itemCost, setItemCost] = useState("");
     const [category, setCategory] = useState("Accessories");
     const [bikeParts, setBikeParts] = useState("");
     const [selectedFile, setSelectedFile] = useState(null);
@@ -44,6 +45,7 @@ const Inventory = () => {
     const [selectedItem, setSelectedItem] = useState({
         item_name: "",
         item_price: "",
+        item_cost: "",
         stock_count: 0,
         category_name: "",
         low_stock_alert: false,
@@ -144,6 +146,7 @@ const Inventory = () => {
         const itemData = new FormData();
         itemData.append("itemName", itemName);
         itemData.append("itemPrice", parseFloat(itemPrice));
+        itemData.append("itemCost", parseFloat(itemCost));
         itemData.append("stock", parseInt(stockInput, 10));
         itemData.append("category", category);
         itemData.append("lowStockAlert", lowStockAlert ? "true" : "false");
@@ -209,6 +212,7 @@ const Inventory = () => {
             ...prev,
             item_name: item.item_name,
             item_price: item.item_price,
+            item_cost: item.item_cost,
             stock_count: item.stock_count,
             category_name: item.category_name,
             low_stock_alert: item.low_stock_alert,
@@ -259,6 +263,7 @@ const Inventory = () => {
         const updatedData = new FormData();
         updatedData.append("itemName", selectedItem.item_name);
         updatedData.append("itemPrice", parseFloat(selectedItem.item_price));
+        updatedData.append("itemCost", parseFloat(selectedItem.item_cost));
         updatedData.append("stock", parseInt(selectedItem.stock_count, 10));
         updatedData.append("category", selectedItem.category_name);
         updatedData.append(
@@ -395,6 +400,7 @@ const Inventory = () => {
     const resetForm = () => {
         setItemName("");
         setItemPrice("");
+        setItemCost("");
         setStockInput(0);
         setConfirmedStock(0);
         setCategory("");
@@ -721,14 +727,41 @@ const Inventory = () => {
                                             type="text"
                                             id="item-price"
                                             name="itemPrice"
-                                            value={selectedItem.item_price || ""}
-                                            onChange={(e) =>
-                                                setSelectedItem((prev) => ({
-                                                    ...prev,
-                                                    item_price: e.target.value,
-                                                }))
-                                            }
+                                            value={selectedItem.item_price === 0 ? "" : selectedItem.item_price || ""} // Show placeholder when price is 0 or empty
+                                            onChange={(e) => {
+                                                const value = e.target.value;
+                                                // Allow empty input or valid numbers (>= 0)
+                                                if (value === "" || (!isNaN(Number(value)) && Number(value) >= 0)) {
+                                                    setSelectedItem((prev) => ({
+                                                        ...prev,
+                                                        item_price: value === "" ? "" : Number(value), // Keep empty string or valid numeric value
+                                                    }));
+                                                }
+                                            }}
                                             placeholder="Enter item price"
+                                            disabled={!isEditing}
+                                            required
+                                        />
+                                    </div>
+
+                                    <div className="item-cost form-group">
+                                        <label htmlFor="item-cost">Cost</label>
+                                        <input
+                                            type="text"
+                                            id="item-cost"
+                                            name="itemCost"
+                                            value={selectedItem.item_cost === 0 ? "" : selectedItem.item_cost || ""} // Show placeholder when cost is 0 or empty
+                                            onChange={(e) => {
+                                                const value = e.target.value;
+                                                // Allow empty input or valid numbers (>= 0)
+                                                if (value === "" || (!isNaN(Number(value)) && Number(value) >= 0)) {
+                                                    setSelectedItem((prev) => ({
+                                                        ...prev,
+                                                        item_cost: value === "" ? "" : Number(value), // Keep empty string or valid numeric value
+                                                    }));
+                                                }
+                                            }}
+                                            placeholder="Enter item cost"
                                             disabled={!isEditing}
                                             required
                                         />
@@ -925,10 +958,6 @@ const Inventory = () => {
                                                                 <option value="Wheelset">Wheelset</option>
                                                                 <option value="Seat">Seat</option>
                                                                 <option value="Cockpit">Cockpit</option>
-                                                                <option value="Headset">Headset</option>
-                                                                <option value="Handlebar">Handlebar</option>
-                                                                <option value="Stem">Stem</option>
-                                                                <option value="Hubs">Hubs</option>
                                                             </select>
                                                         </div>
                                                     )}
@@ -982,9 +1011,34 @@ const Inventory = () => {
                                                 type="text"
                                                 id="item-price-add"
                                                 name="itemPrice"
-                                                value={itemPrice}
-                                                onChange={(e) => setItemPrice(e.target.value)}
+                                                value={itemPrice === 0 ? "" : itemPrice} // Display empty string when value is 0
+                                                onChange={(e) => {
+                                                    const value = e.target.value;
+                                                    // Allow empty input or valid numbers (>= 0)
+                                                    if (value === "" || (!isNaN(Number(value)) && Number(value) >= 0)) {
+                                                        setItemPrice(value === "" ? "" : Number(value)); // Keep empty string for empty input
+                                                    }
+                                                }}
                                                 placeholder="Enter item price"
+                                                required
+                                            />
+                                        </div>
+
+                                        <div className="item-cost form-group">
+                                            <label htmlFor="item-cost-add">Cost</label>
+                                            <input
+                                                type="text"
+                                                id="item-cost-add"
+                                                name="itemCost"
+                                                value={itemCost === 0 ? "" : itemCost} // Display empty string when value is 0
+                                                onChange={(e) => {
+                                                    const value = e.target.value;
+                                                    // Allow empty input or valid numbers (>= 0)
+                                                    if (value === "" || (!isNaN(Number(value)) && Number(value) >= 0)) {
+                                                        setItemCost(value === "" ? "" : Number(value)); // Keep empty string for empty input
+                                                    }
+                                                }}
+                                                placeholder="Enter item cost"
                                                 required
                                             />
                                         </div>
@@ -1115,10 +1169,6 @@ const Inventory = () => {
                                                     <option value="Wheelset">Wheelset</option>
                                                     <option value="Seat">Seat</option>
                                                     <option value="Cockpit">Cockpit</option>
-                                                    <option value="Headset">Headset</option>
-                                                    <option value="Handlebar">Handlebar</option>
-                                                    <option value="Stem">Stem</option>
-                                                    <option value="Hubs">Hubs</option>
                                                 </select>
                                             </div>
                                         )}

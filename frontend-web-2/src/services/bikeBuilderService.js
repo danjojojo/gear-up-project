@@ -60,10 +60,11 @@ export const getCockpitItems = async () => {
     }
 };
 
+
 export const getAnyItems = async (desiredPart, filterValues) => {
     try {
         const response = await api.get(`/bike-builder/${desiredPart}`, {
-            params : {filterValues}
+            params: { filterValues }
         });
         return response.data;
     } catch (error) {

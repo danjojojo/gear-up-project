@@ -11,7 +11,7 @@ import { AuthContext } from "../../../../context/auth-context";
 import { updateForkItem, archiveForkItem, restoreForkItem, deleteForkItem } from "../../../../services/bbuService";
 import ImagePreviewModal from "../../../../components/image-preview-modal/image-preview";
 
-const Form = ({ selectedItem, setSelectedItem, setItems, refreshWaitlist, onClose, showArchived }) => {
+const Form = ({ selectedItem, setSelectedItem, setItems, refreshWaitlist, onClose, showArchived, isEditing, setIsEditing }) => {
     const [name, setName] = useState('');
     const [price, setPrice] = useState('');
     const [description, setDescription] = useState('');
@@ -27,7 +27,6 @@ const Form = ({ selectedItem, setSelectedItem, setItems, refreshWaitlist, onClos
     const [maxTireWidth, setMaxTireWidth] = useState('');
     const [frontHubWidth, setFrontHubWidth] = useState('');
     const [material, setMaterial] = useState('');
-    const [isEditing, setIsEditing] = useState(false);
     const [itemImage, setItemImage] = useState(null)
     const [selectedFile, setSelectedFile] = useState(null);
     const [originalItem, setOriginalItem] = useState(null);
@@ -330,8 +329,8 @@ const Form = ({ selectedItem, setSelectedItem, setItems, refreshWaitlist, onClos
                     disabled={!isEditing}
                 >
                     <option value="">Select Type</option>
-                    <option value="Tapered">Tapered</option>
                     <option value="Non Tapered">Non Tapered</option>
+                    <option value="Tapered">Tapered</option>
                 </select>
             </div>
 
@@ -473,11 +472,11 @@ const Form = ({ selectedItem, setSelectedItem, setItems, refreshWaitlist, onClos
                     disabled={!isEditing}
                 >
                     <option value="">Select Width</option>
-                    <option value='2.1"'>2.1"</option>
-                    <option value='2.25"'>2.25"</option>
-                    <option value='2.4"'>2.4"</option>
-                    <option value='2.6"'>2.6"</option>
-                    <option value='2.8"'>2.8"</option>
+                    <option value='2.1'>2.1</option>
+                    <option value='2.25'>2.25</option>
+                    <option value='2.4'>2.4</option>
+                    <option value='2.6'>2.6</option>
+                    <option value='2.8'>2.8</option>
                 </select>
             </div>
 

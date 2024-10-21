@@ -89,58 +89,6 @@ export const getCockpitItems = async (archived) => {
     }
 };
 
-// Fetch headset items
-export const getHeadsetItems = async (archived) => {
-    try {
-        const response = await api.get('/bike-builder-upgrader/headset-item', {
-            params: { archived }
-        });
-        return response.data;
-    } catch (error) {
-        console.error('Error fetching headset items:', error);
-        throw error;
-    }
-};
-
-// Fetch handlebar items
-export const getHandlebarItems = async (archived) => {
-    try {
-        const response = await api.get('/bike-builder-upgrader/handlebar-item', {
-            params: { archived }
-        });
-        return response.data;
-    } catch (error) {
-        console.error('Error fetching handlebar items:', error);
-        throw error;
-    }
-};
-
-// Fetch stem items
-export const getStemItems = async (archived) => {
-    try {
-        const response = await api.get('/bike-builder-upgrader/stem-item', {
-            params: { archived }
-        });
-        return response.data;
-    } catch (error) {
-        console.error('Error fetching stem items:', error);
-        throw error;
-    }
-};
-
-// Fetch hubs items
-export const getHubsItems = async (archived) => {
-    try {
-        const response = await api.get('/bike-builder-upgrader/hubs-item', {
-            params: { archived }
-        });
-        return response.data;
-    } catch (error) {
-        console.error('Error fetching hubs items:', error);
-        throw error;
-    }
-};
-
 // Update frame item
 export const updateFrameItem = async (itemId, updatedData) => {
     try {
@@ -200,50 +148,6 @@ export const updateSeatItem = async (itemId, updatedData) => {
 export const updateCockpitItem = async (itemId, updatedData) => {
     try {
         const response = await api.put(`/bike-builder-upgrader/update-cockpit/${itemId}`, updatedData);
-        return response.data;
-    } catch (error) {
-        console.error('Error updating item:', error);
-        throw error;
-    }
-};
-
-// Update headset item
-export const updateHeadsetItem = async (itemId, updatedData) => {
-    try {
-        const response = await api.put(`/bike-builder-upgrader/update-headset/${itemId}`, updatedData);
-        return response.data;
-    } catch (error) {
-        console.error('Error updating item:', error);
-        throw error;
-    }
-};
-
-// Update handlebar item
-export const updateHandlebarItem = async (itemId, updatedData) => {
-    try {
-        const response = await api.put(`/bike-builder-upgrader/update-handlebar/${itemId}`, updatedData);
-        return response.data;
-    } catch (error) {
-        console.error('Error updating item:', error);
-        throw error;
-    }
-};
-
-// Update stem item
-export const updateStemItem = async (itemId, updatedData) => {
-    try {
-        const response = await api.put(`/bike-builder-upgrader/update-stem/${itemId}`, updatedData);
-        return response.data;
-    } catch (error) {
-        console.error('Error updating item:', error);
-        throw error;
-    }
-};
-
-// Update hubs item
-export const updateHubsItem = async (itemId, updatedData) => {
-    try {
-        const response = await api.put(`/bike-builder-upgrader/update-hubs/${itemId}`, updatedData);
         return response.data;
     } catch (error) {
         console.error('Error updating item:', error);
@@ -317,50 +221,6 @@ export const archiveCockpitItem = async (cockpit_id) => {
     }
 };
 
-// Archive headset item
-export const archiveHeadsetItem = async (headset_id) => {
-    try {
-        const response = await api.put(`/bike-builder-upgrader/archive-headset/${headset_id}`);
-        return response.data;
-    } catch (error) {
-        console.error('Error updating item status:', error);
-        throw error;
-    }
-};
-
-// Archive handlebar item
-export const archiveHandlebarItem = async (handlebar_id) => {
-    try {
-        const response = await api.put(`/bike-builder-upgrader/archive-handlebar/${handlebar_id}`);
-        return response.data;
-    } catch (error) {
-        console.error('Error updating item status:', error);
-        throw error;
-    }
-};
-
-// Archive stem item
-export const archiveStemItem = async (stem_id) => {
-    try {
-        const response = await api.put(`/bike-builder-upgrader/archive-stem/${stem_id}`);
-        return response.data;
-    } catch (error) {
-        console.error('Error updating item status:', error);
-        throw error;
-    }
-};
-
-// Archive hubs item
-export const archiveHubsItem = async (hub_id) => {
-    try {
-        const response = await api.put(`/bike-builder-upgrader/archive-hubs/${hub_id}`);
-        return response.data;
-    } catch (error) {
-        console.error('Error updating item status:', error);
-        throw error;
-    }
-};
-
 // Restore frame item
 export const restoreFrameItem = async (frame_id) => {
     try {
@@ -420,50 +280,6 @@ export const restoreSeatItem = async (seat_id) => {
 export const restoreCockpitItem = async (cockpit_id) => {
     try {
         const response = await api.put(`/bike-builder-upgrader/restore-cockpit/${cockpit_id}`);
-        return response.data;
-    } catch (error) {
-        console.error('Error restoring item:', error);
-        throw error;
-    }
-};
-
-// Restore headset item
-export const restoreHeadsetItem = async (headset_id) => {
-    try {
-        const response = await api.put(`/bike-builder-upgrader/restore-headset/${headset_id}`);
-        return response.data;
-    } catch (error) {
-        console.error('Error restoring item:', error);
-        throw error;
-    }
-};
-
-// Restore handlebar item
-export const restoreHandlebarItem = async (handlebar_id) => {
-    try {
-        const response = await api.put(`/bike-builder-upgrader/restore-handlebar/${handlebar_id}`);
-        return response.data;
-    } catch (error) {
-        console.error('Error restoring item:', error);
-        throw error;
-    }
-};
-
-// Restore stem item
-export const restoreStemItem = async (stem_id) => {
-    try {
-        const response = await api.put(`/bike-builder-upgrader/restore-stem/${stem_id}`);
-        return response.data;
-    } catch (error) {
-        console.error('Error restoring item:', error);
-        throw error;
-    }
-};
-
-// Restore hubs item
-export const restoreHubsItem = async (hub_id) => {
-    try {
-        const response = await api.put(`/bike-builder-upgrader/restore-hubs/${hub_id}`);
         return response.data;
     } catch (error) {
         console.error('Error restoring item:', error);
@@ -537,46 +353,3 @@ export const deleteCockpitItem = async (cockpit_id) => {
     }
 };
 
-// Delete headset item
-export const deleteHeadsetItem = async (headset_id) => {
-    try {
-        const response = await api.put(`/bike-builder-upgrader/delete-headset/${headset_id}`);
-        return response.data;
-    } catch (error) {
-        console.error('Error deleting item:', error);
-        throw error;
-    }
-};
-
-// Delete handlebar item
-export const deleteHandlebarItem = async (handlebar_id) => {
-    try {
-        const response = await api.put(`/bike-builder-upgrader/delete-handlebar/${handlebar_id}`);
-        return response.data;
-    } catch (error) {
-        console.error('Error deleting item:', error);
-        throw error;
-    }
-};
-
-// Delete stem item
-export const deleteStemItem = async (stem_id) => {
-    try {
-        const response = await api.put(`/bike-builder-upgrader/delete-stem/${stem_id}`);
-        return response.data;
-    } catch (error) {
-        console.error('Error deleting item:', error);
-        throw error;
-    }
-};
-
-// Delete hubs item
-export const deleteHubsItem = async (hub_id) => {
-    try {
-        const response = await api.put(`/bike-builder-upgrader/delete-hubs/${hub_id}`);
-        return response.data;
-    } catch (error) {
-        console.error('Error deleting item:', error);
-        throw error;
-    }
-};

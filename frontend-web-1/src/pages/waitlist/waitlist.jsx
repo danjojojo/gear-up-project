@@ -15,10 +15,6 @@ import GroupsetForm from './parts-form/groupset-form';
 import WheelsetForm from './parts-form/wheelset-form';
 import SeatForm from './parts-form/seat-form';
 import CockpitForm from './parts-form/cockpit-form';
-import HeadsetForm from './parts-form/headset-form';
-import HandlebarForm from './parts-form/handlebar-form';
-import StemForm from './parts-form/stem-form';
-import HubsForm from './parts-form/hubs-form';
 
 const Waitlist = () => {
     const [items, setItems] = useState([]);
@@ -322,55 +318,6 @@ const Waitlist = () => {
                                     deleteItem={deleteItem}
                                 />
                             )}
-
-                            {selectedItem.bike_parts === 'Headset' && (
-                                <HeadsetForm
-                                    waitlistItemID={selectedItem.waitlist_item_id}
-                                    itemID={selectedItem.item_id}
-                                    itemName={selectedItem.item_name}
-                                    itemPrice={selectedItem.item_price}
-                                    onClose={handleCloseView}
-                                    refreshWaitlist={refreshWaitlist}
-                                    deleteItem={deleteItem}
-                                />
-                            )}
-
-                            {selectedItem.bike_parts === 'Handlebar' && (
-                                <HandlebarForm
-                                    waitlistItemID={selectedItem.waitlist_item_id}
-                                    itemID={selectedItem.item_id}
-                                    itemName={selectedItem.item_name}
-                                    itemPrice={selectedItem.item_price}
-                                    onClose={handleCloseView}
-                                    refreshWaitlist={refreshWaitlist}
-                                    deleteItem={deleteItem}
-                                />
-                            )}
-
-                            {selectedItem.bike_parts === 'Stem' && (
-                                <StemForm
-                                    waitlistItemID={selectedItem.waitlist_item_id}
-                                    itemID={selectedItem.item_id}
-                                    itemName={selectedItem.item_name}
-                                    itemPrice={selectedItem.item_price}
-                                    onClose={handleCloseView}
-                                    refreshWaitlist={refreshWaitlist}
-                                    deleteItem={deleteItem}
-                                />
-                            )}
-
-                            {selectedItem.bike_parts === 'Hubs' && (
-                                <HubsForm
-                                    waitlistItemID={selectedItem.waitlist_item_id}
-                                    itemID={selectedItem.item_id}
-                                    itemName={selectedItem.item_name}
-                                    itemPrice={selectedItem.item_price}
-                                    onClose={handleCloseView}
-                                    refreshWaitlist={refreshWaitlist}
-                                    deleteItem={deleteItem}
-                                />
-                            )}
-
 
                         </div>
                     ) : (
