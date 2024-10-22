@@ -5,6 +5,7 @@ import {
 } from "../../services/bikeBuilderService";
 import { Modal } from 'react-bootstrap';
 import { compatibilitySpecs, formOptions } from "../../utils/compatibilityUtils";
+import PartDetails from "./part-details";
 
 const BikeUpgrader = () => {
     const ownedPartsSelection = [
@@ -23,8 +24,6 @@ const BikeUpgrader = () => {
     const [filterValues, setFilterValues] = useState({});
     const [items, setItems] = useState([]);
     const [findPartsClicked, setFindPartsClicked] = useState(false);
-    const [parts, setParts] = useState([]);
-    const [filteredParts, setFilteredParts] = useState([]);
 
     const handleOwnedPartSelected = (ownedPartsValue) => {
         if (ownedParts.includes(ownedPartsValue)) {
@@ -223,11 +222,6 @@ const BikeUpgrader = () => {
         );
     }
 
-    const PesoFormat = new Intl.NumberFormat("en-US", {
-        style: "currency",
-        currency: "PHP",
-    });
-
     const [showModal, setShowModal] = useState(false);
 
     return (
@@ -317,7 +311,7 @@ const BikeUpgrader = () => {
                             </div>
                             <div className="part-details">
                                 <h5>Part Name</h5>
-                                <p>Part Description</p>
+                                <p>Part Description</p> 
                                 <p>{PesoFormat.format(1000)}</p>
                                 <button>Add to cart</button>
                             </div>
@@ -337,12 +331,8 @@ const BikeUpgrader = () => {
                                             </>
                                         )}
                                     </div>
-                                    <div className="part-details">
-                                        <h5>{item.item_name}</h5>
-                                        <p>{item.description}</p>
-                                        <p>{PesoFormat.format(item.item_price)}</p>
-                                        <button>Add to cart</button>
-                                    </div>
+
+                                    <PartDetails item={item} partType={desiredPart} />
                                 </div>
                             )
                         })}
