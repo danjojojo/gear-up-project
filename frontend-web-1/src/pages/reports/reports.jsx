@@ -1,29 +1,78 @@
 import './reports.scss';
+import React, { useState } from 'react';
 import PageLayout from '../../components/page-layout/page-layout';
-import PDFReport from '../../components/pdf-report/pdf-report';
-import { PDFDownloadLink, PDFViewer } from '@react-pdf/renderer';
+import sales from "../../assets/icons/sales.png";
+import expenses from "../../assets/icons/expenses.png";
+import labor from "../../assets/icons/labor.png";
+import revenue from "../../assets/icons/revenue.png";
+import SalesReport from '../../components/reports/sales-report';
+import ExpensesReport from '../../components/reports/expenses-report';
+import LaborReport from '../../components/reports/labor-cost-report';
+import RevenueReport from '../../components/reports/revenue';
 
 const Reports = () => {
+    const [selectedReport, setSelectedReport] = useState("sales");
+
+    // Render the corresponding component based on the selected report
+    const renderReportComponent = () => {
+        switch (selectedReport) {
+            case "sales":
+                return <SalesReport />;
+            case "expenses":
+                return <ExpensesReport />;
+            case "labor":
+                return <LaborReport />;
+            case "revenue":
+                return <RevenueReport />;
+            default:
+                return null;
+        }
+    };
+
     return (
         <div className='reports p-3'>
             <PageLayout
-                leftContent={
-                    <div>
-                        <PDFDownloadLink
-                            document={<PDFReport />} fileName='Report'
+                leftContent={renderReportComponent()}
+                rightContent={
+                    <>
+                        <div
+                            className="container-content"
+                            onClick={() => setSelectedReport("sales")}
                         >
-                            <button className='download-btn'>
-                                Download
-                            </button>
-                        </PDFDownloadLink>
-
-                        
-                        <PDFViewer className="pdf-viewer" style={{ width: '100%', height: '500px', marginTop: '20px' }}>
-                            <PDFReport />
-                        </PDFViewer>
-                    </div>
+                            <div className={`main-content ${selectedReport === "sales" ? "active" : ""}`}>
+                                Sales Report
+                                <img src={sales} alt="sales" className="sales-icon" />
+                            </div>
+                        </div>
+                        <div
+                            className="container-content"
+                            onClick={() => setSelectedReport("expenses")}
+                        >
+                            <div className={`main-content ${selectedReport === "expenses" ? "active" : ""}`}>
+                                Expenses Report
+                                <img src={expenses} alt="expenses" className="expenses-icon" />
+                            </div>
+                        </div>
+                        <div
+                            className="container-content"
+                            onClick={() => setSelectedReport("labor")}
+                        >
+                            <div className={`main-content ${selectedReport === "labor" ? "active" : ""}`}>
+                                Labor Costs Report
+                                <img src={labor} alt="labor" className="labor-icon" />
+                            </div>
+                        </div>
+                        <div
+                            className="container-content"
+                            onClick={() => setSelectedReport("revenue")}
+                        >
+                            <div className={`main-content ${selectedReport === "revenue" ? "active" : ""}`}>
+                                Revenue Report
+                                <img src={revenue} alt="revenue" className="revenue-icon" />
+                            </div>
+                        </div>
+                    </>
                 }
-                rightContent={<div></div>}
             />
         </div>
     );
