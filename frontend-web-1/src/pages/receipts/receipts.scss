@@ -47,6 +47,7 @@ $tag2-radius: 5px;
                         border-radius: 7px;
                         padding: 3px;
                         flex-grow: 1;
+                        margin: 0;
                         
                         input {
                             border: none;
@@ -66,7 +67,7 @@ $tag2-radius: 5px;
                         border: 1px solid $normal-border-color;
                         font-size: $font-size;
                         border-radius: 7px;
-
+                        
                         button {
                             border-radius: 5px;
                             padding: 5px 10px;

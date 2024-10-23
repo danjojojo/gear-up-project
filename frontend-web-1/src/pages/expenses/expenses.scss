@@ -16,11 +16,13 @@ $font-size: clamp(0.9em, 1.2vw, 1.1em);
             display: flex;
             flex-direction: column;
             height: 100%;
-
+            
             .nav{
                 display: flex;
                 flex-direction: column;
                 height: auto;
+                position: relative;
+                z-index: 0 !important;
 
                 .date-picker{
                     border: none;
@@ -121,14 +123,19 @@ $font-size: clamp(0.9em, 1.2vw, 1.1em);
     .right-content{
 
         .expense-container{
+            height: 100%;
             .expense-details-container{
                 display: flex;
                 flex-direction: column;
+                height: 100%;
 
                 .nav{
                     display: flex;
                     justify-content: space-between;
                     align-items: center;
+                    position: relative;
+                    z-index: 0 !important;
+                    height: auto;
 
                     h4{
                         font-weight: 700;
@@ -150,13 +157,16 @@ $font-size: clamp(0.9em, 1.2vw, 1.1em);
                 }
 
                 form{
+                    flex-grow: 1;
+                    overflow-y: auto;
+                    scrollbar-width: thin;
                     display: flex;
                     flex-direction: column;
                     
                     .form-input{
                         display: flex;
                         flex-direction: column;
-                        margin: 15px 0 0 0;
+                        margin: 10px 0 0 0;
 
                         .select-nav{
                             display: flex;
@@ -165,7 +175,6 @@ $font-size: clamp(0.9em, 1.2vw, 1.1em);
 
                             label, p{
                                 font-size: 1em;
-                                margin: 5px 0;
                             }
 
                             p:hover{
@@ -192,12 +201,13 @@ $font-size: clamp(0.9em, 1.2vw, 1.1em);
                             display: flex;
                             flex-direction: row;
                             gap: 2%;
-
+                            
                             .expense-name{
                                 margin: 0;
                             }
                             
                             p{
+                                margin: 0;
                                 padding: 5px 15px;
                                 border: 1px solid #ddd;
                                 border-radius: 100px;
@@ -324,4 +334,8 @@ $font-size: clamp(0.9em, 1.2vw, 1.1em);
         width: 100%;
         margin: 0 auto;
     }
+}
+
+.menu-nav{
+    z-index: 10000 !important;
 }

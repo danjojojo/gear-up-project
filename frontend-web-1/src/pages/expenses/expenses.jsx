@@ -38,6 +38,8 @@ const Expenses = () => {
 	const [expensePreviewImage, setExpensePreviewImage] = useState(null);
 	const maxImageSizeMB = 5;
 	const maxImageSize = maxImageSizeMB * 1024 * 1024;
+	const [othersExpense, setOthersExpense] = useState(false);
+	const [othersExpenseName, setOthersExpenseName] = useState('');
 
 	// FOR EDITING EXPENSE
 	const [editExpenseID, setEditExpenseID] = useState('');
@@ -225,7 +227,6 @@ const Expenses = () => {
 			</Modal>
 		);
 	}
-
 	function openAddExpense(){
         setExpenseName(expenseNameOptions[0]);
 		setAddExpenseView(true);
@@ -244,6 +245,8 @@ const Expenses = () => {
 		setExpenseName(expenseNameOptions[0]);
 		setExpenseAmount(1);
 		setExpensePreviewImage(null);
+		setOthersExpenseName('');
+		setOthersExpense(false);
 		removeImage();
 	}
 	function restartExpenseForm(){
@@ -295,6 +298,12 @@ const Expenses = () => {
 
 		setEditExpenseID(expense.expense_id);
 		setEditExpenseName(expense.expense_name);
+		if(expense.expense_name.includes('Others')){
+			setOthersExpense(true);
+			setOthersExpenseName(expense.expense_name.substring(9));
+		} else {
+			setOthersExpense(false);
+		}
 		setEditExpenseAmount(expense.expense_amount);
 		setEditExpenseDateTime(expense.date_updated);
 		setEditExpenseImage(imageFile);
@@ -305,15 +314,19 @@ const Expenses = () => {
 		event.preventDefault();
 
 		const formData = new FormData();
-		formData.append("name", expenseName);
+		if(othersExpense) {
+			formData.append("name", 'Others - ' + othersExpenseName);
+		} else {
+			formData.append("name", expenseName);
+		}
 		formData.append("amount", expenseAmount);
 		formData.append("date", startDate);
 		if(expenseImage) formData.append("image", expenseImage);
 		
 		// Log the form data values
-		console.log("Expense Name:", expenseName);
-		console.log("Expense Amount:", expenseAmount);
-		console.log("Expense Image:", expenseImage);
+		console.log("Expense Name:", formData.get("name"));
+		console.log("Expense Amount:", formData.get("amount"));
+		console.log("Expense Image:", formData.get("image"));
 
 		try{
 			await addExpense(formData);
@@ -327,21 +340,26 @@ const Expenses = () => {
 			console.error("Error adding expense", error);
 			alert("An error occurred while adding the expense");
 		}
-
 		console.log(formData);
 	}
 	const handleEditExpense = async () => {
+
 		const formData = new FormData();
 		formData.append("id", editExpenseID);
-		formData.append("name", editExpenseName);
+		if(othersExpense) {
+			console.log('others');
+			formData.append("name", 'Others - ' + othersExpenseName);
+		} else {
+			formData.append("name", editExpenseName);
+		}
 		formData.append("amount", editExpenseAmount);
 		if(editExpenseImage) formData.append("image", editExpenseImage);
 		
 		// Log the form data values
 		console.log("Expense ID:", editExpenseID);
-		console.log("Expense Name:", editExpenseName);
-		console.log("Expense Amount:", editExpenseAmount);
-		console.log("Expense Image:", editExpenseImage);
+		console.log("Expense Name:", formData.get("name"));
+		console.log("Expense Amount:", formData.get("amount"));
+		console.log("Expense Image:", formData.get("image"));
 
 		try{
 			await editExpense(editExpenseID, formData);
@@ -379,6 +397,9 @@ const Expenses = () => {
 			handleArchiveExpense();
 		}
 	};
+	useEffect(() => {
+		console.log("Others Expense Name: ", othersExpenseName);
+	}, [othersExpenseName]);
 
 	useEffect(() => {
 		handleGetExpenses(startDate);
@@ -516,21 +537,46 @@ const Expenses = () => {
 							<form>
 								<div className='form-input'>
 									<div className='select-nav'>
-										<label>Name</label>
+										<label>Tag</label>
 									</div>
 									<div className='radio-buttons'>
 									{!editExpenseView && <p className='expense-name'>{editExpenseName}</p>}
 									{editExpenseView && expenseNameOptions.map((option, index) => 
 										<p 
 										key={index}
-										className={editExpenseName === option ? 'selected' : ''}
+										className={
+											editExpenseName === option || editExpenseName.substring(0,6) === option ? 'selected' : ''
+										}
 										onClick={() => {
 											console.log(option);
 											setEditExpenseName(option);
+											if(option === 'Others') {
+												setOthersExpense(true);
+											} else { 
+												setOthersExpense(false);
+											}
 										}}>{option}</p>
 									)}
 									</div>
 								</div>
+								{editExpenseName.includes('Others') && 
+								<div className='form-input'>
+									<div className='select-nav'>
+										<label>Expense Name</label>
+									</div>
+									<input 
+										type='text'
+										placeholder='Enter expense name'
+										value={othersExpenseName}
+										onChange={(e) => {
+											setOthersExpenseName(e.target.value);
+											console.log(e.target.value);
+										}}
+									/>
+									{othersExpenseName === '' && (
+										<p className='error'>Expense name cannot be empty for Others tag.</p>
+									)}
+								</div>}
 								<div className='form-input'>
 									<label>Amount</label>
 									<NumericFormat
@@ -575,7 +621,7 @@ const Expenses = () => {
 									}
 									{error && <p className='error'>{error}</p>}
 								</div>
-								{(editExpenseAmount > 0 && editExpenseImage !== null) && (
+								{(editExpenseAmount > 0 && editExpenseImage !== null && (!othersExpense || (othersExpense && othersExpenseName !== ''))) && (
 									<button type='button' className='submit-btn'
 										onClick={() => {
 											setModalConfirmShow(true)
@@ -616,7 +662,7 @@ const Expenses = () => {
 							<form>
 								<div className='form-input'>
 									<div className='select-nav'>
-										<label>Name</label>
+										<label>Tag</label>
 									</div>
 									<div className='radio-buttons'>
 										<p className='expense-name'>{editExpenseName}</p>
@@ -661,7 +707,7 @@ const Expenses = () => {
 							<form onSubmit={handleAddExpense}>
 								<div className='form-input'>
 									<div className='select-nav'>
-										<label>Name</label>
+										<label>Tag</label>
 									</div>
 									<div className='radio-buttons'>
 									{expenseNameOptions.map((option, index) => 
@@ -671,10 +717,32 @@ const Expenses = () => {
 											onClick={() => {
 												console.log(option);
 												setExpenseName(option);
+												if(option === 'Others') {
+													setOthersExpense(true);
+												} else { 
+													setOthersExpense(false);
+												}
 											}}>{option}</p>
 										)}
 									</div>
 								</div>
+								{expenseName === 'Others' && 
+								<div className='form-input'>
+									<div className='select-nav'>
+										<label>Expense Name</label>
+									</div>
+									<input 
+										type='text'
+										placeholder='Enter expense name'
+										value={othersExpenseName}
+										onChange={(e) => {
+											setOthersExpenseName(e.target.value);
+										}}
+									/>
+									{othersExpenseName === '' && (
+										<p className='error'>Expense name cannot be empty for Others tag.</p>
+									)}
+								</div>}
 								<div className='form-input'>
 									<label>Amount</label>
 									<NumericFormat
@@ -718,7 +786,7 @@ const Expenses = () => {
 									}
 									{error && <p className='error'>{error}</p>}
 								</div>
-								{(expenseAmount > 0 && expenseImage !== null) && (
+								{(expenseAmount > 0 && expenseImage !== null && (!othersExpense || (othersExpense && othersExpenseName !== ''))) && (
 									<button type='submit' className='submit-btn'>Add Expense</button>
 								)} 
 							</form>
