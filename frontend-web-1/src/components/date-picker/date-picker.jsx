@@ -1,9 +1,9 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Select from 'react-select';
 import "./date-picker.scss";
 
-const MonthYearPicker = () => {
-    const [selectedDate, setSelectedDate] = useState({
+const MonthYearPicker = ({ setSelectedDate }) => {
+    const [selectedDate, setLocalSelectedDate] = useState({
         month: new Date().getMonth(),
         year: new Date().getFullYear()
     });
@@ -24,7 +24,6 @@ const MonthYearPicker = () => {
         { value: 11, label: 'December' }
     ];
 
-    // Generate an array of months and years, starting from the current and going backwards
     const generateMonthYearOptions = () => {
         const currentMonth = new Date().getMonth();
         const currentYear = new Date().getFullYear();
@@ -50,8 +49,15 @@ const MonthYearPicker = () => {
     const combinedOptions = generateMonthYearOptions();
 
     const handleChange = (selectedOption) => {
-        setSelectedDate(selectedOption.value);
+        const { month, year } = selectedOption.value;
+        setLocalSelectedDate({ month, year });
+        setSelectedDate({ month: month + 1, year }); // Adjusting month to be 1-indexed (January = 1)
     };
+
+    // Automatically set the initial selected date on component mount
+    useEffect(() => {
+        setSelectedDate({ month: selectedDate.month + 1, year: selectedDate.year });
+    }, [selectedDate]);
 
     return (
         <Select

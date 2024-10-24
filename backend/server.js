@@ -15,6 +15,7 @@ const posUsersRoutes = require('./routers/posUsersRouter');
 const recordsRoutes = require('./routers/recordsRouter');
 const summaryRoutes = require('./routers/summaryRouter');
 const mechanicRoutes = require('./routers/mechanicsRouter');
+const reportsRoutes = require('./routers/reportsRouter');
 
 // web 2
 const bikeBuilderRouter = require('./routers/bikeBuilderRouter');
@@ -62,6 +63,7 @@ app.use('/pos-users', posUsersRoutes);
 app.use('/records', recordsRoutes);
 app.use('/summary', summaryRoutes);
 app.use('/mechanics', mechanicRoutes);
+app.use('/reports', reportsRoutes);
 
 // web 2
 app.use('/bike-builder', bikeBuilderRouter);
