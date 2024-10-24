@@ -181,6 +181,8 @@ const ExpensesReport = () => {
                         ))}
                     </tbody>
                 </table>
+
+                <p className='mt-4 fs-7 fw-light'> @2024 GearUp. All rights reserved.</p>
             </div>
         </>
     );

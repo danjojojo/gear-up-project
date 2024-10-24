@@ -98,7 +98,57 @@ const getExpensesReport = async (req, res) => {
     }
 };
 
+// Get labor report data
+const getLaborReport = async (req, res) => {
+    const { month, year } = req.query;
+
+    try {
+        // Summary Query: Aggregate total service costs and days worked per mechanic
+        const summaryResult = await pool.query(
+            `
+            SELECT 
+                m.mechanic_name,
+                COUNT(DISTINCT EXTRACT(DAY FROM sm.date_created)) AS days_worked,
+                SUM(sm.service_price) AS total_service_amount
+            FROM sales_mechanics sm
+            JOIN mechanics m ON sm.mechanic_id = m.mechanic_id
+            WHERE EXTRACT(MONTH FROM sm.date_created) = $1
+            AND EXTRACT(YEAR FROM sm.date_created) = $2
+            GROUP BY m.mechanic_name
+            ORDER BY total_service_amount DESC;
+            `,
+            [month, year]
+        );
+
+        // Detailed Query: Aggregate service costs by day and mechanic
+        const detailedResult = await pool.query(
+            `
+            SELECT 
+                EXTRACT(DAY FROM sm.date_created) AS day,
+                m.mechanic_name,
+                SUM(sm.service_price) AS service_price
+            FROM sales_mechanics sm
+            JOIN mechanics m ON sm.mechanic_id = m.mechanic_id
+            WHERE EXTRACT(MONTH FROM sm.date_created) = $1 
+            AND EXTRACT(YEAR FROM sm.date_created) = $2
+            GROUP BY day, m.mechanic_name
+            ORDER BY day ASC, m.mechanic_name;
+            `,
+            [month, year]
+        );
+
+        res.json({
+            summary: summaryResult.rows,
+            detailed: detailedResult.rows,
+        });
+    } catch (error) {
+        console.error('Error fetching labor report:', error);
+        res.status(500).json({ error: 'Failed to fetch labor report' });
+    }
+};
+
 module.exports = {
     getSalesReport,
-    getExpensesReport
+    getExpensesReport,
+    getLaborReport
 }

@@ -19,3 +19,13 @@ export const getExpensesReport = async (month, year) => {
         throw error;
     }
 };
+
+export const getLaborReport = async (month, year) => {
+    try {
+        const response = await api.get(`/reports/labor-report?month=${month}&year=${year}`);
+        return response.data;
+    } catch (error) {
+        console.error('Error retrieving labor report data:', error);
+        throw error;
+    }
+};
