@@ -111,6 +111,11 @@ const Seat = () => {
         setShowSort(false);
     }
 
+    const PesoFormat = new Intl.NumberFormat("en-US", {
+        style: "currency",
+        currency: "PHP",
+    });
+
     return (
         <div className='seat p-3'>
             <PageLayout
@@ -217,7 +222,7 @@ const Seat = () => {
                                                 </div>
 
                                                 <div className="item-price fw-light">
-                                                    ₱ {item.item_price}
+                                                    {PesoFormat.format(item.item_price)}
                                                 </div>
                                             </div>
                                         </div>

@@ -112,6 +112,11 @@ const Groupset = () => {
         setShowSort(false);
     }
 
+    const PesoFormat = new Intl.NumberFormat("en-US", {
+        style: "currency",
+        currency: "PHP",
+    });
+
     return (
         <div className='groupset p-3'>
             <PageLayout
@@ -218,7 +223,7 @@ const Groupset = () => {
                                                 </div>
 
                                                 <div className="item-price fw-light">
-                                                    ₱ {item.item_price}
+                                                    {PesoFormat.format(item.item_price)}
                                                 </div>
                                             </div>
                                         </div>

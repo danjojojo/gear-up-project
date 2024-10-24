@@ -1,5 +1,6 @@
 import './reports.scss';
-import React, { useState } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
+import { useNavigate } from 'react-router-dom';
 import PageLayout from '../../components/page-layout/page-layout';
 import sales from "../../assets/icons/sales.png";
 import expenses from "../../assets/icons/expenses.png";
@@ -12,6 +13,20 @@ import RevenueReport from '../../components/reports/revenue';
 
 const Reports = () => {
     const [selectedReport, setSelectedReport] = useState("sales");
+    const navigate = useNavigate();
+
+    // Memoize reportPaths to avoid unnecessary re-renders
+    const reportPaths = useMemo(() => ({
+        sales: "sales-report",
+        expenses: "expenses-report",
+        labor: "labor-cost-report",
+        revenue: "revenue-report",
+    }), []);
+
+    // Update URL based on selected report
+    useEffect(() => {
+        navigate(`/reports/${reportPaths[selectedReport]}`);
+    }, [selectedReport, navigate, reportPaths]);
 
     // Render the corresponding component based on the selected report
     const renderReportComponent = () => {

@@ -31,29 +31,42 @@ const SalesReport = () => {
     const generatePDF = () => {
         const input = reportRef.current;
         html2canvas(input, { scale: 2 }).then((canvas) => {
-            const imgData = canvas.toDataURL('image/png');
             const pdf = new jsPDF('p', 'mm', 'a4');
-            const imgProps = pdf.getImageProperties(imgData);
             const pdfWidth = pdf.internal.pageSize.getWidth();
-            const pdfHeight = (imgProps.height * pdfWidth) / imgProps.width;
 
-            // Determine number of pages
-            const pageHeight = pdf.internal.pageSize.getHeight();
-            let heightLeft = pdfHeight;
-            let position = 0;
+            const pageHeight = 295; // Adjust based on your requirements
+            const margin = 10; // Top and bottom margins
 
-            // Add the first page
-            pdf.addImage(imgData, 'PNG', 0, position, pdfWidth, pdfHeight);
-            heightLeft -= pageHeight;
+            // Manually render parts of the content to avoid breaking tables
+            const splitCanvasIntoPages = () => {
+                const contentHeight = canvas.height;
+                const contentWidth = canvas.width;
 
-            // Add more pages if content is longer than one page
-            while (heightLeft > 0) {
-                position -= pageHeight; // Move to the next page
-                pdf.addPage();
-                pdf.addImage(imgData, 'PNG', 0, position, pdfWidth, pdfHeight);
-                heightLeft -= pageHeight;
-            }
+                const ratio = contentWidth / pdfWidth;
+                const scaledPageHeight = pageHeight * ratio;
 
+                let heightLeft = contentHeight;
+                let position = 0;
+
+                while (heightLeft > 0) {
+                    const pageCanvas = document.createElement('canvas');
+                    pageCanvas.width = contentWidth;
+                    pageCanvas.height = Math.min(heightLeft, scaledPageHeight);
+                    const context = pageCanvas.getContext('2d');
+
+                    context.drawImage(canvas, 0, position, contentWidth, pageCanvas.height, 0, 0, contentWidth, pageCanvas.height);
+
+                    const pageData = pageCanvas.toDataURL('image/png');
+
+                    if (position > 0) pdf.addPage();
+                    pdf.addImage(pageData, 'PNG', margin, margin, pdfWidth - margin * 2, (pageCanvas.height * (pdfWidth - margin * 2)) / contentWidth);
+
+                    heightLeft -= pageCanvas.height;
+                    position += pageCanvas.height;
+                }
+            };
+
+            splitCanvasIntoPages();
             pdf.save('Sales_Report.pdf');
         });
     };
@@ -85,7 +98,9 @@ const SalesReport = () => {
     };
 
     const organizeSalesDataByDay = (salesData, month, year) => {
-        const daysInMonth = new Date(year, month, 0).getDate();
+        const currentDate = new Date();
+        const isCurrentMonth = month === currentDate.getMonth() + 1 && year === currentDate.getFullYear();
+        const daysInMonth = isCurrentMonth ? currentDate.getDate() : new Date(year, month, 0).getDate();
         const salesByDay = {};
 
         salesData.forEach((item) => {

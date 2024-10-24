@@ -111,6 +111,11 @@ const Fork = () => {
         setShowSort(false);
     }
 
+    const PesoFormat = new Intl.NumberFormat("en-US", {
+        style: "currency",
+        currency: "PHP",
+    });
+
     return (
         <div className='fork p-3'>
             <PageLayout
@@ -217,7 +222,7 @@ const Fork = () => {
                                                 </div>
 
                                                 <div className="item-price fw-light">
-                                                    ₱ {item.item_price}
+                                                    {PesoFormat.format(item.item_price)}
                                                 </div>
                                             </div>
                                         </div>
