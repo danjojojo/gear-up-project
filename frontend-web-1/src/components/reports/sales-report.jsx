@@ -33,35 +33,25 @@ const SalesReport = () => {
         html2canvas(input, { scale: 2 }).then((canvas) => {
             const imgData = canvas.toDataURL('image/png');
             const pdf = new jsPDF('p', 'mm', 'a4');
+            const imgProps = pdf.getImageProperties(imgData);
             const pdfWidth = pdf.internal.pageSize.getWidth();
-            const pdfHeight = pdf.internal.pageSize.getHeight();
+            const pdfHeight = (imgProps.height * pdfWidth) / imgProps.width;
 
-            let imgProps = pdf.getImageProperties(imgData);
-            let imgHeight = (imgProps.height * pdfWidth) / imgProps.width;
-
-            // Calculate total canvas height and divide into segments
-            const canvasHeight = canvas.height;
-            const canvasWidth = canvas.width;
-            let heightLeft = canvasHeight;
-
+            // Determine number of pages
+            const pageHeight = pdf.internal.pageSize.getHeight();
+            let heightLeft = pdfHeight;
             let position = 0;
+
+            // Add the first page
+            pdf.addImage(imgData, 'PNG', 0, position, pdfWidth, pdfHeight);
+            heightLeft -= pageHeight;
+
+            // Add more pages if content is longer than one page
             while (heightLeft > 0) {
-                const pageCanvas = document.createElement('canvas');
-                pageCanvas.width = canvasWidth;
-                pageCanvas.height = Math.min(canvasHeight, pdfHeight * (canvasWidth / pdfWidth));
-                const pageCtx = pageCanvas.getContext('2d');
-
-                // Draw only the current page part on the new canvas
-                pageCtx.drawImage(canvas, 0, position, canvasWidth, pageCanvas.height, 0, 0, canvasWidth, pageCanvas.height);
-
-                const pageData = pageCanvas.toDataURL('image/png');
-
-                // Add the page image to PDF
-                if (position > 0) pdf.addPage();
-                pdf.addImage(pageData, 'PNG', 0, 0, pdfWidth, (pageCanvas.height * pdfWidth) / canvasWidth);
-
-                heightLeft -= pageCanvas.height;
-                position += pageCanvas.height;
+                position -= pageHeight; // Move to the next page
+                pdf.addPage();
+                pdf.addImage(imgData, 'PNG', 0, position, pdfWidth, pdfHeight);
+                heightLeft -= pageHeight;
             }
 
             pdf.save('Sales_Report.pdf');

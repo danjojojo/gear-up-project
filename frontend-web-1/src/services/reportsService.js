@@ -9,3 +9,13 @@ export const getSalesReport = async (month, year) => {
         throw error;
     }
 };
+
+export const getExpensesReport = async (month, year) => {
+    try {
+        const response = await api.get(`/reports/expenses-report?month=${month}&year=${year}`);
+        return response.data;
+    } catch (error) {
+        console.error('Error retrieving expenses report data:', error);
+        throw error;
+    }
+};
