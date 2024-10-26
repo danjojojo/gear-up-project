@@ -401,7 +401,7 @@ $button-fail: #dee2e6;
                 height: calc(100vh - 160px);
                 overflow-y: auto;
                 display: block;
-                padding-right: 15px;
+                scrollbar-width: none;
 
                 .container-1 {
                     height: 6%;

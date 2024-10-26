@@ -35,7 +35,7 @@ const ExpensesReport = () => {
             const pdfWidth = pdf.internal.pageSize.getWidth();
 
             const pageHeight = 295; // Adjust based on your requirements
-            const margin = 10; // Top and bottom margins
+            const margin = 7; // Top and bottom margins
 
             // Manually render parts of the content to avoid breaking tables
             const splitCanvasIntoPages = () => {

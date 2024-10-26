@@ -5,6 +5,7 @@ const cookieParser = require('cookie-parser');
 
 // web 1
 const authRoutes = require('./routers/authRouter');
+const dashboardRoutes = require('./routers/dashboardRouter');
 const inventoryRoutes = require('./routers/inventoryRouter');
 const waitlistRoutes = require('./routers/waitlistRouter');
 const bbuRoutes = require('./routers/bbuRouter');
@@ -53,6 +54,7 @@ app.use(compression());
 
 // web 1
 app.use('/auth', authRoutes);
+app.use('/dashboard', dashboardRoutes);
 app.use('/inventory', inventoryRoutes);
 app.use('/waitlist', waitlistRoutes);
 app.use('/bike-builder-upgrader', bbuRoutes);
