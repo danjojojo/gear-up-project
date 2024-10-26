@@ -101,12 +101,24 @@ const Dashboard = () => {
             try {
                 const data = await fetchReceiptOverview();
 
-                const labels = Array.from({ length: 24 }, (_, i) => `${i}h`);
-                const totalCostData = new Array(24).fill(0);
+                // Get current hour (24-hour format) to limit displayed hours
+                const currentHour = new Date().getHours();
+
+                // Generate labels in 12-hour format with AM/PM up to the current hour
+                const labels = Array.from({ length: currentHour + 1 }, (_, i) =>
+                    i === 0 ? '12 AM' :
+                        i < 12 ? `${i} AM` :
+                            i === 12 ? '12 PM' :
+                                `${i - 12} PM`
+                );
+
+                const totalCostData = new Array(currentHour + 1).fill(0);
 
                 data.forEach(entry => {
                     const hour = parseInt(entry.hour, 10);
-                    totalCostData[hour] = parseFloat(entry.total_cost);
+                    if (hour <= currentHour) {  // Only populate up to the current hour
+                        totalCostData[hour] = parseFloat(entry.total_cost);
+                    }
                 });
 
                 setChartData({
@@ -115,7 +127,7 @@ const Dashboard = () => {
                         {
                             label: 'Total Receipts',
                             data: totalCostData,
-                            backgroundColor: 'black'
+                            backgroundColor: '#2E2E2E',  // Dark color for bars
                         }
                     ]
                 });
