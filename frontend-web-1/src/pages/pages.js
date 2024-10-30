@@ -8,6 +8,10 @@ import POSUsers from './pos-users/pos-users.jsx';
 import Inventory from './inventory/inventory.jsx';
 import Summaries from './summaries/summaries.jsx';
 import Reports from './reports/reports.jsx';
+    import SalesReport from '../components/reports/sales-report.jsx';
+    import ExpensesReport from '../components/reports/expenses-report.jsx';
+    import LaborReport from '../components/reports/labor-cost-report.jsx';
+    import RevenueReport from '../components/reports/revenue.jsx';
 import Records from './records/records.jsx'
 import Waitlist from './waitlist/waitlist.jsx';
 import BikeBuilderUpgrader from './bike-builder-upgrader/bike-builder-upgrader.jsx';
@@ -51,6 +55,12 @@ const Pages = {
 
     // Reports Page
     Reports,
+
+        // Reports 
+        SalesReport,
+        ExpensesReport,
+        LaborReport,
+        RevenueReport,
 
     // Records Page
     Records,

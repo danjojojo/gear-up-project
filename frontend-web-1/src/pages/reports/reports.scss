@@ -1,0 +1,162 @@
+$normal-bg-color: #f8f9fa;
+$normal-border-color: #dee2e6;
+$active-bg-color: white;
+$active-text-color: rgb(65, 65, 65);
+$error-border-color: #ce6868;
+$inactive-text-color: grey;
+$qty-bg-color: #a3a3a3;
+$qty-text-color: white;
+$button-bg-color: #9e9e9e;
+$subheading-text-color: #606060;
+$font-size: clamp(0.9em, 1.2vw, 1.1em);
+$button-success: #9C9B9B;
+$button-fail: #dee2e6;
+
+.reports {
+    .left-content {
+        padding: 0 !important;
+        overflow-y: auto;
+        scrollbar-width: none;
+
+        .upper {
+            display: flex;
+            justify-content: space-between;
+            padding: 30px 50px 42px;
+
+            select {
+                width: 130px;
+                border: none;
+            }
+
+            button {
+                margin: 0 !important;
+                border: none;
+                background-color: #2E2E2E;
+                padding: 3px;
+                width: 150px;
+                border-radius: 5px;
+                color: white;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                font-weight: 600;
+                font-size: 14px;
+
+                img {
+                    height: 14px;
+                    width: 14px;
+                    margin-right: 10px;
+                }
+            }
+        }
+
+        .pdf-content {
+            padding: 8px 50px 50px;
+
+            h1 {
+                margin-bottom: 4px;
+
+                span {
+                    font-family: "Cooper";
+                }
+
+                span:nth-child(1) {
+                    color: #F9961F;
+                }
+
+                span:nth-child(2) {
+                    color: #2E2E2E;
+                }
+            }
+
+            h3 {
+                font-weight: bold;
+                color: #363636;
+                margin-bottom: 8px;
+            }
+
+            p {
+                margin-bottom: 8px;
+                font-size: 14px;
+            }
+
+            table {
+                width: 100%;
+                border-collapse: collapse;
+                table-layout: fixed;
+                border: solid 1px #2E2E2E;
+
+                thead {
+                    tr {
+                        text-align: center;
+
+                        th {
+                            border: 1px solid #2E2E2E;
+                            padding: 8px;
+                        }
+                    }
+                }
+
+                tbody {
+                    tr {
+                        td {
+                            border: 1px solid #2E2E2E;
+                            padding: 8px;
+                            text-align: center;
+                        }
+                    }
+
+                }
+            }
+
+        }
+    }
+
+    .right-content {
+        .container-content {
+            height: 25%;
+            padding: 5px;
+            cursor: pointer;
+
+
+            .main-content {
+                border: 1px solid $normal-border-color;
+                border-radius: 12px;
+                height: 100%;
+                padding: 24px;
+                align-content: end;
+                font-weight: 700;
+                position: relative;
+                overflow: hidden;
+                font-size: 20px;
+                background-color: white; // Ensure the background stands out
+                transition: border-color 0.3s ease;
+                transition: transform 0.3s ease;
+
+
+                &:hover {
+                    box-shadow: 0 5px 10px rgba(0, 0, 0, 0.1);
+                }
+
+                &.active {
+                    color: #F9961F;
+                    border: solid 2px #F9961F; // Active state
+
+                    img {
+                        filter: brightness(0) saturate(100%) invert(36%) sepia(84%) saturate(5635%) hue-rotate(9deg) brightness(101%) contrast(104%);
+                    }
+                }
+
+                img {
+                    position: absolute;
+                    top: -15px;
+                    right: -10px;
+                    height: 150px;
+                    width: 150px;
+                    opacity: 0.2;
+                }
+            }
+        }
+    }
+
+}

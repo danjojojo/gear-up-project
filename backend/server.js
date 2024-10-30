@@ -5,6 +5,7 @@ const cookieParser = require('cookie-parser');
 
 // web 1
 const authRoutes = require('./routers/authRouter');
+const dashboardRoutes = require('./routers/dashboardRouter');
 const inventoryRoutes = require('./routers/inventoryRouter');
 const waitlistRoutes = require('./routers/waitlistRouter');
 const bbuRoutes = require('./routers/bbuRouter');
@@ -15,6 +16,7 @@ const posUsersRoutes = require('./routers/posUsersRouter');
 const recordsRoutes = require('./routers/recordsRouter');
 const summaryRoutes = require('./routers/summaryRouter');
 const mechanicRoutes = require('./routers/mechanicsRouter');
+const reportsRoutes = require('./routers/reportsRouter');
 
 // web 2
 const bikeBuilderRouter = require('./routers/bikeBuilderRouter');
@@ -54,6 +56,7 @@ app.use(compression());
 
 // web 1
 app.use('/auth', authRoutes);
+app.use('/dashboard', dashboardRoutes);
 app.use('/inventory', inventoryRoutes);
 app.use('/waitlist', waitlistRoutes);
 app.use('/bike-builder-upgrader', bbuRoutes);
@@ -64,6 +67,7 @@ app.use('/pos-users', posUsersRoutes);
 app.use('/records', recordsRoutes);
 app.use('/summary', summaryRoutes);
 app.use('/mechanics', mechanicRoutes);
+app.use('/reports', reportsRoutes);
 
 // web 2
 app.use('/bike-builder', bikeBuilderRouter);
