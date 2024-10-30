@@ -9,7 +9,8 @@ const {
     addPosUser,
     editPosUserName,
     editPosUserPassword,
-    editPosUserStatus
+    editPosUserStatus,
+    deletePosUser
 } = require('../controllers/posUsersController');
 
 router.get('/get-pos-users', verifyToken, checkRole('admin'), getPosUsers);
@@ -21,5 +22,7 @@ router.put('/edit-pos-name/:id', verifyToken, checkRole('admin'), upload.none(),
 router.put('/edit-pos-pass/:id', verifyToken, checkRole('admin'), upload.none(), editPosUserPassword);
 
 router.put('/edit-pos-status/:id', verifyToken, checkRole('admin'), editPosUserStatus);
+
+router.put('/delete-pos-user/:id', verifyToken, checkRole('admin'), upload.none(), deletePosUser);
 
 module.exports = router;

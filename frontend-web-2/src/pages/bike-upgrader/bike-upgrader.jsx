@@ -156,12 +156,12 @@ const BikeUpgrader = () => {
     const getParts = async (desiredPart, filterValues) => {
         // console.log(desiredPart, filterValues);
         // await getAnyItems(desiredPart, filterValues);
-        const { parts } = await getAnyItems(desiredPart, filterValues);
         setLoading(true);
+        const { parts } = await getAnyItems(desiredPart, filterValues);
+        setItems(parts);
         setTimeout(() => {
             setLoading(false);
         }, 1000);
-        setItems(parts);
     }
 
     const handleFindParts = () => {
@@ -305,17 +305,6 @@ const BikeUpgrader = () => {
                                 <p>Sorry, we can't find any available parts for your bike's specifications.</p>
                             </div>
                         }
-                        {/* <div className="part">
-                            <div className="part-image">
-                                <img src="https://via.placeholder.com/150" alt="part" />
-                            </div>
-                            <div className="part-details">
-                                <h5>Part Name</h5>
-                                <p>Part Description</p> 
-                                <p>{PesoFormat.format(1000)}</p>
-                                <button>Add to cart</button>
-                            </div>
-                        </div> */}
                         {!loading && findPartsClicked && items.length !== 0 && items.map((item, index) => {
                             return (
                                 <div className="part" key={index}>

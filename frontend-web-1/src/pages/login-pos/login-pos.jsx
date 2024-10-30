@@ -70,7 +70,12 @@ const LoginPOS = () => {
                 >
                   &larr; Select POS
                 </p>
+                <div className="intro">
+                  <h4 className='header'>POS Login</h4>
+                  <p className='subtitle'>Enter your password to login to your account.</p>
+                </div>
                 <form onSubmit={handleLoginPOS}>
+                  {error && <p className="error-msg">{error}</p>}
                   <div className="form-group">
                     <input type="hidden" id="id" value={selectedPosID} />
                     <div className="pos_name">
@@ -84,10 +89,8 @@ const LoginPOS = () => {
                       placeholder="Enter your password"
                       value={password}
                       onChange={(e) => setPassword(e.target.value)}
-                      required
                     />
                   </div>
-                  {error && <p className="error">{error}</p>}
                   <button type="submit" className="submit-btn">
                     Login
                   </button>
@@ -95,9 +98,12 @@ const LoginPOS = () => {
               </div>
             ) : posExists ? (
               <div className="select-pos row d-flex justify-content-center">
+                {!loading && <div className="intro">
+                  <h4 className='header'>Select a POS Account</h4>
+                </div>}
                 {loading && (
                   <div className="loading">
-                    <p>Retrieving POS users</p>
+                    <i className="fa-solid fa-gear fa-spin"></i>
                   </div>
                 )}
                 {!loading &&
@@ -124,9 +130,9 @@ const LoginPOS = () => {
                 )}
               </div>
             )}
-            <p className="toggle-text">
-              <Link to="/login">Login as Admin</Link>
-            </p>
+            {!loading && !isSelectPOS && <p className="toggle-text">
+              <Link to="/login" className="toggle-text">&larr; Login as Admin</Link>
+            </p>}
           </div>
         }
       />

@@ -1,6 +1,6 @@
 import './receipts.scss'
 import ResponsivePageLayout from '../../components/responsive-page-layout/responsive-page-layout';
-import { useEffect, useState, forwardRef } from 'react';
+import { useEffect, useState, forwardRef, useContext } from 'react';
 import { 
   getPosReceipts, 
   getReceiptItems, 
@@ -12,6 +12,7 @@ import {
   adminCancelRefundReceipt,
   getReceiptsDashboard
 } from '../../services/receiptService';
+import { AuthContext } from '../../context/auth-context';
 import moment from 'moment';
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
@@ -86,13 +87,12 @@ const Receipts = () => {
       currency: "PHP",
     });
 
-    const [userRole, setRole] = useState('');
+    const { userRole } = useContext(AuthContext);
 
     // FETCH SHIT FROM DATABASE
     const getReceipts = async (startDate) => {
         try{
-            const { receipts, role } = await getPosReceipts(startDate);
-            setRole(role);
+            const { receipts } = await getPosReceipts(startDate);
             setRetrievedReceipts(receipts);
             setFilteredReceipts(receipts);
             setAllReceipts(receipts);
@@ -401,7 +401,7 @@ const Receipts = () => {
             }}>
               Confirm
             </Button>
-            <Button variant="primary" onClick={() => {
+            <Button variant="danger" onClick={() => {
                 onHide();
               }}>
               Cancel

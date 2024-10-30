@@ -1,6 +1,7 @@
 // src/components/PartDetailsAccordion.jsx
-import React from 'react';
+import React, {useState} from 'react';
 import Accordion from 'react-bootstrap/Accordion';
+import { addToBUCart } from '../../utils/cartDB';
 
 
 const PartDetails = ({ item, partType }) => {
@@ -114,6 +115,10 @@ const PartDetails = ({ item, partType }) => {
         }
     };
 
+    const addToCart = (part) => {
+        addToBUCart(part);
+    };
+
     return (
         <div className="part-details">
             <div className='item-name'>{item.item_name}</div>
@@ -136,7 +141,16 @@ const PartDetails = ({ item, partType }) => {
                 </Accordion.Item>
             </Accordion>
 
-            <button className='add-to-cart'>Add to cart</button>
+            <button className='add-to-cart'
+                onClick={() => {
+                    if(item.stock_count > 0) {
+                        addToCart(item); 
+                    }
+                    else alert("This item is out of stock.");
+                }}
+            >
+                Add to cart
+            </button>
         </div>
     );
 };

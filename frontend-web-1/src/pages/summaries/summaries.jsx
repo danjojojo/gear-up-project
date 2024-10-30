@@ -289,11 +289,11 @@ const Summaries = () => {
                                     </div>
                                     <div className="four">
                                         <div className="green">
-                                            <p className="left">Net Sales</p>
+                                            <p className="left">Receipt Sales</p>
                                             <p className="right">{netSales + netLabor}</p>
                                         </div>
                                         <div className="red">
-                                            <p className="left">Labor</p>
+                                            <p className="left">Labor Cost</p>
                                             <p className="right">({netLabor})</p>
                                         </div>
                                         <div className="red">

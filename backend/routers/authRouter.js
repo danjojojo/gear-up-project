@@ -8,6 +8,7 @@ const {
   checkPosExists,
   checkAdminExists,
   getMyRole,
+  getMyName,
   logoutUser
 } = require("../controllers/authController");
 
@@ -22,6 +23,8 @@ router.post('/login', loginUser);
 router.post('/login-pos', loginPOS);
 
 router.get('/me', verifyToken, getMyRole);
+
+router.get('/my-name', verifyToken, getMyName);
 
 router.post('/logout', logoutUser);
 

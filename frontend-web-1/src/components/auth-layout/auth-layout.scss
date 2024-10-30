@@ -15,9 +15,20 @@
             border-radius: 20px 0 0 20px;
 
             h1 {
-                text-align: center;
+                text-align: left;
                 margin-bottom: 20px;
                 font-weight: 800;
+            }
+
+            .error-msg {
+                color: #cb2020;
+                font-size: 1rem;
+                margin-top: 15px;
+                padding: 10px 0;
+                text-align: center;
+                background-color: #ff5a5a45;
+                border-radius: 5px;
+                
             }
         }
 

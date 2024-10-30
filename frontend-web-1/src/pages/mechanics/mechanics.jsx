@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import PageLayout from '../../components/page-layout/page-layout'
 import './mechanics.scss'
-import { getMechanics, addMechanic, editMechanic, changeMechanicStatus } from '../../services/mechanicsService'
+import { getMechanics, addMechanic, editMechanic, changeMechanicStatus, deleteMechanic} from '../../services/mechanicsService'
 import moment from 'moment';
 import {Modal, Button} from 'react-bootstrap';
 import LoadingPage from '../../components/loading-page/loading-page';
@@ -65,12 +65,17 @@ const Mechanics = () => {
                     }
 					{modalState === 'archive' && 
                     <p>
-						Mechanic {activeTab ? 'deletion' : 'restoration'} {modalResponse}!
+						Mechanic {selectedMechanicName} archived {modalResponse}! This mechanic will be stored in the Archive. 
 					</p>
                     }
 					{modalState === 'restore' && 
                     <p>
-						Mechanic restoration {modalResponse}!
+						Mechanic {selectedMechanicName} restored {modalResponse}!
+					</p>
+                    }
+					{modalState === 'delete' && 
+                    <p>
+						Mechanic {selectedMechanicName} deleted {modalResponse}!
 					</p>
                     }
 				</Modal.Body>
@@ -87,24 +92,41 @@ const Mechanics = () => {
 			>
 				<Modal.Header closeButton onClick={onHide}>
 					<Modal.Title id="contained-modal-title-vcenter">
-						Confirmation
+						{functionKey === "archive" &&
+                            "Delete mechanic?"
+                        }
+                        {functionKey === "restore" &&
+                            "Restore mechanic?"
+                        }
+                        {functionKey === "delete" &&
+                            "Delete this mechanic?"
+                        }
 					</Modal.Title>
 				</Modal.Header>
 				<Modal.Body>
-					<p>Are you sure you want to {activeTab ? 'delete' : 'restore'} this mechanic?</p>
+                    {functionKey === "archive" && 
+                        <p>If you archive this mechanic, it will not be shown in your POS. Archived mechanics will be stored and can be restored in the Archived tab in this page.</p>
+                    }
+                    {functionKey === "restore" &&
+                        <p>If you restore this mechanic, it can be used again in your POS. You will also be able to edit its details.</p>
+                    }
+                    {functionKey === "delete" &&
+                        <p>If you delete this mechanic, you won't be able to restore it.</p>
+                    }
+					{/* <p>Are you sure you want to {activeTab ? 'delete' : 'restore'} this mechanic?</p> */}
 				</Modal.Body>
 				<Modal.Footer>
 					<Button variant="secondary" onClick={() => {
                         onHide();
-                        if(functionKey === "del") onConfirm();
+                        if(functionKey === "delete") onConfirm();
                     }}>
-						{functionKey === "del" ? "Confirm" : "Cancel"}
+						{(functionKey === "archive" || functionKey === "restore") ? "Cancel" : "Confirm"}
 					</Button>
-					<Button variant="primary" onClick={() => {
+					<Button variant={functionKey === 'delete' || functionKey === 'archive' ? "danger" : "primary"} onClick={() => {
 							onHide();
-							if(functionKey === "res") onConfirm();
+							if(functionKey === "archive" || functionKey === "restore") onConfirm();
 						}}>
-						{functionKey === "res" ? "Confirm" : "Cancel"}
+						{(functionKey === "archive" || functionKey === "restore") ? "Confirm" : "Cancel"}
 					</Button>
 				</Modal.Footer>
 			</Modal>
@@ -167,10 +189,24 @@ const Mechanics = () => {
     }
     const handleChangeMechanicStatus = async () => {
         const id = selectedMechanic.mechanic_id;
-        setModalState('archive');
         const status = selectedMechanic.status === true ? false : true; 
         try {
             await changeMechanicStatus(id, status);
+            setModalResponseShow(true);
+            setModalResponse('successfully');
+            setActiveTab(activeTab);
+            handleInteractMechanic({}, 'close');
+            await handleGetMechanic();
+        } catch (error) {
+            setModalResponseShow(true);
+            setModalResponse('failed');
+        }
+    }
+
+    const handleDeleteMechanic = async () => {
+        const id = selectedMechanic.mechanic_id;
+        try {
+            await changeMechanicStatus(id);
             setModalResponseShow(true);
             setModalResponse('successfully');
             setActiveTab(activeTab);
@@ -206,20 +242,26 @@ const Mechanics = () => {
             setNameSuccess(false);
         }
     }
-    function deleteMechanic(){
+    function archiveMechanic(){
         setModalState('archive');
         setModalConfirmShow(true);
-        setFunctionKey('del');
+        setFunctionKey('archive');
+    }
+    function deleteMechanic(){
+        setModalState('delete');
+        setModalConfirmShow(true);
+        setFunctionKey('delete');
     }
     function restoreMechanic(){
         setModalState('restore');
         setModalConfirmShow(true);
-        setFunctionKey('res');
+        setFunctionKey('restore');
     }
     function handleInteractMechanic(mechanic, interact){
         switch(interact){
             case 'open':
                 setSelectedMechanic(mechanic);
+                setSelectedMechanicName(mechanic.mechanic_name);
                 setOpenMechanicView(true);
                 setAddMechanicView(false);
                 setEditMechanicView(false);
@@ -255,7 +297,11 @@ const Mechanics = () => {
         }
     }
     function functionKeyAction(){
-        handleChangeMechanicStatus();
+        if(functionKey === 'delete'){
+            handleDeleteMechanic();
+        } else {
+            handleChangeMechanicStatus();
+        }
     }
     function sortList(){
         setSortMechanicsRecent(!sortMechanicsRecent);
@@ -301,7 +347,8 @@ const Mechanics = () => {
 					/>
                     <div className="nav">
                         <button className='add-mechanic' onClick={() => handleInteractMechanic('', 'add')}>
-                            Add Mechanic +
+                            <span className="add-pos-user-text">Add Mechanic</span>
+                            <i className="fa-solid fa-circle-plus"></i> 
                         </button>
                         <div className="search-sorting">
                             <SearchBar
@@ -329,7 +376,18 @@ const Mechanics = () => {
                                 handleInteractMechanic({}, 'close');
                             }}
                         >
-                            {activeTab ? 'View Archived' : 'View Active'}
+                            {activeTab ? 
+                                <>
+                                    <span>Archive</span>
+                                    <i className="fa-solid fa-clock-rotate-left"></i> 
+                                </>
+                            : 
+                                <>
+                                    <span>Active</span>
+                                    <i className="fa-solid fa-check"></i>
+                                </>
+                            }
+                            
                         </button>
                     </div>
                     <div className="columns">
@@ -480,13 +538,23 @@ const Mechanics = () => {
                             </div>}
                             <div className="change"
                                 onClick={() => {
-                                    if(selectedMechanic.status) deleteMechanic();
+                                    if(selectedMechanic.status) archiveMechanic();
                                     if(!selectedMechanic.status) restoreMechanic();
                                 }}
                             >
                                 <p>{selectedMechanic.status ? 'Delete' : 'Restore'} this mechanic</p>
                                 <i className="fa-solid fa-arrow-right"></i>
                             </div>
+                            {!selectedMechanic.status &&
+                            <div className="change"
+                                onClick={() => {
+                                    deleteMechanic();
+                                }}
+                            >
+                                <p>Delete this mechanic</p>
+                                <i className="fa-solid fa-arrow-right"></i>
+                            </div>
+                            }
                         </div>
                     )}
                 </div>

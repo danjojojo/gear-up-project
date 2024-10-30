@@ -26,6 +26,7 @@ const AdminRoutes = () => (
                 <Route path="bike-builder-upgrader/parts/seat" element={<Pages.Seat />} />
                 <Route path="bike-builder-upgrader/parts/cockpit" element={<Pages.Cockpit />} />
             <Route path="orders" element={<Pages.Orders />} />
+            <Route path="profile" element={<Pages.Profile />} />
         </Route>
         <Route path="*" element={<Pages.NotFound />} />
     </Routes >

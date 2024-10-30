@@ -6,9 +6,10 @@ $error-border-color: #ce6868;
 $inactive-text-color: grey;
 $qty-bg-color: #a3a3a3;
 $qty-text-color: white;
-$button-bg-color: #9e9e9e;
 $subheading-text-color: #606060;
 $font-size: clamp(0.9em, 1.2vw, 1.1em);
+
+$button-bg-color: #F9961F;
 
 .expenses{
     .left-content{
@@ -39,14 +40,14 @@ $font-size: clamp(0.9em, 1.2vw, 1.1em);
                     margin-bottom: 15px;
                     padding: 8px;
                     font-size: 1em;
-                    background-color: #9C9B9B;
+                    background-color: $button-bg-color;
                     color: #ffffff;
                     border: none;
                     border-radius: 5px;
                     cursor: pointer;
 
                     &:hover {
-                        background-color: #B0B0B0;
+                        text-decoration: underline;
                     }
 
                     &.error {
@@ -95,7 +96,6 @@ $font-size: clamp(0.9em, 1.2vw, 1.1em);
                         .list-item-info {
                             display: flex;
                             flex-direction: column;
-                            border: 1px solid blac;
             
                             .time {
                                 text-align: right;
@@ -104,7 +104,7 @@ $font-size: clamp(0.9em, 1.2vw, 1.1em);
                             }
             
                             .cost {
-                                background-color: $qty-bg-color;
+                                background-color: $button-bg-color;
                                 color: $qty-text-color;
                                 border-radius: 2px;
                                 padding: 0 5px;
@@ -215,8 +215,8 @@ $font-size: clamp(0.9em, 1.2vw, 1.1em);
 
                                 &.selected{
                                     color: white;
-                                    background-color: #9C9B9B;
-                                    border: 1px solid #9C9B9B;
+                                    background-color: $button-bg-color;
+                                    border: 1px solid $button-bg-color;
                                 }
                             }
                         }
@@ -296,14 +296,14 @@ $font-size: clamp(0.9em, 1.2vw, 1.1em);
                         margin-top: 10px;
                         padding: 8px;
                         font-size: 1em;
-                        background-color: #9C9B9B;
+                        background-color: $button-bg-color;
                         color: #ffffff;
                         border: none;
                         border-radius: 5px;
                         cursor: pointer;
 
                         &:hover {
-                            background-color: #B0B0B0;
+                            text-decoration: underline;
                         }
                         
                         &.error{

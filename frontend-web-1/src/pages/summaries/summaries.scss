@@ -265,7 +265,7 @@ $button-fail: #dee2e6;
 
                                 .amount {
                                     padding: 1px 10px;
-                                    background-color: $button-success;
+                                    background-color: #F9961F;
                                     border-radius: 4px;
                                     text-align: center;
                                     color: white;
@@ -288,6 +288,7 @@ $button-fail: #dee2e6;
             overflow-y: auto;
             scrollbar-width: none;
             .content{
+                background: white;
                 display: flex;
                 flex-direction: column;
                 .top{
@@ -371,7 +372,7 @@ $button-fail: #dee2e6;
                             &.selected{
                                 // box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); // Adjusted box-shadow to be more prominent
                                 // margin: 5px;
-                                border: 2px solid $normal-border-color;
+                                border: 2px solid #F9961F;
                                 border-radius: 4px;
                                 scroll-behavior: smooth;
                             }

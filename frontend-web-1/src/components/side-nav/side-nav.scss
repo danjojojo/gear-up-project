@@ -1,37 +1,82 @@
-.side-nav {
-    display: flex;
-    flex-direction: column;
-    width: 250px; // Adjust the width as needed
-    height: 100%; // Full height of the viewport
-    background-color: #f8f9fa; // Light gray background
-    border-right: 1px solid #dee2e6; // Border on the right side
-    padding: 15px; // Padding inside the sidebar
-    z-index: 1000;
+.side-nav-bg{
+    background-color: rgba(242, 242, 242, 0.356) !important; // Light gray background
+    padding: 18px 0px 18px 15px;
 
-    .nav {
+    .side-nav {
         display: flex;
         flex-direction: column;
-        width: 100%;
-        padding: 0;
-        margin: 0;
+        width: 250px; // Adjust the width as needed
+        height: 100% !important; // Full height of the viewport
+        background-color: white !important; // Light gray background
+        border: 1px solid #dee2e6; // Border on the right side
+        border-radius: 15px;
+        padding: 15px; // Padding inside the sidebar
+        z-index: 1000;
 
-        .nav-link {
-            display: block;
-            font-size: 12px;
-            padding: 10px 15px;
-            margin: 5px 0;
-            color: #495057; // Dark gray color for text
-            text-decoration: none;
-            border-radius: 4px; // Rounded corners
-
-            &:hover {
-                background-color: #e9ecef; // Light gray on hover
-                color: #007bff; // Blue color on hover
+        .title{
+            font-weight: 600;
+            font-size: 1.6rem !important;
+            padding-bottom: 5px;
+        }
+        
+        .nav {
+            border-top: 1px solid #dee2e6; // Border at the bottom
+            display: flex;
+            flex-direction: column;
+            width: 100%;
+            padding: 0;
+            margin: 0;
+    
+            .nav-link {
+                display: block;
+                font-size: 0.9rem;
+                font-weight: 500;
+                padding: 10px 15px;
+                margin: 5px 0;
+                color: rgb(58, 58, 58); // Dark gray color for text
+                text-decoration: none;
+                border-radius: 4px; // Rounded corners
+                
+                i{
+                    font-size: 0.9rem;
+                    margin-right: 10px;
+                    // border: 1px solid black;
+                    width: 20px;
+                    text-align: center;
+                }
+    
+                &:hover {
+                    background-color: #e9ecef42; // Light gray on hover
+                    color: #F9961F; // Blue color on hover
+                }
+    
+                &.active {
+                    background-color: #007bff; // Blue background for active link
+                    color: #ffffff; // White text for active link
+                }
             }
 
-            &.active {
-                background-color: #007bff; // Blue background for active link
-                color: #ffffff; // White text for active link
+        }
+
+        .logout {
+            border-radius: 100px;
+            padding: 5px;
+            width: 100%;
+            background-color: #F9961F;
+            color: white;
+            border: none;
+            margin-top: auto;
+
+            button{
+                border: none;
+                background-color: transparent;
+                width: 100%;
+                color: white;
+                font-size: 0.8rem;
+
+                &:hover {
+                    text-decoration: underline; // Light gray on hover
+                }
             }
         }
     }

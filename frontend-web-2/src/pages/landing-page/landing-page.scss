@@ -1,7 +1,7 @@
 .landing-page {
     position: relative;
     width: 100vw;
-    height: calc(100vh - 149px);
+    height: 100%;
     overflow: hidden;
     background-image: url('../../assets/images/landing-image.jpg');
     background-size: cover;
@@ -26,7 +26,7 @@
         z-index: 2;
         top: 15%;
         left: 5%;
-        font-family: "poppins";
+        // font-family: "poppins";
         color: white !important;
     }
 

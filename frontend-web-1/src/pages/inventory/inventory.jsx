@@ -19,6 +19,8 @@ import { archiveItem, restoreItem, deleteItem } from "../../services/inventorySe
 import ImagePreviewModal from "../../components/image-preview-modal/image-preview";
 import LoadingPage from '../../components/loading-page/loading-page';
 import ErrorLoad from '../../components/error-load/error-load';
+import {Modal, Button} from 'react-bootstrap';
+import moment from 'moment';
 
 const Inventory = () => {
     // State management
@@ -82,6 +84,99 @@ const Inventory = () => {
         item.item_name.toLowerCase().includes(searchTerm.toLowerCase())
     );
 
+    const [functionKey, setFunctionKey] = useState('');
+    const [showConfirmModal, setShowConfirmModal] = useState(false);
+    const [showResponseModal, setShowResponseModal] = useState(false);
+
+    const [addedItemName, setAddedItemName] = useState('');
+
+    function ConfirmModal({ onHide, onConfirm, ...props }) {
+		return (
+			<Modal
+				{...props}
+				size="md"
+				aria-labelledby="contained-modal-title-vcenter"
+				centered
+			>
+				<Modal.Header closeButton onClick={onHide}>
+					<Modal.Title id="contained-modal-title-vcenter">
+						{functionKey === 'archive' && 
+                            'Delete item?'
+                        }
+                        {functionKey === 'delete' &&
+                            'Delete this item?'
+                        }
+                        {functionKey === 'restore' &&
+                            'Restore item?'
+                        }
+					</Modal.Title>
+				</Modal.Header>
+				<Modal.Body>
+					{functionKey === 'archive' && 
+                        <p>If you archive this item, it will not be shown in your POS. Archived items will be stored and can be restored in the Archived tab in this page.</p>
+                    }
+					{(functionKey === 'delete' && !selectedItem.bb_bu_status) && 
+                        <p>If you delete this item, you won't be able to restore it.</p>
+                    }
+					{(functionKey === 'delete' && selectedItem.bb_bu_status) && 
+                        <p>If you delete this item, you won't be able to restore it. Also, this item will be removed from the Bike Builder and Upgrader. Are you sure with this?</p>
+                    }
+					{functionKey === 'restore' && 
+                        <p>If you restore this item, it can be used again in your POS. You will also be able to edit its details.</p>
+                    }
+				</Modal.Body>
+				<Modal.Footer>
+					<Button variant="secondary" onClick={() => {
+							onHide();
+							if(functionKey === "delete") onConfirm();
+					}}>
+						{(functionKey === "archive" || functionKey === "restore") ? "Cancel" : "Confirm"}
+					</Button>
+					<Button variant={functionKey === 'delete' || functionKey === 'archive' ? "danger" : "primary"} onClick={() => {
+							onHide();
+							if(functionKey === "archive" || functionKey === "restore") onConfirm();
+						}}>
+						{(functionKey === "archive" || functionKey === "restore") ? "Confirm" : "Cancel"}
+					</Button>
+				</Modal.Footer>
+			</Modal>
+		);
+	}
+    function ResponseModal(props) {
+		return (
+			<Modal
+				{...props}
+				size="md"
+				aria-labelledby="contained-modal-title-vcenter"
+				centered
+			>
+				<Modal.Header closeButton>
+					<Modal.Title id="contained-modal-title-vcenter">
+						Success
+					</Modal.Title>
+				</Modal.Header>
+				<Modal.Body>
+					{functionKey === 'archive' && 
+                        <p>{selectedItem.item_name} was archived successfully. This item will be stored in the Archive.</p>
+                    }
+					{functionKey === 'delete' && 
+                        <p>{selectedItem.item_name} was deleted successfully.</p>
+                    }
+					{functionKey === 'restore' && 
+                        <p>{selectedItem.item_name} was restored successfully.</p>
+                    }
+					{functionKey === 'edit' && 
+                        <p>{selectedItem.item_name} was edited successfully.</p>
+                    }
+					{functionKey === 'add' && 
+                        <p>{addedItemName} was added successfully.</p>
+                    }
+				</Modal.Body>
+			</Modal>
+		);
+	}
+    
+
     // Fetch dashboard data
     const fetchDashboardData = async () => {
         try {
@@ -142,6 +237,8 @@ const Inventory = () => {
     // Handle form submission (Add item)
     const handleFormSubmit = async (event) => {
         event.preventDefault();
+        setFunctionKey('add');
+        setAddedItemName(itemName);
 
         const itemData = new FormData();
         itemData.append("itemName", itemName);
@@ -162,7 +259,7 @@ const Inventory = () => {
 
         try {
             const result = await addItem(itemData);
-            alert("Item added successfully");
+            setShowResponseModal(true);
             if (result && result.items) {
                 setItems(result.items);
             }
@@ -259,6 +356,7 @@ const Inventory = () => {
     // Handle saving the edited item
     const handleSaveClick = async (event) => {
         event.preventDefault();
+        setFunctionKey('edit');
 
         const updatedData = new FormData();
         updatedData.append("itemName", selectedItem.item_name);
@@ -291,7 +389,7 @@ const Inventory = () => {
 
         try {
             await updateItem(selectedItem.item_id, updatedData);
-            alert("Item updated successfully");
+            setShowResponseModal(true);
 
             setItems((prevItems) =>
                 prevItems.map((item) =>
@@ -351,7 +449,8 @@ const Inventory = () => {
     const handleArchiveItem = async (item_id) => {
         try {
             await archiveItem(item_id);
-            alert("Item archived successfully");
+            setShowConfirmModal(false);
+            setShowResponseModal(true);
 
             setViewingItem(false);
             fetchDashboardData();
@@ -366,7 +465,8 @@ const Inventory = () => {
     const handleRestoreItem = async (item_id) => {
         try {
             await restoreItem(item_id);
-            alert("Item restored successfully");
+            setShowConfirmModal(false);
+            setShowResponseModal(true);
 
             setViewingItem(false);
             fetchDashboardData();
@@ -379,13 +479,10 @@ const Inventory = () => {
 
     // Delete item
     const handleDeleteItem = async (item_id) => {
-        const confirmDelete = window.confirm("Are you sure you want to delete this item? This action cannot be undone.");
-
-        if (!confirmDelete) return;
-
         try {
             await deleteItem(item_id);
-            alert("Item deleted successfully");
+            setShowConfirmModal(false);
+            setShowResponseModal(true);
 
             setViewingItem(false);
             fetchDashboardData();
@@ -424,6 +521,22 @@ const Inventory = () => {
         currency: "PHP",
     });
 
+    function handleConfirmModal(){
+        switch(functionKey){
+            case 'archive':
+                handleArchiveItem(selectedItem.item_id);
+                break;
+            case 'delete':     
+                handleDeleteItem(selectedItem.item_id);
+                break;
+            case 'restore':
+                handleRestoreItem(selectedItem.item_id);
+                break;
+            default:
+                break;
+        }
+    }
+
     if(loading) return <LoadingPage classStyle={"loading-in-page"}/>
     if(errorLoad) return <ErrorLoad classStyle={"error-in-page"}/>
 
@@ -432,9 +545,23 @@ const Inventory = () => {
             <PageLayout
                 leftContent={
                     <div className="inventory-content">
+                        <ConfirmModal
+                            show={showConfirmModal}
+                            onHide={() => {
+                                setShowConfirmModal(false);
+                            }}
+                            onConfirm={handleConfirmModal}
+                        />
+                        <ResponseModal
+                            show={showResponseModal}
+                            onHide={() => {
+                                setShowResponseModal(false);
+                            }}
+                        />
                         <div className="upper-container d-flex">
                             <button className="add-btn" onClick={handleAddItemClick}>
-                                Add Item +
+                                <span className="add-pos-user-text">Add Item</span>
+                                <i className="fa-solid fa-circle-plus"></i> 
                             </button>
 
                             <SearchBar
@@ -455,11 +582,13 @@ const Inventory = () => {
 
                             {showArchived ? (
                                 <button className="active" onClick={handleActiveItemClick}>
-                                    View Active
+                                    <span>Active</span>
+                                    <i className="fa-solid fa-check"></i>
                                 </button>
                             ) : (
                                 <button className="archive" onClick={handleArchiveItemClick}>
-                                    View Archived
+                                    <span>Archive</span>
+                                    <i className="fa-solid fa-clock-rotate-left"></i>
                                 </button>
                             )}
                         </div>
@@ -549,9 +678,9 @@ const Inventory = () => {
                                     Price
                                 </div>
 
-                                <div className="item-date">
+                                {/* <div className="item-date">
                                     Date Added
-                                </div>
+                                </div> */}
 
                                 <div className="item-stocks">
                                     Stock
@@ -574,6 +703,15 @@ const Inventory = () => {
                                         onClick={() => handleItemClick(item)}
                                     >
                                         <div className="item-name">
+                                            {(!item.add_part && !item.bb_bu_status) && 
+                                                <i className="fa-solid fa-box"></i>
+                                            }
+                                            {(item.add_part && !item.bb_bu_status) && 
+                                                <i className="fa-solid fa-ruler-horizontal"></i>
+                                            }
+                                            {(!item.add_part && item.bb_bu_status) && 
+                                                <i className="fa-solid fa-bicycle"></i>
+                                            }
                                             {item.item_name}
                                         </div>
                                         <div className="item-category">
@@ -582,9 +720,9 @@ const Inventory = () => {
                                         <div className="item-price"> 
                                             {PesoFormat.format(item.item_price)}
                                         </div>
-                                        <div className="item-date">
+                                        {/* <div className="item-date">
                                             {new Date(item.date_created).toLocaleDateString()}
-                                        </div>
+                                        </div> */}
                                         <div className="item-stocks">
                                             {item.stock_count}
                                         </div>
@@ -624,23 +762,22 @@ const Inventory = () => {
                         {/* VIEW ITEM */}
                         {viewingItem && !isAddingItem && selectedItem ? (
                             <div className="form-container" onSubmit={handleSaveClick}>
-                                <form className="form-content">
-                                    <div className="container-1 d-flex">
-                                        <div className="exit-btn">
-                                            <img
-                                                src={exit}
-                                                alt="Exit"
-                                                className="exit-icon"
-                                                onClick={handleCloseView}
-                                            />
-                                        </div>
+                                <div className="container-1 d-flex">
+                                    <div className="title">
+                                        <h4>{isEditing ? 'Edit' : 'View'} Item</h4>
+                                    </div>
+                                    <div className="button-nav">
                                         <div className="edit-btn">
                                             {showArchived ? (
                                                 <img
                                                     src={restore}
                                                     alt="Restore"
                                                     className="restore-icon"
-                                                    onClick={() => handleRestoreItem(selectedItem.item_id)}
+                                                    onClick={() => {
+                                                        // handleRestoreItem(selectedItem.item_id);
+                                                        setShowConfirmModal(true);
+                                                        setFunctionKey('restore');
+                                                    }}
                                                 />
                                             ) : isEditing ? (
                                                 <img
@@ -664,18 +801,38 @@ const Inventory = () => {
                                                     src={del}
                                                     alt="Delete"
                                                     className="del-icon"
-                                                    onClick={() => handleDeleteItem(selectedItem.item_id)}
-                                                />
-                                            ) : (
-                                                <img
-                                                    src={archive}
+                                                    onClick={() => {
+                                                        // handleDeleteItem(selectedItem.item_id);
+                                                        setShowConfirmModal(true);
+                                                        setFunctionKey('delete');
+                                                    }}
+                                                    />
+                                                ) : (
+                                                    <img
+                                                    src={del}
                                                     alt="Archive"
                                                     className="archive-icon"
-                                                    onClick={() => handleArchiveItem(selectedItem.item_id)}
+                                                    onClick={() => {
+                                                        // handleDeleteItem(selectedItem.item_id);
+                                                        // handleArchiveItem(selectedItem.item_id)
+                                                        setShowConfirmModal(true);
+                                                        setFunctionKey('archive')
+                                                    }}
                                                 />
                                             )}
                                         </div>
+                                        <div className="exit-btn">
+                                            <img
+                                                src={exit}
+                                                alt="Exit"
+                                                className="exit-icon"
+                                                onClick={handleCloseView}
+                                            />
+                                        </div>
                                     </div>
+                                </div>
+                                <p>Created {moment(selectedItem.date_created).format("LLL")}</p>
+                                <form className="form-content">
 
                                     {!isEditing ? (
                                         itemImage ? (
@@ -978,17 +1135,20 @@ const Inventory = () => {
                         ) : // ADD ITEM
                             isAddingItem ? (
                                 <div className="form-container">
-                                    <form className="form-content" onSubmit={handleFormSubmit}>
-                                        <div className="container-1 d-flex">
-                                            <div className="exit-btn">
-                                                <img
-                                                    src={exit}
-                                                    alt="Exit"
-                                                    className="exit-icon"
-                                                    onClick={() => { setIsAddingItem(false); setIsAddingStock(false); }}
-                                                />
-                                            </div>
+                                    <div className="container-1 d-flex">
+                                        <div className="title">
+                                            <h4>Add Item</h4>
                                         </div>
+                                        <div className="exit-btn">
+                                            <img
+                                                src={exit}
+                                                alt="Exit"
+                                                className="exit-icon"
+                                                onClick={() => { setIsAddingItem(false); setIsAddingStock(false); }}
+                                            />
+                                        </div>
+                                    </div>
+                                    <form className="form-content" onSubmit={handleFormSubmit}>
 
                                         <ImageUploadButton onFileSelect={handleFileSelect} />
 
@@ -1199,14 +1359,14 @@ const Inventory = () => {
                                     <div className="container-content">
                                         <div className="main-content">
                                             <div className="number">{data.stockCounts}</div>
-                                            <div className="title">Stock Counts</div>
+                                            <div className="title">Total Stock Count</div>
                                         </div>
                                     </div>
 
                                     <div className="container-content">
                                         <div className="main-content">
                                             <div className="number">{PesoFormat.format(data.stockValue)}</div>
-                                            <div className="title">Stock Value</div>
+                                            <div className="title">Total Stock Value</div>
                                         </div>
                                     </div>
                                 </>

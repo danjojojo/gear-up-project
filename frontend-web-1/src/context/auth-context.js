@@ -1,5 +1,5 @@
 import React, { createContext, useEffect, useState } from 'react';
-import { login, loginPOS, getMyRole, logoutUser } from '../services/authService';
+import { login, loginPOS, getMyRole, logoutUser, getMyName } from '../services/authService';
 
 const AuthContext = createContext();
 
@@ -8,12 +8,15 @@ const AuthProvider = ({ children }) => {
   const [authenticated, setAuthenticated] = useState(false);
   const [loading, setLoading] = useState(true);  // New loading state
   const [error, setError] = useState(null);  // Error state to handle login errors
+  const [userName, setUserName] = useState(null);
 
   useEffect(() => {
     const fetchRole = async () => {
       try {
         const role = await getMyRole();
+        const name = await getMyName();
         setUserRole(role);
+        setUserName(name);
         setAuthenticated(true);
         setLoading(false);
       } catch (error) {
@@ -25,7 +28,13 @@ const AuthProvider = ({ children }) => {
       }
     };
     fetchRole();
+    // Mounted
+    // Restart
+
+
   }, []);  // Ensure this only runs on mount
+
+
 
   const loginAdmin = async (email, password) => {
     try {
@@ -44,7 +53,7 @@ const AuthProvider = ({ children }) => {
       setAuthenticated(false);
       throw error;  // Throw the error so it's caught and handled in the login component
     }
-  };
+};
 
 
   const loginPOSUser = async (id, password) => {
@@ -57,7 +66,7 @@ const AuthProvider = ({ children }) => {
         const role = await getMyRole();
         setUserRole(role);
         setAuthenticated(true);
-        // window.location.reload();  // Reload the page only on successful login
+        window.location.reload();  // Reload the page only on successful login
       } else {
         setError('Login failed. Please check your credentials.');
       }
@@ -76,7 +85,9 @@ const AuthProvider = ({ children }) => {
         setLoading(false)
         setUserRole(null);
         setAuthenticated(false);
+        setUserName(null);
       }, 1000);
+      localStorage.removeItem("pageTitle");
       // setTimeout(() => {
       //   window.location.reload()
       // }, 1000);  // Reload the page after logout
@@ -86,7 +97,7 @@ const AuthProvider = ({ children }) => {
   };
 
   return (
-    <AuthContext.Provider value={{ userRole, authenticated, loading, error, loginAdmin, loginPOSUser, logout }}>
+    <AuthContext.Provider value={{ userRole, authenticated, loading, error, loginAdmin, loginPOSUser, logout, userName }}>
       {children}
     </AuthContext.Provider>
   );

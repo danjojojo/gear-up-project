@@ -47,3 +47,13 @@ export const changeMechanicStatus = async (mechanicID, mechanicStatus) => {
         throw error;
     }
 }
+
+export const deleteMechanic = async (mechanicID) => {
+    try {
+        const response = await api.put(`/mechanics/delete-mechanic/${mechanicID}`);
+        return response.data;
+    } catch (error) {
+        console.error('Error deleting mechanic', error);
+        throw error;
+    }
+}

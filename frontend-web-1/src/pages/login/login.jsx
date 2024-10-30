@@ -25,7 +25,12 @@ const Login = () => {
     <div className='login'>
       <AuthLayout formData={
         <div>
+          <div className="intro">
+            <h4 className='header'>Login</h4>
+            <p className='subtitle'>Enter your email and password to login to your account.</p>
+          </div>
           <form onSubmit={handleSubmit}>
+            {error && <p className="error-msg">{error}</p>}  {/* Display local error message */}
             <div className="form-group">
               <label htmlFor="email">Email</label>
               <input
@@ -34,7 +39,6 @@ const Login = () => {
                 placeholder="Enter your email"
                 value={email}  // Ensure value comes from state
                 onChange={(e) => setEmail(e.target.value)}  // Update state on change
-                required
               />
             </div>
             <div className="form-group">
@@ -45,16 +49,14 @@ const Login = () => {
                 placeholder="Enter your password"
                 value={password}  // Ensure value comes from state
                 onChange={(e) => setPassword(e.target.value)}  // Update state on change
-                required
               />
             </div>
-            {error && <p className="error">{error}</p>}  {/* Display local error message */}
             <button type="submit" className="submit-btn" disabled={loading}>  {/* Disable button when loading */}
               {loading ? 'Loading...' : 'Login'}  {/* Show loading text when loading */}
             </button>
           </form>
           <p className="toggle-text">
-            <Link to="/login-pos">Login as POS</Link>
+            <Link to="/login-pos" className="toggle-text">Login as POS &rarr;</Link>
           </p>
         </div>
       } />

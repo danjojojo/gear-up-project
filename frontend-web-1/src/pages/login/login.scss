@@ -1,4 +1,14 @@
+$button-bg-color: #F9961F;
+
 .login {
+
+    .intro{
+        margin-bottom: 10px;
+
+        .subtitle{
+            color: grey;
+        }
+    }
 
     .form-group {
         margin-bottom: 10px;
@@ -6,16 +16,17 @@
         label {
             display: block;
             margin-bottom: 8px;
-            font-size: 12px;
-            color: #555;
+            font-size: 0.9rem;
+            font-weight: 500;
+            color: #2b2b2b;
         }
 
         input {
             width: 100%;
             padding: 10px;
-            font-size: 12px;
+            font-size: 0.9rem;
             border: 1px solid #ddd;
-            border-radius: 5px;
+            border-radius: 9px;
         }
     }
 
@@ -23,24 +34,25 @@
         width: 100%;
         margin-top: 10px;
         padding: 8px;
-        font-size: 12px;
-        background-color: #9C9B9B;
+        font-size: 0.9rem;
+        background-color: $button-bg-color;
         color: #ffffff;
         border: none;
-        border-radius: 5px;
+        border-radius: 9px;
         cursor: pointer;
 
         &:hover {
-            background-color: #B0B0B0;
+            text-decoration: underline;
         }
     }
 
     .toggle-text {
-        text-align: center;
+        text-align: right;
         margin-top: 10px;
-        font-size: 12px;
-        color: #9C9B9B;
+        font-size: 1rem;
+        color: $button-bg-color;
         cursor: pointer;
+        text-decoration: none;
 
         &:hover {
             text-decoration: underline;

@@ -1,12 +1,39 @@
 import React from 'react';
 import backbutton from "../../../assets/icons/back-button.png";
+import {
+    addToBBCart
+} from "../../../utils/cartDB";
+import { useNavigate } from 'react-router-dom';
 
-const BuildSummary = ({ selectedParts, buildStatsPrice, finalBuildImage, goBackToBuild }) => {
-
+const BuildSummary = ({ selectedParts, buildStatsPrice, finalBuildImage, goBackToBuild, handleReset, setIsBuildFinalized }) => {
+    const navigate = useNavigate();
     const PesoFormat = new Intl.NumberFormat("en-US", {
         style: "currency",
         currency: "PHP",
     });
+
+     const handleCreateNewBuild = () => {
+        // const currentUrl = new URL(window.location.href);
+        // const baseUrl = `${currentUrl.origin}${currentUrl.pathname}`;
+        handleReset();
+        setIsBuildFinalized(false);
+        navigate('/bike-builder');
+        // window.history.pushState({}, '', baseUrl); // Reset URL to remove query params
+    };
+
+    // let build_id = 'build-' + new Date().getMonth() + new Date().getFullYear() + new Date().getHours() + new Date().getMinutes() + new Date().getSeconds();
+    // make build_id unique using MM-DD-YYYY
+    let build_id = 'build-' + (new Date().getMonth() + 1) + '-' + new Date().getDate() + '-' + new Date().getFullYear() + '-' + new Date().getHours() + new Date().getMinutes() + new Date().getSeconds();
+    const finalBuild = {...selectedParts, image: finalBuildImage, build_id: build_id, build_price : buildStatsPrice };
+
+    const handleAddBuild = async (build) => {
+        const success = await addToBBCart(build);
+        if (success) {
+            console.log("Build added successfully!");
+        } else {
+            console.log("Build was not added due to duplication.");
+        }
+    };
 
     return (
         <div className='build-summary-container'>
@@ -87,9 +114,20 @@ const BuildSummary = ({ selectedParts, buildStatsPrice, finalBuildImage, goBackT
                         <div className="back-button" onClick={goBackToBuild}>
                             <img src={backbutton} alt="back-button" />
                         </div>
-                        <button className='add-to-cart'>
-                            Add to Cart
+                        <div className="btns">
+                            <button className='add-to-cart' onClick={() => handleAddBuild(finalBuild)}>
+                                Add to Cart
+                            </button>
+                            <button className='new-build' onClick={handleCreateNewBuild}>
+                                Create New Build
+                            </button>
+                        </div>
+                        {/* 
+                        <button type="button" onClick={() => handleCreateNewBuild()}>
+                            Add to cart
                         </button>
+                        
+                        */}
                     </div>
                 </div>
             </div>

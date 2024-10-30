@@ -1,5 +1,7 @@
+$bg-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+
 .bike-builder-container {
-    height: calc(100vh - 149px);
+    height: 100%;
 
     .budget-container {
         background-color: #2E2E2E;
@@ -60,7 +62,8 @@
                     margin: 20px;
 
                     &:hover {
-                        background-color: #666666;
+                        background-color: #F9961F;
+                        color: white;
                     }
                 }
 
@@ -76,18 +79,19 @@
 
     }
 
-
-
     .builder-container {
         height: 100%;
 
+
         .bike-parts-sidebar {
-            width: 400px;
+            width: 350px;
             height: 100%;
+            display: flex;
+            flex-direction: column;
 
             .upper-container {
                 background-color: #2E2E2E;
-                height: 20%;
+                padding: 10px;
                 display: flex;
                 justify-content: center;
                 align-items: center;
@@ -114,7 +118,7 @@
                 .btn-container {
                     button {
                         height: 35px;
-                        width: 140px;
+                        width: 100px;
                         margin: 15px;
                         border-radius: 50px;
                         border: none;
@@ -134,27 +138,32 @@
 
             .lower-container {
                 background-color: #2E2E2E;
-                height: 80%;
+                flex-grow: 1;
                 display: flex;
+                flex-direction: column;
                 justify-content: center;
                 padding: 5px;
                 overflow: hidden;
 
                 .parts-container {
-                    height: calc(100vh - 300px);
+                    // border: 1px solid white;
                     background-color: #2E2E2E;
+                    border: none;
                     width: 100%;
-                    overflow-y: auto;
-                    display: block;
+                    height: 100%;
+                    
                     padding: 15px 15px 0 15px;
                     scrollbar-color: #888 #2E2E2E;
                     scrollbar-width: thin;
+                    display: flex;
+                    flex-direction: column;
 
                     .sort-container {
                         display: flex;
                         justify-content: center;
                         align-items: center;
                         margin-bottom: 20px;
+                        height: auto;
 
                         .sort-title {
                             color: white;
@@ -195,83 +204,101 @@
                         }
                     }
 
+                    .parts-cards{
+                        flex-grow: 1;
+                        overflow-y: auto;
+                        display: flex;
+                        flex-direction: column;
+                        scrollbar-width: thin;
 
-                    .parts-card {
-                        background-color: white;
-                        border-radius: 20px;
-                        width: 100%;
-                        height: auto;
-                        margin-bottom: 15px;
-                        padding: 30px;
-
-                        .item-image {
-                            border-radius: 5px;
-                            height: 150px;
-                            padding: 15px;
+                        .parts-card {
+                            background-color: white;
+                            border-radius: 20px;
+                            width: 100%;
+                            height: auto;
                             margin-bottom: 15px;
-
-                            img {
-                                width: 100%;
-                                height: 100%;
-                                object-fit: contain;
-                            }
-                        }
-
-                        .item-name {
-                            display: flex;
-                            align-content: center;
-                            justify-content: center;
-                            font-size: 20px !important;
-                            font-weight: 500;
-                            padding: 5px 0;
-                            border-bottom: solid 1px #D9D9D9;
-                            margin: 0 !important;
-                        }
-
-                        .item-price {
-                            display: flex;
-                            align-content: center;
-                            justify-content: center;
-                            font-size: 16px !important;
-                            font-weight: 300;
-                            padding: 10px;
-                            margin: 0 !important;
-                        }
-
-                        .accordion {
-                            margin-bottom: 30px;
-
-                            .accordion-body {
-                                padding: 20px;
-
-                                .specs-container {
-                                    margin-bottom: 10px;
-                                    padding: 15px;
-                                    font-size: 14px;
-                                    border: solid 1px #dee2e6;
+                            padding: 20px;
+    
+                            .item-image {
+                                border-radius: 5px;
+                                height: 150px;
+                                padding: 15px;
+                                margin-bottom: 15px;
+    
+                                img {
+                                    width: 100%;
+                                    height: 100%;
+                                    object-fit: contain;
+                                }
+    
+                                p{
+                                    width: 100%;
+                                    text-align: center;
                                 }
                             }
-                        }
+    
+                            .item-name {
+                                display: flex;
+                                align-content: center;
+                                justify-content: center;
+                                font-size: 20px !important;
+                                font-weight: 500;
+                                padding: 5px 0;
+                                border-bottom: solid 1px #D9D9D9;
+                                margin: 0 !important;
+                            }
+    
+                            .item-price {
+                                display: flex;
+                                align-items: center;
+                                text-align: center;
+                                justify-content: center;
+                                font-size: 16px !important;
+                                font-weight: 300;
+                                padding: 10px;
+                                margin: 0 auto !important;
+                            }
+    
+                            .accordion {
+                                margin-bottom: 30px;
+    
+                                .accordion-body {
+                                    padding: 20px;
+    
+                                    .specs-container {
+                                        margin-bottom: 10px;
+                                        padding: 15px;
+                                        font-size: 14px;
+                                        border: solid 1px #dee2e6;
+                                    }
+                                }
+                            }
+    
+                            .item-name {
+                                margin-bottom: 15px;
+                                font-size: 20px;
+                            }
+    
+                            .item-price {
+                                margin-bottom: 20px;
+                                font-size: 20px;
+                            }
+    
+                            .add-to-build {
+                                background-color: #2E2E2E;
+                                color: white;
+                                height: 40px;
+                                width: 100%;
+                                border-radius: 5px;
+                                border: none;
+                                cursor: pointer;
+    
+                            }
 
-                        .item-name {
-                            margin-bottom: 15px;
-                            font-size: 20px;
-                        }
-
-                        .item-price {
-                            margin-bottom: 20px;
-                            font-size: 20px;
-                        }
-
-                        .add-to-build {
-                            background-color: #2E2E2E;
-                            color: white;
-                            height: 40px;
-                            width: 100%;
-                            border-radius: 5px;
-                            border: none;
-                            cursor: pointer;
-
+                            &:hover .item-image {
+                                border: 5px solid #F9961F;
+                                cursor: pointer;
+                            }
                         }
                     }
                 }
@@ -300,44 +327,58 @@
 
         .bike-content {
             height: 100%;
-            width: calc(100vw - 400px);
+            width: calc(100vw - 350px);
             background-color: #F0F0F0;
 
             .left-container {
                 height: 100%;
                 width: 70%;
-                background-color: white;
+                background-color: #525252;
+                display: flex;
+                flex-direction: column;
 
                 .budget-stat-container {
                     height: 25%;
-
+                    
                     .budget {
-                        width: 45%;
-                        padding: 20px 10px 20px 20px;
-
+                        width: 35%;
+                        padding: 10px 10px 5px 20px;
+                        
                         .content {
                             height: 100%;
-                            border: 1px solid #2E2E2E;
-                            border-radius: 10px;
-                            padding: 20px;
-
+                            background-color: #F9961F;
+                            border: none;
+                            border-radius: 15px;
+                            padding: 0px 20px;
+                            color: white;
+                            display: flex;
+                            flex-direction: column;
+                            justify-content: center;
+                            align-items: start;
+                            font-weight: 500;
+                            
                             .upper {
-                                height: 50%;
+                                width: 100%;
+                                height: auto;
                                 border-bottom: solid 1px #D9D9D9;
+                                padding: 5px 0px;  
 
                                 .price {
                                     height: 100%;
                                     width: 50%;
-                                    font-family: "poppins";
-                                    font-size: 14px;
+                                    font-size: 0.9rem;
                                     justify-items: center;
+                                    // border: 1px solid red;
                                 }
                             }
 
                             .lower {
-                                height: 50%;
+                                // height: auto;
+                                // margin-top: auto;
                                 align-content: end;
-                                font-size: 14px;
+                                font-size: 0.9rem;
+                                padding: 5px 0px;
+                                text-wrap: balance;
                             }
 
                         }
@@ -345,59 +386,63 @@
 
                     .message-container {
                         height: 100%;
-                        width: 55%;
-                        padding: 20px 20px 20px 10px;
+                        width: 65%;
+                        padding: 10px 20px 5px 5px;
 
                         .content {
                             height: 100%;
                             width: 100%;
-                            border: 1px solid #2E2E2E;
-                            border-radius: 10px;
-                            padding: 20px;
-                            font-size: 14px;
+                            // border: 1px solid #ccc;
+                            border: none;
+                            background-color: #2E2E2E;
+                            color: white;
+                            border-radius: 15px;
+                            padding: 10px 15px;
+                            font-size: 0.9rem;
                             display: flex;
                             flex-direction: column;
-                            justify-content: space-between;
+                            // justify-content: space-between;
+                            gap: 10px;
 
                             .upper-text {
-                                height: auto;
+                                margin-top: auto;
                                 display: flex;
                                 align-items: center;
                                 justify-content: center;
                                 text-align: center;
-                                padding: 10px 0;
+                                // padding: 3px 0;
                             }
-
+                            
                             .lower-text {
-                                height: auto;
+                                margin-top: auto;
                                 display: flex;
                                 align-items: center;
                                 justify-content: space-between;
                                 /* Arrows and text are spaced evenly */
                                 text-align: justify;
                                 position: relative;
-
+                                
                                 .text-slide {
                                     flex: 1;
                                     display: flex;
                                     align-items: center;
                                     justify-content: center;
                                     text-align: center;
-                                    line-height: 1.5;
-                                    padding: 0 10px;
+                                    // line-height: 1.5;
+                                    // padding: 0 5px;
                                     /* Add padding to prevent text from touching arrows */
                                 }
-
+                                
                                 .back-slide,
                                 .proceed-slide {
                                     border: none;
                                     background-color: transparent;
                                     cursor: pointer;
+                                    filter: invert(1);
                                 }
-
+                                
                                 .back-slide {
-                                    margin-right: 10px;
-
+                                    margin-right: 5px;
                                     img {
                                         width: 20px;
                                         height: 20px;
@@ -405,8 +450,7 @@
                                 }
 
                                 .proceed-slide {
-                                    margin-left: 10px;
-
+                                    margin-left: 5px;
                                     img {
                                         width: 20px;
                                         height: 20px;
@@ -416,17 +460,16 @@
 
                             .btn-container,
                             .btn-container-2 {
-                                height: auto;
+                                margin-top: auto;
                                 display: flex;
                                 justify-content: space-between;
-                                margin-top: 20px;
 
                                 button {
                                     border: none;
                                     text-decoration: underline;
-                                    background-color: white;
-                                    font-weight: bold;
-                                    color: #2E2E2E;
+                                    background-color: #2E2E2E;
+                                    color: white;
+                                    font-weight: 500;
                                     cursor: pointer;
                                     padding: 0;
                                 }
@@ -442,18 +485,19 @@
                 .canvas-container {
                     width: 100%;
                     height: 75%;
-                    padding: 0 20px 20px 20px;
+                    padding: 10px 20px 20px 20px;
 
                     .canvas-content {
                         overflow: hidden;
                         position: relative;
                         width: 100%;
                         height: 100%;
-                        border: 1px solid #2E2E2E;
-                        border-radius: 10px;
+                        border: none;
+                        border-radius: 15px;
                         display: flex;
                         justify-content: center;
                         align-items: center;
+                        background-color: white;
 
                         img {
                             position: absolute;
@@ -503,16 +547,17 @@
             .right-container {
                 height: 100%;
                 width: 30%;
-                background-color: white;
+                background-color: #525252;
 
                 .guide-container {
-                    padding: 20px 20px 10px 0;
+                    padding: 10px 20px 10px 0;
                     height: 33%;
 
                     .content-container {
                         height: 100%;
-                        border: 1px solid #2E2E2E;
-                        border-radius: 10px;
+                        border: none;
+                        background-color: white;
+                        border-radius: 15px;
                         display: flex;
                         align-items: center;
                         justify-content: center;
@@ -522,34 +567,69 @@
                             border-radius: 20px;
                             width: 100%;
                             height: 100%;
-                            object-fit: contain;
+                            object-fit: cover;
                         }
 
                     }
                 }
 
                 .summary-container {
-                    padding: 10px 20px 20px 0;
+                    padding: 10px;
+                    margin-right: 20px;
                     height: 67%;
+                    display: flex;
+                    flex-direction: column;
+                    border-radius: 15px 15px 0 0;
+                    background-color: white;
+                    overflow: hidden;
 
                     .content-container {
+                        height: auto;
+                        border: none;
+                        background-color: white;
+                        padding: 10px 10px 0px 10px;
+                    }
+
+                    .parts-none{
                         height: 100%;
-                        border: 1px solid #2E2E2E;
-                        border-radius: 10px;
-                        padding: 10px;
+                        display: flex;
+                        flex-direction: column;
+                        justify-content: center;
+                        align-items: center;
+                    }
+
+                    .parts-prices{
+                        flex-grow: 1;
+                        overflow-y: auto;
+                        scrollbar-width: thin;
 
                         .part-price {
-                            height: 16.66%;
-                            padding: 10px;
+                            padding: 5px;
+                            
+                            p{
+                                margin: 0;
+                            }
 
                             .price {
                                 height: 100%;
                                 border: 1px solid #dee2e6;
                                 display: flex;
-                                align-items: center;
-                                padding: 20px;
-                                font-size: 14px;
-                                border-radius: 5px;
+                                display: flex;
+                                flex-direction: column;
+                                padding: 10px;
+                                font-size: 1rem;
+                                border-radius: 9px;
+                                font-weight: 700;
+                                
+                                p:nth-child(2){
+                                    // width: fit-content;
+                                    background-color: #F9961F;
+                                    border-radius: 5px;
+                                    color: white;
+                                    // margin-left: auto;
+                                    padding: 5px 15px;
+                                    text-align: right;
+                                }
                             }
                         }
                     }
@@ -587,11 +667,12 @@
                         background-color: white;
                         height: 100%;
                         border-radius: 20px;
-
+                        
                         img {
                             width: 100%;
                             height: 100%;
-                            object-fit: contain;
+                            object-fit: cover;
+                            // border: 1px solid black;
                         }
                     }
 
@@ -684,12 +765,26 @@
                         }
                     }
 
+                    .btns { display: flex; flex-direction: column; gap: 5px; }
+
                     .add-to-cart {
                         height: 50px;
                         width: 360px;
                         padding: 10px;
                         border: none;
                         border-radius: 10px;
+                        background-color: #F9961F;
+                        color: white;
+
+                    }
+
+                    .new-build {
+                        height: 50px;
+                        width: 360px;
+                        padding: 10px;
+                        border: none;
+                        border-radius: 10px;
+                        // background-color: #F9961F;
                         background-color: #2E2E2E;
                         color: white;
 

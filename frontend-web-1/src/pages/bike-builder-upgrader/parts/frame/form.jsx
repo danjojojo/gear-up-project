@@ -10,8 +10,11 @@ import { base64ToFile } from "../../../../utility/imageUtils";
 import { AuthContext } from "../../../../context/auth-context";
 import { updateFrameItem, archiveFrameItem, restoreFrameItem, deleteFrameItem } from "../../../../services/bbuService";
 import ImagePreviewModal from "../../../../components/image-preview-modal/image-preview";
+import './frame.scss';
+import {Modal, Button} from 'react-bootstrap';
+import CropModal from '../../../../components/crop-modal/crop-modal';
 
-const Form = ({ selectedItem, setSelectedItem, setItems, refreshWaitlist, onClose, showArchived, isEditing, setIsEditing }) => {
+const Form = ({ selectedItem, setSelectedItem, setItems, refreshWaitlist, onClose, showArchived, isEditing, setIsEditing, functionKey, setFunctionKey, setShowResponseModal }) => {
     const [name, setName] = useState('');
     const [price, setPrice] = useState('');
     const [description, setDescription] = useState('');
@@ -36,6 +39,59 @@ const Form = ({ selectedItem, setSelectedItem, setItems, refreshWaitlist, onClos
     const [showModal, setShowModal] = useState(false);
     const handleOpenModal = () => setShowModal(true);
     const handleCloseModal = () => setShowModal(false);
+    const [showCropModal, setShowCropModal] = useState(false);
+
+    const [showConfirmModal, setShowConfirmModal] = useState(false);
+
+    function ConfirmModal({ onHide, onConfirm, ...props }) {
+		return (
+			<Modal
+				{...props}
+				size="md"
+				aria-labelledby="contained-modal-title-vcenter"
+				centered
+			>
+				<Modal.Header closeButton onClick={onHide}>
+					<Modal.Title id="contained-modal-title-vcenter">
+						{functionKey === 'archive' && 
+                            'Delete item?'
+                        }
+                        {functionKey === 'delete' &&
+                            'Delete this item?'
+                        }
+                        {functionKey === 'restore' &&
+                            'Restore item?'
+                        }
+					</Modal.Title>
+				</Modal.Header>
+				<Modal.Body>
+					{functionKey === 'archive' && 
+                        <p>If you archive this part, it will not be shown in your Bike Builder and Bike Upgrader. Archived parts will be stored and can be restored in the Archived tab in this page.</p>
+                    }
+					{functionKey === 'delete' && 
+                        <p>If you delete this part, you won't be able to restore it.</p>
+                    }
+					{functionKey === 'restore' && 
+                        <p>If you restore this part, it can be used again in your Bike Builder and Bike Upgrader. You will also be able to edit its details.</p>
+                    }
+				</Modal.Body>
+				<Modal.Footer>
+					<Button variant="secondary" onClick={() => {
+							onHide();
+							if(functionKey === "delete") onConfirm();
+					}}>
+						{(functionKey === "archive" || functionKey === "restore") ? "Cancel" : "Confirm"}
+					</Button>
+					<Button variant={functionKey === 'delete' || functionKey === 'archive' ? "danger" : "primary"} onClick={() => {
+							onHide();
+							if(functionKey === "archive" || functionKey === "restore") onConfirm();
+						}}>
+						{(functionKey === "archive" || functionKey === "restore") ? "Confirm" : "Cancel"}
+					</Button>
+				</Modal.Footer>
+			</Modal>
+		);
+	}
 
     // Populate fields when a new item is selected
     useEffect(() => {
@@ -79,7 +135,6 @@ const Form = ({ selectedItem, setSelectedItem, setItems, refreshWaitlist, onClos
         }
     }, [selectedItem]);
 
-
     const handleSubmit = async (event) => {
         event.preventDefault();
 
@@ -105,7 +160,7 @@ const Form = ({ selectedItem, setSelectedItem, setItems, refreshWaitlist, onClos
         }
 
         const updatedItem = await updateFrameItem(selectedItem.frame_id, updatedData);
-        alert("Item updated successfully");
+        setShowResponseModal(true);
 
         setItems((prevItems) =>
             prevItems.map((item) =>
@@ -117,7 +172,6 @@ const Form = ({ selectedItem, setSelectedItem, setItems, refreshWaitlist, onClos
         setIsEditing(false);
         onClose();
     };
-
 
     // Select image file
     const handleFileSelect = (file) => {
@@ -136,12 +190,12 @@ const Form = ({ selectedItem, setSelectedItem, setItems, refreshWaitlist, onClos
         setIsEditing(false);
     };
 
-
     // Archive item
     const handleArchiveItem = async (frame_id) => {
         try {
             await archiveFrameItem(frame_id);
-            alert("Item archived successfully");
+            setShowConfirmModal(false);
+            setShowResponseModal(true);
 
             refreshWaitlist();
             setIsEditing(false);
@@ -156,7 +210,8 @@ const Form = ({ selectedItem, setSelectedItem, setItems, refreshWaitlist, onClos
     const handleRestoreItem = async (frame_id) => {
         try {
             await restoreFrameItem(frame_id);
-            alert("Item restored successfully");
+            setShowConfirmModal(false);
+            setShowResponseModal(true);
 
             refreshWaitlist();
             setIsEditing(false);
@@ -169,13 +224,10 @@ const Form = ({ selectedItem, setSelectedItem, setItems, refreshWaitlist, onClos
 
     // Delete item
     const handleDeleteItem = async (frame_id) => {
-        const confirmDelete = window.confirm("Are you sure you want to delete this item? This action cannot be undone.");
-
-        if (!confirmDelete) return;
-
         try {
             await deleteFrameItem(frame_id);
-            alert("Item deleted successfully");
+            setShowConfirmModal(false);
+            setShowResponseModal(true);
 
             refreshWaitlist();
             setIsEditing(false);
@@ -186,79 +238,126 @@ const Form = ({ selectedItem, setSelectedItem, setItems, refreshWaitlist, onClos
         }
     }
 
+    function handleConfirmModal(){
+        switch(functionKey){
+            case 'archive':
+                handleArchiveItem(selectedItem.frame_id);
+                break;
+            case 'delete':     
+                handleDeleteItem(selectedItem.frame_id);
+                break;
+            case 'restore':
+                handleRestoreItem(selectedItem.frame_id);
+                break;
+            default:
+                break;
+        }
+    }
 
     return (
-        <form className="form-content" onSubmit={handleSubmit}>
+        <form className="form-content" onSubmit={(e) => {
+            handleSubmit(e);
+            setFunctionKey('edit');
+        }}>
+            <ConfirmModal
+                show={showConfirmModal}
+                onHide={() => {
+                    setShowConfirmModal(false);
+                }}
+                onConfirm={handleConfirmModal}
+            />
             <div className="container-1 d-flex">
-                <div className="exit-btn">
-                    <img
-                        src={exit}
-                        alt="Exit"
-                        className="exit-icon"
-                        onClick={onClose}
-                    />
-                </div>
-                <div className="edit-btn">
-                    {showArchived ? (
+                <h4>Specifications</h4>
+                <div className="btns">
+                    <div className="exit-btn">
                         <img
-                            src={restore}
-                            alt="Restore"
-                            className="restore-icon"
-                            onClick={() => handleRestoreItem(selectedItem.frame_id)}
+                            src={exit}
+                            alt="Exit"
+                            className="exit-icon"
+                            onClick={onClose}
                         />
-                    ) : isEditing ? (
-                        <img
-                            src={cancel}
-                            alt="Cancel"
-                            className="cancel-icon"
-                            onClick={handleCancelEdit}
-                        />
-                    ) : (
-                        <img
-                            src={edit}
-                            alt="Edit"
-                            className="edit-icon"
-                            onClick={handleEditClick}
-                        />
-                    )}
-                </div>
-                <div className="del-btn">
-                    {showArchived ? (
-                        <img
-                            src={del}
-                            alt="Delete"
-                            className="del-icon"
-                            onClick={userRole === 'admin' ? () => handleDeleteItem(selectedItem.frame_id) : null}
-                            style={{ opacity: userRole === 'admin' ? 1 : 0.5, cursor: userRole === 'admin' ? 'pointer' : 'not-allowed' }} // Adjust appearance based on role
-                        />
-                    ) : (
-                        <img
-                            src={archive}
-                            alt="Archive"
-                            className="archive-icon"
-                            onClick={() => handleArchiveItem(selectedItem.frame_id)}
-                        />
-                    )}
+                    </div>
+                    <div className="edit-btn">
+                        {showArchived ? (
+                            <img
+                                src={restore}
+                                alt="Restore"
+                                className="restore-icon"
+                                onClick={() => {
+                                    setShowConfirmModal(true);
+                                    setFunctionKey('restore');
+                                }}
+                            />
+                        ) : isEditing ? (
+                            <img
+                                src={cancel}
+                                alt="Cancel"
+                                className="cancel-icon"
+                                onClick={handleCancelEdit}
+                            />
+                        ) : (
+                            <img
+                                src={edit}
+                                alt="Edit"
+                                className="edit-icon"
+                                onClick={handleEditClick}
+                            />
+                        )}
+                    </div>
+                    <div className="del-btn">
+                        {userRole === 'admin' && showArchived && (
+                              <img
+                                src={del}
+                                alt="Delete"
+                                className="del-icon"
+                                onClick={() => {
+                                    setShowConfirmModal(true);
+                                    setFunctionKey('delete');
+                                }}
+                            /> 
+                        )}
+                        {userRole === 'admin' && !showArchived && (
+                             <img
+                                src={del}
+                                alt="Archive"
+                                className="archive-icon"
+                                onClick={() => {
+                                    setShowConfirmModal(true);
+                                    setFunctionKey('archive');
+                                }}
+                            />
+                        )}
+                    </div>
                 </div>
             </div>
 
             {!isEditing ? (
                 itemImage ? (
-                    <div className="item-image-container" onClick={handleOpenModal}>
-                        <img
-                            src={itemImage}
-                            alt="Item"
-                            className="item-image"
-                        />
-                    </div>
+                    <>
+                        <div className="item-image-container" onClick={handleOpenModal}>
+                            <img
+                                src={itemImage}
+                                alt="Item"
+                                className="item-image"
+                            />
+                        </div>
+                        {/* <div className="crop-btn">
+                            <button type="button" onClick={() => setShowCropModal(true)}>Crop</button>
+                        </div> */}
+                    </>
                 ) : (
                     <div className="no-image-container">
                         No image attached
                     </div>
                 )
             ) : (
-                <ImageUploadButton onFileSelect={handleFileSelect} />
+                <ImageUploadButton onFileSelect={handleFileSelect} part={'frame'}/>
             )}
+
+            {/* <CropModal 
+                show={showCropModal}
+                onHide={() => setShowCropModal(false)}
+            /> */}
 
             <ImagePreviewModal
                 show={showModal}
@@ -292,7 +391,7 @@ const Form = ({ selectedItem, setSelectedItem, setItems, refreshWaitlist, onClos
 
             <div className="input-container form-group">
                 <label htmlFor="item-description-frame">Description</label>
-                <input
+                <textarea
                     type="text"
                     id="item-description-frame"
                     name="itemDescription"
@@ -301,7 +400,7 @@ const Form = ({ selectedItem, setSelectedItem, setItems, refreshWaitlist, onClos
                     placeholder="Enter item description"
                     required
                     disabled={!isEditing}
-                />
+                ></textarea>
             </div>
 
             <div className="dropdown-container d-flex justify-content-between">

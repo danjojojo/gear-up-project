@@ -104,6 +104,7 @@ const Expenses = () => {
 			setRightContainerStyle("right-container-close");
 			setExpensesContainerStyle("expenses-container");
 		}
+		clearForm();
 	}
 
 	// IMAGE CHANGE HANDLERS
@@ -163,9 +164,9 @@ const Expenses = () => {
 				</Modal.Header>
 				<Modal.Body>
 					<div className='img-preview'>
-						{expensePreviewImage && <img src={expensePreviewImage} alt=""/>}
-						{openExpenseView && <img src={editExpensePreviewImage} alt=""/>}
-						{editExpenseView && <img src={editExpensePreviewImage} alt=""/>}
+						{expensePreviewImage && !openExpenseView && !editExpenseView && <img src={expensePreviewImage} alt=""/>}
+						{openExpenseView && !editExpenseView && <img src={editExpensePreviewImage} alt=""/>}
+						{editExpenseView && !openExpenseView && <img src={editExpensePreviewImage} alt=""/>}
 					</div>
 				</Modal.Body>
 			</Modal>
@@ -233,6 +234,8 @@ const Expenses = () => {
 		setOpenExpenseView(false);
 		setEditExpenseView(false);
 		openExpenseFormView();
+		setOthersExpenseName('');
+		setOthersExpense(false);
 	}
 	function openExpenseEntry(){
 		setOpenExpenseView(true);

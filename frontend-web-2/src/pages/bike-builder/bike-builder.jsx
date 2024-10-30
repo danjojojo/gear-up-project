@@ -33,10 +33,10 @@ const BikeBuilder = () => {
 
     const hitRegions = {
         frame: { x: 299, y: 146, width: 313, height: 208, rotation: 0 },
-        fork: { x: 567, y: 166, width: 42, height: 205, rotation: -27 },
-        groupset: { x: 285, y: 300, width: 116, height: 96, rotation: 0 },
-        frontWheel: { x: 559, y: 215, width: 231, height: 231, rotation: 0 },
-        rearWheel: { x: 203, y: 215, width: 231, height: 231, rotation: 0 },
+        fork: { x: 545, y: 145, width: 55, height: 220, rotation: -27 },
+        groupset: { x: 270, y: 295, width: 136, height: 106, rotation: 0 },
+        frontWheel: { x: 539, y: 219, width: 251, height: 231, rotation: 0 },
+        rearWheel: { x: 183, y: 219, width: 251, height: 231, rotation: 0 },
         seat: { x: 357, y: 149, width: 96, height: 123, rotation: -3 },
         cockpit: { x: 563, y: 117, width: 52, height: 45, rotation: 0 }
     };
@@ -357,7 +357,7 @@ const BikeBuilder = () => {
             let updatedPositions = { ...prevPositions };
 
             // Reset current part's position
-            updatedPositions[partType] = { x: 0, y: 0, rotation: 0 }; // Default position for each part
+            updatedPositions[partType] = { x: 120, y: 70, rotation: 0 }; // Default position for each part
 
             // Reset dependent parts' positions based on the current part
             switch (partType) {
@@ -497,6 +497,9 @@ const BikeBuilder = () => {
                     buildStatsPrice={buildStatsPrice}
                     finalBuildImage={finalBuildImage}
                     goBackToBuild={goBackToBuild}
+                    handleReset={ handleReset}
+                    setIsBuildFinalized={setIsBuildFinalized}
+                    setShowBudgetStep={setShowBudgetStep}
                 />
             ) : (
                 showBudgetStep ? (

@@ -104,22 +104,25 @@ const CanvasContainer = ({
                 <div className="budget-stat-container d-flex">
                     <div className="budget">
                         <div className="content">
-                            <div className='upper d-flex'>
-                                {budget && (
+                            {budget && (
+                                <div className='upper d-flex'>
                                     <div className="price">
-                                        <b>Your Budget</b> <br />
+                                        Budget: 
                                         <span style={{ color: buildStatsPrice <= budget || !budget ? 'green' : 'red' }}>
-                                            Price:   {PesoFormat.format(budget)}
+                                             {" "} {PesoFormat.format(budget)}
                                         </span>
                                     </div>
-                                )}
-                                <div className="price">
-                                    <b>Build Stats</b> <br />
-                                    Total Price: {PesoFormat.format(buildStatsPrice)}
                                 </div>
-                            </div>
+                            )}
+                            {!budget && (
+                                <div className='upper d-flex'>
+                                    <div className="price">
+                                        Note:                                        
+                                    </div>
+                                </div>
+                            )}
                             <div className='lower'>
-                                <span><b>Note: </b> Please select and drag the part exactly onto the highlighted hit region before proceeding.</span>
+                                <span>Please select and drag the part exactly onto the highlighted hit region before proceeding.</span>
                             </div>
                         </div>
                     </div>
@@ -138,7 +141,7 @@ const CanvasContainer = ({
                         >
                             <Layer>
                                 {/* Background Image */}
-                                {backgroundImage && (
+                                {/* {backgroundImage && (
                                     <Image
                                         image={backgroundImage}
                                         x={(stageWidth - 570) / 2}
@@ -147,7 +150,7 @@ const CanvasContainer = ({
                                         height={570}
                                         opacity={0.6}
                                     />
-                                )}
+                                )} */}
                             </Layer>
                             <Layer ref={partsLayerRef}>
                                 {selectedPart && (
@@ -298,7 +301,7 @@ const CanvasContainer = ({
                                         y={partPositions.cockpit.y}
                                         rotation={partPositions.cockpit.rotation}
                                         height={39}
-                                        width={46}
+                                        width={40}
                                         opacity={selectedPart?.name() === 'cockpit' ? 0.85 : 1} // Slight opacity change when selected
                                         draggable={selectedPart?.name() === 'cockpit' && !lockedParts.includes("cockpit")}
                                         listening={!lockedParts.includes("cockpit")}
@@ -432,8 +435,8 @@ const CanvasContainer = ({
                                         crop={{
                                             x: 0, // Crop starting from the left
                                             y: 0,
-                                            width: 250, // Crop to half of original 500 width
-                                            height: 214, // Use original height
+                                            width: groupsetImage.width / 2, // Crop to half of original 500 width
+                                            height: groupsetImage.height, // Use original height
                                         }}
                                         draggable={selectedPart?.name() === 'groupset' && !lockedParts.includes("groupset")}
                                         listening={!lockedParts.includes("groupset")}
@@ -522,10 +525,10 @@ const CanvasContainer = ({
                                         width={110} // Adjusted width
                                         opacity={selectedPart?.name() === 'groupset' ? 0.85 : 1} // Slight opacity change when selected
                                         crop={{
-                                            x: 250, // Start from middle of original 500 width
+                                            x: groupsetImage.width / 2, // Start from middle of original 500 width
                                             y: 0,
-                                            width: 250, // Crop the second half of the image
-                                            height: 214, // Use original height
+                                            width: groupsetImage.width / 2, // Crop the second half of the image
+                                            height: groupsetImage.height, // Use original height
                                         }}
                                         draggable={false}
                                         listening={!lockedParts.includes("groupset")}
@@ -609,37 +612,87 @@ const CanvasContainer = ({
                 </div>
                 <div className="summary-container">
                     <div className="content-container">
-                        <div className='part-price'>
-                            <div className='price'>
-                                Frame:  {PesoFormat.format(partSelected?.frame?.item_price || 0)}
-                            </div>
-                        </div>
-                        <div className='part-price'>
-                            <div className='price'>
-                                Fork:  {PesoFormat.format(partSelected?.fork?.item_price || 0)}
-                            </div>
-                        </div>
-                        <div className='part-price'>
-                            <div className='price'>
-                                Groupset:  {PesoFormat.format(partSelected?.groupset?.item_price || 0)}
-                            </div>
-                        </div>
-                        <div className='part-price'>
-                            <div className='price'>
-                                Wheelset:  {PesoFormat.format(partSelected?.wheelset?.item_price || 0)}
-                            </div>
-                        </div>
-                        <div className='part-price'>
-                            <div className='price'>
-                                Seat:  {PesoFormat.format(partSelected?.seat?.item_price || 0)}
-                            </div>
-                        </div>
-                        <div className='part-price'>
-                            <div className='price'>
-                                Cockpit:  {PesoFormat.format(partSelected?.cockpit?.item_price || 0)}
-                            </div>
-                        </div>
+                        <h4>Total Build: {PesoFormat.format(buildStatsPrice)}</h4>
                     </div>
+                    {
+                    !partSelected.frame && 
+                    !partSelected.fork && 
+                    !partSelected.groupset && 
+                    !partSelected.wheelset && 
+                    !partSelected.seat && 
+                    !partSelected.cockpit && 
+                    <div className="parts-none">
+                        No selected parts yet.
+                    </div>}
+                    {partSelected && <div className="parts-prices">
+                        {partSelected.frame && <div className='part-price'>
+                            Frame:
+                            <div className='price'>
+                                <p>
+                                    {partSelected.frame.item_name}
+                                </p>
+                                <p>
+                                    {PesoFormat.format(partSelected?.frame?.item_price || 0)}
+                                </p>
+                            </div>
+                        </div>}
+                        {partSelected.fork && 
+                        <div className='part-price'>
+                            Fork:  
+                            <div className='price'>
+                                <p>
+                                    {partSelected.fork.item_name}
+                                </p>
+                                <p>
+                                    {PesoFormat.format(partSelected?.fork?.item_price || 0)}
+                                </p>
+                            </div>
+                        </div>}
+                        {partSelected.groupset && <div className='part-price'>
+                            Groupset:  
+                            <div className='price'>
+                                <p>
+                                    {partSelected.groupset.item_name}
+                                </p>
+                                <p>
+                                    {PesoFormat.format(partSelected?.groupset?.item_price || 0)}
+                                </p>
+                            </div>
+                        </div>}
+                        {partSelected.wheelset && <div className='part-price'>
+                            Wheelset:  
+                            <div className='price'>
+                                <p>
+                                    {partSelected.wheelset.item_name}
+                                </p>
+                                <p>
+                                    {PesoFormat.format(partSelected?.wheelset?.item_price || 0)}
+                                </p>
+                            </div>
+                        </div>}
+                        {partSelected.seat && <div className='part-price'>
+                            Seat:  
+                            <div className='price'>
+                                <p>
+                                    {partSelected.seat.item_name}
+                                </p>
+                                <p>
+                                    {PesoFormat.format(partSelected?.seat?.item_price || 0)}
+                                </p>
+                            </div>
+                        </div>}
+                        {partSelected.cockpit && <div className='part-price'>
+                            Cockpit:  
+                            <div className='price'>
+                                <p>
+                                    {partSelected.cockpit.item_name}
+                                </p>
+                                <p>
+                                    {PesoFormat.format(partSelected?.cockpit?.item_price || 0)}
+                                </p>
+                            </div>
+                        </div>}
+                    </div>}
                 </div>
             </div>
         </div >

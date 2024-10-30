@@ -52,7 +52,7 @@ const loginUser = async (req, res) => {
         const isValid = await bcrypt.compare(password, user.admin_password);
         if (!isValid) return res.status(400).json({ error: 'Invalid password' });
 
-        const token = jwt.sign({ admin_id: user.admin_id, email: user.admin_email, role: user.role }, process.env.JWT_SECRET, { expiresIn: '1h' });
+        const token = jwt.sign({ admin_id: user.admin_id, email: user.admin_email, name: user.admin_name, role: user.role }, process.env.JWT_SECRET, { expiresIn: '1h' });
 
         res.cookie('token', token, {
           httpOnly: true, // httpOnly ensures JavaScript can't access this cookie
@@ -81,7 +81,7 @@ const loginPOS = async (req, res) => {
 
     try {
       const { rows } = await pool.query(
-        "SELECT * FROM pos_users WHERE pos_id = $1",
+        "SELECT * FROM pos_users WHERE pos_id = $1 AND pos_status = 'active'",
         [id]
       );
       if (!rows.length)
@@ -92,7 +92,7 @@ const loginPOS = async (req, res) => {
       if (!isValid) return res.status(400).json({ error: "Invalid password" });
 
       const token = jwt.sign(
-        { pos_id: user.pos_id, role: user.role },
+        { pos_id: user.pos_id, name: user.pos_name, role: user.role },
         process.env.JWT_SECRET,
         { expiresIn: '1h' }
       );
@@ -121,6 +121,27 @@ const getMyRole = async (req, res) => {
     res.json({ role: req.user.role });
 }
 
+const getMyName = async (req, res) => {
+    try {
+      const role = req.user.role;
+      if(role === 'staff'){
+        const { rows } = await pool.query(
+          "SELECT pos_name FROM pos_users WHERE pos_id = $1",
+          [req.user.pos_id]
+        );
+        res.json({ name: rows[0].pos_name });
+      } else if(role === 'admin'){
+        const { rows } = await pool.query(
+          "SELECT admin_name FROM admin WHERE admin_id = $1",
+          [req.user.admin_id]
+        );
+        res.json({ name: rows[0].admin_name });
+      }
+    } catch (error) {
+      res.status(500).json({ error: error.message });
+    }
+}
+
 const logoutUser = (req, res) => {
   // Clear the token and any other relevant cookies
   res.clearCookie('token', { httpOnly: true, sameSite: 'Strict', secure: process.env.NODE_ENV === 'production' });
@@ -135,5 +156,6 @@ module.exports = {
     loginUser,
     loginPOS,
     getMyRole,
+    getMyName,
     logoutUser
 };

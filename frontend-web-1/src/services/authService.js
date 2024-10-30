@@ -77,3 +77,14 @@ export const logoutUser = async () => {
     throw error;
   }
 }
+
+// Get user name
+export const getMyName = async () => {
+  try {
+    const response = await api.get('/auth/my-name');
+    return response.data.name;
+  } catch (error) {
+    console.error('Error getting name:', error);
+    throw error;
+  }
+}

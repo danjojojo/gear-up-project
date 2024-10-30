@@ -7,7 +7,7 @@ require('dotenv').config();
 const getDashboardData = async (req, res) => {
     try {
         // Query to get the total number of items available
-        const totalItemsQuery = 'SELECT COUNT(*) FROM items WHERE status = true';
+        const totalItemsQuery = 'SELECT COUNT(*) FROM items WHERE status = true and is_deleted = false';
         const totalItemsResult = await pool.query(totalItemsQuery);
         const totalItems = parseInt(totalItemsResult.rows[0].count, 10) || 0;
 
@@ -17,18 +17,19 @@ const getDashboardData = async (req, res) => {
             WHERE low_stock_alert = true 
             AND stock_count > 0 
             AND stock_count <= low_stock_count
-            AND status = true`;
+            AND status = true
+            AND is_deleted = false`;
 
         const lowStockItemsResult = await pool.query(lowStockItemsQuery);
         const lowStockItems = parseInt(lowStockItemsResult.rows[0].count, 10) || 0;
 
         // Query to get the total stock count
-        const stockCountsQuery = 'SELECT SUM(stock_count) FROM items WHERE status = true';
+        const stockCountsQuery = 'SELECT SUM(stock_count) FROM items WHERE status = true and is_deleted = false';
         const stockCountsResult = await pool.query(stockCountsQuery);
         const stockCounts = parseInt(stockCountsResult.rows[0].sum, 10) || 0;
 
         // Query to get the total stock value
-        const stockValueQuery = 'SELECT SUM(item_price * stock_count) FROM items WHERE status = true';
+        const stockValueQuery = 'SELECT SUM(item_price * stock_count) FROM items WHERE status = true and is_deleted = false';
         const stockValueResult = await pool.query(stockValueQuery);
         const stockValue = Number(stockValueResult.rows[0].sum) || 0;
 
@@ -150,7 +151,7 @@ const archiveItem = async (req, res) => {
     try {
         const query = `
             UPDATE items
-            SET status = false
+            SET status = false, date_updated = NOW()
             WHERE item_id = $1
             RETURNING *; 
         `;
@@ -177,7 +178,7 @@ const restoreItem = async (req, res) => {
     try {
         const query = `
             UPDATE items
-            SET status = true
+            SET status = true, date_updated = NOW()
             WHERE item_id = $1
             RETURNING *; 
         `;
@@ -205,7 +206,8 @@ const deleteItem = async (req, res) => {
 
     try {
         const deleteQuery = `
-            DELETE FROM items
+            UPDATE items
+            SET is_deleted = true, date_updated = NOW()
             WHERE item_id = $1 RETURNING *;
         `;
         const result = await pool.query(deleteQuery, [item_id]);
@@ -235,13 +237,15 @@ const displayItem = async (req, res) => {
                 i.low_stock_alert, 
                 i.low_stock_count,
                 i.date_created,
+                i.add_part,
+                i.bb_bu_status,
                 c.category_name 
             FROM 
                 items i 
             JOIN 
                 category c ON i.category_id = c.category_id 
             WHERE 
-                i.status = $1;
+                i.status = $1 and i.is_deleted = false;
         `;
 
         const { rows } = await pool.query(query, [archived === 'true']);
@@ -268,7 +272,8 @@ const getItemById = async (req, res) => {
                 i.add_part,
                 i.bike_parts,
                 i.bb_bu_status,
-                encode(i.item_image, 'base64') AS item_image
+                encode(i.item_image, 'base64') AS item_image,
+                i.date_created
             FROM items i
             JOIN category c ON i.category_id = c.category_id
             WHERE i.item_id = $1;
@@ -287,7 +292,7 @@ const getItemById = async (req, res) => {
 const updateItem = async (req, res) => {
     try {
         const { id } = req.params;
-        const { itemName, itemPrice, stock, category, lowStockAlert, lowStockThreshold, addToBikeBuilder, bikeParts } = req.body;
+        const { itemName, itemPrice, stock, category, lowStockAlert, lowStockThreshold, addToBikeBuilder, bikeParts, itemCost } = req.body;
         const itemImage = req.file ? req.file.buffer : null;
 
         const categoryQuery = 'SELECT category_id FROM category WHERE category_name = $1';
@@ -316,8 +321,9 @@ const updateItem = async (req, res) => {
                 add_part = $7,
                 bike_parts = $8,
                 item_image = $9,
-                date_updated = $10
-            WHERE item_id = $11
+                date_updated = $10,
+                item_cost = $11
+            WHERE item_id = $12
             RETURNING *`;
 
         const values = [
@@ -331,6 +337,7 @@ const updateItem = async (req, res) => {
             itemBikeParts,
             itemImage,
             new Date(), // date_updated
+            itemCost,
             id
         ];
 

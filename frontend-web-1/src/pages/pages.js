@@ -22,6 +22,7 @@ import PointOfSales from './point-of-sales/point-of-sales.jsx';
 import Expenses from './expenses/expenses.jsx';
 import Receipts from './receipts/receipts.jsx';
 import Mechanics from './mechanics/mechanics.jsx';
+import Profile from './profile/profile.jsx';
 
 const Pages = {
     // Not Found Page
@@ -81,7 +82,10 @@ const Pages = {
     Receipts,
 
     // Mechanics Page
-    Mechanics
+    Mechanics,
+
+    // Profile Page
+    Profile
 };
 
 export default Pages;

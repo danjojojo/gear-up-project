@@ -4,7 +4,6 @@
 
     .side-nav {
         width: 250px;
-        background-color: #f8f9fa;
         border-right: 1px solid #dee2e6;
         height: 100%;
     }
@@ -20,6 +19,7 @@
 
     .content {
         flex: 1;
+        background-color: rgba(242, 242, 242, 0.356);
     }
 
     .menu-button {
@@ -33,7 +33,7 @@
         height: 100svh;
     }
 
-    .side-nav {
+    .side-nav-bg {
         display: none;
     }
 
@@ -46,12 +46,21 @@
         height: 100vh;
     }
 
+    .upper-nav{
+        margin-top: 0;
+        margin-left: 0;
+        margin-right: 0;
+        border-radius: 0;
+        border-left: none;
+        padding: 30px !important;
+    }
+
     .menu-button {
         display: flex !important;
         justify-content: center !important;
         align-items: center !important;
         padding-left: 16px !important;
-        background-color: #f8f9fa;
+        background-color: white !important; // Light gray background
         border-bottom: 1px solid #dee2e6;
         cursor: pointer;
     }

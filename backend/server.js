@@ -18,6 +18,8 @@ const mechanicRoutes = require('./routers/mechanicsRouter');
 
 // web 2
 const bikeBuilderRouter = require('./routers/bikeBuilderRouter');
+const checkoutRouter = require('./routers/checkoutRouter');
+const webhookRouter = require('./routers/webhookRouter');
 
 require('dotenv').config();
 
@@ -32,7 +34,7 @@ const port = process.env.PORT || 5000;
 //   credentials: true,  // Allow cookies (credentials) to be sent
 // }));
 
-const allowedOrigins = ['http://localhost:3000', 'http://localhost:3001'];
+const allowedOrigins = ['http://localhost:3000', 'http://localhost:3001', 'https://4274-149-30-138-2.ngrok-free.app'];
 
 app.use(cors({
   origin: function (origin, callback) {
@@ -65,6 +67,8 @@ app.use('/mechanics', mechanicRoutes);
 
 // web 2
 app.use('/bike-builder', bikeBuilderRouter);
+app.use('/checkout', checkoutRouter);
+app.use('/webhook', webhookRouter);
 
 app.listen(port, () => {
     console.log(`Server running on port ${port}`);

@@ -6,7 +6,9 @@ const getAllMechanics = async (req, res) => {
         const query = `
             SELECT * 
             FROM mechanics 
-            ORDER BY date_created DESC;
+            WHERE is_deleted = false
+            ORDER BY date_created DESC
+            ;
         `
         const { rows } = await pool.query(query);
         res.json({ mechanics: rows });
@@ -71,9 +73,27 @@ const changeMechanicStatus = async (req, res) => {
     }
 }
 
+const deleteMechanic = async(req,res) => {
+    try {
+        console.log('Delete');
+        const { id } = req.params;
+        const query = `
+            UPDATE mechanics
+            SET is_deleted = true, date_updated = NOW()
+            WHERE mechanic_id = $1
+        `;
+        const values = [id];
+        await pool.query(query, values);
+        res.status(201).json({ message: 'Success' });
+    } catch (error) {
+        res.status(500).json({error: error.message});
+    }
+}
+
 module.exports = {
     getAllMechanics,
     addMechanic,
     editMechanic,
-    changeMechanicStatus
+    changeMechanicStatus,
+    deleteMechanic
 }

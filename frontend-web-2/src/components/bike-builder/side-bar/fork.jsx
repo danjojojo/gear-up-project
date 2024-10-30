@@ -71,47 +71,49 @@ const Fork = ({ onAddToBuild, selectedFramePurpose, selectedFrame }) => {
                 </button>
             </div>
 
-            {items.map((item) => (
-                <div className="parts-card" key={item.fork_id}>
-                    <div className="item-image">
-                        {item.item_image ? (
-                            <img src={`data:image/png;base64,${item.item_image}`} alt="frame" />
-                        ) : (
-                            <p>No Image Available</p>
-                        )}
+            <div className="parts-cards">
+                {items.map((item) => (
+                    <div className="parts-card" key={item.fork_id}>
+                        <div className="item-image" onClick={() => onAddToBuild(item)}>
+                            {item.item_image ? (
+                                <img src={`data:image/png;base64,${item.item_image}`} alt="frame" />
+                            ) : (
+                                <p>No Image Available</p>
+                            )}
+                        </div>
+                        <div className="item-name">{item.item_name}</div>
+                        <div className="item-price">
+                            {PesoFormat.format(item.item_price)}
+                            <br />
+                            {item.fork_size} - {item.fork_tube_type}
+                        </div>
+
+                        <Accordion>
+                            <Accordion.Item eventKey="0">
+                                <Accordion.Header>Details</Accordion.Header>
+                                <Accordion.Body>{item.description}</Accordion.Body>
+                            </Accordion.Item>
+                            <Accordion.Item eventKey="1">
+                                <Accordion.Header>Tech Specs</Accordion.Header>
+                                <Accordion.Body>
+                                    <div className='specs-container'>Fork Size: {item.fork_size}</div>
+                                    <div className='specs-container'>Fork Tube Type: {item.fork_tube_type}</div>
+                                    <div className='specs-container'>Fork Tube Upper Diameter: {item.fork_tube_upper_diameter}</div>
+                                    <div className='specs-container'>Fork Tube Lower Diameter: {item.fork_tube_lower_diameter}</div>
+                                    <div className='specs-container'>Fork Travel: {item.fork_travel}</div>
+                                    <div className='specs-container'>Fork Axle Type: {item.axle_type}</div>
+                                    <div className='specs-container'>Fork Axle Diameter: {item.axle_diameter}</div>
+                                    <div className='specs-container'>Fork Suspension Type: {item.suspension_type}</div>
+                                    <div className='specs-container'>Fork Rotor Size: {item.rotor_size}</div>
+                                    <div className='specs-container'>Fork Max Tire Width: {item.max_tire_width}</div>
+                                    <div className='specs-container'>Front Hub Width: {item.front_hub_width}</div>
+                                    <div className='specs-container'>Material: {item.material}</div>
+                                </Accordion.Body>
+                            </Accordion.Item>
+                        </Accordion>
                     </div>
-                    <div className="item-name">{item.item_name}</div>
-                    <div className="item-price">{PesoFormat.format(item.item_price)}</div>
-
-                    <Accordion>
-                        <Accordion.Item eventKey="0">
-                            <Accordion.Header>Details</Accordion.Header>
-                            <Accordion.Body>{item.description}</Accordion.Body>
-                        </Accordion.Item>
-                        <Accordion.Item eventKey="1">
-                            <Accordion.Header>Tech Specs</Accordion.Header>
-                            <Accordion.Body>
-                                <div className='specs-container'>Fork Size: {item.fork_size}</div>
-                                <div className='specs-container'>Fork Tube Type: {item.fork_tube_type}</div>
-                                <div className='specs-container'>Fork Tube Upper Diameter: {item.fork_tube_upper_diameter}</div>
-                                <div className='specs-container'>Fork Tube Lower Diameter: {item.fork_tube_lower_diameter}</div>
-                                <div className='specs-container'>Fork Travel: {item.fork_travel}</div>
-                                <div className='specs-container'>Fork Axle Type: {item.axle_type}</div>
-                                <div className='specs-container'>Fork Axle Diameter: {item.axle_diameter}</div>
-                                <div className='specs-container'>Fork Suspension Type: {item.suspension_type}</div>
-                                <div className='specs-container'>Fork Rotor Size: {item.rotor_size}</div>
-                                <div className='specs-container'>Fork Max Tire Width: {item.max_tire_width}</div>
-                                <div className='specs-container'>Front Hub Width: {item.front_hub_width}</div>
-                                <div className='specs-container'>Material: {item.material}</div>
-                            </Accordion.Body>
-                        </Accordion.Item>
-                    </Accordion>
-
-                    <button className="add-to-build" onClick={() => onAddToBuild(item)}>
-                        Add to Build
-                    </button>
-                </div>
-            ))}
+                ))}
+            </div>
         </div>
     );
 };

@@ -18,6 +18,7 @@ const getFrameItems = async (req, res) => {
                 f.item_id = i.item_id
             WHERE 
                 i.status = true 
+                AND i.is_deleted = false
                 AND f.status = true;
         `;
 
@@ -47,6 +48,7 @@ const getForkItems = async (req, res) => {
                 f.item_id = i.item_id
             WHERE 
                 i.status = true 
+                AND i.is_deleted = false
                 AND f.status = true;
         `;
 
@@ -76,6 +78,7 @@ const getGroupsetItems = async (req, res) => {
                     g.item_id = i.item_id
                 WHERE 
                     i.status = true 
+                    AND i.is_deleted = false
                     AND g.status = true;
         `;
 
@@ -105,6 +108,7 @@ const getWheelsetItems = async (req, res) => {
                     w.item_id = i.item_id
                 WHERE 
                     i.status = true 
+                    AND i.is_deleted = false
                     AND w.status = true;
         `;
 
@@ -134,6 +138,7 @@ const getSeatItems = async (req, res) => {
                     s.item_id = i.item_id
                 WHERE 
                     i.status = true 
+                    AND i.is_deleted = false
                     AND s.status = true;
         `;
 
@@ -163,6 +168,7 @@ const getCockpitItems = async (req, res) => {
                     c.item_id = i.item_id
                 WHERE 
                     i.status = true 
+                    AND i.is_deleted = false
                     AND c.status = true;
         `;
 
@@ -180,9 +186,9 @@ function buildQuery(reference, filterCriteria) {
         .map(([key, value]) => {
             // Wrap value in single quotes to ensure proper formatting
             if (key === 'tire_width') {
-                return `${key} <= ${value}`;
+                return `${key}::FLOAT8 <= ${value}`;
             } else if (key === 'max_tire_width') {
-                return `${key} >= ${value}`;
+                return `${key}::FLOAT8 >= ${value}`;
             } else {
                 return `${key} = '${value}'`;
             }
@@ -196,6 +202,7 @@ function buildQuery(reference, filterCriteria) {
             i.item_name,
             i.item_price,
             i.stock_count,
+            i.bike_parts,
             encode(${reference.charAt(0)}.image, 'base64') AS item_image
         FROM 
             ${reference} ${reference.charAt(0)}
@@ -205,6 +212,7 @@ function buildQuery(reference, filterCriteria) {
             ${reference.charAt(0)}.item_id = i.item_id
         WHERE 
             i.status = true 
+            AND i.is_deleted = false
             AND  ${reference.charAt(0)}.status = true
             ${conditions ? `AND ${conditions}` : ''}
     `;
@@ -226,6 +234,34 @@ const getAnyItems = async (req, res) => {
     }
 }
 
+const getNewStockCounts = async (req, res) => {
+    try {
+        const { ids } = req.body; // Expecting { ids: [1, 2, 3, ...] }
+
+        if (!Array.isArray(ids) || ids.length === 0) {
+            return res.status(400).json({ error: 'Invalid or missing item IDs.' });
+        }
+
+        const query = `
+            SELECT 
+                i.item_id,
+                i.stock_count
+            FROM 
+                items i
+            WHERE 
+                i.item_id = ANY($1) 
+                AND i.status = true 
+                AND i.is_deleted = false;
+        `;
+
+        const result = await pool.query(query, [ids]); // Pass the ids array as parameter
+        res.status(200).json(result.rows);
+    } catch (error) {
+        console.error('Error fetching stock counts:', error);
+        res.status(500).json({ error: 'Internal Server Error' });
+    }
+};
+
 module.exports = {
     getFrameItems,
     getForkItems,
@@ -233,5 +269,6 @@ module.exports = {
     getWheelsetItems,
     getSeatItems,
     getCockpitItems,
-    getAnyItems
+    getAnyItems,
+    getNewStockCounts
 };

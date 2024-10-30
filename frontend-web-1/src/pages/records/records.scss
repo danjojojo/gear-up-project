@@ -11,7 +11,7 @@ $subheading-text-color: #606060;
 $font-size: clamp(0.9em, 1.2vw, 1.1em);
 $button-success: #9C9B9B;
 $button-fail: #dee2e6;
-
+$bg-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 
 .records {
     
@@ -107,7 +107,9 @@ $button-fail: #dee2e6;
                         &.active {
                             background-color: $active-bg-color;
                             color: $active-text-color;
-                            border: 1px solid $normal-border-color;
+                            // border: 1px solid $normal-border-color;
+                            border: none;
+                            box-shadow: $bg-shadow;
                         }
                     }
                 }

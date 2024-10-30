@@ -32,7 +32,7 @@ const AdminWrapper = () => {
             <SessionExpiredModal show={showModal} handleClose={handleClose} />
             <SideNav isAdmin={true} onNavClick={handleNavClick} />
             <div className="content">
-                <UpperNav title={title} />
+                <UpperNav title={title} onNavClick={handleNavClick}/>
                 <div className='main-content'>
                     <Outlet />
                 </div>

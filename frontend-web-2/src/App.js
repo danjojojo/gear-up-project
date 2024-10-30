@@ -16,8 +16,8 @@ function App() {
             <Route path="help" element={<Pages.Help />} />
             <Route path="bike-builder" element={<Pages.BikeBuilder />} />
             <Route path="bike-upgrader" element={<Pages.BikeUpgrader />} />
-            <Route path="bike-upgrader/headset" element={<Pages.Headset />} />
             <Route path="cart" element={<Pages.Cart />} />
+            <Route path="checkout" element={<Pages.Checkout />} />
             <Route path="*" element={<Pages.NotFound />} />
           </Route>
         </Routes>

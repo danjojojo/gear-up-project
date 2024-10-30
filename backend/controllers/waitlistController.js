@@ -5,6 +5,11 @@ require('dotenv').config();
 // Get waitlist items
 const getWaitlistItems = async (req, res) => {
     try {
+        const token = req.cookies.token;
+        if(!token) {
+            return res.status(401).json({ message: 'Unauthorized' });
+        }
+        const role = req.cookies.role;
         const query = `
             SELECT 
                 w.waitlist_item_id,
@@ -24,8 +29,8 @@ const getWaitlistItems = async (req, res) => {
             ORDER BY 
                 w.date_created DESC;
         `;
-        const result = await pool.query(query);
-        res.status(200).json(result.rows);
+        const { rows } = await pool.query(query);
+        res.status(200).json({ data: rows, role: role });
     } catch (error) {
         console.error('Error fetching waitlist items:', error);
         res.status(500).json({ error: 'Internal Server Error' });

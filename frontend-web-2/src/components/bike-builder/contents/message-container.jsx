@@ -44,6 +44,10 @@ const MessageContainer = ({ currentPart, partSelected }) => {
             upperText: <>Let’s finish strong by choosing your bike’s cockpit! The cockpit (handlebar, stem, and headset) is where you control your bike.</>,
             lowerText: <>To get the right one, we’ll check your frame and fork’s setup.</>
         }
+        , finalize: {
+           upperText: <>Great! You’ve picked all the parts for your bike!</>,
+        //    lowerText: <>Click the Finalize Build on the left sidebar to proceed to Summary Details. </>
+        }
     };
 
     // Help content for different parts (frame, fork, groupset, etc.)

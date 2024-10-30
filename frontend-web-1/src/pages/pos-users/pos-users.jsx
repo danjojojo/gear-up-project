@@ -2,7 +2,7 @@ import './pos-users.scss'
 import PageLayout from '../../components/page-layout/page-layout';
 import { useEffect, useState } from 'react';
 import LoadingPage from '../../components/loading-page/loading-page';
-import { getPosUsers, addPosUser, editPosUserName, editPosUserPassword, editPosUserStatus } from '../../services/posUsersService';
+import { getPosUsers, addPosUser, editPosUserName, editPosUserPassword, editPosUserStatus, deletePosUser } from '../../services/posUsersService';
 import moment from 'moment';
 import {Modal, Button} from 'react-bootstrap';
 import SearchBar from "../../components/search-bar/search-bar";
@@ -22,8 +22,6 @@ const POSUsers = () => {
     const [confirmPasswordSuccess, setConfirmPasswordSuccess] = useState(false);
 
     const [allPosUsers, setAllPosUsers] = useState([]);
-    const [allActivePosUsers, setAllActivePosUsers] = useState([]);
-    const [allInactivePosUsers, setAllInactivePosUsers] = useState([]);
     const [retrievedPosUsers, setRetrievedPosUsers] = useState([]);
     const [selectedPosUser, setSelectedPosUser] = useState([]);
 
@@ -32,11 +30,14 @@ const POSUsers = () => {
     const [editPosUserPassView, setEditPosUserPassView] = useState(false);
     const [editPosUserStatusView, setEditPosUserStatusView] = useState(false);
     const [addPosUserView, setAddPosUserView] = useState(false);
+    const [deletePosUserView, setDeletePosUserView] = useState(false);
 
     const [posUserName, setPosUserName] = useState('');
     const [posUserPassword, setPosUserPassword] = useState('');
     const [posUserConfirmPassword, setPosUserConfirmPassword] = useState('');
     const [samePassword, setSamePassword] = useState(false);
+    const [deletePassword, setDeletePassword] = useState('');
+    const [deletePasswordError, setDeletePasswordError] = useState(false);
 
     const [selectedPosUserID, setSelectedPosUserID] = useState('');
     const [selectedPosUserName, setSelectedPosUserName] = useState('');
@@ -59,7 +60,7 @@ const POSUsers = () => {
 			>
 			<Modal.Header closeButton>
 					<Modal.Title id="contained-modal-title-vcenter">
-						{modalResponse === 'successfully' ? 'Success' : 'Failed'}
+						{modalResponse === 'successfully' || modalResponse === 'successful' ? 'Success' : 'Failed'}
 					</Modal.Title>
 				</Modal.Header>
 				<Modal.Body>
@@ -81,6 +82,11 @@ const POSUsers = () => {
 					{modalState === 'edit-status' && 
                     <p>
 						POS User {modalResponse} {statusChange}!
+					</p>
+                    }
+					{modalState === 'delete' && 
+                    <p>
+						POS User deletion {modalResponse}!
 					</p>
                     }
 				</Modal.Body>
@@ -110,7 +116,7 @@ const POSUsers = () => {
 					}}>
 						{functionKey === "status" ? "Cancel" : "Confirm"}
 					</Button>
-					<Button variant="primary" onClick={() => {
+					<Button variant={selectedPosUser.pos_status === "active" ? 'danger' : 'primary'} onClick={() => {
 							onHide();
 							if(functionKey === "status") onConfirm();
 						}}>
@@ -120,20 +126,6 @@ const POSUsers = () => {
 			</Modal>
 		);
 	}
-
-    const getAllActivePosUsers = (allPosUsers) => {
-        const activePosUsers = allPosUsers.filter((posUser) => 
-            posUser.pos_status === 'active'
-        );
-        setAllActivePosUsers(activePosUsers);
-    }    
-
-    const getAllInactivePosUsers = (allPosUsers) => {
-        const inactivePosUsers = allPosUsers.filter((posUser) => 
-            posUser.pos_status === 'inactive'
-        );
-        setAllInactivePosUsers(inactivePosUsers);
-    }
 
     const getPosUsersFromDB = async () => {
         try {
@@ -227,7 +219,27 @@ const POSUsers = () => {
             setModalResponse('not');
         }
     }
+    const handleDeletePosUser = async (event) => {
+        event.preventDefault();
+        const formData = new FormData();
+        formData.append('password', deletePassword);
+        setModalState('delete');   
 
+        try {
+            const {passwordError} = await deletePosUser(selectedPosUserID, formData);
+            if(passwordError){
+                setDeletePasswordError(true);
+                return;
+            }
+            setModalResponseShow(true);
+            setModalResponse('successful');
+            handleInteractPosUser([], 'close');
+            await getPosUsersFromDB();
+        } catch (error) {
+            setModalResponseShow(true);
+            setModalResponse('not');
+        }
+    }
     function handleInteractPosUser(posUser, interact){
         switch(interact){
             case 'open':
@@ -237,6 +249,7 @@ const POSUsers = () => {
                 setEditPosUserNameView(false);
                 setEditPosUserPassView(false);
                 setAddPosUserView(false);
+                setDeletePosUserView(false);
                 resetPosUserInputs();
                 break;
             case 'close':
@@ -246,6 +259,7 @@ const POSUsers = () => {
                 setEditPosUserPassView(false);
                 setEditPosUserStatusView(false);
                 setAddPosUserView(false);
+                setDeletePosUserView(false);
                 resetPosUserInputs();
                 break;
             case 'add':
@@ -255,6 +269,7 @@ const POSUsers = () => {
                 setEditPosUserPassView(false);
                 setEditPosUserStatusView(false);
                 setAddPosUserView(true);
+                setDeletePosUserView(false);
                 break;
             case 'edit-name':
                 setSelectedPosUser(posUser);
@@ -265,6 +280,7 @@ const POSUsers = () => {
                 setEditPosUserPassView(false);
                 setEditPosUserStatusView(false);
                 setAddPosUserView(false);
+                setDeletePosUserView(false);
                 break;
             case 'edit-pass':
                 setSelectedPosUser(posUser);
@@ -274,6 +290,7 @@ const POSUsers = () => {
                 setEditPosUserPassView(true);
                 setEditPosUserStatusView(false);
                 setAddPosUserView(false);
+                setDeletePosUserView(false);
                 break;
             case 'edit-status':
                 setSelectedPosUser(posUser);
@@ -284,6 +301,17 @@ const POSUsers = () => {
                 setEditPosUserPassView(false);
                 setEditPosUserStatusView(true);
                 setAddPosUserView(false);
+                setDeletePosUserView(false);
+                break;
+            case 'delete':
+                setSelectedPosUser(posUser);
+                setSelectedPosUserID(posUser.pos_id);
+                setOpenPosUserView(false);
+                setEditPosUserNameView(false);
+                setEditPosUserPassView(false);
+                setEditPosUserStatusView(false);
+                setAddPosUserView(false);
+                setDeletePosUserView(true);
                 break;
             default:
                 setSelectedPosUser([]);
@@ -291,6 +319,7 @@ const POSUsers = () => {
                 setEditPosUserNameView(false);
                 setEditPosUserPassView(false);
                 setAddPosUserView(false);
+                setDeletePosUserView(false);
                 break;
         }
     }
@@ -312,11 +341,35 @@ const POSUsers = () => {
             setNameError(false);
         }
     }
-    function handlePosUserPassword(posPassword){
-        if(posPassword){
+
+    const [pwHasLowerCase, setPwHasLowerCase] = useState(false);
+    const [pwHasUpperCase, setPwHasUpperCase] = useState(false);
+    const [pwHasNumber, setPwHasNumber] = useState(false);
+    const [pwHasSpecialChar, setPwHasSpecialChar] = useState(false);
+
+    function handlePosUserPassword(posPassword) {
+        if (posPassword) {
             let minLength = 8;
-            if(posPassword.length > minLength){
-                if(posPassword === posUserConfirmPassword){
+
+            // Regular expression to check the password
+            const hasLowerCase = /[a-z]/.test(posPassword);
+            const hasUpperCase = /[A-Z]/.test(posPassword);
+            const hasNumber = /[0-9]/.test(posPassword);
+            const hasSpecialChar = /[!_@#$%^&*(),.?":{}|<>]/.test(posPassword);
+
+            if(hasLowerCase) setPwHasLowerCase(true); else setPwHasLowerCase(false);
+            if(hasUpperCase) setPwHasUpperCase(true); else setPwHasUpperCase(false);
+            if(hasNumber) setPwHasNumber(true); else setPwHasNumber(false);
+            if(hasSpecialChar) setPwHasSpecialChar(true); else setPwHasSpecialChar(false);
+
+            if (
+                posPassword.length >= minLength &&
+                hasLowerCase &&
+                hasUpperCase &&
+                hasNumber &&
+                hasSpecialChar
+            ) {
+                if (posPassword === posUserConfirmPassword) {
                     setPasswordError(false);
                     setPasswordSuccess(true);
                     setSamePassword(true);
@@ -330,7 +383,7 @@ const POSUsers = () => {
                 setPasswordSuccess(false);
                 setSamePassword(false);
             }
-        }else{
+        } else {
             setPasswordError(false);
             setPasswordSuccess(false);
             setSamePassword(false);
@@ -421,7 +474,8 @@ const POSUsers = () => {
                                 handleInteractPosUser([], 'add');
                             }}
                         >
-                            Add POS User +
+                             <span className="add-pos-user-text">Add POS User</span>
+                             <i className="fa-solid fa-circle-plus"></i> 
                         </button>
                         <div className="search-sorting">
                             <SearchBar
@@ -441,7 +495,8 @@ const POSUsers = () => {
                                         handleInteractPosUser([], 'close');
                                     }}
                                     >
-                                    View Archived
+                                    <span>Archive</span>
+                                    <i className="fa-solid fa-clock-rotate-left"></i>
                                 </button>
                             }
                             {tab === "inactive" && 
@@ -451,7 +506,8 @@ const POSUsers = () => {
                                         handleInteractPosUser([], 'close');
                                     }}
                                     >
-                                    View Active
+                                    <span>Active</span>
+                                    <i className="fa-solid fa-check"></i>
                                 </button>
                             }
                             
@@ -488,8 +544,8 @@ const POSUsers = () => {
                 </div>}
 
                 rightContent=
-                {<div>
-                    {(!openPosUserView && !addPosUserView && !editPosUserNameView && !editPosUserPassView && !editPosUserStatusView) 
+                {<div className='pos-user-right-container'>
+                    {(!openPosUserView && !addPosUserView && !editPosUserNameView && !editPosUserPassView && !editPosUserStatusView && !deletePosUserView) 
                     && 
                     <div className='pos-user-details-container'>
                         <div className='pos-user-nav'>
@@ -499,6 +555,51 @@ const POSUsers = () => {
                             <p>Add a POS User by clicking the Add POS User button.</p>
 						</div>
                     </div>} 
+                    {deletePosUserView &&
+                        <div className='pos-user-details-container'>
+                            <div className='pos-user-nav'>
+                                <h4>Delete POS</h4>
+                                <div className='edit-nav'>
+                                    <i className="fa-solid fa-xmark"
+                                        onClick={()=> {
+                                            handleInteractPosUser(selectedPosUser, 'open');
+                                        }}
+                                    ></i>
+                                </div>
+                            </div>
+                            <div className='guide'>
+                                <p>Guideline:</p>
+                                <ul>
+                                    <li>Once deleted, you will not be able to recover this POS User.</li>
+                                </ul>
+                            </div>
+                            {deletePasswordError && 
+                            <div className="error-msg">
+                                <p>Incorrect password.</p>
+                            </div>
+                            }
+                            <form onSubmit={handleDeletePosUser}>
+                                <div className="form-input">
+                                    <label>Enter your password to confirm</label>
+                                    <input type={showPassword ? "text" : "password"} value={deletePassword} name="" id="password" placeholder="Enter your password" autoComplete='off' onChange={(e) => setDeletePassword(e.target.value)}/>
+                                </div>
+                                <div className="show-password">
+                                    <input type="checkbox" name="" id="" onClick={handleShowPassword}/>
+                                    <span>Show password</span>
+                                </div>
+                                {deletePassword.length != 0 && 
+                                    <button className='submit-btn'>
+                                        Delete
+                                    </button>
+                                }
+                                {deletePassword.length === 0 && 
+                                    <button className='submit-btn error' disabled>
+                                       Delete
+                                    </button>
+                                }
+                            </form>
+                        </div>
+                    }
                     {editPosUserStatusView && 
                         <div className='pos-user-details-container'>
                             <div className='pos-user-nav'>
@@ -535,13 +636,6 @@ const POSUsers = () => {
                                     ></i>
                                 </div>
                             </div>
-                            <div className='guide'>
-                                <p>Guideline for changing the password:</p>
-                                <ul>
-                                    <li>Password must be atleast 8 characters.</li>
-                                    <li>Password and confirm password must match.</li>
-                                </ul>
-                            </div>
                             <form onSubmit={handleEditPosUserPass}>
                                 <div className="form-input">
                                     <label>New Password</label>
@@ -551,12 +645,15 @@ const POSUsers = () => {
                                             setPosUserPassword(e.target.value);
                                         }}
                                     />
-                                    {passwordError && <p className='error'>Password must be at least 8 characters.</p>}
-                                    {(!passwordError && passwordSuccess) &&
-                                        <p className='success'>
-                                            Password is valid.
-                                        </p>
-                                    }
+                                    <div className="guide">
+                                        <ul className="password-guide">
+                                            <li className={posUserPassword !== '' ? (pwHasLowerCase ? 'good' : 'fail') : ''}>One lowercase letter</li>
+                                            <li className={posUserPassword !== '' ? (pwHasUpperCase ? 'good' : 'fail') : ''}>One uppercase letter</li>
+                                            <li className={posUserPassword !== '' ? (pwHasNumber ? 'good' : 'fail') : ''}>One number</li>
+                                            <li className={posUserPassword !== '' ? (pwHasSpecialChar ? 'good' : 'fail') : ''}>One special character</li>
+                                            <li className={posUserPassword !== '' ? (posUserPassword.length >= 8 ? 'good' : 'fail') : ''}>8 characters minimum</li>
+                                        </ul>
+                                    </div>
                                 </div>
                                 <div className="form-input">
                                     <label>Confirm Password</label>
@@ -566,8 +663,11 @@ const POSUsers = () => {
                                             setPosUserConfirmPassword(e.target.value);
                                         }}
                                     />
-                                    {(!samePassword && posUserPassword.length > 0) && <p className='error'>Passwords do not match.</p>}
-                                    {samePassword && <p className='success'>Passwords match.</p>}
+                                    <div className="guide">
+                                        <ul className="password-g">
+                                            <li className={posUserPassword !== '' ? (posUserConfirmPassword === posUserPassword ? 'good' : 'fail') : ''}>Passwords must match.</li>
+                                        </ul>
+                                    </div>
                                 </div>
                                 <div className="show-password">
                                     <input type="checkbox" name="" id="" onClick={handleShowPassword}/>
@@ -666,6 +766,16 @@ const POSUsers = () => {
                                 <p>{selectedPosUser.pos_status === "active" ? "Deactivate" : "Activate"} POS</p>
                                 <i className="fa-solid fa-arrow-right"></i>
                             </div>
+                            {selectedPosUser.pos_status === 'inactive' &&
+                                <div className="change"
+                                    onClick={()=>{
+                                        handleInteractPosUser(selectedPosUser, 'delete');
+                                    }}
+                                >
+                                    <p>Delete POS</p>
+                                    <i className="fa-solid fa-arrow-right"></i>
+                                </div>
+                            }
                         </div>
                     } 
                     {addPosUserView && 
@@ -680,29 +790,20 @@ const POSUsers = () => {
                                     ></i>
                                 </div>
                             </div>
-                            <div className='guide'>
-                                <p>Fill in the form below to add a new POS User.</p>
-                                <ul>
-                                    <li>Name must be unique.</li>
-                                    <li>Password must be atleast 8 characters.</li>
-                                    <li>Password and confirm password must match.</li>
-                                </ul>
-                            </div>
                             <form onSubmit={handleAddPosUser}>
                                 <div className='form-input'>
                                     <label>Name</label>
-                                    <input type="text" value={posUserName} name="" id="name" placeholder="Enter POS Name"
+                                    <input type="text" value={posUserName} name="" id="name" placeholder="Enter POS Name" autoComplete='off'
                                         onChange={(e)=>{
                                             handlePosUserName(e.target.value);
                                             setPosUserName(e.target.value);
                                         }}
                                     />
-                                    {nameError && <p className='error'>Name is already existing.</p>}
-                                    {(!nameError && nameSuccess) &&
-                                        <p className='success'>
-                                            Name is available.
-                                        </p>
-                                    }
+                                    <div className="guide">
+                                        <ul className="password-g">
+                                            <li className={posUserName !== '' ? (!nameError && nameSuccess ? 'good' : 'fail') : ''}>Name must be unique.</li>
+                                        </ul>
+                                    </div>
                                 </div>
                                 <div className="form-input">
                                     <label>Password</label>
@@ -712,12 +813,15 @@ const POSUsers = () => {
                                             setPosUserPassword(e.target.value);
                                         }}
                                     />
-                                    {passwordError && <p className='error'>Password must be at least 8 characters.</p>}
-                                    {(!passwordError && passwordSuccess) &&
-                                        <p className='success'>
-                                            Password is valid.
-                                        </p>
-                                    }
+                                    <div className="guide">
+                                        <ul className="password-guide">
+                                            <li className={posUserPassword !== '' ? (pwHasLowerCase ? 'good' : 'fail') : ''}>One lowercase letter</li>
+                                            <li className={posUserPassword !== '' ? (pwHasUpperCase ? 'good' : 'fail') : ''}>One uppercase letter</li>
+                                            <li className={posUserPassword !== '' ? (pwHasNumber ? 'good' : 'fail') : ''}>One number</li>
+                                            <li className={posUserPassword !== '' ? (pwHasSpecialChar ? 'good' : 'fail') : ''}>One special character</li>
+                                            <li className={posUserPassword !== '' ? (posUserPassword.length >= 8 ? 'good' : 'fail') : ''}>8 characters minimum</li>
+                                        </ul>
+                                    </div>
                                 </div>
                                 <div className="form-input">
                                     <label>Confirm Password</label>
@@ -727,8 +831,11 @@ const POSUsers = () => {
                                             setPosUserConfirmPassword(e.target.value);
                                         }}
                                     />
-                                    {(!samePassword && posUserPassword.length > 0) && <p className='error'>Passwords do not match.</p>}
-                                    {samePassword && <p className='success'>Passwords match.</p>}
+                                    <div className="guide">
+                                        <ul className="password-g">
+                                            <li className={posUserPassword !== '' ? (posUserConfirmPassword === posUserPassword ? 'good' : 'fail') : ''}>Passwords must match.</li>
+                                        </ul>
+                                    </div>
                                 </div>
                                 <div className="show-password">
                                     <input type="checkbox" name="" id="" onClick={handleShowPassword}/>

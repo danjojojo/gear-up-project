@@ -1,12 +1,15 @@
 import './waitlist.scss';
-import React, { useEffect, useState, useCallback } from 'react';
-import PageLayout from '../../components/page-layout/page-layout';
+import React, { useEffect, useState, useCallback, useContext } from 'react';
+import ResponsivePageLayout from '../../components/responsive-page-layout/responsive-page-layout';
 import SearchBar from '../../components/search-bar/search-bar';
 import filter from '../../assets/icons/filter.png';
 import sort from '../../assets/icons/sort.png';
 import arrowUp from "../../assets/icons/arrow-up.png";
 import arrowDown from "../../assets/icons/arrow-down.png";
 import { getWaitlistItems, deleteWaitlistItem } from '../../services/waitlistService';
+import LoadingPage from '../../components/loading-page/loading-page';
+import {Modal, Button} from 'react-bootstrap';
+import { AuthContext } from '../../context/auth-context';
 
 // Parts Form
 import FrameForm from './parts-form/frame-form';
@@ -19,18 +22,101 @@ import CockpitForm from './parts-form/cockpit-form';
 const Waitlist = () => {
     const [items, setItems] = useState([]);
     const [selectedItem, setSelectedItem] = useState(null);
-    const [sortCriteria, setSortCriteria] = useState("name"); // Default sorting by name
-    const [sortOrder, setSortOrder] = useState("asc");
+    const [sortCriteria, setSortCriteria] = useState("date"); // Default sorting by name
+    const [sortOrder, setSortOrder] = useState("desc");
     const [selectedPart, setSelectedPart] = useState("");
     const [searchTerm, setSearchTerm] = useState('');
     const [showFilter, setShowFilter] = useState(false);
     const [showSort, setShowSort] = useState(false);
     const showMiddleSection = showFilter || showSort;
+    const { userRole } = useContext(AuthContext);
+    const [loading, setLoading] = useState(true);
+    const [showDeleteModal, setShowDeleteModal] = useState(false);
+    const [showDeleteResponseModal, setShowDeleteResponseModal] = useState(false);
+    const [showResponseModal, setShowResponseModal] = useState(false);
+
+    function DeleteModal({ onHide, onConfirm, ...props }) {
+        return (
+			<Modal
+				{...props}
+				size="md"
+				aria-labelledby="contained-modal-title-vcenter"
+				centered
+			>
+				<Modal.Header closeButton onClick={onHide}>
+					<Modal.Title id="contained-modal-title-vcenter">
+						Confirmation
+					</Modal.Title>
+				</Modal.Header>
+				<Modal.Body>
+					<p>
+						This bike part will be removed from the waitlist. You can add this back again from the Inventory.
+					</p>
+				</Modal.Body>
+				<Modal.Footer>
+					<Button variant="secondary" onClick={() => {
+							onHide();
+					}}>
+						Cancel
+					</Button>
+					<Button variant="danger" onClick={() => {
+							onConfirm();
+						}}>
+						Remove
+					</Button>
+				</Modal.Footer>
+			</Modal>
+		);
+    }
+
+    function DeleteResponseModal(props) {
+		return (
+			<Modal
+				{...props}
+				size="md"
+				aria-labelledby="contained-modal-title-vcenter"
+				centered
+			>
+				<Modal.Header closeButton>
+					<Modal.Title id="contained-modal-title-vcenter">
+						Message
+					</Modal.Title>
+				</Modal.Header>
+				<Modal.Body>
+					<p>
+						Successfully removed bike part from waitlist.
+					</p>
+				</Modal.Body>
+			</Modal>
+		);
+	}
+
+    function ResponseModal(props) {
+		return (
+			<Modal
+				{...props}
+				size="md"
+				aria-labelledby="contained-modal-title-vcenter"
+				centered
+			>
+				<Modal.Header closeButton>
+					<Modal.Title id="contained-modal-title-vcenter">
+						Message
+					</Modal.Title>
+				</Modal.Header>
+				<Modal.Body>
+					<p>
+						Successfully set specifications. Part is added to the Bike Builder and Upgrader.
+					</p>
+				</Modal.Body>
+			</Modal>
+		);
+	}
 
     // Fetch waitlist items when the component mounts
     const fetchItems = useCallback(async () => {
         try {
-            const data = await getWaitlistItems();
+            const { data, role} = await getWaitlistItems();
 
             // Filter items by selected part
             const filteredItems = data.filter((item) => {
@@ -57,8 +143,10 @@ const Waitlist = () => {
                     return aValue > bValue ? -1 : aValue < bValue ? 1 : 0;
                 }
             });
-
             setItems(sortedItems);
+            setTimeout(() => {
+                setLoading(false);
+            }, 1000);
         } catch (error) {
             console.error("Error fetching waitlist items:", error);
         }
@@ -80,39 +168,79 @@ const Waitlist = () => {
     // Handle click on an item
     const handleItemClick = (item) => {
         setSelectedItem(item);
+        setRightContainerStyle("right-container");
     };
 
     // Handle closing the form
     const handleCloseView = () => {
         setSelectedItem(null);
+        if(window.innerWidth < 900) {
+            setRightContainerStyle("right-container-close");
+        }
     };
 
     // Delete item
     const deleteItem = async (waitlist_item_id) => {
-        const confirmDelete = window.confirm("Are you sure you want to delete this item? This action cannot be undone.");
-
-        if (!confirmDelete) return;
-
         try {
             await deleteWaitlistItem(waitlist_item_id);
-            alert("Item deleted successfully");
-
+            setShowDeleteModal(false);
+            setShowDeleteResponseModal(true);
+            handleCloseView();
             refreshWaitlist();
         } catch (error) {
             console.error("Error deleting item:", error);
             alert("An error occurred while deleting the item");
         }
     }
+    const [isVisible, setIsVisible] = useState(true);
+    const [waitlistContainer, setWaitlistContainer] = useState("waitlist-content");
+    const [rightContainerStyle, setRightContainerStyle] = useState("right-container");
+
+    const handleResize = () => {
+        if (window.innerWidth < 900) {
+            setIsVisible(false);
+            setWaitlistContainer("waitlist-content");
+            setRightContainerStyle("right-container-close");
+        } else {
+            setIsVisible(true);
+            setWaitlistContainer("waitlist-content");
+            setRightContainerStyle("right-container");
+        }
+    }
+
+    useEffect(() => {
+      handleResize();
+      window.addEventListener("resize", handleResize);
+    }, [isVisible]);
+
+    if(loading) return <LoadingPage classStyle={"loading-in-page"}/>
 
     return (
         <div className='waitlist p-3'>
-            <PageLayout
+            <ResponsivePageLayout
+                rightContainer={rightContainerStyle}
                 leftContent={
-                    <div className='waitlist-content'>
+                    <div className={waitlistContainer}>
+                        <DeleteModal
+                            show={showDeleteModal}
+                            onHide={() => setShowDeleteModal(false)}
+                            onConfirm={() => {
+                                deleteItem(selectedItem.waitlist_item_id);
+                            }}
+                        />
+                        <DeleteResponseModal
+                            show={showDeleteResponseModal}
+                            onHide={() => setShowDeleteResponseModal(false)}
+                        />
+                        <ResponseModal
+                            show={showResponseModal}
+                            onHide={() => setShowResponseModal(false)}
+                        />
                         <div className='upper-container d-flex'>
                             <SearchBar
                                 value={searchTerm}
                                 onChange={(e) => setSearchTerm(e.target.value)}
+                                placeholder={"Search waitlisted bike parts"}
                             />
 
                             {/* Toggle filter visibility */}
@@ -132,7 +260,7 @@ const Waitlist = () => {
 
                                     {/* Conditional rendering for Filter section */}
                                     {showFilter && (
-                                        <>
+                                        <div className='filter'>
                                             <div className="title">
                                                 <img src={filter} alt="Filter" className="icon me-2" />
                                                 Filter by:
@@ -144,17 +272,16 @@ const Waitlist = () => {
                                                 value={selectedPart}
                                             >
                                                 <option value="">Bike Parts</option>
-                                                {["Frame", "Fork", "Groupset", "Wheelset", "Seat", "Cockpit",
-                                                    "Headset", "Handlebar", "Stem", "Hubs"].map((parts) => (
+                                                {["Frame", "Fork", "Groupset", "Wheelset", "Seat", "Cockpit"].map((parts) => (
                                                         <option key={parts} value={parts}>{parts}</option>
                                                     ))}
                                             </select>
-                                        </>
+                                        </div>
                                     )}
 
                                     {/* Conditional rendering for Sort section */}
                                     {showSort && (
-                                        <>
+                                        <div className='sort'>
                                             <div className="title">
                                                 <img src={sort} alt="Sort" className="icon me-2" />
                                                 Sort by:
@@ -182,37 +309,37 @@ const Waitlist = () => {
                                                     <img src={arrowUp} alt="Sort Ascending" />
                                                 )}
                                             </button>
-                                        </>
+                                        </div>
                                     )}
                                 </div>
                             </div>
                         )}
 
                         <div className='lower-container'>
-                            <div className='lower-content'>
-                                <div className="item-container-title d-flex p-4 bg-secondary">
-                                    <div className="item-name fw-bold text-light">
-                                        Item Name
-                                    </div>
-
-                                    <div className="bike-part fw-bold text-light">
-                                        Bike Part
-                                    </div>
-
-                                    <div className="date fw-bold text-light">
-                                        Date Added
-                                    </div>
-
-                                    <div className="time fw-bold text-light">
-                                        Time Added
-                                    </div>
+                            <div className="item-container-title d-flex">
+                                <div className="item-name">
+                                    Item Name
                                 </div>
+
+                                <div className="bike-part">
+                                    Bike Part
+                                </div>
+
+                                <div className="date">
+                                    Date Added
+                                </div>
+
+                                <div className="time">
+                                    Time Added
+                                </div>
+                            </div>
+                            <div className='lower-content'>
 
                                 {filteredItems.length > 0 ? (
                                     filteredItems.map((item) => (
                                         <div
                                             key={item.waitlist_item_id}
-                                            className="item-container d-flex p-4"
+                                            className="item-container d-flex"
                                             onClick={() => handleItemClick(item)} // Add click handler
                                         >
                                             <div className="item-name fw-bold">
@@ -236,7 +363,7 @@ const Waitlist = () => {
                                     ))
                                 ) : (
                                     <div className='no-item'>
-                                        No items in the waitlist
+                                        <p>No items in the waitlist</p>
                                     </div>
                                 )}
                             </div>
@@ -256,6 +383,9 @@ const Waitlist = () => {
                                     onClose={handleCloseView}
                                     refreshWaitlist={refreshWaitlist}
                                     deleteItem={deleteItem}
+                                    role={userRole}
+                                    setShowDeleteModal={setShowDeleteModal}
+                                    setShowResponseModal={setShowResponseModal}
                                 />
                             )}
 
@@ -268,6 +398,9 @@ const Waitlist = () => {
                                     onClose={handleCloseView}
                                     refreshWaitlist={refreshWaitlist}
                                     deleteItem={deleteItem}
+                                    role={userRole}
+                                    setShowDeleteModal={setShowDeleteModal}
+                                    setShowResponseModal={setShowResponseModal}
                                 />
                             )}
 
@@ -280,6 +413,9 @@ const Waitlist = () => {
                                     onClose={handleCloseView}
                                     refreshWaitlist={refreshWaitlist}
                                     deleteItem={deleteItem}
+                                    role={userRole}
+                                    setShowDeleteModal={setShowDeleteModal}
+                                    setShowResponseModal={setShowResponseModal}
                                 />
                             )}
 
@@ -292,6 +428,9 @@ const Waitlist = () => {
                                     onClose={handleCloseView}
                                     refreshWaitlist={refreshWaitlist}
                                     deleteItem={deleteItem}
+                                    role={userRole}
+                                    setShowDeleteModal={setShowDeleteModal}
+                                    setShowResponseModal={setShowResponseModal}
                                 />
                             )}
 
@@ -304,6 +443,9 @@ const Waitlist = () => {
                                     onClose={handleCloseView}
                                     refreshWaitlist={refreshWaitlist}
                                     deleteItem={deleteItem}
+                                    role={userRole}
+                                    setShowDeleteModal={setShowDeleteModal}
+                                    setShowResponseModal={setShowResponseModal}
                                 />
                             )}
 
@@ -316,13 +458,19 @@ const Waitlist = () => {
                                     onClose={handleCloseView}
                                     refreshWaitlist={refreshWaitlist}
                                     deleteItem={deleteItem}
+                                    role={userRole}
+                                    setShowDeleteModal={setShowDeleteModal}
+                                    setShowResponseModal={setShowResponseModal}
                                 />
                             )}
 
                         </div>
                     ) : (
                         <div className="no-selection">
-                            Select an item to view details
+                            <h4>Waitlist</h4>
+                            <p>
+                                Select a waitlisted bike part to set specifications.
+                            </p>
                         </div>
                     )
                 }

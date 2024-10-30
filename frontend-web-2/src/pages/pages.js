@@ -9,6 +9,7 @@ import BikeBuilder from "./bike-builder/bike-builder";
 import BikeUpgrader from "./bike-upgrader/bike-upgrader";
 
 import Cart from "./cart/cart";
+import Checkout from "./checkout/checkout";
 
 const Pages = {
 
@@ -34,7 +35,10 @@ const Pages = {
     BikeUpgrader,
     
     // Cart Page
-    Cart
+    Cart,
+
+    // Checkout Page
+    Checkout
 
 };
 

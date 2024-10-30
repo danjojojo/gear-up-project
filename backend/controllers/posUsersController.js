@@ -1,4 +1,5 @@
 const bcrypt = require('bcrypt');
+const jwt = require('jsonwebtoken');
 const { v4: uuidv4 } = require('uuid');
 const pool = require('../config/db');
 require('dotenv').config();
@@ -12,6 +13,7 @@ const getPosUsers = async (req, res) => {
         const query = `
             SELECT pos_id, pos_name, pos_status, date_created, date_updated 
             FROM pos_users
+            WHERE is_deleted = false
             ORDER BY date_created DESC;
         `
         const { rows } = await pool.query(query);
@@ -114,10 +116,45 @@ const editPosUserStatus = async (req, res) => {
     }
 }
 
+const deletePosUser = async (req, res) => {
+    try {
+        const token = req.cookies.token;
+        const verifedToken = jwt.verify(token, process.env.JWT_SECRET);
+        const email = verifedToken.email;
+
+        const { id } = req.params;
+        console.log(id);
+        const {password} = req.body;
+        let passwordError = false;
+        
+        const { rows } = await pool.query('SELECT * FROM admin WHERE admin_email = $1', [email]);
+        if (!rows.length) return res.status(400).json({ error: 'User not found' });
+        
+        const user = rows[0];
+        const isValid = await bcrypt.compare(password, user.admin_password);
+        if (!isValid) {
+            passwordError = true;
+            res.status(201).json({ message: 'Incorrect password', passwordError : passwordError });
+        } else {
+            const query = `
+                UPDATE pos_users
+                SET is_deleted = true, date_updated = NOW()
+                WHERE pos_id = $1
+            `
+            const values = [id];
+            await pool.query(query, values);
+            res.status(201).json({ message: 'User deleted successfully', passwordError : passwordError });
+        }
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+}
+
 module.exports = {
     getPosUsers,
     addPosUser,
     editPosUserName,
     editPosUserPassword,
-    editPosUserStatus
+    editPosUserStatus,
+    deletePosUser
 }

@@ -5,8 +5,7 @@
         display: flex;
         align-items: center;
         gap: 2rem;
-        padding: 15px;
-        font-family: "Poppins";
+        padding: 10px;
         padding-left: 100px;
 
         .nav-link {
@@ -21,12 +20,14 @@
         display: flex;
         align-items: center;
         gap: 3rem;
-        padding: 15px;
+        padding: 20px;
         font-family: "Poppins";
         padding-left: 100px;
         padding-right: 100px;
-        height: 100px;
-        background-color: #205375;
+        // height: 100px;
+        background-color: #2E2E2E;
+        border-bottom: 1px solid white;
+
         h2 {
             margin: 0;
         }
@@ -35,6 +36,12 @@
             text-decoration: none;
             font-size: 20px;
             color: white;
+            padding: 5px 10px;
+
+            &:hover {
+                background-color: #F9961F;
+                border-radius: 10px;
+            }
         }
 
         .add-to-cart {

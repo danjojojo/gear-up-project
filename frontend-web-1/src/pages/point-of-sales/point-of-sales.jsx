@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { NumericFormat } from "react-number-format";
 import { getAllItems, getAllMechanics, confirmSale } from "../../services/posService";
 import LoadingPage from "../../components/loading-page/loading-page";
+import SearchBar from "../../components/search-bar/search-bar";
 
 const PointOfSales = () => {
   const [error, setError] = useState(null)
@@ -111,7 +112,6 @@ const PointOfSales = () => {
         );
 
         setItemsList(updatedItems);
-        persistItems(updatedItems);
         setRetrievedItemsList(updatedRetrievedItems);
       } else {
         const newItemList = [...items, newItem];
@@ -126,7 +126,6 @@ const PointOfSales = () => {
         );
 
         setItemsList(newItemList);
-        persistItems(newItemList);
         setRetrievedItemsList(updatedRetrievedItems);
       }
       setMechanicAdded(false);
@@ -137,7 +136,6 @@ const PointOfSales = () => {
       return itemIndex !== index;
     });
     setItemsList(newItemList);
-    persistItems(newItemList);
   }
   function updateItemQty(existingItem, value) {
     const updatedItems = items.map((item) => {
@@ -162,7 +160,6 @@ const PointOfSales = () => {
       return retrievedItem;
     });
     setItemsList(updatedItems);
-    persistItems(updatedItems);
     setRetrievedItemsList(updatedRetrievedItems);
   }
   function removeItem(existingItem) {
@@ -194,11 +191,9 @@ const PointOfSales = () => {
             : mechanic
         );
         setMechanicsList(updatedMechanics);
-        persistMechanics(updatedMechanics);
       } else {
         const newMechanicsList = [...mechanics, newMechanic]; // Ensure the new mechanic price is a number
         setMechanicsList(newMechanicsList);
-        persistMechanics(newMechanicsList);
       }
       setCheckOutListView("mechanics");
       setMechanicAdded(false);
@@ -212,7 +207,6 @@ const PointOfSales = () => {
       return mechanicIndex !== index;
     });
     setMechanicsList(newMechanicsList);
-    persistMechanics(newMechanicsList);
   }
 
   // FOR CHECKOUT AND REVIEW ORDER
@@ -430,46 +424,6 @@ const PointOfSales = () => {
     window.addEventListener("resize", handleResize);
   }, [isVisible]);
 
-  // FUNCTIONS FOR PERSISTING ITEMS AND MECHANICS IN CHECKOUT PAGE
-  function persistItems(newList) {
-    try {
-      localStorage.setItem("items", JSON.stringify({ items: newList }));
-      console.log("added to local items");
-    } catch (e) {
-      console.error("Error saving items to localStorage", e);
-    }
-  }
-  function persistMechanics(newList) {
-    try {
-      localStorage.setItem("mechanics", JSON.stringify({ mechanics: newList }));
-      console.log("added to local mechanics");
-    } catch (e) {
-      console.error("Error saving mechanics to localStorage", e);
-    }
-  }
-
-  // PERSIST LOCAL STORAGE
-  useEffect(() => {
-    if (!localStorage) return;
-
-    let localItems = localStorage.getItem("items");
-    let localMechanics = localStorage.getItem("mechanics");
-
-    if (localItems) {
-      localItems = JSON.parse(localItems).items;
-      setItemsList(localItems);
-    } else {
-      setItemsList([]); // Initialize empty array if no local items
-    }
-
-    if (localMechanics) {
-      localMechanics = JSON.parse(localMechanics).mechanics;
-      setMechanicsList(localMechanics);
-    } else {
-      setMechanicsList([]); // Initialize empty array if no local mechanics
-    }
-  }, []);
-
   // DISPLAY LOADING
   if(loading) return <LoadingPage classStyle="loading-in-page"/>
 
@@ -510,24 +464,21 @@ const PointOfSales = () => {
                 </div>
               </div>
               <div className="search-sorting">
-                <div className="search-bar">
-                  <input
-                    type="text"
+                <SearchBar
                     value={tab === "items" ? searchItem : searchMechanic}
                     onChange={(e) => {
-                      if (tab === "items") {
-                        console.log(e.target.value);
-                        setSearchItem(e.target.value);
-                        searchForItem(e.target.value);
-                      } else {
-                        console.log(e.target.value);
-                        setSearchMechanic(e.target.value);
-                        searchForMechanic(e.target.value);
-                      }
+                        if (tab === "items") {
+                          console.log(e.target.value);
+                          setSearchItem(e.target.value);
+                          searchForItem(e.target.value);
+                        } else {
+                          console.log(e.target.value);
+                          setSearchMechanic(e.target.value);
+                          searchForMechanic(e.target.value);
+                        }
                     }}
                     placeholder={`Search for ${tab} here`}
-                  />
-                </div>
+                />
                 <div className="sorting">
                   {tab === "items" && (
                     <div className="sort-tabs">
@@ -541,10 +492,10 @@ const PointOfSales = () => {
                           }
                         }}
                       >
-                        {!sortItemNameDESCClicked && (
+                        {sortItemNameDESCClicked && (
                           <i className="fa-solid fa-arrow-down-a-z"></i>
                         )}
-                        {sortItemNameDESCClicked && (
+                        {!sortItemNameDESCClicked && (
                           <i className="fa-solid fa-arrow-down-z-a"></i>
                         )}
                       </button>
@@ -857,6 +808,7 @@ const PointOfSales = () => {
                 {/* LIST IN REVIEW ORDER */}
                 <div className="payment-list-items">
                   {/* ITEMS LIST */}
+                  {/* <strong>{item.name}</strong> */}
                   {items.length !== 0 && (
                     <p className="title">
                       {totalItemsQty} {totalItemsQty > 1 ? "Items" : "Item"}
@@ -867,8 +819,9 @@ const PointOfSales = () => {
                       <div className="payment-list-item" key={itemIndex}>
                         <div className="left">
                           <p>
-                            {item.name} x{item.qty}
+                            {item.name} 
                           </p>
+                          <p><em>Qty: {item.qty}</em></p>
                         </div>
                         <div className="right">
                           <p className="item-price">
@@ -962,6 +915,7 @@ const PointOfSales = () => {
                         decimalScale={2}
                         fixedDecimalScale={true}
                         prefix={"₱"}
+                        minimumValue={1}
                         allowNegative={false}
                         value={mechanicSelected.price}
                         onValueChange={(values) => {
@@ -991,7 +945,7 @@ const PointOfSales = () => {
                       </button>
                     )}
 
-                    {mechanicSelected.edit === "no" && (
+                    {mechanicSelected.edit === "no" && mechanicSelected.price > 0 && (
                       <button
                         onClick={() => {
                           addMechanic({

@@ -6,6 +6,7 @@ import Pages from './pages/pages';
 import { AuthProvider, AuthContext } from './context/auth-context';
 import { checkAdminExists } from './services/authService';
 import LoadingPage from './components/loading-page/loading-page';
+import 'react-image-crop/src/ReactCrop.scss';
 
 function App() {
   const [adminExists, setAdminExists] = useState(null);

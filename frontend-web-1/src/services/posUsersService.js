@@ -61,3 +61,17 @@ export const editPosUserStatus = async (posID, posUserStatus) => {
         throw error;
     }
 }
+
+export const deletePosUser = async (posID, posUserData) => {
+    try {
+        const response = await api.put(`/pos-users/delete-pos-user/${posID}`, posUserData, {
+            headers: {
+                'Content-Type': 'multipart/form-data',
+            }
+        });
+        return response.data;
+    } catch (error) {
+        console.error("Error deleting pos user", error);
+        throw error;
+    }
+}
