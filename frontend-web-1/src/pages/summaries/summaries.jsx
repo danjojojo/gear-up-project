@@ -301,7 +301,7 @@ const Summaries = () => {
                                             <p className="right">({netExpenses})</p>
                                         </div>
                                         <div className="net">
-                                            <p className="left">Net Profit</p>
+                                            <p className="left">Net Revenue</p>
                                             <p className={netProfit === 0 ? "right" : (netProfit > 0 ? "right green" : "right red")}>{PesoFormat.format(netProfit)}</p>
                                         </div>
                                     </div>

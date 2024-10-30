@@ -54,8 +54,8 @@ const Checkout = () => {
         console.log(name, email, phone, address);
         const retrievedLineItems = getLineItems();
         console.log(retrievedLineItems);
-        // const checkoutUrl = await createCheckoutSession(name, email, phone, address, retrievedLineItems);
-        // window.location.href = checkoutUrl;
+        const checkoutUrl = await createCheckoutSession(name, email, phone, address, retrievedLineItems);
+        window.location.href = checkoutUrl;
     }
 
     // Retrieve name, email, phone, address from local storage

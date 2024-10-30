@@ -141,7 +141,7 @@ const Dashboard = () => {
 
     const selectLBFilter = () => (
         <select name="leaderboardFilter" id="leaderboardFilter" className='filter' onChange={(e) => handleLeaderBoardFilter(e.target.value)}>
-            <option value="today">Calendar</option>
+            <option value="today">Today</option>
             <option value="week">This week</option>
             <option value="month">This month</option>
             <option value="all">All time</option>
@@ -318,8 +318,15 @@ const Dashboard = () => {
                 <div className='lower-container'>
                     <div className='content'>
                         <h3>Overview</h3>
-                        <Bar className='canvas'
-                            data={chartData}
+                        <Bar
+                            className='canvas'
+                            data={{
+                                ...chartData,
+                                datasets: chartData.datasets.map(dataset => ({
+                                    ...dataset,
+                                    backgroundColor: '#F9961F'  // Apply dark color directly to dataset
+                                }))
+                            }}
                             options={{
                                 scales: {
                                     x: {
@@ -369,7 +376,6 @@ const Dashboard = () => {
                                 },
                                 elements: {
                                     bar: {
-                                        backgroundColor: "#2E2E2E",  // Dark color for bars
                                         borderRadius: {
                                             topLeft: 3,  // Rounded top corners
                                             topRight: 3,
@@ -388,7 +394,7 @@ const Dashboard = () => {
                         <div className="summary-content">
 
                             <div className='title'>
-                                <h3> Daily Summary</h3>
+                                <h3> Today's Summary</h3>
                             </div>
                             <div className='upper-content'>
                                 <div className='main-content'>
@@ -412,11 +418,11 @@ const Dashboard = () => {
                                     </div>
                                     <div className="four">
                                         <div className="green">
-                                            <p className="left">Net Sales</p>
+                                            <p className="left">Receipt Sales</p>
                                             <p className="right">{netSales + netLabor}</p>
                                         </div>
                                         <div className="red">
-                                            <p className="left">Labor</p>
+                                            <p className="left">Labor Cost</p>
                                             <p className="right">({netLabor})</p>
                                         </div>
                                         <div className="red">
@@ -424,7 +430,7 @@ const Dashboard = () => {
                                             <p className="right">({netExpenses})</p>
                                         </div>
                                         <div className="net">
-                                            <p className="left">Net Profit</p>
+                                            <p className="left">Net Revenue</p>
                                             <p className={netProfit === 0 ? "right" : (netProfit > 0 ? "right green" : "right red")}>{PesoFormat.format(netProfit)}</p>
                                         </div>
                                     </div>
