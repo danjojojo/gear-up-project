@@ -45,7 +45,7 @@ const AuthProvider = ({ children }) => {
   useEffect(() => {
     fetchRole();
     // Periodic token refresh (e.g., every 50 minutes)
-    const interval = setInterval(() => handleTokenRefresh(), 1 * 60 * 1000);
+    const interval = setInterval(() => handleTokenRefresh(), 50 * 60 * 1000);
     return () => clearInterval(interval);
   }, []);
 
