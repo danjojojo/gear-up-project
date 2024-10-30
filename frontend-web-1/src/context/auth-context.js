@@ -1,40 +1,53 @@
 import React, { createContext, useEffect, useState } from 'react';
-import { login, loginPOS, getMyRole, logoutUser, getMyName } from '../services/authService';
+import { login, loginPOS, getMyRole, logoutUser, getMyName, refreshToken } from '../services/authService';
+// import { setupAxiosInterceptors } from '../services/api';
 
 const AuthContext = createContext();
 
 const AuthProvider = ({ children }) => {
   const [userRole, setUserRole] = useState(null);
   const [authenticated, setAuthenticated] = useState(false);
-  const [loading, setLoading] = useState(true);  // New loading state
-  const [error, setError] = useState(null);  // Error state to handle login errors
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
   const [userName, setUserName] = useState(null);
 
-  useEffect(() => {
-    const fetchRole = async () => {
-      try {
-        const role = await getMyRole();
-        const name = await getMyName();
-        setUserRole(role);
-        setUserName(name);
-        setAuthenticated(true);
-        setLoading(false);
-      } catch (error) {
-        setUserRole(null);
-        setAuthenticated(false);
-      } 
-      finally {
-        setTimeout(() => setLoading(false), 1000);  // Ensure loading is set to false after fetching role
+  const handleTokenRefresh = async () => {
+    try {
+      await refreshToken(); // Call to refresh the token
+      const role = await getMyRole(); // Retry fetching the role after refresh
+      console.log('Token refreshed successfully');
+      setUserRole(role);
+      setAuthenticated(true);
+    } catch (error) {
+      console.error('Failed to refresh token:', error);
+    }
+  };
+
+  const fetchRole = async () => {
+    try {
+      const role = await getMyRole();
+      const name = await getMyName();
+      setUserRole(role);
+      setUserName(name);
+      setAuthenticated(true);
+    } catch (error) {
+      if (error.response && error.response.status === 401) {
+        // If access token expired, attempt to refresh the token
+        await handleTokenRefresh();
+      } else {
+        console.log('Failed role fetch');
       }
-    };
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
     fetchRole();
-    // Mounted
-    // Restart
-
-
-  }, []);  // Ensure this only runs on mount
-
-
+    // Periodic token refresh (e.g., every 50 minutes)
+    const interval = setInterval(() => handleTokenRefresh(), 1 * 60 * 1000);
+    return () => clearInterval(interval);
+  }, []);
 
   const loginAdmin = async (email, password) => {
     try {
@@ -53,8 +66,7 @@ const AuthProvider = ({ children }) => {
       setAuthenticated(false);
       throw error;  // Throw the error so it's caught and handled in the login component
     }
-};
-
+  };
 
   const loginPOSUser = async (id, password) => {
     try {
@@ -73,8 +85,8 @@ const AuthProvider = ({ children }) => {
     } catch (error) {
       setUserRole(null);
       setAuthenticated(false);
-      setError('Login failed. Please check your credentials.');  // Set error message on failure
-    } 
+      setError('Login failed. Please check your credentials.');
+    }
   };
 
   const logout = async () => {
@@ -82,17 +94,14 @@ const AuthProvider = ({ children }) => {
       await logoutUser();
       setLoading(true);
       setTimeout(() => {
-        setLoading(false)
+        setLoading(false);
         setUserRole(null);
         setAuthenticated(false);
         setUserName(null);
       }, 1000);
       localStorage.removeItem("pageTitle");
-      // setTimeout(() => {
-      //   window.location.reload()
-      // }, 1000);  // Reload the page after logout
     } catch (error) {
-      throw error;
+      console.error('Logout failed:', error);
     }
   };
 

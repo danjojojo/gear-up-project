@@ -11,17 +11,19 @@ export const setupAxiosInterceptors = (setShowModal) => {
   api.interceptors.response.use(
     response => response,
     error => {
-      if (error.response && (error.response.status === 403 || error.response.status === 401)) {
+      if (
+        error.response &&
+        (error.response.status === 401 || error.response.status === 403) ||
+        error.response.data.message === 'Access token expired. Please use the refresh token to obtain a new access token.'
+      ) {
         if (!alertShown) {
-          setShowModal(true); 
-          alertShown = true; 
+          setShowModal(true); // Display the modal
+          alertShown = true; // Prevent multiple alerts
         }
       }
-
       return Promise.reject(error);
     }
   );
 };
-
 
 export default api;

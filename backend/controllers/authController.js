@@ -4,6 +4,9 @@ const jwt = require('jsonwebtoken');
 const pool = require('../config/db');
 require('dotenv').config();
 
+const accessTokenRefresh = '1h';
+const refreshTokenRefresh = '7d';
+
 const checkAdminExists = async (req, res) => {
   try {
     const { rowCount } = await pool.query('SELECT * FROM admin');
@@ -52,7 +55,22 @@ const loginUser = async (req, res) => {
     const isValid = await bcrypt.compare(password, user.admin_password);
     if (!isValid) return res.status(400).json({ error: 'Invalid password' });
 
-    const token = jwt.sign({ admin_id: user.admin_id, email: user.admin_email, name: user.admin_name, role: user.role }, process.env.JWT_SECRET, { expiresIn: '1h' });
+    const token = jwt.sign({ admin_id: user.admin_id, email: user.admin_email, name: user.admin_name, role: user.role }, process.env.JWT_SECRET, { expiresIn: accessTokenRefresh });
+
+    // Create refresh token (long-lived)
+    const refreshToken = jwt.sign(
+      { admin_id: user.admin_id },
+      process.env.JWT_REFRESH_SECRET,
+      { expiresIn: refreshTokenRefresh } // Refresh token expires in 7 days
+    );
+
+    // Store refresh token in HttpOnly cookie
+    res.cookie('refreshToken', refreshToken, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'Strict',
+      maxAge: 7 * 24 * 60 * 60 * 1000 // 7 days
+    });
 
     res.cookie('token', token, {
       httpOnly: true, // httpOnly ensures JavaScript can't access this cookie
@@ -96,8 +114,23 @@ const loginPOS = async (req, res) => {
     const token = jwt.sign(
       { pos_id: user.pos_id, name: user.pos_name, role: user.role, logId },
       process.env.JWT_SECRET,
-      { expiresIn: '1h' }
+      { expiresIn: accessTokenRefresh }
     );
+
+    // Create refresh token (long-lived)
+    const refreshToken = jwt.sign(
+      { pos_id: user.pos_id },
+      process.env.JWT_REFRESH_SECRET,
+      { expiresIn: refreshTokenRefresh } // Refresh token expires in 7 days
+    );
+
+    // Store refresh token in HttpOnly cookie
+    res.cookie('refreshToken', refreshToken, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'Strict',
+      maxAge: 7 * 24 * 60 * 60 * 1000 // 7 days
+    });
 
     res.cookie('token', token, {
       httpOnly: true, // httpOnly ensures JavaScript can't access this cookie
@@ -120,12 +153,12 @@ const loginPOS = async (req, res) => {
 };
 
 const getMyRole = async (req, res) => {
-  res.json({ role: req.user.role });
+  res.json({ role: req.cookies.role });
 }
 
 const getMyName = async (req, res) => {
   try {
-    const role = req.user.role;
+    const role = req.cookies.role;
     if (role === 'staff') {
       const { rows } = await pool.query(
         "SELECT pos_name FROM pos_users WHERE pos_id = $1",
@@ -161,8 +194,39 @@ const logoutUser = (req, res) => {
 
   // Clear the token and any other relevant cookies
   res.clearCookie('token', { httpOnly: true, sameSite: 'Strict', secure: process.env.NODE_ENV === 'production' });
+  res.clearCookie('refreshToken', { httpOnly: true, sameSite: 'Strict', secure: process.env.NODE_ENV === 'production' });
   res.clearCookie('role');  // If you're storing the role in a separate cookie
   res.status(200).json({ message: 'Logged out successfully' });
+};
+
+const refreshToken = (req, res) => {
+  const refreshToken = req.cookies.refreshToken;
+  if (!refreshToken) return res.status(401).json({ error: 'Refresh Token required' });
+
+  try {
+    console.log(req.cookies.role);
+    // Verify refresh token
+    const decoded = jwt.verify(refreshToken, process.env.JWT_REFRESH_SECRET);
+
+    // Create a new access token
+    const accessToken = jwt.sign(
+      { pos_id: decoded.pos_id, role: decoded.role },
+      process.env.JWT_SECRET,
+      { expiresIn: accessTokenRefresh }
+    );
+
+    // Return the new access token
+    res.cookie('token', accessToken, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'Strict',
+      maxAge: 3600000 // 1 hour expiration
+    });
+
+    res.json({ message: 'Access token refreshed' });
+  } catch (err) {
+    res.status(403).json({ error: err.message });
+  }
 };
 
 // Logs the user's login and returns the log_id for this session
@@ -196,5 +260,6 @@ module.exports = {
   loginPOS,
   getMyRole,
   getMyName,
-  logoutUser
+  logoutUser,
+  refreshToken
 };

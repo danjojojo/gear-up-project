@@ -9,7 +9,8 @@ const {
   checkAdminExists,
   getMyRole,
   getMyName,
-  logoutUser
+  logoutUser,
+  refreshToken
 } = require("../controllers/authController");
 
 router.get('/admin-check', checkAdminExists);
@@ -27,5 +28,7 @@ router.get('/me', verifyToken, getMyRole);
 router.get('/my-name', verifyToken, getMyName);
 
 router.post('/logout', logoutUser);
+
+router.post('/refresh-token', refreshToken);
 
 module.exports = router;

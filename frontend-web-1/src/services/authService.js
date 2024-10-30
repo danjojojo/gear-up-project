@@ -88,3 +88,16 @@ export const getMyName = async () => {
     throw error;
   }
 }
+
+
+// Refresh the access token
+export const refreshToken = async () => {
+  try {
+    // Calls the /refresh-token endpoint to request a new access token
+    const response = await api.post('/auth/refresh-token');
+    return response.data; // Return data to indicate refresh success
+  } catch (error) {
+    console.error('Error refreshing token:', error);
+    throw error;
+  }
+}
