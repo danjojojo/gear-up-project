@@ -17,7 +17,7 @@ const getPosUsers = async (req, res) => {
             ORDER BY date_created DESC;
         `
         const { rows } = await pool.query(query);
-        res.status(201).json({ posUsers: rows});
+        res.status(201).json({ posUsers: rows });
     } catch (error) {
         res.status(500).json({ error: error.message });
     }
@@ -36,7 +36,7 @@ const addPosUser = async (req, res) => {
         const posPassword = password;
         const hashedPassword = await bcrypt.hash(posPassword, 10);
         const posStatus = "active"
-        console.log(name); 
+        console.log(name);
         console.log(password);
 
         const query = `
@@ -61,20 +61,29 @@ const editPosUserName = async (req, res) => {
         console.log(id);
         console.log(name);
 
-        const query = `
+        // Update the `pos_name` in `pos_users`
+        const userUpdateQuery = `
             UPDATE pos_users
             SET pos_name = $1, date_updated = NOW()
             WHERE pos_id = $2
-        `
+        `;
+        const userValues = [name, id];
+        await pool.query(userUpdateQuery, userValues);
 
-        const values = [name, id];
-        await pool.query(query, values);
+        // Update the `pos_name` in `pos_logs` for all logs with the given `pos_id`
+        const logUpdateQuery = `
+            UPDATE pos_logs
+            SET pos_name = $1
+            WHERE pos_id = $2
+        `;
+        const logValues = [name, id];
+        await pool.query(logUpdateQuery, logValues);
 
-        res.status(201).json({ message: 'User edited successfully' });
+        res.status(201).json({ message: 'User name updated successfully in both pos_users and pos_logs' });
     } catch (error) {
         res.status(500).json({ error: error.message });
     }
-}
+};
 
 const editPosUserPassword = async (req, res) => {
     try {
@@ -100,8 +109,8 @@ const editPosUserPassword = async (req, res) => {
 const editPosUserStatus = async (req, res) => {
     try {
         const token = req.cookies.token;
-        const {id} = req.params;
-        const {status} = req.body;
+        const { id } = req.params;
+        const { status } = req.body;
         console.log(status);
         const query = `
             UPDATE pos_users
@@ -124,17 +133,17 @@ const deletePosUser = async (req, res) => {
 
         const { id } = req.params;
         console.log(id);
-        const {password} = req.body;
+        const { password } = req.body;
         let passwordError = false;
-        
+
         const { rows } = await pool.query('SELECT * FROM admin WHERE admin_email = $1', [email]);
         if (!rows.length) return res.status(400).json({ error: 'User not found' });
-        
+
         const user = rows[0];
         const isValid = await bcrypt.compare(password, user.admin_password);
         if (!isValid) {
             passwordError = true;
-            res.status(201).json({ message: 'Incorrect password', passwordError : passwordError });
+            res.status(201).json({ message: 'Incorrect password', passwordError: passwordError });
         } else {
             const query = `
                 UPDATE pos_users
@@ -143,12 +152,61 @@ const deletePosUser = async (req, res) => {
             `
             const values = [id];
             await pool.query(query, values);
-            res.status(201).json({ message: 'User deleted successfully', passwordError : passwordError });
+            res.status(201).json({ message: 'User deleted successfully', passwordError: passwordError });
         }
     } catch (error) {
         res.status(500).json({ error: error.message });
     }
 }
+
+const getPosUsersLogs = async (req, res) => {
+    try {
+        const { date } = req.query; // Get the date from the query parameter
+        const selectedDate = date || new Date().toISOString().split('T')[0]; // Use current date if no date is provided
+
+        const query = `
+            SELECT 
+                log_id,
+                pos_name,
+                login_time,
+                logout_time
+            FROM 
+                pos_logs
+            WHERE 
+                DATE(login_time) = $1
+            ORDER BY 
+                login_time DESC;
+        `;
+
+        const { rows } = await pool.query(query, [selectedDate]); // Pass the selected date to the query
+        res.json({ logs: rows }); // Send the result as JSON response
+    } catch (error) {
+        console.error('Error fetching POS user logs:', error.message);
+        console.error(error.stack);
+        res.status(500).json({ error: 'Failed to fetch POS user logs' });
+    }
+};
+
+const getPosLogsDates = async (req, res) => {
+    try {
+        const query = `
+            SELECT DISTINCT DATE(login_time) AS log_date
+            FROM pos_logs
+            ORDER BY log_date DESC;
+        `;
+
+        const { rows } = await pool.query(query);
+
+        // Extract dates and send as an array of dates
+        const dates = rows.map(row => row.log_date);
+        res.json({ dates }); // Send the result as JSON response with only dates
+    } catch (error) {
+        console.error('Error fetching POS logs dates:', error.message);
+        console.error(error.stack);
+        res.status(500).json({ error: 'Failed to fetch POS logs dates' });
+    }
+};
+
 
 module.exports = {
     getPosUsers,
@@ -156,5 +214,7 @@ module.exports = {
     editPosUserName,
     editPosUserPassword,
     editPosUserStatus,
-    deletePosUser
+    deletePosUser,
+    getPosUsersLogs,
+    getPosLogsDates
 }
