@@ -240,10 +240,11 @@ const Inventory = () => {
         setFunctionKey('add');
         setAddedItemName(itemName);
 
+        let costOfItem = 0;
         const itemData = new FormData();
         itemData.append("itemName", itemName);
         itemData.append("itemPrice", parseFloat(itemPrice));
-        itemData.append("itemCost", parseFloat(itemCost));
+        itemData.append("itemCost", parseFloat(costOfItem));
         itemData.append("stock", parseInt(stockInput, 10));
         itemData.append("category", category);
         itemData.append("lowStockAlert", lowStockAlert ? "true" : "false");
@@ -358,10 +359,11 @@ const Inventory = () => {
         event.preventDefault();
         setFunctionKey('edit');
 
+        let costOfItem = 0;
         const updatedData = new FormData();
         updatedData.append("itemName", selectedItem.item_name);
         updatedData.append("itemPrice", parseFloat(selectedItem.item_price));
-        updatedData.append("itemCost", parseFloat(selectedItem.item_cost));
+        updatedData.append("itemCost", parseFloat(costOfItem));
         updatedData.append("stock", parseInt(selectedItem.stock_count, 10));
         updatedData.append("category", selectedItem.category_name);
         updatedData.append(
@@ -902,9 +904,10 @@ const Inventory = () => {
                                     </div>
 
                                     <div className="item-cost form-group">
-                                        <label htmlFor="item-cost">Cost</label>
+                                        {/* HIDDEN FOR NOW */}
+                                        {/* <label htmlFor="item-cost">Cost</label> */}
                                         <input
-                                            type="text"
+                                            type="hidden"
                                             id="item-cost"
                                             name="itemCost"
                                             value={selectedItem.item_cost === 0 ? "" : selectedItem.item_cost || ""} // Show placeholder when cost is 0 or empty
@@ -920,7 +923,7 @@ const Inventory = () => {
                                             }}
                                             placeholder="Enter item cost"
                                             disabled={!isEditing}
-                                            required
+                                            // required
                                         />
                                     </div>
 
@@ -1185,22 +1188,24 @@ const Inventory = () => {
                                         </div>
 
                                         <div className="item-cost form-group">
-                                            <label htmlFor="item-cost-add">Cost</label>
-                                            <input
-                                                type="text"
+                                            {/* Hidden */}
+                                            {/* <label htmlFor="item-cost-add">Cost</label> */}
+                                            {/* <input
+                                                type="hidden"
                                                 id="item-cost-add"
                                                 name="itemCost"
-                                                value={itemCost === 0 ? "" : itemCost} // Display empty string when value is 0
+                                                // value={itemCost === 0 ? "" : itemCost} // Display empty string when value is 0
                                                 onChange={(e) => {
-                                                    const value = e.target.value;
-                                                    // Allow empty input or valid numbers (>= 0)
-                                                    if (value === "" || (!isNaN(Number(value)) && Number(value) >= 0)) {
-                                                        setItemCost(value === "" ? "" : Number(value)); // Keep empty string for empty input
-                                                    }
+                                                    // const value = e.target.value;
+                                                    // // Allow empty input or valid numbers (>= 0)
+                                                    // if (value === "" || (!isNaN(Number(value)) && Number(value) >= 0)) {
+                                                    //     setItemCost(value === "" ? "0" : Number(value)); // Keep empty string for empty input
+                                                    // }
+                                                    setItemCost(0);
                                                 }}
                                                 placeholder="Enter item cost"
-                                                required
-                                            />
+                                                // required
+                                            /> */}
                                         </div>
 
                                         <div className="stock-container d-flex justify-content-between">
