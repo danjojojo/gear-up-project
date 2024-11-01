@@ -77,6 +77,31 @@ $normal-border-color: #dee2e6;
                 overflow-y: auto;
                 scroll-padding: 10px !important;
             }
+
+            .categories{
+                display: flex;
+                margin-bottom: 10px;
+                gap: 5px;
+
+                button {
+                    width: 100%;
+                    border-radius: 5px;
+                    padding: 5px 10px;
+                    background-color: $tabs-bg-color;
+                    color: $inactive-text-color;
+                    border: none;
+                    cursor: pointer;
+            
+                    &.active {
+                        background-color: white;
+                        border: 2px solid #F9961F;
+                        color: $active-text-color;
+                        // border: none;
+                        box-shadow: $bg-shadow;
+                        /* Light shadow */
+                    }
+                }
+            }
         }
         
         .search-sorting {

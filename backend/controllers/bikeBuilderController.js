@@ -9,6 +9,7 @@ const getFrameItems = async (req, res) => {
                 i.item_name,
                 i.item_price,
                 i.stock_count,
+                i.bike_parts,
                 encode(f.image, 'base64') AS item_image
             FROM 
                 frame f
@@ -19,6 +20,7 @@ const getFrameItems = async (req, res) => {
             WHERE 
                 i.status = true 
                 AND i.is_deleted = false
+                AND i.stock_count > 0
                 AND f.status = true;
         `;
 
@@ -39,6 +41,7 @@ const getForkItems = async (req, res) => {
                 i.item_name,
                 i.item_price,
                 i.stock_count,
+                i.bike_parts,
                 encode(f.image, 'base64') AS item_image
             FROM 
                 fork f
@@ -49,6 +52,7 @@ const getForkItems = async (req, res) => {
             WHERE 
                 i.status = true 
                 AND i.is_deleted = false
+                AND i.stock_count > 0
                 AND f.status = true;
         `;
 
@@ -69,6 +73,7 @@ const getGroupsetItems = async (req, res) => {
                 i.item_name,
                 i.item_price,
                 i.stock_count,
+                i.bike_parts,
                 encode(g.image, 'base64') AS item_image
                 FROM 
                     groupset g
@@ -79,6 +84,7 @@ const getGroupsetItems = async (req, res) => {
                 WHERE 
                     i.status = true 
                     AND i.is_deleted = false
+                    AND i.stock_count > 0
                     AND g.status = true;
         `;
 
@@ -99,6 +105,7 @@ const getWheelsetItems = async (req, res) => {
                 i.item_name,
                 i.item_price,
                 i.stock_count,
+                i.bike_parts,
                 encode(w.image, 'base64') AS item_image
                 FROM 
                     wheelset w
@@ -109,6 +116,7 @@ const getWheelsetItems = async (req, res) => {
                 WHERE 
                     i.status = true 
                     AND i.is_deleted = false
+                    AND i.stock_count > 0
                     AND w.status = true;
         `;
 
@@ -129,6 +137,7 @@ const getSeatItems = async (req, res) => {
                 i.item_name,
                 i.item_price,
                 i.stock_count,
+                i.bike_parts,
                 encode(s.image, 'base64') AS item_image
                 FROM 
                     seat s
@@ -139,6 +148,7 @@ const getSeatItems = async (req, res) => {
                 WHERE 
                     i.status = true 
                     AND i.is_deleted = false
+                    AND i.stock_count > 0
                     AND s.status = true;
         `;
 
@@ -159,6 +169,7 @@ const getCockpitItems = async (req, res) => {
                 i.item_name,
                 i.item_price,
                 i.stock_count,
+                i.bike_parts,
                 encode(c.image, 'base64') AS item_image
                 FROM 
                     cockpit c
@@ -169,6 +180,7 @@ const getCockpitItems = async (req, res) => {
                 WHERE 
                     i.status = true 
                     AND i.is_deleted = false
+                    AND i.stock_count > 0
                     AND c.status = true;
         `;
 

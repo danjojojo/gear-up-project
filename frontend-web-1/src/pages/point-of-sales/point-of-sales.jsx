@@ -50,6 +50,8 @@ const PointOfSales = () => {
   const [receiptStatus, setReceiptStatus] = useState("");
 
   // SOME STUFF
+  const [categories, setCategories] = useState([]);
+  const [selectedCategory, setSelectedCategory] = useState("all");
 
   // FOR SORTING
   const [itemSort, setItemSort] = useState("stock_count");
@@ -280,17 +282,48 @@ const PointOfSales = () => {
  
   // FOR SEARCHING ITEMS AND MECHANICS 
   function searchForItem(searchValue){
-    if (!searchValue) {
-      setRetrievedItemsList(allItems);
-      return;
+    // if (!searchValue) {
+    //   setRetrievedItemsList(allItems);
+    //   return;
+    // } else {
+    //   const searchResults = allItems.filter((allItem) =>
+    //     allItem.item_name
+    //       .toLowerCase()
+    //       .includes(searchValue.toLowerCase())
+    //   );
+    //   setRetrievedItemsList(searchResults);
+    // }
+
+    // include if category is selected
+    if(selectedCategory === "all"){
+      if (!searchValue) {
+        setRetrievedItemsList(allItems);
+        return;
+      } else {
+        const searchResults = allItems.filter((allItem) =>
+          allItem.item_name
+            .toLowerCase()
+            .includes(searchValue.toLowerCase())
+        );
+        setRetrievedItemsList(searchResults);
+      }
     } else {
-      const searchResults = allItems.filter((allItem) =>
-        allItem.item_name
-          .toLowerCase()
-          .includes(searchValue.toLowerCase())
-      );
-      setRetrievedItemsList(searchResults);
+      if (!searchValue) {
+        const filteredItems = allItems.filter(
+          (item) => item.category_name === selectedCategory
+        );
+        setRetrievedItemsList(filteredItems);
+        return;
+      } else {
+        const searchResults = allItems.filter((allItem) =>
+          allItem.item_name
+            .toLowerCase()
+            .includes(searchValue.toLowerCase()) && allItem.category_name === selectedCategory
+        );
+        setRetrievedItemsList(searchResults);
+      }
     }
+
   }
   function searchForMechanic(searchValue){
     if (!searchValue) {
@@ -312,7 +345,8 @@ const PointOfSales = () => {
       const { items } = await getAllItems();
       setRetrievedItemsList(items);
       setAllItemsList(items);
-      console.log(items);
+      // GET THE CATEGORY NAMES FOR EACH ITEM AND REMOVE DUPLICATES
+      setCategories([...new Set(items.map((item) => item.category_name))]);
     } catch (err) {
       setError("Something went wrong.");
     }
@@ -354,6 +388,17 @@ const PointOfSales = () => {
       setTimeout(() => {
         setReceiptStatus("failed");
       }, 3000);
+    }
+  };
+  const selectCategory = (category) => {
+    setSelectedCategory(category);
+    if (category === "all") {
+      setRetrievedItemsList(allItems);
+    } else {
+      const filteredItems = allItems.filter(
+        (item) => item.category_name === category
+      );
+      setRetrievedItemsList(filteredItems);
     }
   };
 
@@ -542,6 +587,19 @@ const PointOfSales = () => {
                 </div>
               </div>
             </div>
+            {tab === 'items' && <div className="categories">
+              <button className={selectedCategory === 'all' ? "active" : ""}
+                onClick={() => selectCategory('all')}
+              >All</button>
+              {categories.map((category, categoryIndex) => {
+                return (
+                    <button key={categoryIndex} 
+                            className={selectedCategory === category ? "active" : ""}
+                            onClick={() => selectCategory(category)}
+                    >{category}</button>
+                );
+              })}
+            </div>}
             <div className="list">
               {tab === "items" && (
                 <div className="items-list">

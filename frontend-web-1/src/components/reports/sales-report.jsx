@@ -138,7 +138,7 @@ const SalesReport = () => {
                 <div className="upper-text" style={{ textAlign: 'center', marginBottom: '20px' }}>
                     <h1><span>ARON</span><span>BIKES</span></h1>
                     <p>Antipolo City</p>
-                    <h3>Monthly Sales Report</h3>
+                    <h3>Monthly POS Sales Report</h3>
                     <h6>({`${months[selectedDate.month - 1].label} ${selectedDate.year}`})</h6>
                     <p>Sales performance across different products.</p>
                 </div>

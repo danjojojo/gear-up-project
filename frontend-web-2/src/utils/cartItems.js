@@ -20,8 +20,9 @@ export const useCartItems = () => {
             buItems = await updateBuCartStockCounts();
         }
         const bbItems = await getBBCartItems();
-        setBuParts(buItems);
-        setBbParts(bbItems);
+
+        setBuParts(buItems.sort((a, b) => b.date_added - a.date_added));
+        setBbParts(bbItems.sort((a, b) => b.date_added - a.date_added));
         setLoading(false);
     };
 

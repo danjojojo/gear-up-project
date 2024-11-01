@@ -10,6 +10,7 @@ import BikeUpgrader from "./bike-upgrader/bike-upgrader";
 
 import Cart from "./cart/cart";
 import Checkout from "./checkout/checkout";
+import CheckoutSuccess from "./checkout-success/checkout-success";
 
 const Pages = {
 
@@ -38,7 +39,10 @@ const Pages = {
     Cart,
 
     // Checkout Page
-    Checkout
+    Checkout,
+
+    // Checkout Success Page
+    CheckoutSuccess
 
 };
 
