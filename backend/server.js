@@ -17,11 +17,15 @@ const recordsRoutes = require('./routers/recordsRouter');
 const summaryRoutes = require('./routers/summaryRouter');
 const mechanicRoutes = require('./routers/mechanicsRouter');
 const reportsRoutes = require('./routers/reportsRouter');
+const orderRoutes = require('./routers/orderRouter');
 
 // web 2
 const bikeBuilderRouter = require('./routers/bikeBuilderRouter');
 const checkoutRouter = require('./routers/checkoutRouter');
 const webhookRouter = require('./routers/webhookRouter');
+
+// util
+const startOrderExpiryScheduler = require('./utils/orderScheduler');
 
 require('dotenv').config();
 
@@ -49,9 +53,9 @@ app.use(cors({
   credentials: true,
 }));
 
-app.use(express.json());
-app.use(cookieParser());
 app.use(compression());
+app.use(express.json({ limit: '10mb' }));
+app.use(cookieParser());
 
 
 // web 1
@@ -68,11 +72,14 @@ app.use('/records', recordsRoutes);
 app.use('/summary', summaryRoutes);
 app.use('/mechanics', mechanicRoutes);
 app.use('/reports', reportsRoutes);
+app.use('/orders', orderRoutes);
 
 // web 2
 app.use('/bike-builder', bikeBuilderRouter);
 app.use('/checkout', checkoutRouter);
 app.use('/webhook', webhookRouter);
+
+startOrderExpiryScheduler();
 
 app.listen(port, () => {
     console.log(`Server running on port ${port}`);

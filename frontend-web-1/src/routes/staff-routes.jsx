@@ -18,7 +18,7 @@ const StaffRoutes = () => (
                 <Route path="bike-builder-upgrader/parts/wheelset" element={<Pages.Wheelset />} />
                 <Route path="bike-builder-upgrader/parts/seat" element={<Pages.Seat />} />
                 <Route path="bike-builder-upgrader/parts/cockpit" element={<Pages.Cockpit />} />
-            <Route path="orders" element={<Pages.Orders />} />
+            {/* <Route path="orders" element={<Pages.Orders />} /> */}
         </Route>
          <Route path="*" element={<Pages.NotFound />} />
     </Routes>

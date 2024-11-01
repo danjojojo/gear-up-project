@@ -219,6 +219,17 @@
             .total{
                 font-size: 1.2rem;
             }
+
+
+            .edit-cart{
+                font-size: 1rem;
+                cursor: pointer;
+                color: #F9961F;
+
+                &:hover{
+                    text-decoration: underline;
+                }
+            }
         }
 
         .loading {

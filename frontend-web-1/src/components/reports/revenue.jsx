@@ -135,7 +135,7 @@ const RevenueReport = () => {
                 <table className='mb-4'>
                     <tbody>
                         <tr>
-                            <td className='text-start'>Sales</td>
+                            <td className='text-start'>POS Sales</td>
                             <td className='text-end'>{PesoFormat.format(sales)}</td>
                         </tr>
                         <tr>

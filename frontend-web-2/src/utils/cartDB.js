@@ -15,7 +15,7 @@ export async function addToBUCart(part) {
         return;
     }
     alert("Added to cart!");
-    await db.buCart.add({ ...part, qty: 1, checked: 0 });
+    await db.buCart.add({ ...part, qty: 1, checked: 0, date_added: new Date() });
 }
 
 export async function getBUCartItems() {
@@ -83,8 +83,8 @@ export async function addToBBCart(build) {
             alert("This build is already in the Bike Builder cart!");
             return false; // Indicates the build was not added due to duplication
         }
-        await db.bbCart.add({ ...build, checked: 0 });
-        console.log("Build added to BB cart:", build);
+        await db.bbCart.add({ ...build, checked: 0, date_added: new Date() });
+        alert("Build added to BB cart:", build);
         return true; // Indicates the build was successfully added
     } catch (error) {
         console.error("Error adding build to BB cart:", error);
@@ -106,4 +106,15 @@ export async function checkPartInBBCart(id) {
 }
 export async function removeFromBBCart(id) {
     await db.bbCart.delete(id);
+}
+
+
+export async function clearCheckedItemsFromIndexedDB() {
+    try {
+        await db.buCart.where('checked').equals(1).delete();
+        await db.bbCart.where('checked').equals(1).delete();
+        console.log('Checked items cleared from the cart.');
+    } catch (error) {
+        console.error('Failed to clear checked items:', error);
+    }
 }

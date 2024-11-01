@@ -23,8 +23,8 @@ const BuildSummary = ({ selectedParts, buildStatsPrice, finalBuildImage, goBackT
 
     // let build_id = 'build-' + new Date().getMonth() + new Date().getFullYear() + new Date().getHours() + new Date().getMinutes() + new Date().getSeconds();
     // make build_id unique using MM-DD-YYYY
-    let build_id = 'build-' + (new Date().getMonth() + 1) + '-' + new Date().getDate() + '-' + new Date().getFullYear() + '-' + new Date().getHours() + new Date().getMinutes() + new Date().getSeconds();
-    const finalBuild = {...selectedParts, image: finalBuildImage, build_id: build_id, build_price : buildStatsPrice };
+    let build_id = 'build-' + (new Date().getMonth() + 1) + new Date().getDate() + new Date().getFullYear() + '-' + new Date().getHours() + new Date().getMinutes() + new Date().getSeconds();
+    const finalBuild = {image: finalBuildImage, build_id: build_id, build_price : buildStatsPrice, parts : selectedParts };
 
     const handleAddBuild = async (build) => {
         const success = await addToBBCart(build);

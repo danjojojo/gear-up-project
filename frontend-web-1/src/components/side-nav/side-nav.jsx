@@ -40,7 +40,7 @@ const SideNav = ({ onNavClick, isAdmin }) => {
                             <Nav.Link as={Link} to="/receipts" onClick={() => onNavClick('Receipts')}><i className="fa-solid fa-receipt"></i>Receipts</Nav.Link>
                             <Nav.Link as={Link} to="/waitlist" onClick={() => onNavClick('Waitlist')}><i className="fa-solid fa-ruler-horizontal"></i>Waitlist</Nav.Link>
                             <Nav.Link as={Link} to="/bike-builder-upgrader" onClick={() => onNavClick('Bike Builder & Upgrader')}><i className="fa-solid fa-bicycle"></i>Bike Builder & Upgrader</Nav.Link>
-                            <Nav.Link as={Link} to="/orders" onClick={() => onNavClick('Orders')}><i className="fa-solid fa-cart-shopping"></i>Orders</Nav.Link>
+                            {/* <Nav.Link as={Link} to="/orders" onClick={() => onNavClick('Orders')}><i className="fa-solid fa-cart-shopping"></i>Orders</Nav.Link> */}
                         </>
                     )}
                 </Nav>

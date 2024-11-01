@@ -69,8 +69,7 @@ const getPosReceipts = async (req, res) => {
             `;
             const { rows } = await pool.query(query,
                 [posId.toString(), startDate]);
-            console.log('Role will be sent: ' , role)
-            res.json({ receipts: rows, role: role });
+            res.json({ receipts: rows });
         }
     } catch (err) {
         res.status(500).json({ error: err.message });
@@ -448,7 +447,6 @@ const getReceiptsDashboard = async (req, res) => {
         if (!token) {
             return res.status(401).json({ error: "No token provided " });
         }
-        console.log('Get Receipts Dashboard');
         const { date } = req.query;
         const query = `
             SELECT 

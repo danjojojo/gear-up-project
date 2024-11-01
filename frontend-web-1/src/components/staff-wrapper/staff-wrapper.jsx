@@ -21,6 +21,7 @@ const StaffWrapper = () => {
 
     useEffect(() => {
         setupAxiosInterceptors(setShowModal);
+        console.log('Test 3');
     }, []);
 
     const handleClose = () => {

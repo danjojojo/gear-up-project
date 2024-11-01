@@ -1,4 +1,5 @@
 import "./auth-layout.scss";
+import wp from "../../assets/images/gearup-wp.jpg";
 
 const AuthLayout = ({ formData }) => {
   return (
@@ -9,7 +10,9 @@ const AuthLayout = ({ formData }) => {
           {formData}
         </div>
 
-        <div className="right-container col-md-6 p-2 "></div>
+        <div className="right-container col-md-6">
+          <img src={wp} alt="" />
+        </div>
       </div>
     </div>
   );

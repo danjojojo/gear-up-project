@@ -1,9 +1,11 @@
 import React, {useState, useEffect} from 'react'
 import './checkout.scss';
+import {useNavigate} from 'react-router-dom';
 import { useCartItems } from "../../utils/cartItems";
-import { createCheckoutSession } from "../../services/checkoutService";
+import { createCheckoutSession, createOrder } from "../../services/checkoutService";
 import {Tooltip} from 'react-tooltip';
 import 'react-tooltip/dist/react-tooltip.css'
+import compressBase64Image from '../../utils/compressImage';
 
 const Checkout = () => {
     const { totalPrice, loading, checkedBuItems, checkedBbItems, checkedBuItemsTotal, checkedBbItemsTotal  } = useCartItems();
@@ -16,45 +18,118 @@ const Checkout = () => {
     const getLineItems = () => {
         let lineItems = [];
         checkedBuItems.forEach((part) => {
-            lineItems = [...lineItems, { id: part.item_id, cart_id: part.id, name: part.item_name, quantity: part.qty, amount: part.item_price * 100, currency: 'PHP', description: 'Test' }];
+            lineItems = [...lineItems, 
+                { 
+                    name: part.item_name, 
+                    quantity: part.qty, 
+                    amount: part.item_price * 100, 
+                    currency: 'PHP', 
+                    description: 'Bike upgrader',
+                }];
         });
         checkedBbItems.forEach((part) => {
-            lineItems = [...lineItems, { name: part.build_id.toUpperCase(), quantity: 1, amount: part.build_price * 100, currency: 'PHP', description: 'Test' }];
+            lineItems = [...lineItems, 
+                { 
+                    name: part.build_id.toUpperCase(),
+                    quantity: 1, 
+                    amount: part.build_price * 100, 
+                    currency: 'PHP', 
+                    description: 'Bike builder' ,
+                }];
         });
         return lineItems;
     }
 
     useEffect(() => {
         getLineItems();
-    }, [checkedBuItems]);
+        if(checkedBuItems.length === 0) {
+            setBikeUpgradeDelivery('n/a');
+        }
+        checkedBbItems.length > 0 ? setBikeBuildDelivery('pickup-store') : setBikeBuildDelivery('n/a');
+    }, [checkedBuItems, checkedBbItems]);
 
     const [name, setName] = useState('');
     const [email, setEmail] = useState('');
     const [phone, setPhone] = useState('');
     const [address, setAddress] = useState('');
+
+    const navigate = useNavigate();
     
-    const [bikeBuildDelivery, setBikeBuildDelivery] = useState('');
     const [bikeUpgradeDelivery, setBikeUpgradeDelivery] = useState('');
-    
+    const [bikeBuildDelivery, setBikeBuildDelivery] = useState('');
+
     const isFormIncomplete = 
-    checkedBuItems.length + checkedBbItems.length === 0 || 
-    name === '' || 
-    email === '' || 
-    phone.length === 0 || phone.length !== 11 ||
-    address === '';
+        checkedBuItems.length + checkedBbItems.length === 0 || 
+        name === '' || 
+        email === '' || 
+        phone.length === 0 || phone.length !== 11 ||
+        address === '';
     
-    const isDeliveryOptionIncomplete = checkedBuItems.length != 0 && bikeUpgradeDelivery === '' || checkedBbItems.length != 0 && bikeBuildDelivery === '';
-    
-    useEffect(() => { 
-        console.log((checkedBuItems.length + checkedBbItems.length === 0), isFormIncomplete, bikeBuildDelivery, bikeUpgradeDelivery);
-    },[name, email, phone, address, bikeBuildDelivery, bikeUpgradeDelivery]);
+    const isDeliveryOptionIncomplete = 
+        (checkedBuItems.length !== 0 && bikeUpgradeDelivery === 'n/a') || 
+        (checkedBbItems.length !== 0 && bikeBuildDelivery === 'n/a');
+
+    const prepareOrderDetails = async (checkedBbItems) => {
+        const orderBbDetails = await Promise.all(
+            checkedBbItems.map(async (part) => ({
+                build_name: part.build_id,
+                build_price: part.build_price,
+                image: await compressBase64Image(part.image, 800, 800, 0.7),
+            }))
+        );
+        return orderBbDetails;
+    };
     
     const proceedToPayment = async () => {
-        console.log('Proceed to Payment');
-        console.log(name, email, phone, address);
         const retrievedLineItems = getLineItems();
         console.log(retrievedLineItems);
-        const checkoutUrl = await createCheckoutSession(name, email, phone, address, retrievedLineItems);
+
+        let sessionOrder = [{
+            name: name,
+            email: email,
+            phone: phone,
+            address: address,
+            bikeBuildDelivery: bikeBuildDelivery,
+            bikeUpgradeDelivery: bikeUpgradeDelivery,
+            amount: totalPrice
+        }];
+
+        const orderBuItems = checkedBuItems.map((part) => ({
+            id: part.item_id,
+            name: part.item_name,
+            quantity: part.qty,
+            amount: part.item_price,
+            type: 'Bike Upgrader',
+            build_id: 'n/a',
+            part: part.bike_parts,
+        })); 
+
+        const orderBbItems = checkedBbItems.flatMap((part) => 
+            Object.entries(part.parts).map(([key, value]) => ({
+                id: value.item_id,
+                name: value.item_name,
+                quantity: 1,
+                amount: value.item_price,
+                type: 'Bike Builder',
+                build_id: part.build_id,
+                part: value.bike_parts,
+            }))
+        );  
+
+        const orderBbDetails = await prepareOrderDetails(checkedBbItems);
+
+        const orderItems = [...orderBuItems, ...orderBbItems];
+        console.log(sessionOrder, orderItems);
+
+        const {checkoutUrl, checkoutSessionId } = await createCheckoutSession(name, email, phone, address, retrievedLineItems, sessionOrder, orderItems);
+
+        sessionOrder[0].checkoutSessionId = checkoutSessionId;
+        await createOrder(sessionOrder, orderBbDetails, orderItems);
+
+        sessionOrder = [...sessionOrder, {checkoutSessionId: checkoutSessionId}];
+        sessionStorage.setItem('sessionOrder', JSON.stringify(sessionOrder));
+        sessionStorage.setItem('sessionOrderId', checkoutSessionId);
+        sessionStorage.setItem('orderItems', JSON.stringify(orderItems));
         window.location.href = checkoutUrl;
     }
 
@@ -128,14 +203,14 @@ const Checkout = () => {
                             placeholder='09xxxxxxxxx' 
                         />
                     </div>
-                    {checkedBbItems.length != 0 && <div className="input-group">
+                    {checkedBbItems.length !== 0 && <div className="input-group">
                         <label>Bike Build Delivery Option</label>
                         <div className="btns">
                             <input
                                 type="radio"
                                 id="bikeBuildPickup"
                                 name="bikeBuildDelivery"
-                                value="inStore"
+                                value="pickup-store"
                                 onChange={(e) => {
                                     setBikeBuildDelivery(e.target.value);
                                     setAddress(address);
@@ -152,14 +227,14 @@ const Checkout = () => {
                             </label>
                         </div>
                     </div>}
-                    {checkedBuItems.length != 0 && <div className="input-group">
+                    {checkedBuItems.length !== 0 && <div className="input-group">
                         <label>Bike Upgrade Delivery Option</label>
                         <div className="btns">
                             <input
                                 type="radio"
                                 id="bikeUpgradePickup"
                                 name="bikeUpgradeDelivery"
-                                value="inStore"
+                                value="pickup-store"
                                 onClick={(e) => {
                                     setBikeUpgradeDelivery(e.target.value);
                                     setAddress(address);
@@ -178,7 +253,7 @@ const Checkout = () => {
                                 type="radio"
                                 id="bikeUpgradeDelivery"
                                 name="bikeUpgradeDelivery"
-                                value="homeDelivery"
+                                value="deliver-home"
                                 onClick={(e) => {
                                     setBikeUpgradeDelivery(e.target.value);
                                     setAddress(address);
@@ -194,12 +269,12 @@ const Checkout = () => {
                             </label>
                         </div>
                     </div>}
-                    {bikeUpgradeDelivery === 'inStore' && <div className="input-group">
+                    {(bikeUpgradeDelivery === 'pickup-store' || bikeBuildDelivery === 'pickup-store') && <div className="input-group">
                         <label htmlFor="">Store Location</label>
                         <p>123 Main St, Cityville, Province, 12345</p>
                     </div>}
-                    {bikeUpgradeDelivery === 'homeDelivery' && <div className="input-group">
-                        <label htmlFor="address">Address</label>
+                    {bikeUpgradeDelivery === 'deliver-home' && <div className="input-group">
+                        <label htmlFor="address">Your Address</label>
                         <input type="text" id="address" 
                             value={address}
                             className={address === '' ? 'input-incomplete' : ''}
@@ -237,6 +312,7 @@ const Checkout = () => {
                     <div className="title">
                         <i className="fa-solid fa-cart-shopping"></i>
                         <h4>Cart Summary</h4>
+                        <p className='edit-cart' onClick={() => navigate('/cart')}>Edit Cart</p>
                     </div>
                     {!loading && <div className="total">
                         <p>Total: {PesoFormat.format(totalPrice)}</p>

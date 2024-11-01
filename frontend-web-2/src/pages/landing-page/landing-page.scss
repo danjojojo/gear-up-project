@@ -31,12 +31,14 @@
     }
 
     p {
-        font-size: 16px;
+        font-size: 1.3rem;
         position: relative;
         z-index: 2;
         top: 15%;
         left: 5%;
         color: white !important;
-        font-weight: lighter;
+        font-weight: normal;
+        width: 50%;
+        text-wrap: pretty;
     }
 }

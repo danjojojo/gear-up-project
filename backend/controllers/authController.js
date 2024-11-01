@@ -208,20 +208,34 @@ const refreshToken = (req, res) => {
     // Verify refresh token
     const decoded = jwt.verify(refreshToken, process.env.JWT_REFRESH_SECRET);
 
-    // Create a new access token
-    const accessToken = jwt.sign(
-      { pos_id: decoded.pos_id, role: decoded.role },
-      process.env.JWT_SECRET,
-      { expiresIn: accessTokenRefresh }
-    );
-
-    // Return the new access token
-    res.cookie('token', accessToken, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
-      sameSite: 'Strict',
-      maxAge: 3600000 // 1 hour expiration
-    });
+        // Create a new access token
+        if(role === 'admin'){
+            const accessToken = jwt.sign(
+                { admin_id: decoded.admin_id, role: decoded.role },
+                process.env.JWT_SECRET,
+                { expiresIn: accessTokenRefresh }
+            );
+            // Return the new access token
+            res.cookie('token', accessToken, {
+                httpOnly: true,
+                secure: process.env.NODE_ENV === 'production',
+                sameSite: 'Strict',
+                maxAge: 3600000 // 1 hour expiration
+            });
+        } else {
+          const accessToken = jwt.sign(
+              { pos_id: decoded.pos_id, role: decoded.role },
+              process.env.JWT_SECRET,
+              { expiresIn: accessTokenRefresh }
+          );
+          // Return the new access token
+          res.cookie('token', accessToken, {
+              httpOnly: true,
+              secure: process.env.NODE_ENV === 'production',
+              sameSite: 'Strict',
+              maxAge: 3600000 // 1 hour expiration
+          });
+        }
 
     res.json({ message: 'Access token refreshed' });
   } catch (err) {

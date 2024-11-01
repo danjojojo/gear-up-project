@@ -6,7 +6,14 @@ require("dotenv").config();
 
 const getAllItems = async (req,res) => {
     try {
-      const { rows } = await pool.query("SELECT * FROM items WHERE status = true ORDER BY stock_count DESC");
+      const query = `
+        SELECT *, c.category_name
+        FROM items i
+        JOIN category c ON i.category_id = c.category_id
+        WHERE status = true 
+        ORDER BY item_name ASC
+      `
+      const { rows } = await pool.query(query);
       res.json({ items: rows });
     } catch (err) {
       res.status(500).json({ error: err.message });
