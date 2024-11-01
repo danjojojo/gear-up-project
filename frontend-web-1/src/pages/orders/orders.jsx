@@ -16,8 +16,9 @@ import {
     getOrderStatistics
 } from '../../services/orderService';
 
-const Orders = () => {
+import LoadingPage from '../../components/loading-page/loading-page';
 
+const Orders = () => {
     const todayDate = new Date();
     const nowDate = moment(todayDate).format("YYYY-MM-DD");
     const [startDate, setStartDate] = useState(moment(new Date()).format("YYYY-MM-DD"));
@@ -48,6 +49,8 @@ const Orders = () => {
     const [orderStats, setOrderStats] = useState({});
 
     const [orderDates, setOrderDates] = useState([]);
+
+    const [loading, setLoading] = useState(true);
 
     const link = 'http://localhost:3000/checkout?order=';
     
@@ -138,6 +141,9 @@ const Orders = () => {
             setRetrievedOrders(filteredOrders);
             setCourier('');
             setTrackingNumber('');
+            setTimeout(()=> {
+                setLoading(false);
+            }, 500);
             console.log(filteredOrders);
         } catch (error) {
             console.error('Error getting orders:', error.message);
@@ -299,6 +305,8 @@ const Orders = () => {
     const sortedStatusDates = statusDates
     .filter(status => status.date) // Remove entries with null/undefined dates
     .sort((a, b) => new Date(a.date) - new Date(b.date)); 
+
+    if(loading) return <LoadingPage classStyle={"loading-in-page"}/>
 
     return (
         <div className='orders p-3'>
