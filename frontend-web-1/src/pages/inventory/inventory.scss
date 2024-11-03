@@ -45,16 +45,17 @@ $bg-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
                     justify-content: center;
                     cursor: pointer;
 
-                    &:hover span{
+                    &:hover span {
                         text-decoration: underline;
                     }
                 }
 
-                .add-btn{
+                .add-btn {
                     width: 20%;
                 }
 
-                .archive, .active{
+                .archive,
+                .active {
                     width: 20%;
                     background-color: rgb(87, 87, 87);
                 }
@@ -64,8 +65,8 @@ $bg-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
                     margin: 5px;
                     border: 1px solid $normal-border-color;
                     border-radius: 7px;
-                    
-                    input{
+
+                    input {
                         font-size: 1em;
                     }
                 }
@@ -199,8 +200,8 @@ $bg-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
                     text-transform: uppercase;
                     font-size: 0.7em;
                     scrollbar-gutter: stable;
-                    
-                    div{
+
+                    div {
                         margin-top: 0;
                         color: $subheading-text-color;
                         justify-content: center;
@@ -212,31 +213,31 @@ $bg-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
                         display: flex;
                         align-items: center;
                     }
-                
+
                     .item-category {
                         width: 20%;
                         display: flex;
                         align-items: center;
                     }
-                
+
                     .item-price {
                         width: 15%;
                         display: flex;
                         align-items: center;
-                
+
                     }
-                
+
                     .item-stocks {
                         width: 15%;
                         display: flex;
                         align-items: center;
                     }
-                
+
                     .item-stock-status {
                         width: 15%;
                         display: flex;
                         align-items: center;
-                        
+
                         .status-container {
 
                             padding: 5px;
@@ -247,15 +248,15 @@ $bg-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
                             align-items: center;
                             justify-content: center;
                         }
-                
+
                     }
 
                     .item-name,
                     .item-category,
                     .item-price,
-                    .item-stocks{
+                    .item-stocks {
                         font-size: 1.1em !important;
-                        
+
                     }
                 }
 
@@ -282,18 +283,18 @@ $bg-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
                         border-radius: 9px;
                         cursor: pointer;
 
-                        div{
+                        div {
                             justify-content: center;
                             flex-grow: 1;
                         }
-                        
+
                         .item-name {
                             width: calc(25% + 10px);
                             display: flex;
                             align-items: center;
                             justify-content: flex-start;
                             gap: 10px;
-                            
+
                             i {
                                 width: 15%;
                                 text-align: center;
@@ -417,35 +418,37 @@ $bg-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
                 gap: 10px;
                 margin-bottom: 10px;
 
-                h4{
+                h4 {
                     margin: 0;
                 }
-                
-                .button-nav{
+
+                .button-nav {
                     gap: 10px;
                     display: flex;
                     align-items: center;
 
                     .exit-btn {
                         // border: 1px solid black;
-                        
+
                         .exit-icon {
                             height: 20px;
                             width: 20px;
                             cursor: pointer;
                         }
                     }
+
                     .exit-btn {
                         // border: 1px solid black;
-                        
+
                         .exit-icon {
                             height: 20px;
                             width: 20px;
                             cursor: pointer;
                         }
                     }
-                    
+
                     .edit-btn {
+
                         .edit-icon,
                         .cancel-icon,
                         .restore-icon {
@@ -453,22 +456,24 @@ $bg-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
                             width: 20px;
                             cursor: pointer;
                         }
-                        
+
                     }
-                    
+
                     .del-btn {
+
                         .del-icon,
                         .archive-icon {
                             height: 20px;
                             width: 20px;
                             cursor: pointer;
                         }
-                        
+
                     }
                 }
+
                 .exit-btn {
                     // border: 1px solid black;
-                    
+
                     .exit-icon {
                         height: 20px;
                         width: 20px;
@@ -528,7 +533,7 @@ $bg-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
                         margin-bottom: 8px;
                         font-weight: 500;
                     }
-                    
+
                     input {
                         width: 100%;
                         padding: 8px;
@@ -536,9 +541,24 @@ $bg-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
                         border: 1px solid #ddd;
                         border-radius: 10px;
                     }
+
+                    .error {
+                        color: red;
+                        margin: 2px;
+                        margin-bottom: 0px;
+                        font-size: 0.9rem;
+                    }
+
+                    .success {
+                        color: green;
+                        margin: 2px;
+                        margin-bottom: 0px;
+                        font-size: 0.9rem;
+                    }
+
                     margin: 10px 0;
                 }
-                
+
                 .stock-container {
                     height: auto;
                     padding: 10px 0;
@@ -551,7 +571,7 @@ $bg-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
                         align-items: center;
                     }
 
-                    .title{
+                    .title {
                         font-weight: 500;
                         font-size: 1rem;
                     }
@@ -768,13 +788,20 @@ $bg-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
                         align-items: center;
                         box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 
-                        &:hover{
+                        &:hover {
                             text-decoration: underline;
                         }
 
                         &:active {
                             background-color: #e6e6e6;
                         }
+                    }
+
+                    .submit-btn:disabled {
+                        opacity: 0.5;
+                        /* Set opacity to 0.8 when disabled */
+                        cursor: not-allowed;
+                        /* Change cursor to indicate the button is disabled */
                     }
                 }
             }

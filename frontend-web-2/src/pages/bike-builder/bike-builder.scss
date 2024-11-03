@@ -21,6 +21,17 @@ $bg-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
             align-items: center;
             justify-content: center;
             border-radius: 20px;
+            position: relative;
+
+            img {
+                position: absolute;
+                top: 30px;
+                left: 30px;
+                border: none;
+                height: 30px;
+                width: 30px;
+                cursor: pointer;
+            }
 
 
             .content {
@@ -151,7 +162,7 @@ $bg-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
                     border: none;
                     width: 100%;
                     height: 100%;
-                    
+
                     padding: 15px 15px 0 15px;
                     scrollbar-color: #888 #2E2E2E;
                     scrollbar-width: thin;
@@ -204,7 +215,7 @@ $bg-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
                         }
                     }
 
-                    .parts-cards{
+                    .parts-cards {
                         flex-grow: 1;
                         overflow-y: auto;
                         display: flex;
@@ -218,25 +229,25 @@ $bg-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
                             height: auto;
                             margin-bottom: 15px;
                             padding: 20px;
-    
+
                             .item-image {
                                 border-radius: 5px;
                                 height: 150px;
                                 padding: 15px;
                                 margin-bottom: 15px;
-    
+
                                 img {
                                     width: 100%;
                                     height: 100%;
                                     object-fit: contain;
                                 }
-    
-                                p{
+
+                                p {
                                     width: 100%;
                                     text-align: center;
                                 }
                             }
-    
+
                             .item-name {
                                 display: flex;
                                 align-content: center;
@@ -247,7 +258,7 @@ $bg-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
                                 border-bottom: solid 1px #D9D9D9;
                                 margin: 0 !important;
                             }
-    
+
                             .item-price {
                                 display: flex;
                                 align-items: center;
@@ -258,13 +269,13 @@ $bg-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
                                 padding: 10px;
                                 margin: 0 auto !important;
                             }
-    
+
                             .accordion {
                                 margin-bottom: 30px;
-    
+
                                 .accordion-body {
                                     padding: 20px;
-    
+
                                     .specs-container {
                                         margin-bottom: 10px;
                                         padding: 15px;
@@ -273,17 +284,17 @@ $bg-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
                                     }
                                 }
                             }
-    
+
                             .item-name {
                                 margin-bottom: 15px;
                                 font-size: 20px;
                             }
-    
+
                             .item-price {
                                 margin-bottom: 20px;
                                 font-size: 20px;
                             }
-    
+
                             .add-to-build {
                                 background-color: #2E2E2E;
                                 color: white;
@@ -292,7 +303,7 @@ $bg-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
                                 border-radius: 5px;
                                 border: none;
                                 cursor: pointer;
-    
+
                             }
 
                             &:hover .item-image {
@@ -339,11 +350,11 @@ $bg-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 
                 .budget-stat-container {
                     height: 25%;
-                    
+
                     .budget {
                         width: 35%;
                         padding: 10px 10px 5px 20px;
-                        
+
                         .content {
                             height: 100%;
                             background-color: #F9961F;
@@ -356,12 +367,12 @@ $bg-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
                             justify-content: center;
                             align-items: start;
                             font-weight: 500;
-                            
+
                             .upper {
                                 width: 100%;
                                 height: auto;
                                 border-bottom: solid 1px #D9D9D9;
-                                padding: 5px 0px;  
+                                padding: 5px 0px;
 
                                 .price {
                                     height: 100%;
@@ -412,7 +423,7 @@ $bg-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
                                 text-align: center;
                                 // padding: 3px 0;
                             }
-                            
+
                             .lower-text {
                                 margin-top: auto;
                                 display: flex;
@@ -421,7 +432,7 @@ $bg-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
                                 /* Arrows and text are spaced evenly */
                                 text-align: justify;
                                 position: relative;
-                                
+
                                 .text-slide {
                                     flex: 1;
                                     display: flex;
@@ -432,7 +443,7 @@ $bg-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
                                     // padding: 0 5px;
                                     /* Add padding to prevent text from touching arrows */
                                 }
-                                
+
                                 .back-slide,
                                 .proceed-slide {
                                     border: none;
@@ -440,9 +451,10 @@ $bg-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
                                     cursor: pointer;
                                     filter: invert(1);
                                 }
-                                
+
                                 .back-slide {
                                     margin-right: 5px;
+
                                     img {
                                         width: 20px;
                                         height: 20px;
@@ -451,6 +463,7 @@ $bg-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 
                                 .proceed-slide {
                                     margin-left: 5px;
+
                                     img {
                                         width: 20px;
                                         height: 20px;
@@ -590,7 +603,7 @@ $bg-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
                         padding: 10px 10px 0px 10px;
                     }
 
-                    .parts-none{
+                    .parts-none {
                         height: 100%;
                         display: flex;
                         flex-direction: column;
@@ -598,15 +611,15 @@ $bg-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
                         align-items: center;
                     }
 
-                    .parts-prices{
+                    .parts-prices {
                         flex-grow: 1;
                         overflow-y: auto;
                         scrollbar-width: thin;
 
                         .part-price {
                             padding: 5px;
-                            
-                            p{
+
+                            p {
                                 margin: 0;
                             }
 
@@ -620,8 +633,8 @@ $bg-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
                                 font-size: 1rem;
                                 border-radius: 9px;
                                 font-weight: 700;
-                                
-                                p:nth-child(2){
+
+                                p:nth-child(2) {
                                     // width: fit-content;
                                     background-color: #F9961F;
                                     border-radius: 5px;
@@ -667,7 +680,7 @@ $bg-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
                         background-color: white;
                         height: 100%;
                         border-radius: 20px;
-                        
+
                         img {
                             width: 100%;
                             height: 100%;
@@ -765,7 +778,11 @@ $bg-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
                         }
                     }
 
-                    .btns { display: flex; flex-direction: column; gap: 5px; }
+                    .btns {
+                        display: flex;
+                        flex-direction: column;
+                        gap: 5px;
+                    }
 
                     .add-to-cart {
                         height: 50px;

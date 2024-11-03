@@ -12,7 +12,7 @@ $font-size: clamp(0.9em, 1.2vw, 1.1em);
 $button-success: #9C9B9B;
 $button-fail: #dee2e6;
 
-.pos-users{
+.pos-users {
 
     .status-tabs {
         button {
@@ -27,30 +27,30 @@ $button-fail: #dee2e6;
             border: none;
             border-radius: 7px;
             cursor: pointer;
-        
-            &:hover span{
+
+            &:hover span {
                 text-decoration: underline;
             }
         }
     }
 
-    .left-content{
-        .pos-users-container{
+    .left-content {
+        .pos-users-container {
             display: flex;
             flex-direction: column;
             height: 100%;
-        
-            .pos-users-nav{
+
+            .pos-users-nav {
                 height: auto;
                 display: flex;
                 flex-direction: row;
                 gap: 10px;
-                
+
                 .search-sorting {
                     display: flex;
                     margin-bottom: 15px;
                     flex-grow: 1;
-            
+
                     .search-bar {
                         background-color: $normal-bg-color;
                         border: 1px solid $normal-border-color;
@@ -59,7 +59,7 @@ $button-fail: #dee2e6;
                         border-radius: 7px;
                         padding: 3px;
                         flex-grow: 1;
-            
+
                         input {
                             width: 100%;
                             border-radius: 5px;
@@ -96,9 +96,55 @@ $button-fail: #dee2e6;
                         text-align: center;
                     }
                 }
+
+                .logs-tab {
+
+                    button {
+                        display: flex;
+                        align-items: center;
+                        justify-content: center;
+                        gap: 10px;
+                        padding: 10px 15px;
+                        font-size: 1em;
+                        background-color: rgb(87, 87, 87);
+                        color: #ffffff;
+                        border: none;
+                        border-radius: 7px;
+                        cursor: pointer;
+
+                        &:hover span {
+                            text-decoration: underline;
+                        }
+                    }
+                }
             }
 
-            .columns{
+            .date-picker-container {
+                display: flex;
+                align-items: center;
+                background-color: white;
+
+                .date-picker {
+                    border: none;
+                    cursor: pointer;
+                    font-size: 20px;
+                    font-weight: 700;
+                    background-color: white;
+                    margin-bottom: 16px;
+
+                }
+            }
+
+
+            .react-datepicker__day--highlighted-custom {
+                background-color: #00aaff;
+                /* Set your preferred color */
+                color: white;
+                border-radius: 50%;
+                /* Optional: for a dot-like appearance */
+            }
+
+            .columns {
                 height: auto;
                 display: flex;
                 // justify-content: space-between;
@@ -109,26 +155,26 @@ $button-fail: #dee2e6;
                 text-transform: uppercase;
                 font-size: 0.9em;
 
-                p{
+                p {
                     margin: 0;
                     color: $subheading-text-color;
                     // border: 1px solid black;
                     width: 33.3%;
-                    
-                    &:nth-child(3){
+
+                    &:nth-child(3) {
                         display: flex;
                         align-items: center;
                         justify-content: center;
                     }
                 }
             }
-            
+
             .list {
                 display: flex;
                 flex-direction: column;
                 flex-grow: 1;
                 overflow-y: auto !important;
-                
+
                 .empty-list {
                     display: flex;
                     justify-content: center;
@@ -137,7 +183,7 @@ $button-fail: #dee2e6;
                     font-size: 1rem;
                     color: $subheading-text-color;
                 }
-                
+
                 .list-item {
                     margin-bottom: 9px;
                     border-radius: 8px;
@@ -147,21 +193,21 @@ $button-fail: #dee2e6;
                     width: 100%;
                     cursor: pointer;
                     font-size: $font-size;
-                    
+
                     .list-item-content {
                         display: flex;
                         // justify-content: space-between;
                         flex-direction: row;
                         align-items: center;
                         // border: 1px solid black;
-                        
+
                         p {
                             // border: 1px solid black;
                             margin: 0;
                             width: 33.3%;
                         }
 
-                        .inactive{
+                        .inactive {
                             display: flex;
                             align-items: center;
                             justify-content: center;
@@ -174,8 +220,8 @@ $button-fail: #dee2e6;
                             font-size: 0.9rem;
                             text-transform: capitalize;
                         }
-                        
-                        .active{
+
+                        .active {
                             display: flex;
                             align-items: center;
                             justify-content: center;
@@ -194,41 +240,42 @@ $button-fail: #dee2e6;
         }
     }
 
-    .right-content{
-        .pos-user-right-container{
+    .right-content {
+        .pos-user-right-container {
             height: 100%;
             display: flex;
             flex-direction: column;
-            .pos-user-details-container{
+
+            .pos-user-details-container {
                 flex-grow: 1;
                 overflow-y: auto;
-    
+
                 .pos-user-nav {
                     display: flex;
                     justify-content: space-between;
                     align-items: center;
-            
+
                     h4 {
                         font-weight: 700;
                     }
-            
+
                     i {
                         cursor: pointer;
                         color: grey;
                     }
-            
+
                     i:hover {
                         color: black;
                     }
-            
+
                     .edit-nav {
                         i:nth-child(1) {
                             margin-right: 10px;
                         }
                     }
                 }
-    
-                .updated{
+
+                .updated {
                     margin-top: 10px;
                     text-align: left;
                     font-style: italic;
@@ -239,30 +286,32 @@ $button-fail: #dee2e6;
                     flex-wrap: wrap;
                     margin-top: 10px;
                     font-size: 0.9rem;
+
                     /* Allows items to wrap to the next line */
                     .good {
                         color: green;
                     }
-                
+
                     .fail {
                         color: #fa4545;
                     }
                 }
 
-                .password-guide, .password-g {
+                .password-guide,
+                .password-g {
                     // list-style-type: none;
                     /* Removes default list styling */
                     display: flex;
                     flex-wrap: wrap;
                     margin: 0;
                 }
-                
+
                 .password-guide li {
                     width: 50%;
                     font-size: 0.9rem;
                 }
-    
-                .change{
+
+                .change {
                     display: flex;
                     flex-direction: row;
                     margin: 15px 0 0 0;
@@ -273,12 +322,12 @@ $button-fail: #dee2e6;
                     border-radius: 5px;
                     justify-content: space-between;
                     cursor: pointer;
-    
-                    p{
+
+                    p {
                         margin: 0;
                     }
                 }
-                
+
                 .error-msg {
                     color: #cb2020;
                     font-size: 1rem;
@@ -296,17 +345,17 @@ $button-fail: #dee2e6;
                 form {
                     display: flex;
                     flex-direction: column;
-    
+
                     .form-input {
                         display: flex;
                         flex-direction: column;
                         margin: 10px 0 0 0;
-    
+
                         label {
                             font-size: 1em;
                             margin: 5px 0;
                         }
-    
+
                         input {
                             width: 100%;
                             padding: 10px;
@@ -314,21 +363,21 @@ $button-fail: #dee2e6;
                             border: 1px solid #ddd;
                             border-radius: 5px;
                         }
-    
+
                         .error {
                             color: red;
                             margin: 2px;
                             margin-bottom: 0px;
                             font-size: 0.9rem;
                         }
-    
+
                         .success {
                             color: green;
                             margin: 2px;
                             margin-bottom: 0px;
                             font-size: 0.9rem;
                         }
-    
+
                         .upload-image {
                             padding: 20px 10px;
                             border: 2px dashed #ddd;
@@ -340,27 +389,27 @@ $button-fail: #dee2e6;
                             height: 100%;
                             text-align: center;
                             cursor: pointer;
-    
+
                             .title,
                             .subtitle,
                             i {
                                 margin: auto 0;
                             }
-    
+
                             .title {
                                 font-weight: 700;
                             }
-    
+
                             .subtitle {
                                 font-size: 0.9em;
                                 color: #B0B0B0;
                             }
-    
+
                             &:hover {
                                 background-color: #f9f9f9;
                             }
                         }
-    
+
                         .img-preview {
                             padding: 10px;
                             border: 1px solid #ddd;
@@ -368,7 +417,7 @@ $button-fail: #dee2e6;
                             width: 100%;
                             display: flex;
                             flex-direction: column;
-    
+
                             img {
                                 object-fit: cover;
                                 height: 25svh;
@@ -376,7 +425,7 @@ $button-fail: #dee2e6;
                                 margin: 0 auto;
                                 cursor: pointer;
                             }
-    
+
                             .remove-img {
                                 width: 100%;
                                 margin-top: 10px;
@@ -387,33 +436,33 @@ $button-fail: #dee2e6;
                                 border: none;
                                 border-radius: 5px;
                                 cursor: pointer;
-    
+
                                 &:hover {
                                     background-color: #953b3b;
                                 }
                             }
                         }
-    
+
                     }
-    
-                    .show-password{
+
+                    .show-password {
                         display: flex;
                         align-self: start;
                         height: fit-content;
                         margin-top: 10px;
                         margin-bottom: 0px;
-    
-                        input{
+
+                        input {
                             width: 10%;
                             margin-right: 10px;
                         }
-                        
-                        span{
+
+                        span {
                             width: 100%;
                         }
-    
+
                     }
-    
+
                     .submit-btn {
                         width: 100%;
                         margin-top: 30px;
@@ -424,11 +473,11 @@ $button-fail: #dee2e6;
                         border: none;
                         border-radius: 5px;
                         cursor: pointer;
-    
+
                         &:hover {
                             background-color: $button-success;
                         }
-    
+
                         &.error {
                             cursor: not-allowed;
                             background-color: $button-fail;
@@ -436,6 +485,7 @@ $button-fail: #dee2e6;
                         }
                     }
                 }
+
                 .submit-btn {
                     width: 100%;
                     margin-top: 50px;
@@ -446,11 +496,11 @@ $button-fail: #dee2e6;
                     border: none;
                     border-radius: 5px;
                     cursor: pointer;
-    
+
                     &:hover {
                         background-color: $button-success;
                     }
-    
+
                     &.error {
                         cursor: not-allowed;
                         background-color: $button-fail;

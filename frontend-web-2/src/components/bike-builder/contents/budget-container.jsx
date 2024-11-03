@@ -1,10 +1,12 @@
 // src/pages/bike-builder/components/BudgetContainer.jsx
 import React from 'react';
+import backbutton from "../../../assets/icons/back-button.png";
 
 const BudgetContainer = ({ isSettingBudget, budget, setBudget, handleProceed, setIsSettingBudget }) => {
     return (
         <div className="budget-container">
             <div className="budget-content">
+                {isSettingBudget && <img src={backbutton} alt="back-button" onClick={() => setIsSettingBudget(false)} />}
                 {isSettingBudget ? (
                     <div className="content">
                         <label htmlFor="budgetInput">Budget</label>

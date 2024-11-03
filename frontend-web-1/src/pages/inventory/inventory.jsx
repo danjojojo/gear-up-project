@@ -10,7 +10,6 @@ import exit from "../../assets/icons/exit.png";
 import edit from "../../assets/icons/edit.png";
 import del from "../../assets/icons/delete.png";
 import cancel from "../../assets/icons/cancel.png";
-import archive from "../../assets/icons/archive.png";
 import restore from "../../assets/icons/restore.png";
 import ImageUploadButton from "../../components/img-upload-button/img-upload-button";
 import { addItem, displayItems, dashboardData, getItemDetails, updateItem } from "../../services/inventoryService";
@@ -19,7 +18,7 @@ import { archiveItem, restoreItem, deleteItem } from "../../services/inventorySe
 import ImagePreviewModal from "../../components/image-preview-modal/image-preview";
 import LoadingPage from '../../components/loading-page/loading-page';
 import ErrorLoad from '../../components/error-load/error-load';
-import {Modal, Button} from 'react-bootstrap';
+import { Modal, Button } from 'react-bootstrap';
 import moment from 'moment';
 
 const Inventory = () => {
@@ -78,6 +77,21 @@ const Inventory = () => {
 
     const [loading, setLoading] = useState(true);
     const [errorLoad, setErrorLoad] = useState(false);
+    const [nameError, setNameError] = useState("");
+    const [nameSuccess, setNameSuccess] = useState(false);
+
+    const handleNameInput = (value) => {
+        // Check if the name already exists in the items list (case-insensitive comparison)
+        const nameExists = items.some(item => item.item_name.toLowerCase() === value.toLowerCase());
+
+        if (nameExists) {
+            setNameError("Item name already exist.");
+            setNameSuccess(false); // Clear the success message
+        } else {
+            setNameError(""); // Clear the error if the name is unique
+            setNameSuccess(true); // Show success message
+        }
+    };
 
     // Assuming items is an array of item objects
     const filteredItems = items.filter(item =>
@@ -91,16 +105,16 @@ const Inventory = () => {
     const [addedItemName, setAddedItemName] = useState('');
 
     function ConfirmModal({ onHide, onConfirm, ...props }) {
-		return (
-			<Modal
-				{...props}
-				size="md"
-				aria-labelledby="contained-modal-title-vcenter"
-				centered
-			>
-				<Modal.Header closeButton onClick={onHide}>
-					<Modal.Title id="contained-modal-title-vcenter">
-						{functionKey === 'archive' && 
+        return (
+            <Modal
+                {...props}
+                size="md"
+                aria-labelledby="contained-modal-title-vcenter"
+                centered
+            >
+                <Modal.Header closeButton onClick={onHide}>
+                    <Modal.Title id="contained-modal-title-vcenter">
+                        {functionKey === 'archive' &&
                             'Delete item?'
                         }
                         {functionKey === 'delete' &&
@@ -109,73 +123,73 @@ const Inventory = () => {
                         {functionKey === 'restore' &&
                             'Restore item?'
                         }
-					</Modal.Title>
-				</Modal.Header>
-				<Modal.Body>
-					{functionKey === 'archive' && 
+                    </Modal.Title>
+                </Modal.Header>
+                <Modal.Body>
+                    {functionKey === 'archive' &&
                         <p>If you archive this item, it will not be shown in your POS. Archived items will be stored and can be restored in the Archived tab in this page.</p>
                     }
-					{(functionKey === 'delete' && !selectedItem.bb_bu_status) && 
+                    {(functionKey === 'delete' && !selectedItem.bb_bu_status) &&
                         <p>If you delete this item, you won't be able to restore it.</p>
                     }
-					{(functionKey === 'delete' && selectedItem.bb_bu_status) && 
+                    {(functionKey === 'delete' && selectedItem.bb_bu_status) &&
                         <p>If you delete this item, you won't be able to restore it. Also, this item will be removed from the Bike Builder and Upgrader. Are you sure with this?</p>
                     }
-					{functionKey === 'restore' && 
+                    {functionKey === 'restore' &&
                         <p>If you restore this item, it can be used again in your POS. You will also be able to edit its details.</p>
                     }
-				</Modal.Body>
-				<Modal.Footer>
-					<Button variant="secondary" onClick={() => {
-							onHide();
-							if(functionKey === "delete") onConfirm();
-					}}>
-						{(functionKey === "archive" || functionKey === "restore") ? "Cancel" : "Confirm"}
-					</Button>
-					<Button variant={functionKey === 'delete' || functionKey === 'archive' ? "danger" : "primary"} onClick={() => {
-							onHide();
-							if(functionKey === "archive" || functionKey === "restore") onConfirm();
-						}}>
-						{(functionKey === "archive" || functionKey === "restore") ? "Confirm" : "Cancel"}
-					</Button>
-				</Modal.Footer>
-			</Modal>
-		);
-	}
+                </Modal.Body>
+                <Modal.Footer>
+                    <Button variant="secondary" onClick={() => {
+                        onHide();
+                        if (functionKey === "delete") onConfirm();
+                    }}>
+                        {(functionKey === "archive" || functionKey === "restore") ? "Cancel" : "Confirm"}
+                    </Button>
+                    <Button variant={functionKey === 'delete' || functionKey === 'archive' ? "danger" : "primary"} onClick={() => {
+                        onHide();
+                        if (functionKey === "archive" || functionKey === "restore") onConfirm();
+                    }}>
+                        {(functionKey === "archive" || functionKey === "restore") ? "Confirm" : "Cancel"}
+                    </Button>
+                </Modal.Footer>
+            </Modal>
+        );
+    }
     function ResponseModal(props) {
-		return (
-			<Modal
-				{...props}
-				size="md"
-				aria-labelledby="contained-modal-title-vcenter"
-				centered
-			>
-				<Modal.Header closeButton>
-					<Modal.Title id="contained-modal-title-vcenter">
-						Success
-					</Modal.Title>
-				</Modal.Header>
-				<Modal.Body>
-					{functionKey === 'archive' && 
+        return (
+            <Modal
+                {...props}
+                size="md"
+                aria-labelledby="contained-modal-title-vcenter"
+                centered
+            >
+                <Modal.Header closeButton>
+                    <Modal.Title id="contained-modal-title-vcenter">
+                        Success
+                    </Modal.Title>
+                </Modal.Header>
+                <Modal.Body>
+                    {functionKey === 'archive' &&
                         <p>{selectedItem.item_name} was archived successfully. This item will be stored in the Archive.</p>
                     }
-					{functionKey === 'delete' && 
+                    {functionKey === 'delete' &&
                         <p>{selectedItem.item_name} was deleted successfully.</p>
                     }
-					{functionKey === 'restore' && 
+                    {functionKey === 'restore' &&
                         <p>{selectedItem.item_name} was restored successfully.</p>
                     }
-					{functionKey === 'edit' && 
+                    {functionKey === 'edit' &&
                         <p>{selectedItem.item_name} was edited successfully.</p>
                     }
-					{functionKey === 'add' && 
+                    {functionKey === 'add' &&
                         <p>{addedItemName} was added successfully.</p>
                     }
-				</Modal.Body>
-			</Modal>
-		);
-	}
-    
+                </Modal.Body>
+            </Modal>
+        );
+    }
+
 
     // Fetch dashboard data
     const fetchDashboardData = async () => {
@@ -217,13 +231,13 @@ const Inventory = () => {
             setItems(sortedItems);
             setTimeout(() => {
                 setLoading(false);
-                setErrorLoad(false);   
+                setErrorLoad(false);
             }, 1000);
         } catch (error) {
             console.error("Error fetching items:", error);
             setTimeout(() => {
                 setLoading(false);
-                setErrorLoad(true);   
+                setErrorLoad(true);
             }, 1000);
         }
     }, [displayItem, selectedCategory, selectedStockCount, sortCriteria, sortOrder]);
@@ -280,6 +294,8 @@ const Inventory = () => {
         setIsAddingItem(false);
         setIsAddingStock(false);
         setIsEditing(false);
+        setNameError(""); // Clear the error if the name is unique
+        setNameSuccess(false); // Show success message
 
         try {
             const itemDetails = await getItemDetails(item.item_id);
@@ -352,6 +368,8 @@ const Inventory = () => {
         setSelectedItem(originalItem);
         setIsAddingStock(false);
         setIsEditing(false);
+        setNameError(""); // Clear the error if the name is unique
+        setNameSuccess(false); // Show success message
     };
 
     // Handle saving the edited item
@@ -436,6 +454,8 @@ const Inventory = () => {
     }
     // Handle archive item click
     const handleArchiveItemClick = () => {
+        setNameError(""); // Clear the error if the name is unique
+        setNameSuccess(false); // Show success message
         setDisplayItem(false);
         setShowArchived(true);
         setViewingItem(null);
@@ -497,6 +517,8 @@ const Inventory = () => {
 
     // Reset the form fields
     const resetForm = () => {
+        setNameError("");
+        setNameSuccess(false);
         setItemName("");
         setItemPrice("");
         setItemCost("");
@@ -523,12 +545,12 @@ const Inventory = () => {
         currency: "PHP",
     });
 
-    function handleConfirmModal(){
-        switch(functionKey){
+    function handleConfirmModal() {
+        switch (functionKey) {
             case 'archive':
                 handleArchiveItem(selectedItem.item_id);
                 break;
-            case 'delete':     
+            case 'delete':
                 handleDeleteItem(selectedItem.item_id);
                 break;
             case 'restore':
@@ -539,8 +561,8 @@ const Inventory = () => {
         }
     }
 
-    if(loading) return <LoadingPage classStyle={"loading-in-page"}/>
-    if(errorLoad) return <ErrorLoad classStyle={"error-in-page"}/>
+    if (loading) return <LoadingPage classStyle={"loading-in-page"} />
+    if (errorLoad) return <ErrorLoad classStyle={"error-in-page"} />
 
     return (
         <div className="inventory p-3">
@@ -563,7 +585,7 @@ const Inventory = () => {
                         <div className="upper-container d-flex">
                             <button className="add-btn" onClick={handleAddItemClick}>
                                 <span className="add-pos-user-text">Add Item</span>
-                                <i className="fa-solid fa-circle-plus"></i> 
+                                <i className="fa-solid fa-circle-plus"></i>
                             </button>
 
                             <SearchBar
@@ -698,62 +720,62 @@ const Inventory = () => {
                                         {displayItem === false ? 'No archived items' : 'No active items'}
                                     </div>
                                 ) : (
-                                filteredItems.map((item) => (
-                                    <div
-                                        key={item.item_id}
-                                        className="item-container d-flex"
-                                        onClick={() => handleItemClick(item)}
-                                    >
-                                        <div className="item-name">
-                                            {(!item.add_part && !item.bb_bu_status) && 
-                                                <i className="fa-solid fa-box"></i>
-                                            }
-                                            {(item.add_part && !item.bb_bu_status) && 
-                                                <i className="fa-solid fa-ruler-horizontal"></i>
-                                            }
-                                            {(!item.add_part && item.bb_bu_status) && 
-                                                <i className="fa-solid fa-bicycle"></i>
-                                            }
-                                            {item.item_name}
-                                        </div>
-                                        <div className="item-category">
-                                            {item.category_name}
-                                        </div>
-                                        <div className="item-price"> 
-                                            {PesoFormat.format(item.item_price)}
-                                        </div>
-                                        {/* <div className="item-date">
+                                    filteredItems.map((item) => (
+                                        <div
+                                            key={item.item_id}
+                                            className="item-container d-flex"
+                                            onClick={() => handleItemClick(item)}
+                                        >
+                                            <div className="item-name">
+                                                {(!item.add_part && !item.bb_bu_status) &&
+                                                    <i className="fa-solid fa-box"></i>
+                                                }
+                                                {(item.add_part && !item.bb_bu_status) &&
+                                                    <i className="fa-solid fa-ruler-horizontal"></i>
+                                                }
+                                                {(!item.add_part && item.bb_bu_status) &&
+                                                    <i className="fa-solid fa-bicycle"></i>
+                                                }
+                                                {item.item_name}
+                                            </div>
+                                            <div className="item-category">
+                                                {item.category_name}
+                                            </div>
+                                            <div className="item-price">
+                                                {PesoFormat.format(item.item_price)}
+                                            </div>
+                                            {/* <div className="item-date">
                                             {new Date(item.date_created).toLocaleDateString()}
                                         </div> */}
-                                        <div className="item-stocks">
-                                            {item.stock_count}
-                                        </div>
-                                        <div className="item-stock-status">
-                                            <div
-                                                className="status-container"
-                                                style={{
-                                                    backgroundColor:
-                                                        item.stock_count === 0
-                                                            ? "#DA7777" // No stock
-                                                            : item.low_stock_alert && item.stock_count <= item.low_stock_count
-                                                                ? "#DABE77" // Low stock
-                                                                : "#77DA87", // In stock
-                                                }}
-                                            >
-                                                {item.low_stock_alert
-                                                    ? item.stock_count === 0
-                                                        ? "No stock"
-                                                        : item.stock_count <= item.low_stock_count
-                                                            ? "Low stock"
-                                                            : "In stock"
-                                                    : item.stock_count === 0
-                                                        ? "No stock"
-                                                        : "In stock"}
-                                                
+                                            <div className="item-stocks">
+                                                {item.stock_count}
+                                            </div>
+                                            <div className="item-stock-status">
+                                                <div
+                                                    className="status-container"
+                                                    style={{
+                                                        backgroundColor:
+                                                            item.stock_count === 0
+                                                                ? "#DA7777" // No stock
+                                                                : item.low_stock_alert && item.stock_count <= item.low_stock_count
+                                                                    ? "#DABE77" // Low stock
+                                                                    : "#77DA87", // In stock
+                                                    }}
+                                                >
+                                                    {item.low_stock_alert
+                                                        ? item.stock_count === 0
+                                                            ? "No stock"
+                                                            : item.stock_count <= item.low_stock_count
+                                                                ? "Low stock"
+                                                                : "In stock"
+                                                        : item.stock_count === 0
+                                                            ? "No stock"
+                                                            : "In stock"}
+
+                                                </div>
                                             </div>
                                         </div>
-                                    </div>
-                                ))
+                                    ))
                                 )}
                             </div>
                         </div>
@@ -808,9 +830,9 @@ const Inventory = () => {
                                                         setShowConfirmModal(true);
                                                         setFunctionKey('delete');
                                                     }}
-                                                    />
-                                                ) : (
-                                                    <img
+                                                />
+                                            ) : (
+                                                <img
                                                     src={del}
                                                     alt="Archive"
                                                     className="archive-icon"
@@ -868,16 +890,21 @@ const Inventory = () => {
                                             id="item-name"
                                             name="itemName"
                                             value={selectedItem.item_name || ""}
-                                            onChange={(e) =>
+                                            onChange={(e) => {
+                                                handleNameInput(e.target.value); // Check if the name exists
                                                 setSelectedItem((prev) => ({
                                                     ...prev,
                                                     item_name: e.target.value,
-                                                }))
-                                            }
+                                                }));
+                                            }}
                                             placeholder="Enter item name"
                                             disabled={!isEditing}
                                             required
                                         />
+                                        {nameError && <p className='error'>{nameError}</p>}
+                                        {!nameError && nameSuccess && (
+                                            <p className='success'>Item name is available.</p>
+                                        )}
                                     </div>
 
                                     <div className="item-price form-group">
@@ -923,7 +950,7 @@ const Inventory = () => {
                                             }}
                                             placeholder="Enter item cost"
                                             disabled={!isEditing}
-                                            // required
+                                        // required
                                         />
                                     </div>
 
@@ -1128,7 +1155,11 @@ const Inventory = () => {
 
                                     {isEditing && (
                                         <div className="submit-container">
-                                            <button type="submit" className="submit-btn">
+                                            <button
+                                                type="submit"
+                                                className="submit-btn"
+                                                disabled={nameError} // Disable button if there's an error
+                                            >
                                                 Save
                                             </button>
                                         </div>
@@ -1155,17 +1186,24 @@ const Inventory = () => {
 
                                         <ImageUploadButton onFileSelect={handleFileSelect} />
 
-                                        <div className=" item-name form-group">
+                                        <div className="item-name form-group">
                                             <label htmlFor="item-name-add">Name</label>
                                             <input
                                                 type="text"
                                                 id="item-name-add"
                                                 name="itemName"
                                                 value={itemName}
-                                                onChange={(e) => setItemName(e.target.value)}
+                                                onChange={(e) => {
+                                                    handleNameInput(e.target.value); // Check if the name exists
+                                                    setItemName(e.target.value);
+                                                }}
                                                 placeholder="Enter item name"
                                                 required
                                             />
+                                            {nameError && <p className='error'>{nameError}</p>}
+                                            {!nameError && nameSuccess && (
+                                                <p className='success'>Item name is available.</p>
+                                            )}
                                         </div>
 
                                         <div className="item-price form-group">
@@ -1339,7 +1377,11 @@ const Inventory = () => {
                                         )}
 
                                         <div className="submit-container">
-                                            <button type="submit" className="submit-btn">
+                                            <button
+                                                type="submit"
+                                                className="submit-btn"
+                                                disabled={nameError} // Disable button if there's an error
+                                            >
                                                 Add
                                             </button>
                                         </div>
