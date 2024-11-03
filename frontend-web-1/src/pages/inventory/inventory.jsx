@@ -398,14 +398,23 @@ const Inventory = () => {
             "addToBikeBuilder",
             selectedItem.add_part ? "true" : "false",
         );
+
+        updatedData.append(
+            "bbBuStatus",
+            selectedItem.bb_bu_status ? "true" : "false",
+        );
+
         updatedData.append(
             "bikeParts",
-            selectedItem.add_part ? selectedItem.bike_parts : null,
+            selectedItem.bike_parts
         );
+
 
         if (selectedFile) {
             updatedData.append("itemImage", selectedFile);
         }
+
+        console.log(selectedItem.bike_parts);
 
         try {
             await updateItem(selectedItem.item_id, updatedData);

@@ -9,7 +9,8 @@ const {
     updateOrderShipping,
     deductStockForCompletedOrder,
     getOrderDates,
-    getOrderStatistics 
+    getOrderStatistics,
+    getOrder
 } = require('../controllers/orderController');
 
 router.get('/get-orders/:startDate', verifyToken, checkRole('admin'), getOrders);
@@ -25,5 +26,7 @@ router.put('/deduct-stock-for-completed-order/:orderId', verifyToken, checkRole(
 router.get('/get-order-dates', verifyToken, checkRole('admin'), getOrderDates);
 
 router.get('/get-order-statistics/:startDate', verifyToken, checkRole('admin'), getOrderStatistics);
+
+router.get('/:orderId', getOrder);
 
 module.exports = router;

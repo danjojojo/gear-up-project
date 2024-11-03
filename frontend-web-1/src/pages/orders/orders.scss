@@ -224,6 +224,14 @@ $bg-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
                     }
         
                 }
+
+            }
+
+            .no-order{
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                height: 100%;
             }
 
             .order-details{

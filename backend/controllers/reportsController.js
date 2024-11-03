@@ -61,12 +61,18 @@ const getExpensesReport = async (req, res) => {
         const summaryResult = await pool.query(
             `
             SELECT 
-                e.expense_name, 
+                CASE
+                    WHEN e.expense_name = 'Food' THEN 'Food'
+                    WHEN e.expense_name = 'Water' THEN 'Water'
+                    WHEN e.expense_name LIKE 'Others%' THEN 'Others'
+                    ELSE 'Other'
+                END AS expense_name,
                 SUM(e.expense_amount) AS total_amount
             FROM expenses e
             WHERE EXTRACT(MONTH FROM e.date_created) = $1 
             AND EXTRACT(YEAR FROM e.date_created) = $2
-            GROUP BY e.expense_name
+            AND e.status = 'active'
+            GROUP BY expense_name
             ORDER BY total_amount DESC;
             `,
             [month, year]
@@ -82,6 +88,7 @@ const getExpensesReport = async (req, res) => {
             FROM expenses e
             WHERE EXTRACT(MONTH FROM e.date_created) = $1 
             AND EXTRACT(YEAR FROM e.date_created) = $2
+            AND e.status = 'active'
             GROUP BY day, e.expense_name
             ORDER BY day ASC, e.expense_name;
             `,

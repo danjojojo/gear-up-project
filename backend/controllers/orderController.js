@@ -1,5 +1,5 @@
 const pool = require('../config/db');
-
+const { decrypt } = require('../utils/encrypt');
 
 const getOrders = async (req, res) => {
     try {
@@ -12,7 +12,53 @@ const getOrders = async (req, res) => {
             ORDER BY date_created DESC;
         `
         const { rows } = await pool.query(query, [startDate]);
+
+        // // Decrypt the address for each order
+        // const orders = rows.map(order => {
+        //     return {
+        //         ...order,
+        //         address: decrypt(order.address) // Decrypt the address field
+        //     };
+        // });
+
         res.status(200).json({ orders : rows });
+
+    } catch (error) {
+        console.error('Error getting orders:', error.message);
+        res.status(500).json({ error: error.message });
+    }
+}
+
+const getOrder = async (req, res) => {
+    try {
+        const { orderId } = req.params;
+        console.log('orderId:', orderId);
+        console.log(orderId);
+        const orderQuery = `
+            SELECT * 
+            FROM orders
+            WHERE order_name = $1
+        `
+        const oResult = await pool.query(orderQuery, [orderId]);
+       
+        const itemsQuery = `
+            SELECT 
+                oi.*, 
+                i.item_name,
+                CASE
+                    WHEN oi.part_type = 'Bike Upgrader' AND o.bu_option = 'deliver-home'THEN 'TR'
+                    WHEN oi.part_type = 'Bike Upgrader' AND o.bu_option = 'pickup-store' THEN 'TP'
+                    WHEN oi.part_type = 'Bike Builder' AND o.bb_option = 'pickup-store' THEN 'TP'
+                    ELSE oi.part_type
+                END AS part_type
+            FROM order_items oi
+            JOIN items i ON oi.item_id = i.item_id
+            JOIN orders o ON oi.order_id = o.order_id
+            WHERE o.order_name = $1;
+        `
+        const iResult = await pool.query(itemsQuery, [orderId]);
+
+        res.status(200).json({ order : oResult.rows[0], items: iResult.rows });
     } catch (error) {
         console.error('Error getting orders:', error.message);
         res.status(500).json({ error: error.message });
@@ -32,7 +78,6 @@ const getOrderDates = async (req, res) => {
         console.error('Error getting order dates:', error.message);
         res.status(500).json({ error: error.message });
     }
-
 }
 
 const getOrdersItems = async (req, res) => {
@@ -239,5 +284,6 @@ module.exports = {
     updateOrderShipping,
     deductStockForCompletedOrder,
     getOrderDates,
-    getOrderStatistics 
+    getOrderStatistics,
+    getOrder
 }

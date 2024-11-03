@@ -5,6 +5,8 @@ CREATE TABLE public.admin (
     admin_name character varying(30),
     admin_email character varying(255),
     admin_password character varying(255),
+    admin_2fa_secret VARCHAR(255),
+    admin_2fa_enabled BOOLEAN DEFAULT false,
     date_created timestamp without time zone DEFAULT CURRENT_TIMESTAMP,
     date_updated timestamp without time zone DEFAULT CURRENT_TIMESTAMP,
     role character varying(10) DEFAULT 'admin'::character varying

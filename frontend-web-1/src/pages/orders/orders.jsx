@@ -52,7 +52,7 @@ const Orders = () => {
 
     const [loading, setLoading] = useState(true);
 
-    const link = 'http://localhost:3000/checkout?order=';
+    const link = 'http://localhost:3000/orders/';
     
     const DisabledDateInput = forwardRef(
       ({ value, onClick, className }, ref) => (
@@ -143,7 +143,7 @@ const Orders = () => {
             setTrackingNumber('');
             setTimeout(()=> {
                 setLoading(false);
-            }, 500);
+            }, 500); 
             console.log(filteredOrders);
         } catch (error) {
             console.error('Error getting orders:', error.message);
@@ -286,8 +286,10 @@ const Orders = () => {
     }
 
     const handleSetShippingDetails = (status) => {
-        if(selectedOrder.bu_option === 'deliver-home' && (selectedOrder.courier === '' || selectedOrder.trackingNumber === '')) {
+        console.log(selectedOrder.bu_option);
+        if(selectedOrder.bu_option === 'deliver-home' && (courier === '' || trackingNumber === '')){ 
             setShowMessage(true);
+            setShowChangeStatusModal(false);
             return;
         } else {
             setShowMessage(false);
@@ -382,6 +384,11 @@ const Orders = () => {
                                     </div>
                                 ))}
                             </div>
+                            {retrievedOrders.length === 0 &&
+                                <div className="no-order">
+                                    <p>No orders.</p>
+                                </div>
+                            }
                     </>}
                     {openOrderView && <>
                             <div className="nav">

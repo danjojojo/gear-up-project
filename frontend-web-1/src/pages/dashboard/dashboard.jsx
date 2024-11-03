@@ -317,7 +317,7 @@ const Dashboard = () => {
 
                 <div className='lower-container'>
                     <div className='content'>
-                        <h3>Overview</h3>
+                        <h3>POS Overview</h3>
                         <Bar
                             className='canvas'
                             data={{

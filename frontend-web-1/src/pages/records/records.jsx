@@ -632,7 +632,7 @@ const Records = () => {
                                             <p>{record.pos_name}</p>
                                         </div>
                                         <div className="time">
-                                            <p>{moment(record.date_created).format("LT")}</p>
+                                            <p><span>{(selectedRecord === 'expenses' && record.status === 'archived') && record.status}</span> {moment(record.date_created).format("LT")}</p>
                                         </div>
                                     </div>
                                     <div className="bottom">

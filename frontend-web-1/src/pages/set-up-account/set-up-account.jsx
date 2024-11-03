@@ -1,7 +1,8 @@
-import React, { useState, useEffect } from 'react';
-import { register } from '../../services/authService';
+import React, { useState, useEffect, useRef } from 'react';
+import { register, verifyOTP } from '../../services/authService';
 import AuthLayout from '../../components/auth-layout/auth-layout';
 import './set-up-account.scss';
+import {Modal, Form, Button} from 'react-bootstrap';
 
 const SetUpAccount = () => {
     const [email, setEmail] = useState('');
@@ -17,6 +18,24 @@ const SetUpAccount = () => {
     const [pwHasNumber, setPwHasNumber] = useState(false);
     const [pwHasSpecialChar, setPwHasSpecialChar] = useState(false);
 
+    const [qrCodeDataURL, setQrCodeDataURL] = useState(null);  // Store the QR code URL
+    const [otp, setOtp] = useState('');  // OTP input for 2FA verification
+    const [otpError, setOtpError] = useState(null);  // Error if OTP verification fails
+
+    const [showModalOTP, setShowModalOTP] = useState(false);
+
+    const otpRef = useRef(null);
+
+    const errorMsgStyle = {
+        color: '#cb2020',
+        fontSize: '1rem',
+        marginTop: '15px',
+        padding: '10px 0',
+        textAlign: 'center',
+        backgroundColor: '#ff5a5a45',
+        borderRadius: '5px',
+    };
+
     const handleSubmit = async (e) => {
         e.preventDefault();
         console.log('1');
@@ -28,12 +47,16 @@ const SetUpAccount = () => {
         }
 
         try {
-            await register(email, password);
-            window.location.reload();
+            const data = await register(email, password);
+            setQrCodeDataURL(data.qrCodeDataURL);
+            setShowModalOTP(true);
+            // window.location.reload();
+            setError(null);  // Clear any previous error
         } catch (err) {
             setError('Failed to set up account. Please try again.');
         }
     };
+
 
    useEffect(() => {
         const hasLowerCase = /[a-z]/.test(password);
@@ -58,6 +81,69 @@ const SetUpAccount = () => {
         }
     }, [password, confirmPassword]);
 
+    const handleOTPSubmit = async (otp) => {
+
+        try {
+            const response = await verifyOTP(otp); // Call backend to verify OTP
+            if (response.message) {
+                window.location.href = '/';  // Redirect to login if successful
+            } else {
+                setOtpError("Invalid OTP. Please try again.");
+            }
+        } catch (err) {
+            setOtpError("Failed to verify OTP. Please try again.");
+        }
+    };
+
+    function ModalOTP({ onHide, onConfirm, ...props }) {
+        return (
+            <Modal
+            {...props}
+            size="md"
+            aria-labelledby="contained-modal-title-vcenter"
+            centered
+            >
+            <Modal.Header>
+                <Modal.Title id="contained-modal-title-vcenter">
+                2FA Setup
+                </Modal.Title>
+            </Modal.Header>
+            <Modal.Body>                        
+                {qrCodeDataURL && (
+                    <div className="qr-code" style={{display: 'flex', flexDirection: 'column'}}>
+                        <h5>Scan to Enable 2FA</h5>
+                        <p>Scan the QR Code in your Google Authenticator or any authenticator app.</p>
+                        <p>Do not share this with anyone.</p>
+                        <img src={qrCodeDataURL} alt="2FA QR Code" style={{width: '200px', margin: '0 auto'}}/>
+                        <label htmlFor="">Enter the OTP</label>
+                        <input
+                            ref={otpRef}
+                            type="text"
+                            placeholder="XXXXXX"
+                            maxLength="6"
+                            id='otp'
+                        />
+                        {otpError && <p style={errorMsgStyle}>{otpError}</p>}
+                    </div>
+                )}
+            </Modal.Body>
+            <Modal.Footer>
+                <Button variant="primary" onClick={() => {
+                    const otp = otpRef.current.value;
+                    if(otp === '') {
+                        setOtpError('Please enter OTP.');
+                    } else if (otp.length < 6){
+                        setOtpError('OTP must be 6 characters.');
+                    } else {
+                        handleOTPSubmit(otp);
+                    }
+                }}>
+                Confirm
+                </Button>
+            </Modal.Footer>
+            </Modal>
+        );
+    }
 
     return (
         <div className='set-up-account'>
@@ -77,6 +163,7 @@ const SetUpAccount = () => {
                                 placeholder="Enter your email"
                                 value={email}
                                 onChange={(e) => setEmail(e.target.value)}
+                                autocomplete='off'
                                 required
                             />
                         </div>
@@ -135,6 +222,10 @@ const SetUpAccount = () => {
                     </form>
                 </div>
             } />
+            <ModalOTP
+                show={showModalOTP}
+                onHide={() => setShowModalOTP(false)}
+            />
         </div>
     );
 };

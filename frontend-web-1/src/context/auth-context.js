@@ -1,5 +1,5 @@
 import React, { createContext, useEffect, useState } from 'react';
-import { login, loginPOS, getMyRole, logoutUser, getMyName, refreshToken } from '../services/authService';
+import { login, loginPOS, getMyRole, logoutUser, getMyName, refreshToken, verifyAdminOTP } from '../services/authService';
 // import { setupAxiosInterceptors } from '../services/api';
 
 const AuthContext = createContext();
@@ -10,6 +10,7 @@ const AuthProvider = ({ children }) => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [userName, setUserName] = useState(null);
+  const [otpRequired, setOtpRequired] = useState(false);
 
   const handleTokenRefresh = async () => {
     try {
@@ -53,13 +54,8 @@ const AuthProvider = ({ children }) => {
     try {
       const { message } = await login(email, password);
       if (message === 'Login successful') {
+        setOtpRequired(true);
         setError(null);  // Clear previous errors
-        setLoading(true);
-        setTimeout(() => setLoading(false), 1000);
-        const role = await getMyRole();
-        setUserRole(role);
-        setAuthenticated(true);
-        window.location.reload();  // Reload the page only on successful login
       }
     } catch (error) {
       setUserRole(null);
@@ -67,6 +63,26 @@ const AuthProvider = ({ children }) => {
       throw error;  // Throw the error so it's caught and handled in the login component
     }
   };
+
+  const handleVerifyAdminOTP = async (email, otp) => {
+    try {
+      const { message } = await verifyAdminOTP(email, otp);
+      if(message === 'OTP verified') { 
+        setError(null);
+        setOtpRequired(false);
+        setLoading(true);
+        setTimeout(() => setLoading(false), 1000);
+        const role = await getMyRole();
+        setUserRole(role);
+        setAuthenticated(true);
+        window.location.reload();  // Reload the page only on successful login
+      } else {
+        setOtpRequired(true);
+      }
+    } catch (error) {
+      setError('Invalid OTP. Please try again.');
+    }
+  }
 
   const loginPOSUser = async (id, password) => {
     try {
@@ -106,7 +122,7 @@ const AuthProvider = ({ children }) => {
   };
 
   return (
-    <AuthContext.Provider value={{ userRole, authenticated, loading, error, loginAdmin, loginPOSUser, logout, userName }}>
+    <AuthContext.Provider value={{ userRole, authenticated, loading, error, loginAdmin, handleVerifyAdminOTP, loginPOSUser, logout, userName }}>
       {children}
     </AuthContext.Provider>
   );

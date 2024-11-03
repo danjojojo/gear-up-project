@@ -4,6 +4,7 @@ const pool = require('../config/db');
 const { nanoid } = require('nanoid');
 require('dotenv').config();
 const axios = require('axios');
+const { encrypt } = require('../utils/encrypt');
 
 const PAYMONGO_SECRET_KEY = process.env.PAYMONGO_SECRET_KEY;
 

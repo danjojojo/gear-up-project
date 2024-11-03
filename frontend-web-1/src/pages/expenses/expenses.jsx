@@ -250,7 +250,6 @@ const Expenses = () => {
 		setExpensePreviewImage(null);
 		setOthersExpenseName('');
 		setOthersExpense(false);
-		removeImage();
 	}
 	function restartExpenseForm(){
 		setOpenExpenseView(false);

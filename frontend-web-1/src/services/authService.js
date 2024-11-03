@@ -101,3 +101,25 @@ export const refreshToken = async () => {
     throw error;
   }
 }
+
+// Verify OTP
+export const verifyOTP = async (otp) => {
+  try {
+    const response = await api.post('/auth/verify-otp', { otp });
+    return response.data;
+  } catch (error) {
+    console.error('Error verifying OTP:', error);
+    throw error;
+  }
+}
+
+// Verify admin OTP
+export const verifyAdminOTP = async (email, otp) => {
+  try {
+    const response = await api.post('/auth/verify-admin-otp', { email, otp });
+    return response.data;
+  } catch (error) {
+    console.error('Error verifying admin OTP:', error);
+    throw error;
+  }
+}

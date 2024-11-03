@@ -292,8 +292,9 @@ const getItemById = async (req, res) => {
 const updateItem = async (req, res) => {
     try {
         const { id } = req.params;
-        const { itemName, itemPrice, stock, category, lowStockAlert, lowStockThreshold, addToBikeBuilder, bikeParts, itemCost } = req.body;
+        const { itemName, itemPrice, stock, category, lowStockAlert, lowStockThreshold, addToBikeBuilder, bbBuStatus, bikeParts, itemCost } = req.body;
         const itemImage = req.file ? req.file.buffer : null;
+        console.log(itemName, itemPrice, stock, category, lowStockAlert, lowStockThreshold, addToBikeBuilder, bbBuStatus, bikeParts, itemCost)
 
         const categoryQuery = 'SELECT category_id FROM category WHERE category_name = $1';
         const categoryResult = await pool.query(categoryQuery, [category]);
@@ -307,8 +308,10 @@ const updateItem = async (req, res) => {
         const itemLowStockAlert = lowStockAlert === 'true';
         const itemLowStockThreshold = itemLowStockAlert ? (lowStockThreshold ? parseInt(lowStockThreshold, 10) : null) : null;
 
+        console.log('bbStatus: ', bbBuStatus);
         const itemAddToBikeBuilder = addToBikeBuilder === 'true';
-        const itemBikeParts = itemAddToBikeBuilder ? bikeParts : null;
+        const itemBikeParts = itemAddToBikeBuilder || bbBuStatus ? bikeParts : null;
+        console.log(itemBikeParts);
 
         const query = `
             UPDATE items SET

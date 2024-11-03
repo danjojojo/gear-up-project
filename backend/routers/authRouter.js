@@ -10,7 +10,9 @@ const {
   getMyRole,
   getMyName,
   logoutUser,
-  refreshToken
+  refreshToken,
+  verifyOTP,
+  verifyAdminOTP
 } = require("../controllers/authController");
 
 router.get('/admin-check', checkAdminExists);
@@ -30,5 +32,9 @@ router.get('/my-name', verifyToken, getMyName);
 router.post('/logout', logoutUser);
 
 router.post('/refresh-token', refreshToken);
+
+router.post('/verify-otp', verifyToken, verifyOTP);
+
+router.post('/verify-admin-otp', verifyAdminOTP);
 
 module.exports = router;

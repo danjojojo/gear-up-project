@@ -82,7 +82,6 @@ export default function RecordModal({name, date, posName, subtotal, items, selec
                         {(selectedRecord === 'expenses' && !Array.isArray(items)) && (
                             <div className="item">
                                 <div className="top">
-                                    {/* <p>{items.expense_image}</p> */}
                                 </div>
                                 <div className="bottom">
 

@@ -18,6 +18,7 @@ function App() {
             <Route path="bike-upgrader" element={<Pages.BikeUpgrader />} />
             <Route path="cart" element={<Pages.Cart />} />
             <Route path="checkout" element={<Pages.Checkout />} />
+            <Route path="orders/:orderId" element={<Pages.Order />} />
             <Route path="checkout/success" element={<Pages.CheckoutSuccess />} />
             <Route path="*" element={<Pages.NotFound />} />
           </Route>

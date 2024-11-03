@@ -26,7 +26,7 @@ const getSummaryRecords = async (req, res) => {
                 UNION
                 SELECT 'expense' AS record_type, expense_name, expense_amount, e.date_created as date, pos_name, e.expense_id as record_id, e.expense_id as record_item_id, '0' as refund_qty, '1' as item_qty, expense_amount as item_unit_price
                     FROM expenses e JOIN pos_users P on e.pos_id = p.pos_id
-                    WHERE DATE(e.date_created) = $1
+                    WHERE DATE(e.date_created) = $1 AND e.status = 'active'
                     ORDER BY date DESC, item_name ASC;
             `
             const values = [date];

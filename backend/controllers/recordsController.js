@@ -94,7 +94,8 @@ const getDashboardData = async (req, res) => {
                         COUNT(CASE WHEN DATE(date_created) = $1 THEN expense_id ELSE NULL END) AS entries_today,
                         SUM(expense_amount) AS total_expenses,
                         COUNT(expense_id) AS total_entries
-                    FROM expenses;
+                    FROM expenses
+                    WHERE status = 'active';
                 `;
                 const values = [date];
                 const { rows } = await pool.query(query, values);
@@ -182,7 +183,7 @@ const getRecords = async (req, res) => {
         case 'expenses':
             try {
                 const query = `
-                    SELECT e.expense_name AS record_name, e.expense_amount AS record_total_amount, p.pos_name, e.date_created, e.expense_id AS record_id
+                    SELECT e.expense_name AS record_name, e.expense_amount AS record_total_amount, p.pos_name, e.date_created, e.expense_id AS record_id, e.status AS status
                         FROM expenses E
                         JOIN pos_users P ON E.pos_id = P.pos_id
                     WHERE DATE(e.date_created) = $1
@@ -326,7 +327,7 @@ const getInnerRecords = async (req, res) => {
         case 'expenses':
             try {
                 const query = `
-                    SELECT encode(expense_image, 'base64') AS expense_image, expense_name, expense_amount
+                    SELECT encode(expense_image, 'base64') AS expense_image, expense_name, expense_amount, status
                         FROM expenses
                     WHERE expense_id = $1
                 `;
