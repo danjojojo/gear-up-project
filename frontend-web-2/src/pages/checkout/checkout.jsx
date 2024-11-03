@@ -63,7 +63,7 @@ const Checkout = () => {
         name === '' || 
         email === '' || 
         phone.length === 0 || phone.length !== 11 ||
-        address === '';
+        bikeUpgradeDelivery === 'deliver-home' && address === "";
     
     const isDeliveryOptionIncomplete = 
         (checkedBuItems.length !== 0 && bikeUpgradeDelivery === 'n/a') || 
@@ -297,11 +297,14 @@ const Checkout = () => {
                 </div>}
                 <button
                     onClick={proceedToPayment}
-                    disabled={checkedBuItems.length + checkedBbItems.length === 0}
+                    disabled={
+                        (checkedBuItems.length + checkedBbItems.length === 0) ||
+                        (isFormIncomplete ||
+                        isDeliveryOptionIncomplete) }
                     className={
                         (checkedBuItems.length + checkedBbItems.length === 0) ||
-                        isFormIncomplete ||
-                        isDeliveryOptionIncomplete 
+                        (isFormIncomplete ||
+                        isDeliveryOptionIncomplete) 
                          ? "disabled" : "enabled"}
                 >
                     Proceed to Payment

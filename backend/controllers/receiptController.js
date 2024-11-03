@@ -76,6 +76,30 @@ const getPosReceipts = async (req, res) => {
     }
 }
 
+const getReceiptDetails = async(req, res) => {
+    try {
+        const { receiptSaleId } = req.params;
+        const token = req.cookies.token;
+        if (!token) {
+          return res.status(401).json({ error: "No token provided " });
+        }
+
+        const query = `
+            SELECT R1.receipt_id, R1.receipt_name, R1.receipt_total_cost, R1.receipt_paid_amount, 
+                R1.receipt_change, R1.sale_id, P.pos_name, R1.date_created, R1.date_updated, 
+                R1.status, R1.receipt_type, R2.receipt_name AS original_receipt_name
+            FROM receipts R1
+            JOIN pos_users P ON R1.pos_id = P.pos_id
+            LEFT JOIN receipts R2 ON R1.receipt_type = 'refund' AND R1.refund_id = R2.receipt_id
+            WHERE R1.sale_id = $1;
+        `;
+        const { rows } = await pool.query(query, [receiptSaleId]);
+        res.json({ receipt: rows[0] });
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+}
+
 const getReceiptItems = async(req, res) => {
     try {
         const { receiptSaleId } = req.params;
@@ -98,7 +122,7 @@ const getReceiptItems = async(req, res) => {
         `;
 
         const { rows } = await pool.query(query, [receiptSaleId]);
-        res.json({ items: rows });
+        res.json({ items: rows, receiptItems : rows });
     }
     catch(err) {
         res.status(500).json({ error: err.message });
@@ -478,5 +502,6 @@ module.exports = {
   cancelVoidReceipt,
   refundReceipt,
   adminCancelRefundReceipt,
-  getReceiptsDashboard
+  getReceiptsDashboard,
+  getReceiptDetails
 };

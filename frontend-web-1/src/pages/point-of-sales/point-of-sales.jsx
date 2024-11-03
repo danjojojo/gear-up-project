@@ -3,8 +3,10 @@ import ResponsivePageLayout from "../../components/responsive-page-layout/respon
 import { useState, useEffect } from "react";
 import { NumericFormat } from "react-number-format";
 import { getAllItems, getAllMechanics, confirmSale } from "../../services/posService";
+import { getReceiptItems, getReceiptDetails } from "../../services/receiptService";
 import LoadingPage from "../../components/loading-page/loading-page";
 import SearchBar from "../../components/search-bar/search-bar";
+import moment from 'moment';
 
 const PointOfSales = () => {
   const [error, setError] = useState(null)
@@ -83,6 +85,10 @@ const PointOfSales = () => {
 
   // ACTIVE BUTTON STATE
   const [activeButton, setActiveButton] = useState(null);
+
+  const [allReceiptItems, setAllReceiptItems] = useState([]);
+  const [retrievedReceiptItems, setRetrievedReceiptItems] = useState([]);
+  const [receiptDetails, setReceiptDetails] = useState({});
 
   // POS AND CHECKOUT INTERACTIONS
   function addItem(newItem) {
@@ -376,8 +382,11 @@ const PointOfSales = () => {
         amountReceived,
         change
       );
-      const { receiptName } = result;
-      console.log("Sale confirmed", receiptName);
+      const { saleId } = result;
+      const { receiptItems } = await getReceiptItems(saleId);
+      const { receipt } = await getReceiptDetails(saleId);
+      setRetrievedReceiptItems(receiptItems);
+      setReceiptDetails(receipt);
       localStorage.removeItem("items");
       localStorage.removeItem("mechanics");
       setTimeout(() => {
@@ -468,6 +477,12 @@ const PointOfSales = () => {
     handleResize();
     window.addEventListener("resize", handleResize);
   }, [isVisible]);
+
+  const printReceipt = () => {
+    window.print();
+    console.log(receiptDetails);
+    console.log(retrievedReceiptItems);
+  }
 
   // DISPLAY LOADING
   if(loading) return <LoadingPage classStyle="loading-in-page"/>
@@ -723,7 +738,13 @@ const PointOfSales = () => {
                       <h4>Receipt</h4>
                     </div>
                     <p>Transaction successful!</p>
-                    <p className="checkout-total">Print Receipt</p>
+                    <p className="checkout-total"
+                      onClick={() => {
+                        printReceipt(); 
+                      }}
+                    >
+                      Print Receipt
+                    </p>
                     <p
                       className="checkout-total"
                       onClick={() => {
@@ -1180,6 +1201,60 @@ const PointOfSales = () => {
                 )}
               </div>
             )}
+            {/* Hidden print area - to be fixed */}
+            <div id="print-area" className="print-only">
+              {receiptDetails.length !== 0 && (
+                <div className="receipt-details-info">
+                  <h1><span>ARON</span><span>BIKES</span></h1>
+                <div className="receipt-details-info-header">
+                  <p>{receiptDetails.receipt_name}</p>
+                  <p>
+                    {moment(receiptDetails.date_created).format("LL")} -{" "}
+                    {moment(receiptDetails.date_created).format("LT")}
+                  </p>
+                  <p>AronBikes</p>
+                  <p>{receiptDetails.pos_name}</p>
+                  <div className="total">
+                    <p>{PesoFormat.format(receiptDetails.receipt_total_cost)}</p>
+                    <p>Total</p>
+                  </div>
+                </div>
+                <div className="receipt-details-info-content">
+                  {retrievedReceiptItems.length > 0 &&
+                    retrievedReceiptItems.map((item, itemIndex) => {
+                      return (
+                        <div className='receipt-details-item' key={itemIndex}> 
+                            <div className="left">    
+                                <p className="name">{item.item_name}</p>
+                                {item.record_type === 'item' && <p className="qty-unit-price">{item.qty} x {item.item_unit_price}</p>}
+                                {item.record_type === 'mechanic' && <p className="qty-unit-price">Mechanic Service</p>}
+                            </div>
+                            <p className='total-price'>{PesoFormat.format(item.item_total_price)}</p>
+                        </div>
+                      );
+                    })}
+                </div>
+                <div className="total-paid-change">
+                  <div className="total">
+                    <p>Total</p>
+                    <p>{PesoFormat.format(receiptDetails.receipt_total_cost)}
+                    </p>
+                  </div>
+                  <div className="paid">
+                    <p>Paid</p>
+                    <p>{PesoFormat.format(receiptDetails.receipt_paid_amount)}
+                    </p>
+                  </div>
+                  <div className="change">
+                    <p>Change</p>
+                    <p>
+                      {PesoFormat.format(receiptDetails.receipt_change)}
+                    </p>
+                  </div>
+                </div>
+              </div>
+              )}
+            </div>
           </div>
         }
       />

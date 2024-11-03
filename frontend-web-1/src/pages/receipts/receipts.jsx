@@ -968,6 +968,7 @@ const Receipts = () => {
               <div id="print-area" className="print-only">
                 {receiptDetails.length !== 0 && (
                   <div className="receipt-details-info">
+                    <h1><span>ARON</span><span>BIKES</span></h1>
                   <div className="receipt-details-info-header">
                     <p>{receiptDetails.receipt_name}</p>
                     <p>

@@ -343,8 +343,6 @@ ALTER TABLE ONLY public.expenses
 ALTER TABLE ONLY public.expenses
     ADD CONSTRAINT pos_id FOREIGN KEY (pos_id) REFERENCES public.pos_users(pos_id) ON UPDATE CASCADE ON DELETE CASCADE;
 
-
-
 CREATE TABLE orders (
     order_id VARCHAR(255) PRIMARY KEY,
     payment_id VARCHAR(255),
@@ -370,18 +368,6 @@ CREATE TABLE orders (
     expires_at TIMESTAMP
 );
 
-CREATE TABLE orders_bb (
-    build_id VARCHAR(255) PRIMARY KEY,
-    order_id VARCHAR(255),
-    build_name VARCHAR(255),
-    build_image BYTEA,
-	build_price DECIMAL(10, 2),
-    date_created TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    CONSTRAINT fk_order_id FOREIGN KEY (order_id) REFERENCES orders(order_id)
-	ON UPDATE CASCADE 
-	ON DELETE CASCADE
-);
-
 CREATE TABLE order_items (
     order_item_id VARCHAR(255) PRIMARY KEY,
     order_id VARCHAR(255),
@@ -399,34 +385,3 @@ CREATE TABLE order_items (
     ON UPDATE CASCADE
     ON DELETE SET NULL
 );
-
-ALTER TABLE order_items
-ADD COLUMN part VARCHAR(255);
-
-SELECT * FROM orders;
-SELECT * FROM orders_bb;
-SELECT * FROM order_items;
-SELECT * FROM items;
-SELECT image FROM frame;
-
-
-
- SELECT  
-	i.item_name, 
-	CASE 
-		WHEN oi.part = 'Frame' THEN f.image
-		WHEN oi.part = 'Fork' THEN fk.image
-		WHEN oi.part = 'Groupset' THEN g.image
-		WHEN oi.part = 'Wheelset' THEN w.image
-		WHEN oi.part = 'Seat' THEN s.image
-		WHEN oi.part = 'Cockpit' THEN c.image
-		ELSE i.item_image
-	END AS image
-FROM order_items oi
-JOIN items i ON oi.item_id = i.item_id
-LEFT JOIN frame f ON i.item_id = f.item_id AND i.bike_parts = 'Frame'
-LEFT JOIN fork fk ON i.item_id = fk.item_id AND i.bike_parts = 'Fork'
-LEFT JOIN groupset g ON i.item_id = g.item_id AND i.bike_parts = 'Groupset'
-LEFT JOIN wheelset w ON i.item_id = w.item_id AND i.bike_parts = 'Wheelset'
-LEFT JOIN seat s ON i.item_id = s.item_id AND i.bike_parts = 'Seat'
-LEFT JOIN cockpit c ON i.item_id = c.item_id AND i.bike_parts = 'Cockpit'

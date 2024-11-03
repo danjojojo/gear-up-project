@@ -96,3 +96,14 @@ export const getReceiptsDashboard = async (selectedDate) => {
         throw error;
     }
 }
+
+// Get receiptDetails
+export const getReceiptDetails = async (receiptSaleId) => {
+    try {
+        const response = await api.get(`/receipt/get-receipt-details/${receiptSaleId}`);
+        return response.data;
+    } catch (error) {
+        console.error("Error retrieving receipt details", error);
+        throw error;
+    }
+}

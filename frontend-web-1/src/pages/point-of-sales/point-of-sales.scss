@@ -503,6 +503,231 @@ $normal-border-color: #dee2e6;
                 }
             }
         }
+
+        .receipt-details-info {
+            position: relative;
+            // top: 0;
+            z-index: 999999;
+            display: flex;
+            flex-direction: column;
+            // border: 1px solid black;
+
+            h1 {
+                margin: 0 auto 15px;
+
+                span {
+                    font-family: "Cooper";
+                }
+
+                span:nth-child(1) {
+                    color: #F9961F;
+                }
+
+                span:nth-child(2) {
+                    color: #2E2E2E;
+                }
+            }
+
+            .receipt-details-info-header {
+                height: auto;
+                display: flex;
+                flex-direction: column;
+                justify-content: space-between;
+                font-size: $font-size;
+
+                p {
+                    margin: 0 !important;
+                }
+
+                .original-receipt {
+                    color: #e08d11;
+                }
+
+                .name {
+                    margin-bottom: 10px !important;
+                }
+
+                .voided {
+                    text-align: center;
+                    margin: 0 auto;
+                    width: 100%;
+                    background-color: rgba(255, 187, 15, 0.4);
+                    color: black;
+                    border-radius: 5px;
+                    padding: 5px;
+                    font-size: 1rem;
+                }
+
+                .total {
+                    display: flex;
+                    flex-direction: column;
+                    justify-content: center;
+                    text-align: center;
+                    margin: 10px 0;
+                    padding: 5px;
+
+                    p:nth-child(1) {
+                        font-size: 1.5rem;
+                        font-weight: 700;
+                    }
+
+                    p:nth-child(2) {
+                        color: $inactive-text-color;
+                    }
+                }
+
+            }
+
+            .receipt-details-info-content {
+                flex-grow: 1;
+                border-top: 1px solid $normal-border-color;
+                margin-bottom: 15px;
+                overflow-y: auto;
+
+                .receipt-details-item {
+                    margin-top: 10px;
+                    display: flex;
+                    justify-content: space-between;
+                    font-size: $font-size;
+                    // margin: 5px;
+
+                    .left {
+                        .qty-unit-price {
+                            color: grey
+                        }
+                    }
+
+                    .total-price {
+                        font-weight: 700;
+                    }
+
+                    p {
+                        margin: 0;
+                    }
+
+                    &.selected {
+                        // box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); // Adjusted box-shadow to be more prominent
+                        // margin: 5px;
+                        border: 2px solid $normal-border-color;
+                        border-radius: 4px;
+                        scroll-behavior: smooth;
+                    }
+
+                }
+
+                .refund-details-item {
+                    margin: 15px 0;
+                    display: flex;
+                    align-items: center;
+                    gap: 20px;
+                    font-size: $font-size;
+                    // margin: 5px;
+
+                    .left {
+                        .qty-unit-price {
+                            color: grey
+                        }
+
+                        #item-qty {
+                            color: rgb(150, 150, 150)
+                        }
+                    }
+
+
+                    .refund-input {
+                        display: flex;
+                        width: fit-content;
+                        align-items: center;
+                        gap: 10px;
+
+                        p {
+                            color: #ffbc11;
+                        }
+
+                        .refund-qty {
+                            display: flex;
+                            align-items: center;
+                            gap: 10px;
+
+                            .no-decrease {
+                                opacity: 0.4;
+                            }
+
+                            input[type="number"] {
+                                text-align: center;
+                                border: none;
+                                width: 40px;
+                            }
+
+                            input[type="number"]::-webkit-outer-spin-button,
+                            input[type="number"]::-webkit-inner-spin-button {
+                                -webkit-appearance: none;
+                                margin: 0;
+                            }
+                        }
+
+                        button {
+                            border: none;
+                            border-radius: 2px;
+                        }
+
+                        .no-decrease {
+                            opacity: 0.4;
+                        }
+                    }
+
+                    .total-price {
+                        margin-bottom: auto;
+                        margin-left: auto;
+                        font-weight: 700;
+                    }
+
+                    p {
+                        margin: 0;
+                    }
+
+                    &.selected {
+                        // box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); // Adjusted box-shadow to be more prominent
+                        // margin: 5px;
+                        border: 2px solid $normal-border-color;
+                        border-radius: 4px;
+                        scroll-behavior: smooth;
+                    }
+
+                }
+            }
+
+            .total-paid-change {
+                height: auto;
+                display: flex;
+                flex-direction: column;
+                border-top: 1px solid $normal-border-color;
+                padding-top: 15px;
+                margin-top: auto;
+                font-size: $font-size;
+
+                div {
+                    display: flex;
+                    flex-direction: row;
+                    justify-content: space-between;
+                    align-items: center;
+
+                    p {
+                        margin: 5px 0;
+                    }
+
+                    p:nth-child(1) {
+                        font-weight: 700;
+                    }
+                }
+
+                div:nth-child(1) {
+                    p:nth-child(2) {
+                        font-weight: 700;
+                    }
+                }
+            }
+        }
     }
 }
 
@@ -585,6 +810,77 @@ i {
     .right-content {
         #close-checkout {
             visibility: visible !important;
+        }
+    }
+}
+.print-only {
+    display: none;
+}
+
+.receipts-container-close {
+    display: none;
+}
+
+.receipt-container-close {
+    display: none;
+}
+
+.right-container-close {
+    display: none;
+}
+
+
+
+@media print {
+
+    /* Hide everything except the print area */
+    body * {
+        visibility: hidden;
+    }
+
+    /* Ensure print area and its contents are visible */
+    #print-area,
+    #print-area * {
+        visibility: visible;
+    }
+
+    .print-only {
+        position: absolute;
+        left: 0;
+        width: 100%;
+    }
+
+    /* Center the print area on the page */
+    #print-area {
+        display: block;
+        font-size: 0.9rem;
+        width: 100%;
+        padding: 10px;
+        font-size: 12px;
+        height: auto;
+    }
+
+    @page {
+        size: 50mm auto;
+    }
+
+    .right-container {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        display: flex;
+        flex-direction: column;
+        height: 100% !important;
+        z-index: 5000;
+
+        .left-content,
+        .right-content {
+            display: flex;
+            flex-direction: column-reverse;
+            width: 100%;
+            border: 1px solid black;
+            height: 100% !important;
         }
     }
 }

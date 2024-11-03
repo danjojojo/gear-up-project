@@ -123,7 +123,6 @@ const Orders = () => {
         </Modal>
       );
     }
-
     
     const getAllOrders = async (paymentStatus = '', orderStatus = '', searchTerm = '', startDate) => {
         try {
@@ -261,8 +260,9 @@ const Orders = () => {
             }
 
             setShowChangeStatusModal(false);
-            window.location.reload();
-            getAllOrders();
+            const { orders } = await getOrders(startDate);
+            const orderBySelectedID = orders.filter(order => order.order_id === selectedOrder.order_id);
+            setSelectedOrder(orderBySelectedID[0]);
         } catch (error) {
             console.error('Error updating order status:', error.message);
         }
@@ -276,6 +276,7 @@ const Orders = () => {
     }
 
     const handleCloseOrder = () => {
+        getAllOrders(selectedPaymentStatus, selectedOrderStatus, searchTerm, startDate);
         setOrdersView(true);
         setOpenOrderView(false);
     }
@@ -660,7 +661,7 @@ const Orders = () => {
                                         <i className="fa-solid fa-envelope"></i>
                                         <p>{selectedOrder.email}</p>
                                     </div>
-                                    {selectedOrder.bu_option === 'deliver-home' && <div className="address">
+                                    {(selectedOrder.bu_option === 'deliver-home' || selectedOrder.bb_option === 'deliver-home') && <div className="address">
                                         <i className="fa-solid fa-location"></i>
                                         <p>{selectedOrder.cust_address}</p>
                                     </div>}
