@@ -34,7 +34,7 @@ const SalesReport = () => {
             const pdf = new jsPDF('p', 'mm', 'a4');
             const pdfWidth = pdf.internal.pageSize.getWidth();
 
-            const pageHeight = 295; // Adjust based on your requirements
+            const pageHeight = 298; // Adjust based on your requirements
             const margin = 7; // Top and bottom margins
 
             // Manually render parts of the content to avoid breaking tables
@@ -59,7 +59,7 @@ const SalesReport = () => {
                     const pageData = pageCanvas.toDataURL('image/png');
 
                     if (position > 0) pdf.addPage();
-                    pdf.addImage(pageData, 'PNG', margin, margin, pdfWidth - margin * 2, (pageCanvas.height * (pdfWidth - margin * 2)) / contentWidth);
+                    pdf.addImage(pageData, 'JPEG', margin, margin, pdfWidth - margin * 2, (pageCanvas.height * (pdfWidth - margin * 2)) / contentWidth, undefined, 'MEDIUM');
 
                     heightLeft -= pageCanvas.height;
                     position += pageCanvas.height;
@@ -67,7 +67,7 @@ const SalesReport = () => {
             };
 
             splitCanvasIntoPages();
-            pdf.save('Sales_Report.pdf');
+            pdf.save(`${months[selectedDate.month - 1].label}_${selectedDate.year}_Sales_Report.pdf`);
         });
     };
 
@@ -128,7 +128,7 @@ const SalesReport = () => {
         <>
             <div className='upper'>
                 <MonthYearPicker setSelectedDate={setSelectedDate} />
-                <button onClick={generatePDF} style={{ marginTop: '20px' }}>
+                <button onClick={generatePDF} style={{ marginTop: '20px' }} type='button'>
                     <img src={exportpdf} alt="export-icon" />
                     Export
                 </button>

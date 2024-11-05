@@ -47,7 +47,7 @@ const RevenueReport = () => {
             const pdf = new jsPDF('p', 'mm', 'a4');
             const pdfWidth = pdf.internal.pageSize.getWidth();
 
-            const pageHeight = 295; // Adjust based on your requirements
+            const pageHeight = 298; // Adjust based on your requirements
             const margin = 7; // Top and bottom margins
 
             // Manually render parts of the content to avoid breaking tables
