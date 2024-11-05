@@ -30,39 +30,52 @@ const SalesReport = () => {
 
     const generatePDF = () => {
         const input = reportRef.current;
-        html2canvas(input, { scale: 2 }).then((canvas) => {
+
+        // Reduce scale for lower image quality (0.8 - 1.5 range recommended)
+        html2canvas(input, { scale: 1.5 }).then((canvas) => {
             const pdf = new jsPDF('p', 'mm', 'a4');
             const pdfWidth = pdf.internal.pageSize.getWidth();
+            const firstPageHeight = 295; // Height for the first page
+            const otherPagesHeight = 292.5; // Height for other pages
+            const margin = 7; // Standard margin
+            const extraTopMargin = 5; // Additional top margin for pages after the first
 
-            const pageHeight = 298; // Adjust based on your requirements
-            const margin = 7; // Top and bottom margins
-
-            // Manually render parts of the content to avoid breaking tables
             const splitCanvasIntoPages = () => {
                 const contentHeight = canvas.height;
                 const contentWidth = canvas.width;
 
                 const ratio = contentWidth / pdfWidth;
-                const scaledPageHeight = pageHeight * ratio;
+                const scaledFirstPageHeight = firstPageHeight * ratio;
+                const scaledOtherPagesHeight = otherPagesHeight * ratio;
 
                 let heightLeft = contentHeight;
                 let position = 0;
+                let isFirstPage = true;
 
                 while (heightLeft > 0) {
                     const pageCanvas = document.createElement('canvas');
                     pageCanvas.width = contentWidth;
-                    pageCanvas.height = Math.min(heightLeft, scaledPageHeight);
-                    const context = pageCanvas.getContext('2d');
 
+                    // Adjust page height based on whether it's the first page or subsequent pages
+                    pageCanvas.height = isFirstPage
+                        ? Math.min(heightLeft, scaledFirstPageHeight)
+                        : Math.min(heightLeft, scaledOtherPagesHeight);
+
+                    const context = pageCanvas.getContext('2d');
                     context.drawImage(canvas, 0, position, contentWidth, pageCanvas.height, 0, 0, contentWidth, pageCanvas.height);
 
-                    const pageData = pageCanvas.toDataURL('image/png');
+                    const pageData = pageCanvas.toDataURL('image/jpeg', 0.6); // Lower quality for smaller size
 
-                    if (position > 0) pdf.addPage();
-                    pdf.addImage(pageData, 'JPEG', margin, margin, pdfWidth - margin * 2, (pageCanvas.height * (pdfWidth - margin * 2)) / contentWidth, undefined, 'MEDIUM');
+                    if (!isFirstPage) pdf.addPage();
+
+                    // Adjust top margin for subsequent pages
+                    const topMargin = isFirstPage ? margin : margin + extraTopMargin;
+
+                    pdf.addImage(pageData, 'JPEG', margin, topMargin, pdfWidth - margin * 2, (pageCanvas.height * (pdfWidth - margin * 2)) / contentWidth);
 
                     heightLeft -= pageCanvas.height;
                     position += pageCanvas.height;
+                    isFirstPage = false;
                 }
             };
 
