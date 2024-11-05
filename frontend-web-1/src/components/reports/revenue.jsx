@@ -116,7 +116,7 @@ const RevenueReport = () => {
             head: [], // No header row as per the HTML example
             bodyStyles: {
                 font: 'Rubik-Regular',
-                fontSize: 10,
+                fontSize: 9,
                 textColor: [0, 0, 0]
             },
             columnStyles: {
@@ -126,7 +126,7 @@ const RevenueReport = () => {
             styles: {
                 font: 'Rubik-Regular',
                 fontSize: 10,
-                cellPadding: 3,
+                cellPadding: 2,
                 lineWidth: 0.1,
                 lineColor: [0, 0, 0]
             },
@@ -135,7 +135,8 @@ const RevenueReport = () => {
         });
 
         // Display PDF in a new window
-        pdf.output("dataurlnewwindow");
+        // pdf.output("dataurlnewwindow"); for debug
+        pdf.save("Revenue_Report.pdf");
     };
 
     const months = [

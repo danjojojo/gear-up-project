@@ -140,7 +140,7 @@ const LaborReport = () => {
             styles: {
                 font: 'Rubik-Regular',  // Set default font for table
                 fontSize: 10,
-                cellPadding: 3,
+                cellPadding: 2,
                 lineWidth: 0.1, // Ensures the body cells also have a consistent border width
                 lineColor: [0, 0, 0]
             },
@@ -150,8 +150,8 @@ const LaborReport = () => {
         // " Labor Costs" section header
         yPosition = pdf.lastAutoTable.finalY + 7;
         pdf.setFont('Rubik-SemiBold');
-        const  laborCostsHeader = " Labor Costs";
-        pdf.text( laborCostsHeader, margin, yPosition);
+        const laborCostsHeader = " Labor Costs";
+        pdf.text(laborCostsHeader, margin, yPosition);
 
         // Detailed Sales Table
         autoTable(pdf, {
@@ -184,7 +184,7 @@ const LaborReport = () => {
             styles: {
                 font: 'Rubik-Regular',
                 fontSize: 10,
-                cellPadding: 3,
+                cellPadding: 2,
                 lineWidth: 0.1, // Ensures the body cells also have a consistent border width
                 lineColor: [0, 0, 0]
             },
@@ -192,7 +192,8 @@ const LaborReport = () => {
         });
 
         // Display PDF in a new window
-        pdf.output("dataurlnewwindow");
+        // pdf.output("dataurlnewwindow"); for debug
+        pdf.save("Labor_Report.pdf");
     };
 
     const months = [

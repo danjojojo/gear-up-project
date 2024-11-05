@@ -141,7 +141,7 @@ const SalesReport = () => {
             styles: {
                 font: 'Rubik-Regular',  // Set default font for table
                 fontSize: 10,
-                cellPadding: 3,
+                cellPadding: 2,
                 lineWidth: 0.1, // Ensures the body cells also have a consistent border width
                 lineColor: [0, 0, 0]
             },
@@ -189,7 +189,7 @@ const SalesReport = () => {
             styles: {
                 font: 'Rubik-Regular',
                 fontSize: 10,
-                cellPadding: 3,
+                cellPadding: 2,
                 lineWidth: 0.1, // Ensures the body cells also have a consistent border width
                 lineColor: [0, 0, 0]
             },
@@ -197,7 +197,8 @@ const SalesReport = () => {
         });
 
         // Display PDF in a new window
-        pdf.output("dataurlnewwindow");
+        // pdf.output("dataurlnewwindow"); for debug
+        pdf.save("Sales_Report.pdf");
     };
 
 
