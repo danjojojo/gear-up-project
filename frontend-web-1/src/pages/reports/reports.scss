@@ -84,14 +84,15 @@ $button-fail: #dee2e6;
                 width: 100%;
                 border-collapse: collapse;
                 table-layout: fixed;
-                border: solid 1px #2E2E2E;
 
                 thead {
+                    background-color: #2E2E2E;
+                    color: white;
                     tr {
                         text-align: center;
 
                         th {
-                            border: 1px solid #2E2E2E;
+                            border: 1px solid black;
                             padding: 8px;
                         }
                     }
@@ -151,8 +152,8 @@ $button-fail: #dee2e6;
                     position: absolute;
                     top: -15px;
                     right: -10px;
-                    height: 150px;
-                    width: 150px;
+                    height: 140px;
+                    width: 140px;
                     opacity: 0.2;
                 }
             }
