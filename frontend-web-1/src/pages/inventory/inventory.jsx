@@ -700,6 +700,20 @@ const Inventory = () => {
 
                         <div className="lower-container">
                             <div className="item-container-title d-flex">
+                                <div className="legend">
+                                    <i className="fa-solid fa-box"></i>
+                                    <p>Inventory Item</p>
+                                </div>
+                                <div className="legend">
+                                    <i className="fa-solid fa-ruler-horizontal"></i>
+                                    <p>Waitlist Item</p>
+                                </div>
+                                <div className="legend">
+                                    <i className="fa-solid fa-bicycle"></i>
+                                    <p>Bike Builder and Upgrader Item</p>
+                                </div>
+                            </div>
+                            <div className="item-container-title d-flex">
                                 <div className="item-name">Item Name</div>
 
                                 <div className="item-category">
@@ -720,20 +734,6 @@ const Inventory = () => {
 
                                 <div className="item-stock-status">
                                     Status
-                                </div>
-                            </div>
-                            <div className="item-container-title d-flex">
-                                <div className="legend">
-                                    <i className="fa-solid fa-box"></i>
-                                    <p>Inventory Item</p>
-                                </div>
-                                <div className="legend">
-                                    <i className="fa-solid fa-ruler-horizontal"></i>
-                                    <p>Waitlist Item</p>
-                                </div>
-                                <div className="legend">
-                                    <i className="fa-solid fa-bicycle"></i>
-                                    <p>Bike Builder and Upgrader Item</p>
                                 </div>
                             </div>
                             <div className="lower-content">

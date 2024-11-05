@@ -25,8 +25,8 @@ const createCheckoutSession = async (req, res) => {
                     description: 'Checkout from AronBikes',
                     line_items: lineItems, // Products in the cart
                     payment_method_types: ['gcash', 'paymaya'],
-                    cancel_url: process.env.CUSTOMER_URL + '/checkout',
-                    success_url: process.env.CUSTOMER_URL + '/checkout/success?status=success',
+                    cancel_url: process.env.CUSTOMER_URL + 'checkout',
+                    success_url: process.env.CUSTOMER_URL + 'checkout/success?status=success',
                 }
             }
         }, {

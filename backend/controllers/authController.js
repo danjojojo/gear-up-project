@@ -6,7 +6,7 @@ require('dotenv').config();
 const speakeasy = require('speakeasy');
 const qrcode = require('qrcode');
 
-const accessTokenRefresh = '1h';
+const accessTokenRefresh = '7h';
 const refreshTokenRefresh = '7d';
 
 const checkAdminExists = async (req, res) => {
@@ -58,26 +58,6 @@ const registerUser = async (req, res) => {
   }
 };
 
-// const loginUser = async (req, res) => {
-//   const { email, password } = req.body;
-//   if (!email || !password) return res.status(400).json({ error: 'Email and password required' });
-
-//   try {
-//     const { rows } = await pool.query('SELECT * FROM admin WHERE admin_email = $1', [email]);
-//     if (!rows.length) return res.status(400).json({ error: 'User not found' });
-
-//     const user = rows[0];
-//     const isValid = await bcrypt.compare(password, user.admin_password);
-//     if (!isValid) return res.status(400).json({ error: 'Invalid password' });
-
-//     return res.status(200).json({ otpRequired: true });
-//   } catch (error) {
-//     console.error(error);
-//     res.status(500).json({ error: 'Failed to log in' });
-//   }
-// };
-
-
 const loginPOS = async (req, res) => {
   const { id, password } = req.body;
   if (!password) return res.status(400).json({ error: 'Password required' });
@@ -114,21 +94,18 @@ const loginPOS = async (req, res) => {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
       sameSite: 'Strict',
-      maxAge: 7 * 24 * 60 * 60 * 1000 // 7 days
     });
 
     res.cookie('token', token, {
       httpOnly: true, // httpOnly ensures JavaScript can't access this cookie
       secure: process.env.NODE_ENV === 'production', // Use secure cookies in production (HTTPS only)
       sameSite: 'Strict', // Protect against CSRF
-      maxAge: 3600000, // 1 hour expiration
     });
 
     res.cookie('role', user.role, {
       httpOnly: true, // httpOnly ensures JavaScript can't access this cookie
       secure: process.env.NODE_ENV === 'production', // Use secure cookies in production (HTTPS only)
       sameSite: 'Strict', // Protect against CSRF
-      maxAge: 3600000, // 1 hour expiration
     });
 
     res.json({ role: user.role, message: 'Login successful' });
@@ -205,7 +182,6 @@ const refreshToken = (req, res) => {
                 httpOnly: true,
                 secure: process.env.NODE_ENV === 'production',
                 sameSite: 'Strict',
-                maxAge: 3600000 // 1 hour expiration
             });
         } else {
           const accessToken = jwt.sign(
@@ -218,7 +194,6 @@ const refreshToken = (req, res) => {
               httpOnly: true,
               secure: process.env.NODE_ENV === 'production',
               sameSite: 'Strict',
-              maxAge: 3600000 // 1 hour expiration
           });
         }
 
@@ -321,12 +296,12 @@ const verifyAdminOTP = async (req, res) => {
 
       if (verified) {
       // Generate JWT token upon successful OTP verification
-        const token = jwt.sign({ admin_id: user.admin_id, email: user.admin_email, name: user.admin_name, role: user.role }, process.env.JWT_SECRET, { expiresIn: '1h' });
+        const token = jwt.sign({ admin_id: user.admin_id, email: user.admin_email, name: user.admin_name, role: user.role }, process.env.JWT_SECRET, { expiresIn: accessTokenRefresh });
 
         const refreshToken = jwt.sign(
           { admin_id: user.admin_id },
           process.env.JWT_REFRESH_SECRET,
-          { expiresIn: '7d' }
+          { expiresIn: refreshTokenRefresh }
         );
 
         // Set tokens in cookies
@@ -346,7 +321,6 @@ const verifyAdminOTP = async (req, res) => {
           httpOnly: true,
           secure: process.env.NODE_ENV === 'production',
           sameSite: 'Strict',
-          maxAge: 3600000
         });
 
           res.status(200).json({ message: 'OTP verified' });
