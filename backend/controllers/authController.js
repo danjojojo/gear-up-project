@@ -48,7 +48,7 @@ const registerUser = async (req, res) => {
     res.cookie('token', token, {
       httpOnly: true, // httpOnly ensures JavaScript can't access this cookie
       secure: process.env.NODE_ENV === 'production', // Use secure cookies in production (HTTPS only)
-      sameSite: 'Strict', // Protect against CSRF
+      sameSite: 'None', // Protect against CSRF
       maxAge: 3600000, // 1 hour expiration
     });
 
@@ -95,19 +95,19 @@ const loginPOS = async (req, res) => {
     res.cookie('refreshToken', refreshToken, {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
-      sameSite: 'Strict',
+      sameSite: 'None',
     });
 
     res.cookie('token', token, {
       httpOnly: true, // httpOnly ensures JavaScript can't access this cookie
       secure: process.env.NODE_ENV === 'production', // Use secure cookies in production (HTTPS only)
-      sameSite: 'Strict', // Protect against CSRF
+      sameSite:  'None', // Protect against CSRF
     });
 
     res.cookie('role', user.role, {
       httpOnly: true, // httpOnly ensures JavaScript can't access this cookie
       secure: process.env.NODE_ENV === 'production', // Use secure cookies in production (HTTPS only)
-      sameSite: 'Strict', // Protect against CSRF
+      sameSite: 'None', // Protect against CSRF
     });
 
     res.json({ role: user.role, message: 'Login successful' });
@@ -157,8 +157,8 @@ const logoutUser = (req, res) => {
   }
 
   // Clear the token and any other relevant cookies
-  res.clearCookie('token', { httpOnly: true, sameSite: 'Strict', secure: process.env.NODE_ENV === 'production' });
-  res.clearCookie('refreshToken', { httpOnly: true, sameSite: 'Strict', secure: process.env.NODE_ENV === 'production' });
+  res.clearCookie('token', { httpOnly: true, sameSite:  'None', secure: process.env.NODE_ENV === 'production' });
+  res.clearCookie('refreshToken', { httpOnly: true, sameSite:  'None', secure: process.env.NODE_ENV === 'production' });
   res.clearCookie('role');  // If you're storing the role in a separate cookie
   res.status(200).json({ message: 'Logged out successfully' });
 };
@@ -183,7 +183,7 @@ const refreshToken = (req, res) => {
             res.cookie('token', accessToken, {
                 httpOnly: true,
                 secure: process.env.NODE_ENV === 'production',
-                sameSite: 'Strict',
+                sameSite:  'None',
             });
         } else {
           const accessToken = jwt.sign(
@@ -195,7 +195,7 @@ const refreshToken = (req, res) => {
           res.cookie('token', accessToken, {
               httpOnly: true,
               secure: process.env.NODE_ENV === 'production',
-              sameSite: 'Strict',
+              sameSite:  'None',
           });
         }
 
@@ -248,7 +248,7 @@ const verifyOTP = async (req, res) => {
         });
 
         if (verified) {
-            res.clearCookie('token', { httpOnly: true, sameSite: 'Strict', secure: process.env.NODE_ENV === 'production' });
+            res.clearCookie('token', { httpOnly: true, sameSite: 'None', secure: process.env.NODE_ENV === 'production' });
             await pool.query('UPDATE admin SET admin_2fa_enabled = true WHERE admin_id = $1', [adminId]);
             res.status(200).json({ message: 'OTP verified successfully' });
         } else {
@@ -272,7 +272,7 @@ const loginUser = async (req, res) => {
     const isValid = await bcrypt.compare(password, user.admin_password);
     if (!isValid) return res.status(400).json({ error: 'Invalid password' });
     const token = jwt.sign({ admin_id: user.admin_id, email: user.admin_email, role: user.role }, process.env.JWT_SECRET, { expiresIn: '1h' });
-    res.cookie('token', token, { httpOnly: true, sameSite: 'Strict'});
+    res.cookie('token', token, { httpOnly: true, sameSite:  'None'});
     return res.status(200).json({ message: 'Login successful' });
   } catch (error) {
     console.error(error);
@@ -310,19 +310,19 @@ const verifyAdminOTP = async (req, res) => {
         res.cookie('refreshToken', refreshToken, {
           httpOnly: true,
           secure: process.env.NODE_ENV === 'production',
-          sameSite: 'Strict',
+          sameSite:  'None',
         });
 
         res.cookie('token', token, {
           httpOnly: true,
           secure: process.env.NODE_ENV === 'production',
-          sameSite: 'Strict',
+          sameSite:  'None',
         });
 
         res.cookie('role', user.role, {
           httpOnly: true,
           secure: process.env.NODE_ENV === 'production',
-          sameSite: 'Strict',
+          sameSite:  'None',
         });
 
           res.status(200).json({ message: 'OTP verified' });
