@@ -602,19 +602,23 @@ const PointOfSales = () => {
                 </div>
               </div>
             </div>
-            {tab === 'items' && <div className="categories">
-              <button className={selectedCategory === 'all' ? "active" : ""}
-                onClick={() => selectCategory('all')}
-              >All</button>
-              {categories.map((category, categoryIndex) => {
-                return (
-                    <button key={categoryIndex} 
-                            className={selectedCategory === category ? "active" : ""}
-                            onClick={() => selectCategory(category)}
-                    >{category}</button>
-                );
-              })}
-            </div>}
+            <div className="parent-categories">
+              {tab === 'items' && 
+              <div className="categories">
+                <button className={selectedCategory === 'all' ? "active" : ""}
+                  onClick={() => selectCategory('all')}
+                >All</button>
+                {categories.map((category, categoryIndex) => {
+                  return (
+                      <button key={categoryIndex} 
+                              className={selectedCategory === category ? "active" : ""}
+                              onClick={() => selectCategory(category)}
+                      >{category}</button>
+                  );
+                })}
+              </div>
+              }
+            </div>
             <div className="list">
               {tab === "items" && (
                 <div className="items-list">
