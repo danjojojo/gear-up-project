@@ -9,7 +9,9 @@ import LoadingPage from './components/loading-page/loading-page';
 import 'react-image-crop/src/ReactCrop.scss';
 import moment from 'moment-timezone';
 
+
 moment.tz.setDefault("Asia/Manila");
+
 
 function App() {
   const [adminExists, setAdminExists] = useState(null);
