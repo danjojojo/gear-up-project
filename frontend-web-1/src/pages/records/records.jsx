@@ -363,7 +363,6 @@ const Records = () => {
                                                 calendarClassName='calendar'
                                                 todayButton="Today"
                                                 highlightDates={highlightedDates}
-                                                calendarStartDay={1}
                                                 inline
                                             />
                                         </div>
