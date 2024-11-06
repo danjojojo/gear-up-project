@@ -134,6 +134,12 @@ const RevenueReport = () => {
             margin: { left: 20, right: 20 }
         });
 
+        yPosition = pdf.lastAutoTable.finalY + 9;
+        pdf.setFont('Rubik-Regular');
+        pdf.setFontSize(8);
+        const reserved = "@2024 GearUp. All rights reserved.";
+        pdf.text(reserved, margin, yPosition);
+
         // Display PDF in a new window
         // pdf.output("dataurlnewwindow"); for debug
         pdf.save("Revenue_Report.pdf");
