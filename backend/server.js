@@ -40,7 +40,15 @@ const port = process.env.PORT || 5000;
 //   credentials: true,  // Allow cookies (credentials) to be sent
 // }));
 
-const allowedOrigins = ['http://localhost:3000', 'http://localhost:3001', 'https://4274-149-30-138-2.ngrok-free.app', 'https://gear-up-project.vercel.app'];
+const allowedOrigins = 
+  [
+    'http://localhost:3000', 
+    'http://localhost:3001', 
+    'https://4274-149-30-138-2.ngrok-free.app', 
+    'https://gear-up-project.vercel.app',
+    'https://gearupmanager.vercel.app',
+    'https://gearupbuilder.vercel.app',
+  ];
 
 app.use(cors({
   origin: function (origin, callback) {

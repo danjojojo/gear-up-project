@@ -52,7 +52,7 @@ const Orders = () => {
 
     const [loading, setLoading] = useState(true);
 
-    const link = 'http://localhost:3000/orders/';
+    const link = 'https://gearupbuilder.vercel.app/orders/';
     
     const DisabledDateInput = forwardRef(
       ({ value, onClick, className }, ref) => (
