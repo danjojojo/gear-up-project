@@ -344,7 +344,8 @@ const forgotPassword = async (req, res) => {
 
     const token = crypto.randomBytes(32).toString('hex');
     const hashedToken = await bcrypt.hash(token, 10);
-    const expiration = new Date(Date.now() + 3600000);
+    const expiration = new Date(Date.now() + 3600000).toLocaleString("en-US", { timeZone: "Asia/Manila" });
+    // const expiration = new Date(Date.now() + 3600000);
 
     await pool.query('INSERT INTO password_reset_tokens (email, token, expires_at) VALUES ($1, $2, $3)', [email, hashedToken, expiration]);
 
