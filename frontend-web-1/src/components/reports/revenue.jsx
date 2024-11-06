@@ -1,10 +1,14 @@
 import React, { useRef, useState, useEffect, useContext } from 'react';
 import jsPDF from 'jspdf';
-import html2canvas from 'html2canvas';
+import autoTable from 'jspdf-autotable'
 import exportpdf from "../../assets/icons/export.png";
 import MonthYearPicker from '../date-picker/date-picker';
 import { getSalesReport, getLaborReport, getExpensesReport } from '../../services/reportsService';
 import { AuthContext } from "../../context/auth-context";
+import registerCooperFont from '../fonts/Cooper-ExtraBold-normal';
+import registerRubikFont from '../fonts/Rubik-Regular-normal';
+import registerRubikBoldFont from '../fonts/Rubik-Bold-normal';
+import registerRubikSemiBoldFont from '../fonts/Rubik-SemiBold-normal';
 
 const RevenueReport = () => {
     const reportRef = useRef();
@@ -13,6 +17,13 @@ const RevenueReport = () => {
         month: new Date().getMonth() + 1, // Month is 0-indexed, so add 1
         year: new Date().getFullYear(),
     });
+
+    useEffect(() => {
+        registerCooperFont();
+        registerRubikFont();
+        registerRubikBoldFont();
+        registerRubikSemiBoldFont();
+    }, []);
 
     const [sales, setSales] = useState(0);
     const [laborCosts, setLaborCosts] = useState(0);
@@ -42,59 +53,90 @@ const RevenueReport = () => {
     }, [selectedDate]);
 
     const generatePDF = () => {
-        const input = reportRef.current;
+        const pdf = new jsPDF('p', 'mm', 'a4');
+        const pdfWidth = pdf.internal.pageSize.getWidth();
+        const margin = 20;
+        let yPosition = 30; // Starting vertical position for content
+        const columnWidth = (pdfWidth - 2 * margin) / 2;
 
-        // Reduce scale for lower image quality (0.8 - 1.5 range recommended)
-        html2canvas(input, { scale: 1.5 }).then((canvas) => {
-            const pdf = new jsPDF('p', 'mm', 'a4');
-            const pdfWidth = pdf.internal.pageSize.getWidth();
-            const firstPageHeight = 295; // Height for the first page
-            const otherPagesHeight = 292.5; // Height for other pages
-            const margin = 7; // Standard margin
-            const extraTopMargin = 5; // Additional top margin for pages after the first
+        // Header section
+        pdf.setFontSize(22);
+        pdf.setFont('Cooper-ExtraBold');
+        pdf.setTextColor('#F9961F');
+        const title1 = 'ARON';
+        const title2 = 'BIKES';
+        pdf.text(title1, (pdfWidth - pdf.getTextWidth(title1 + title2)) / 2, yPosition);
 
-            const splitCanvasIntoPages = () => {
-                const contentHeight = canvas.height;
-                const contentWidth = canvas.width;
+        pdf.setTextColor('#2E2E2E');
+        pdf.text(title2, (pdfWidth + pdf.getTextWidth(title1) - pdf.getTextWidth(title2)) / 2, yPosition);
 
-                const ratio = contentWidth / pdfWidth;
-                const scaledFirstPageHeight = firstPageHeight * ratio;
-                const scaledOtherPagesHeight = otherPagesHeight * ratio;
+        pdf.setFontSize(8);
+        pdf.setFont('Rubik-Regular');
+        yPosition += 6;
+        const subtitle = 'Antipolo City';
+        pdf.text(subtitle, (pdfWidth - pdf.getTextWidth(subtitle)) / 2, yPosition);
 
-                let heightLeft = contentHeight;
-                let position = 0;
-                let isFirstPage = true;
+        pdf.setFontSize(16);
+        pdf.setFont('Rubik-Bold');
+        yPosition += 8;
+        const reportTitle = 'Monthly Revenue Report';
+        pdf.text(reportTitle, (pdfWidth - pdf.getTextWidth(reportTitle)) / 2, yPosition);
 
-                while (heightLeft > 0) {
-                    const pageCanvas = document.createElement('canvas');
-                    pageCanvas.width = contentWidth;
+        pdf.setFontSize(11);
+        pdf.setFont('Rubik-SemiBold');
+        yPosition += 7;
+        const reportSubtitle = `(${months[selectedDate.month - 1].label} ${selectedDate.year})`;
+        pdf.text(reportSubtitle, (pdfWidth - pdf.getTextWidth(reportSubtitle)) / 2, yPosition);
 
-                    // Adjust page height based on whether it's the first page or subsequent pages
-                    pageCanvas.height = isFirstPage
-                        ? Math.min(heightLeft, scaledFirstPageHeight)
-                        : Math.min(heightLeft, scaledOtherPagesHeight);
+        pdf.setFontSize(9);
+        pdf.setFont('Rubik-Regular');
+        yPosition += 7;
+        const performanceText = 'Overview of revenue, costs, and net income.';
+        pdf.text(performanceText, (pdfWidth - pdf.getTextWidth(performanceText)) / 2, yPosition);
 
-                    const context = pageCanvas.getContext('2d');
-                    context.drawImage(canvas, 0, position, contentWidth, pageCanvas.height, 0, 0, contentWidth, pageCanvas.height);
+        // Report Metadata
+        pdf.setFontSize(8);
+        yPosition += 14;
+        pdf.text(`Date generated: ${new Date().toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}`, margin, yPosition);
+        yPosition += 6;
+        pdf.text(`Time generated: ${new Date().toLocaleTimeString('en-US', { hour: 'numeric', minute: 'numeric', hour12: true })}`, margin, yPosition);
+        yPosition += 6;
+        pdf.text(`Generated by: ${userRole.charAt(0).toUpperCase() + userRole.slice(1)}`, margin, yPosition);
 
-                    const pageData = pageCanvas.toDataURL('image/jpeg', 0.6); // Lower quality for smaller size
-
-                    if (!isFirstPage) pdf.addPage();
-
-                    // Adjust top margin for subsequent pages
-                    const topMargin = isFirstPage ? margin : margin + extraTopMargin;
-
-                    pdf.addImage(pageData, 'JPEG', margin, topMargin, pdfWidth - margin * 2, (pageCanvas.height * (pdfWidth - margin * 2)) / contentWidth);
-
-                    heightLeft -= pageCanvas.height;
-                    position += pageCanvas.height;
-                    isFirstPage = false;
-                }
-            };
-
-            splitCanvasIntoPages();
-            pdf.save("Revenue_Report.pdf");
+        // Summary Table
+        autoTable(pdf, {
+            startY: yPosition + 7,
+            theme: 'grid',
+            body: [
+                ['POS Sales', `P ${PesoFormat.format(sales)}`],
+                ['Labor Costs', `(P ${PesoFormat.format(laborCosts)})`],
+                ['Operational Expenses', `(P ${PesoFormat.format(operationalExpenses)})`],
+                [{ content: 'NET REVENUE', styles: { font: "Rubik-SemiBold", halign: 'left' } }, { content: `P ${PesoFormat.format(netRevenue)}`, styles: { font: "Rubik-SemiBold", halign: 'right' } }]
+            ],
+            head: [], // No header row as per the HTML example
+            bodyStyles: {
+                font: 'Rubik-Regular',
+                fontSize: 9,
+                textColor: [0, 0, 0]
+            },
+            columnStyles: {
+                0: { cellWidth: columnWidth, halign: 'left' },
+                1: { cellWidth: columnWidth, halign: 'right' }
+            },
+            styles: {
+                font: 'Rubik-Regular',
+                fontSize: 10,
+                cellPadding: 2,
+                lineWidth: 0.1,
+                lineColor: [0, 0, 0]
+            },
+            tableWidth: 'auto',
+            margin: { left: 20, right: 20 }
         });
+
+        // Display PDF in a new window
+        // pdf.output("dataurlnewwindow"); for debug
+        pdf.save("Revenue_Report.pdf");
     };
 
     const months = [
