@@ -19,34 +19,33 @@ const getDashboardData = async (req, res) => {
         const lowStockItems = parseInt(lowStockItemsResult.rows[0].count, 10) || 0;
 
         // Define today's date to use in queries
-        const today = new Date();
 
         // Query to get sold_today from sales_items
         const soldTodayQuery = `
             SELECT 
                 SUM(
                     CASE 
-                        WHEN DATE(si.date_created) = $1 AND si.refund_qty = 0 THEN si.item_qty 
-                        WHEN DATE(si.date_created) = $1 AND si.refund_qty = si.item_qty THEN 0
-                        WHEN DATE(si.date_created) = $1 AND si.refund_qty < si.item_qty THEN (si.item_qty - si.refund_qty)
+                        WHEN DATE(si.date_created) = DATE(NOW()) AND si.refund_qty = 0 THEN si.item_qty 
+                        WHEN DATE(si.date_created) = DATE(NOW()) AND si.refund_qty = si.item_qty THEN 0
+                        WHEN DATE(si.date_created) = DATE(NOW()) AND si.refund_qty < si.item_qty THEN (si.item_qty - si.refund_qty)
                     ELSE 0 
                     END
                 ) AS sold_today
             FROM sales_items si
             WHERE si.sale_item_type = 'sale'
         `;
-        const soldTodayResult = await pool.query(soldTodayQuery, [today]);
+        const soldTodayResult = await pool.query(soldTodayQuery);
         const soldToday = parseInt(soldTodayResult.rows[0].sold_today, 10) || 0;
 
         // Query to get rendered_today from sales_mechanics
         const renderedTodayQuery = `
             SELECT 
-                COUNT(CASE WHEN DATE(sm.date_created) = $1 THEN sm.sale_service_id ELSE NULL END) AS rendered_today
+                COUNT(CASE WHEN DATE(sm.date_created) = DATE(NOW()) THEN sm.sale_service_id ELSE NULL END) AS rendered_today
             FROM sales_mechanics sm
             JOIN sales s ON sm.sale_id = s.sale_id
             WHERE s.status = true
         `;
-        const renderedTodayResult = await pool.query(renderedTodayQuery, [today]);
+        const renderedTodayResult = await pool.query(renderedTodayQuery);
         const renderedToday = parseInt(renderedTodayResult.rows[0].rendered_today, 10) || 0;
 
         // Send all the gathered data in the response
