@@ -15,7 +15,7 @@ export async function addToBUCart(part) {
         return;
     }
     alert("Added to cart!");
-    await db.buCart.add({ ...part, qty: 1, checked: 0, date_added: new Date() });
+    await db.buCart.add({ ...part, qty: 1, checked: 0, date_added: new Date(Date.now()).toLocaleString("en-US", { timeZone: "Asia/Manila" }) });
 }
 
 export async function getBUCartItems() {
@@ -83,7 +83,7 @@ export async function addToBBCart(build) {
             alert("This build is already in the Bike Builder cart!");
             return false; // Indicates the build was not added due to duplication
         }
-        await db.bbCart.add({ ...build, checked: 0, date_added: new Date() });
+        await db.bbCart.add({ ...build, checked: 0, date_added: new Date(Date.now()).toLocaleString("en-US", { timeZone: "Asia/Manila" }) });
         alert("Build added to BB cart:", build);
         return true; // Indicates the build was successfully added
     } catch (error) {

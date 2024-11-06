@@ -7,10 +7,12 @@ import { AuthProvider, AuthContext } from './context/auth-context';
 import { checkAdminExists } from './services/authService';
 import LoadingPage from './components/loading-page/loading-page';
 import 'react-image-crop/src/ReactCrop.scss';
+import moment from 'moment-timezone';
 
 function App() {
   const [adminExists, setAdminExists] = useState(null);
   const [loading, setLoading] = useState(true);
+  moment.tz.setDefault("Asia/Manila");
 
   useEffect(() => {
     const fetchAdminStatus = async () => {

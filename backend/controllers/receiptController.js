@@ -155,7 +155,7 @@ const staffVoidReceipt = async(req, res) => {
         `;
 
         await pool.query(query, [receiptId]);
-        res.json({ status: "pending", dateRequested: new Date() });
+        res.json({ status: "pending", dateRequested: new Date(Date.now()).toLocaleString("en-US", { timeZone: "Asia/Manila" }) });
         
     } catch (error) {
         res.status(500).json({ message: error.message });
@@ -227,7 +227,7 @@ const adminVoidReceipt = async(req, res) => {
         await pool.query(query, [receiptId]);
         await pool.query(updateSalesIDtoFalse, [receiptId]);
         await pool.query("COMMIT;");
-        res.json({ status: "voided", dateVoided: new Date() });
+        res.json({ status: "voided", dateVoided: new Date(Date.now()).toLocaleString("en-US", { timeZone: "Asia/Manila" }) });
     } catch (error) {
         await pool.query("ROLLBACK;");
         res.status(500).json({ message: error.message });
@@ -260,7 +260,7 @@ const cancelVoidReceipt = async(req, res) => {
 const refundReceipt = async(req, res) => {
     try {
         const token = req.cookies.token;
-        const todayDate = new Date();
+        const todayDate = new Date(Date.now()).toLocaleString("en-US", { timeZone: "Asia/Manila" });
         if (!token) {
             return res.status(401).json({ error: "No token provided " });
         }
@@ -459,7 +459,7 @@ const adminCancelRefundReceipt = async(req, res) => {
         await pool.query(updateReceiptToVoided, [receiptId]);
         await pool.query(updateSalesIDtoFalse, [receiptId]);
         await pool.query("COMMIT;");
-        res.json({ status: "voided", dateVoided: new Date() });
+        res.json({ status: "voided", dateVoided: new Date(Date.now()).toLocaleString("en-US", { timeZone: "Asia/Manila" }) });
     } catch (error) {
         res.status(500).json({ message: error.message });
     }

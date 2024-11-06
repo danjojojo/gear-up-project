@@ -162,7 +162,7 @@ const deletePosUser = async (req, res) => {
 const getPosUsersLogs = async (req, res) => {
     try {
         const { date } = req.query; // Get the date from the query parameter
-        const selectedDate = date || new Date().toISOString().split('T')[0]; // Use current date if no date is provided
+        const selectedDate = date || new Date(Date.now()).toLocaleString("en-US", { timeZone: "Asia/Manila" }).split('T')[0]; // Use current date if no date is provided
 
         const query = `
             SELECT 

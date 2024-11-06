@@ -289,7 +289,7 @@ const updateFrameItem = async (req, res) => {
             rear_hub_width,
             material,
             item_image,
-            new Date(),
+            new Date(Date.now()).toLocaleString("en-US", { timeZone: "Asia/Manila" }),
             id,
         ];
 
@@ -361,7 +361,7 @@ const updateForkItem = async (req, res) => {
             front_hub_width,
             material,
             item_image,
-            new Date(),
+            new Date(Date.now()).toLocaleString("en-US", { timeZone: "Asia/Manila" }),
             id
         ];
 
@@ -433,7 +433,7 @@ const updateGroupsetItem = async (req, res) => {
             rotor_mount_type,
             rotor_size,
             item_image,
-            new Date(),
+            new Date(Date.now()).toLocaleString("en-US", { timeZone: "Asia/Manila" }),
             id
         ];
 
@@ -508,7 +508,7 @@ const updateWheelsetItem = async (req, res) => {
             Number(tire_width),
             rim_spokes,
             item_image,
-            new Date(),
+            new Date(Date.now()).toLocaleString("en-US", { timeZone: "Asia/Manila" }),
             id
         ];
 
@@ -556,7 +556,7 @@ const updateSeatItem = async (req, res) => {
             seat_clamp_type,
             saddle_material,
             item_image,
-            new Date(),
+            new Date(Date.now()).toLocaleString("en-US", { timeZone: "Asia/Manila" }),
             id
         ];
 
@@ -625,7 +625,7 @@ const updateCockpitItem = async (req, res) => {
             headset_upper_diameter,
             headset_lower_diameter,
             item_image,
-            new Date(),
+            new Date(Date.now()).toLocaleString("en-US", { timeZone: "Asia/Manila" }),
             id
         ];
 
