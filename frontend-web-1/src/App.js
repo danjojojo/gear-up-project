@@ -55,6 +55,7 @@ const AuthRoutes = ({ adminExists }) => {
             element={authenticated && userRole === "staff" ? <Navigate to="/" /> : <Pages.LoginPOS />}
           />
           <Route path="set-up-account" element={<Navigate to="/login" />} />
+          <Route path="reset-password" element={<Pages.ResetPassword/>} />
           <Route path="*" element={
             authenticated && userRole === 'admin' ? (
               <AdminRoutes />
@@ -70,6 +71,7 @@ const AuthRoutes = ({ adminExists }) => {
           <Route path="set-up-account" element={<Pages.SetUpAccount />} />
           <Route path="login" element={<Navigate to="/set-up-account" />} />
           <Route path="login-pos" element={<Navigate to="/set-up-account" />} />
+          <Route path="forgot-password" element={<Navigate to="/set-up-account" />} />
           <Route path="*" element={<Navigate to="/set-up-account" />} />
         </>
       )}

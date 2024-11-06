@@ -38,6 +38,12 @@ const Form = ({ selectedItem, setSelectedItem, setItems, refreshWaitlist, onClos
 
     const [showConfirmModal, setShowConfirmModal] = useState(false);
 
+    const [handlebarError, setHandlebarError] = useState('');
+    const [headsetTypeError, setHeadsetTypeError] = useState('');
+
+    const [handlebarIsCorrect, setHandlebarIsCorrect] = useState(false);
+    const [headsetIsCorrect, setHeadsetIsCorrect] = useState(false);
+
     function ConfirmModal({ onHide, onConfirm, ...props }) {
 		return (
 			<Modal
@@ -130,6 +136,8 @@ const Form = ({ selectedItem, setSelectedItem, setItems, refreshWaitlist, onClos
 
     const handleSubmit = async (event) => {
         event.preventDefault();
+
+        if(!handlebarIsCorrect || !headsetIsCorrect) return;
 
         const updatedData = new FormData();
         updatedData.append('description', description);
@@ -248,6 +256,45 @@ const Form = ({ selectedItem, setSelectedItem, setItems, refreshWaitlist, onClos
         }
     }
 
+    function handleBarCorrect(){
+        // handlebar clamp diameter must be same as stem clamp diameter
+        if(handlebarClampDiameter === stemClampDiameter){
+            setHandlebarError('');
+            return setHandlebarIsCorrect(true);
+        } else {
+            setHandlebarError('Handlebar clamp diameter must be the same as stem clamp diameter');
+            return setHandlebarIsCorrect(false);
+        }
+    }
+
+    function headsetTypeCorrect(){
+        // if headset type is tapered, headset upper diameter must be smaller than headset lower diameter
+        // if headset type is non tapered, headset upper diameter must be equal to headset lower diameter
+        if(headsetType === 'Tapered' && headsetUpperDiameter < headsetLowerDiameter){
+            setHeadsetTypeError('');
+            return setHeadsetIsCorrect(true);
+        }
+
+        if(headsetType === 'Non Tapered' && headsetUpperDiameter === headsetLowerDiameter){
+            setHeadsetTypeError('');
+            return setHeadsetIsCorrect(true);
+        }
+
+        if(headsetType === 'Tapered' && headsetUpperDiameter >= headsetLowerDiameter){
+            setHeadsetTypeError('Headset upper diameter must be smaller than headset lower diameter');
+            return setHeadsetIsCorrect(false);
+        }
+
+        if(headsetType === 'Non Tapered' && headsetUpperDiameter !== headsetLowerDiameter){
+            setHeadsetTypeError('Headset upper diameter must be equal to headset lower diameter');
+            return setHeadsetIsCorrect(false);
+        }
+    }
+
+    useEffect(() => {
+        handleBarCorrect();
+        headsetTypeCorrect();
+    }, [handlebarClampDiameter, stemClampDiameter, headsetType, headsetUpperDiameter, headsetLowerDiameter ]);
 
 
     return (
@@ -586,6 +633,12 @@ const Form = ({ selectedItem, setSelectedItem, setItems, refreshWaitlist, onClos
                     <option value="56mm">56mm</option>
                 </select>
             </div>
+
+             {(handlebarError || headsetTypeError )&& 
+            <div className="error-message">
+                <p>{handlebarError}</p>
+                <p>{headsetTypeError}</p>
+            </div>}
 
             {isEditing && (
                 <div className="submit-container">

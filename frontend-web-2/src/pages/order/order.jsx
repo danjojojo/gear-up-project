@@ -118,6 +118,7 @@ const Order = () => {
                     <div className="order-items">
                         <div className="header">
                             <h2>Order Items</h2>
+                            <h2>Total: {PesoFormat.format(orderDetails.order_amount)}</h2>
                         </div>
                         <div className="items">
                             {orderItems.map((item, index) => (

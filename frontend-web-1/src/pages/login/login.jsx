@@ -4,16 +4,21 @@ import { AuthContext } from '../../context/auth-context';
 import AuthLayout from '../../components/auth-layout/auth-layout';
 import './login.scss';
 import { Modal, Button } from 'react-bootstrap';
+import { forgotPassword } from '../../services/authService';
 
 const Login = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState(null);
-  const { loginAdmin, loading, handleVerifyAdminOTP } = useContext(AuthContext);
+  const { loginAdmin, handleVerifyAdminOTP } = useContext(AuthContext);
   const navigate = useNavigate();
   const otpRef = useRef(null);
   const [showModalOTP, setShowModalOTP] = useState(false);
   const [otpError, setOtpError] = useState(null);
+
+  const [loading, setLoading] = useState(false);
+
+  const [loginView, setLoginView] = useState(true);
 
   const errorMsgStyle = {
     color: '#cb2020',
@@ -55,6 +60,20 @@ const Login = () => {
     }
   };
 
+  const handleForgotPasswordSubmit = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+
+    try {
+      await forgotPassword(email);
+      alert('Reset link sent. Please check your email.');
+      navigate('/login');
+    } catch (error) {
+      console.error('Error sending reset link:', error);
+      setError('Failed to send reset link. Please try again.');
+    }
+  }
+
   function ModalOTP({ onHide, ...props }) {
     return (
       <Modal
@@ -93,50 +112,95 @@ const Login = () => {
     );
   }
 
+  function goToForgotPassword() {
+    setLoginView(false);
+    setEmail('');
+  }
+
+  function goToLogin() {
+    setLoginView(true);
+    setEmail('');
+  }
+
   return (
     <div className='login'>
-      <ModalOTP
-        show={showModalOTP}
-        onHide={() => setShowModalOTP(false)}
-      />
-      <AuthLayout formData={
-        <div>
-          <div className="intro">
-            <h4 className='header'>Login</h4>
-            <p className='subtitle'>Enter your email and password to login to your account.</p>
-          </div>
-          <form onSubmit={handleSubmit}>
-            {error && <p className="error-msg">{error}</p>}
-            <div className="form-group">
-              <label htmlFor="email">Email</label>
-              <input
-                type="email"
-                id="email"
-                placeholder="Enter your email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                autocomplete='off'
-              />
+      {loginView && 
+        <>
+          <ModalOTP
+            show={showModalOTP}
+            onHide={() => setShowModalOTP(false)}
+          />
+          <AuthLayout formData={
+            <div>
+              <div className="intro">
+                <h4 className='header'>Login</h4>
+                <p className='subtitle'>Enter your email and password to login to your account.</p>
+              </div>
+              <form onSubmit={handleSubmit}>
+                {error && <p className="error-msg">{error}</p>}
+                <div className="form-group">
+                  <label htmlFor="email">Email</label>
+                  <input
+                    type="email"
+                    id="email"
+                    placeholder="Enter your email"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    autoComplete='off'
+                  />
+                </div>
+                <div className="form-group">
+                  <label htmlFor="password">Password</label>
+                  <input
+                    type="password"
+                    id="password"
+                    placeholder="Enter your password"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                  />
+                  <p className="toggle-text-3" onClick={goToForgotPassword}>Forgot password?</p>
+                </div>
+                <button type="submit" className="submit-btn" disabled={loading}>
+                  {loading ? 'Loading...' : 'Login'}
+                </button>
+              </form>
+              <p className="toggle-text">
+                <Link to="/login-pos" className="toggle-text">Login as POS &rarr;</Link>
+              </p>
             </div>
-            <div className="form-group">
-              <label htmlFor="password">Password</label>
-              <input
-                type="password"
-                id="password"
-                placeholder="Enter your password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-              />
+          } />
+        </>
+      }
+      {!loginView && 
+        <>
+          <AuthLayout formData={
+            <div>
+              <p className="toggle-text-2" onClick={goToLogin}>&larr; Back to Login</p>
+              <div className="intro">
+                <h4 className='header'>Forgot Password</h4>
+                <p className='subtitle'>Enter your email to receive a password reset link.</p>
+              </div>
+              <form onSubmit={handleForgotPasswordSubmit}>
+                <div className="form-group">
+                  <label htmlFor="email">Email*</label>
+                  <input
+                    type="email"
+                    id="email"
+                    placeholder="Enter your email"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    autoComplete='off'
+                    required
+                  />
+                </div>
+                <button type="submit" className="submit-btn" disabled={loading}>
+                  {loading ? 'Loading...' : 'Send Reset Link'}
+                </button>
+              </form>
             </div>
-            <button type="submit" className="submit-btn" disabled={loading}>
-              {loading ? 'Loading...' : 'Login'}
-            </button>
-          </form>
-          <p className="toggle-text">
-            <Link to="/login-pos" className="toggle-text">Login as POS &rarr;</Link>
-          </p>
-        </div>
-      } />
+          }/>
+        </>
+      }
     </div>
   );
 };

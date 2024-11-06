@@ -27,6 +27,12 @@ const FrameForm = ({ waitlistItemID, itemID, itemName, itemPrice, onClose, refre
     const [selectedFile, setSelectedFile] = useState(null);
     const [showConfirmModal, setShowConfirmModal] = useState(false);
 
+    const [headTubeError, setHeadTubeError] = useState('');
+    const [frameAxleError, setFrameAxleError] = useState('');
+
+    const [headTubeIsCorrect, setHeadTubeIsCorrect] = useState(false);
+    const [frameAxleIsCorrect, setFrameAxleIsCorrect] = useState(false);
+
     function ConfirmationModal({ onHide, onConfirm, ...props }) {
 		return (
 			<Modal
@@ -69,6 +75,9 @@ const FrameForm = ({ waitlistItemID, itemID, itemName, itemPrice, onClose, refre
 
     // Submit part
     const handleSubmit = async () => {
+
+        if (!headTubeIsCorrect || !frameAxleIsCorrect) return;
+        
         const formData = new FormData();
         formData.append('waitlist_item_id', waitlistItemID);
         formData.append('item_id', itemID);
@@ -127,6 +136,37 @@ const FrameForm = ({ waitlistItemID, itemID, itemName, itemPrice, onClose, refre
     const handleFileSelect = (file) => {
         setSelectedFile(file);
     };
+
+    function headTubeCorrect(){
+        if(headTubeType === 'Tapered' && htUpperDiameter === '44mm' && htLowerDiameter === '44mm'){
+            setHeadTubeError('Incorrect specifications for Tapered Head Tube Type');
+            return setHeadTubeIsCorrect(false);
+        }
+        if(headTubeType === 'Non Tapered' && htUpperDiameter === '44mm' && (htLowerDiameter === '55mm' || htLowerDiameter === '56mm')){
+            setHeadTubeError('Incorrect specifications for Non Tapered Head Tube Type');
+            return setHeadTubeIsCorrect(false);
+        }
+        setHeadTubeError('');
+        return setHeadTubeIsCorrect(true);
+    }
+
+    function frameAxleCorrect(){
+        if(axleType === 'Quick Release (QR)' && axleDiameter !== '9mm (QR)'){
+            setFrameAxleError('Incorrect specifications for Quick Release Axle Type');
+            return setFrameAxleIsCorrect(false);
+        }
+        if(axleType === 'Thru-Axle (TA)' && (axleDiameter !== '12mm (Thru-Axle)' || axleDiameter !== '15mm (Thru-Axle)' || axleDiameter !== '20mm (Thru-Axle)')){
+            setFrameAxleError('Incorrect specifications for Thru-Axle Axle Type');
+            return setFrameAxleIsCorrect(false);
+        }
+        setFrameAxleError('');
+        return setFrameAxleIsCorrect(true);
+    }
+
+    useEffect(() => {
+        headTubeCorrect();
+        frameAxleCorrect();
+    }, [headTubeType, htUpperDiameter, htLowerDiameter, axleType, axleDiameter]);
 
     return (
         <>
@@ -439,6 +479,12 @@ const FrameForm = ({ waitlistItemID, itemID, itemName, itemPrice, onClose, refre
                         required
                     />
                 </div>
+
+                {(headTubeError || frameAxleError)&& 
+                <div className="error-message">
+                    <p>{headTubeError}</p>
+                    <p>{frameAxleError}</p>
+                </div>}
 
                 <div className="submit-container">
                     <button type="submit" className="submit-btn">

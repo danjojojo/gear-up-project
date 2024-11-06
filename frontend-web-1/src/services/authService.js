@@ -123,3 +123,25 @@ export const verifyAdminOTP = async (email, otp) => {
     throw error;
   }
 }
+
+// Forgot password
+export const forgotPassword = async (email) => {
+  try {
+    const response = await api.post('/auth/forgot-password', { email });
+    return response.data;
+  } catch (error) {
+    console.error('Error sending forgot password email:', error);
+    throw error;
+  }
+}
+
+// Reset password
+export const resetPassword = async (email, token, newPassword) => {
+  try {
+    const response = await api.post('/auth/reset-password', {email, token, newPassword});
+    return response.data;
+  } catch (error) {
+    console.error('Error resetting password:', error);
+    throw error;
+  }
+}

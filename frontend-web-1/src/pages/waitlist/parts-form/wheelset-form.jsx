@@ -26,6 +26,14 @@ const WheelsetForm = ({ waitlistItemID, itemID, itemName, itemPrice, onClose, re
     const [selectedFile, setSelectedFile] = useState(null);
     const [showConfirmModal, setShowConfirmModal] = useState(false);
     
+    const [hubHolesError, setHubHolesError] = useState('');
+    const [frontHubAxleError, setFrontHubAxleError] = useState(''); 
+    const [rearHubAxleError, setRearHubAxleError] = useState('');
+
+    const [hubHolesIsCorrect, setHubHolesIsCorrect] = useState(false);
+    const [frontHubAxleIsCorrect, setFrontHubAxleIsCorrect] = useState(false);
+    const [rearHubAxleIsCorrect, setRearHubAxleIsCorrect] = useState(false);
+    
     function ConfirmationModal({ onHide, onConfirm, ...props }) {
 		return (
 			<Modal
@@ -68,6 +76,8 @@ const WheelsetForm = ({ waitlistItemID, itemID, itemName, itemPrice, onClose, re
 
     // Submit part
     const handleSubmit = async () => {
+
+        if(!hubHolesIsCorrect || !frontHubAxleIsCorrect || !rearHubAxleIsCorrect) return;
 
         const formData = new FormData();
         formData.append('waitlist_item_id', waitlistItemID);
@@ -125,6 +135,56 @@ const WheelsetForm = ({ waitlistItemID, itemID, itemName, itemPrice, onClose, re
     const handleFileSelect = (file) => {
         setSelectedFile(file);
     };
+
+    function hubHolesCorrect(){
+        // if hub holes is 28H, rim spokes should be 28
+        // get strip 28 from 28H
+        let hubHolesStrip = hubHoles.slice(0, 2);
+        if(hubHolesStrip === rimSpokes){
+            setHubHolesError('');
+            return setHubHolesIsCorrect(true);
+        } else {
+            setHubHolesError(`Hub holes and rim spokes must be same`);
+            return setHubHolesIsCorrect(false);
+        }
+    }
+
+    function frontHubAxleCorrect(){
+        // if front hub axle type is Quick Release (QR), front hub axle diameter should be 9mm (QR)
+        if(frontHubAxleType === 'Quick Release (QR)' && frontHubAxleDiameter !== '9mm (QR)'){
+            setFrontHubAxleError('Front hub axle and diameter must be of Quick Release.');
+            return setFrontHubAxleIsCorrect(false);
+        }
+        // if front hub axle type is Thru-Axle (TA), front hub axle diameter should be 12mm (Thru-Axle) or 15mm (Thru-Axle) or 20mm (Thru-Axle)
+        if(frontHubAxleType === 'Thru-Axle (TA)' && (frontHubAxleDiameter !== '12mm (Thru-Axle)' || frontHubAxleDiameter !== '15mm (Thru-Axle)' || frontHubAxleDiameter !== '20mm (Thru-Axle)')){
+            setFrontHubAxleError('Front hub axle and diameter must be of Thru-Axle.');
+            return setFrontHubAxleIsCorrect(false);
+        }
+        
+        setFrontHubAxleError('');
+        return setFrontHubAxleIsCorrect(true);
+    }
+
+    function rearHubAxleCorrect(){
+        // if rear hub axle type is Quick Release (QR), rear hub axle diameter should be 9mm (QR)
+        if(rearHubAxleType === 'Quick Release (QR)' && rearHubAxleDiameter !== '9mm (QR)'){
+            setRearHubAxleError('Rear hub axle and diameter must be of Quick Release.');
+            return setRearHubAxleIsCorrect(false);
+        }
+        // if rear hub axle type is Thru-Axle (TA), rear hub axle diameter should be 12mm (Thru-Axle) or 15mm (Thru-Axle) or 20mm (Thru-Axle)
+        if(rearHubAxleType === 'Thru-Axle (TA)' && (rearHubAxleDiameter !== '12mm (Thru-Axle)' || rearHubAxleDiameter !== '15mm (Thru-Axle)' || rearHubAxleDiameter !== '20mm (Thru-Axle)')){
+            setRearHubAxleError('Rear hub axle and diameter must be of Thru-Axle.');
+            return setRearHubAxleIsCorrect(false);
+        }
+        setRearHubAxleError('');
+        return setRearHubAxleIsCorrect(true);
+    }
+
+    useEffect(() => {
+        hubHolesCorrect();
+        frontHubAxleCorrect();
+        rearHubAxleCorrect();
+    }, [hubHoles, rimSpokes, frontHubAxleType, frontHubAxleDiameter, rearHubAxleType, rearHubAxleDiameter]);  
 
     return (
         <>
@@ -424,6 +484,13 @@ const WheelsetForm = ({ waitlistItemID, itemID, itemName, itemPrice, onClose, re
                         <option value="36">36</option>
                     </select>
                 </div>
+                
+                {(hubHolesError || frontHubAxleError || rearHubAxleError )&& 
+                <div className="error-message">
+                    <p>{hubHolesError}</p>
+                    <p>{frontHubAxleError}</p>
+                    <p>{rearHubAxleError}</p>
+                </div>}
 
                 <div className="submit-container">
                     <button type="submit" className="submit-btn">

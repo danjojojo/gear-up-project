@@ -43,6 +43,12 @@ const Form = ({ selectedItem, setSelectedItem, setItems, refreshWaitlist, onClos
 
     const [showConfirmModal, setShowConfirmModal] = useState(false);
 
+    const [headTubeError, setHeadTubeError] = useState('');
+    const [frameAxleError, setFrameAxleError] = useState('');
+
+    const [headTubeIsCorrect, setHeadTubeIsCorrect] = useState(false);
+    const [frameAxleIsCorrect, setFrameAxleIsCorrect] = useState(false);
+
     function ConfirmModal({ onHide, onConfirm, ...props }) {
 		return (
 			<Modal
@@ -136,8 +142,11 @@ const Form = ({ selectedItem, setSelectedItem, setItems, refreshWaitlist, onClos
     }, [selectedItem]);
 
     const handleSubmit = async (event) => {
+
         event.preventDefault();
 
+        if (!headTubeIsCorrect || !frameAxleIsCorrect) return;
+        
         const updatedData = new FormData();
         updatedData.append('description', description);
         updatedData.append('purpose', purpose);
@@ -254,6 +263,37 @@ const Form = ({ selectedItem, setSelectedItem, setItems, refreshWaitlist, onClos
         }
     }
 
+    function headTubeCorrect(){
+        if(headTubeType === 'Tapered' && htUpperDiameter === '44mm' && htLowerDiameter === '44mm'){
+            setHeadTubeError('Incorrect specifications for Tapered Head Tube Type');
+            return setHeadTubeIsCorrect(false);
+        }
+        if(headTubeType === 'Non Tapered' && htUpperDiameter === '44mm' && (htLowerDiameter === '55mm' || htLowerDiameter === '56mm')){
+            setHeadTubeError('Incorrect specifications for Non Tapered Head Tube Type');
+            return setHeadTubeIsCorrect(false);
+        }
+        setHeadTubeError('');
+        return setHeadTubeIsCorrect(true);
+    }
+
+    function frameAxleCorrect(){
+        if(axleType === 'Quick Release (QR)' && axleDiameter !== '9mm (QR)'){
+            setFrameAxleError('Incorrect specifications for Quick Release Axle Type');
+            return setFrameAxleIsCorrect(false);
+        }
+        if(axleType === 'Thru-Axle (TA)' && (axleDiameter !== '12mm (Thru-Axle)' || axleDiameter !== '15mm (Thru-Axle)' || axleDiameter !== '20mm (Thru-Axle)')){
+            setFrameAxleError('Incorrect specifications for Thru-Axle Axle Type');
+            return setFrameAxleIsCorrect(false);
+        }
+        setFrameAxleError('');
+        return setFrameAxleIsCorrect(true);
+    }
+
+    useEffect(() => {
+        headTubeCorrect();
+        frameAxleCorrect();
+    }, [headTubeType, htUpperDiameter, htLowerDiameter, axleType, axleDiameter]);
+
     return (
         <form className="form-content" onSubmit={(e) => {
             handleSubmit(e);
@@ -341,9 +381,6 @@ const Form = ({ selectedItem, setSelectedItem, setItems, refreshWaitlist, onClos
                                 className="item-image"
                             />
                         </div>
-                        {/* <div className="crop-btn">
-                            <button type="button" onClick={() => setShowCropModal(true)}>Crop</button>
-                        </div> */}
                     </>
                 ) : (
                     <div className="no-image-container">
@@ -353,11 +390,6 @@ const Form = ({ selectedItem, setSelectedItem, setItems, refreshWaitlist, onClos
             ) : (
                 <ImageUploadButton onFileSelect={handleFileSelect} part={'frame'}/>
             )}
-
-            {/* <CropModal 
-                show={showCropModal}
-                onHide={() => setShowCropModal(false)}
-            /> */}
 
             <ImagePreviewModal
                 show={showModal}
@@ -656,6 +688,12 @@ const Form = ({ selectedItem, setSelectedItem, setItems, refreshWaitlist, onClos
                     disabled={!isEditing}
                 />
             </div>
+
+            {(headTubeError || frameAxleError)&& 
+            <div className="error-message">
+                <p>{headTubeError}</p>
+                <p>{frameAxleError}</p>
+            </div>}
 
             {isEditing && (
                 <div className="submit-container">

@@ -39,6 +39,13 @@ const Form = ({ selectedItem, setSelectedItem, setItems, refreshWaitlist, onClos
 
     const [showConfirmModal, setShowConfirmModal] = useState(false);
 
+    const [forkTubeError, setForkTubeError] = useState('');
+    const [forkAxleError, setForkAxleError] = useState('');
+
+    const [forkTubeIsCorrect, setForkTubeIsCorrect] = useState(false);
+    const [forkAxleIsCorrect, setForkAxleIsCorrect] = useState(false);
+
+
     function ConfirmModal({ onHide, onConfirm, ...props }) {
 		return (
 			<Modal
@@ -132,6 +139,8 @@ const Form = ({ selectedItem, setSelectedItem, setItems, refreshWaitlist, onClos
 
     const handleSubmit = async (event) => {
         event.preventDefault();
+
+        if(!forkTubeIsCorrect || !forkAxleIsCorrect) return;
 
         const updatedData = new FormData();
         updatedData.append('description', description);
@@ -248,6 +257,38 @@ const Form = ({ selectedItem, setSelectedItem, setItems, refreshWaitlist, onClos
                 break;
         }
     }
+
+    function forkTubeCorrect(){
+        if(forkTubeType === 'Non Tapered' && ftUpperDiameter !== ftLowerDiameter){
+            setForkTubeError("Incorrect specifications for Non Tapered fork.");
+            return setForkTubeIsCorrect(false);
+        }
+        if(forkTubeType === 'Tapered' && ftUpperDiameter === ftLowerDiameter){
+            setForkTubeError("Incorrect specifications for Tapered fork.");
+            return setForkTubeIsCorrect(false);
+        }
+        setForkTubeError('');
+        return setForkTubeIsCorrect(true);
+    }
+
+    function forkAxleCorrect(){
+        if(axleType === 'Quick Release (QR)' && axleDiameter !== '9mm (QR)'){
+            setForkAxleError("Incorrect specifications for Quick Release (QR) axle.");
+            return setForkAxleIsCorrect(false);
+        }
+        if(axleType === 'Thru-Axle (TA)' && axleDiameter === '9mm (QR)'){
+            setForkAxleError("Incorrect specifications for Thru-Axle (TA) axle.");
+            return setForkAxleIsCorrect(false);
+        }
+        setForkAxleError('');
+        return setForkAxleIsCorrect(true);
+
+    }
+
+    useEffect(()=>{
+        forkTubeCorrect();
+        forkAxleCorrect();
+    },[forkTubeType, ftUpperDiameter, ftLowerDiameter, axleType, axleDiameter]);
 
     return (
         <form className="form-content" onSubmit={(e) => {
@@ -527,7 +568,6 @@ const Form = ({ selectedItem, setSelectedItem, setItems, refreshWaitlist, onClos
                     <option value="">Select Type</option>
                     <option value="Air">Air</option>
                     <option value="Coil">Coil</option>
-                    <option value="N/A (Rigid)">N/A (Rigid)</option>
                 </select>
             </div>
 
@@ -599,6 +639,12 @@ const Form = ({ selectedItem, setSelectedItem, setItems, refreshWaitlist, onClos
                     disabled={!isEditing}
                 />
             </div>
+
+            {(forkTubeError || forkAxleError)&& 
+            <div className="error-message">
+                <p>{forkTubeError}</p>
+                <p>{forkAxleError}</p>
+            </div>}
 
             {isEditing && (
                 <div className="submit-container">

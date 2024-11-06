@@ -24,6 +24,12 @@ const GroupsetForm = ({ waitlistItemID, itemID, itemName, itemPrice, onClose, re
     const [rotorSize, setRotorSize] = useState('');
     const [selectedFile, setSelectedFile] = useState(null);
     const [showConfirmModal, setShowConfirmModal] = useState(false);
+
+    const [fdError, setFdError] = useState('');
+    const [rdError, setRdError] = useState('');
+
+    const [fdIsCorrect, setFdIsCorrect] = useState(false);
+    const [rdIsCorrect, setRdIsCorrect] = useState(false);
     
     function ConfirmationModal({ onHide, onConfirm, ...props }) {
 		return (
@@ -67,6 +73,8 @@ const GroupsetForm = ({ waitlistItemID, itemID, itemName, itemPrice, onClose, re
 
     // Submit part
     const handleSubmit = async () => {
+
+        if(!fdIsCorrect || !rdIsCorrect) return;
 
         const formData = new FormData();
         formData.append('waitlist_item_id', waitlistItemID);
@@ -122,6 +130,43 @@ const GroupsetForm = ({ waitlistItemID, itemID, itemName, itemPrice, onClose, re
     const handleFileSelect = (file) => {
         setSelectedFile(file);
     };
+
+    function chainringSpeedCorrect(){
+        // if chainring is 1x, front derailleur speed should be N/A
+        if(chainringSpeed === "Single (1x)" && frontDerailleurSpeed !== "N/A (1x Chainring speed)"){
+            setFdError("Front Derailleur Speed should be N/A (1x Chainring speed)");
+            return setFdIsCorrect(false);
+        } 
+        // if chainring is 2x, front derailleur speed should be 2-speed
+        if(chainringSpeed === "Double (2x)" && frontDerailleurSpeed !== "2-speed"){
+            setFdError("Front Derailleur Speed should be 2-speed");
+            return setFdIsCorrect(false);
+        }
+
+        // if chainring is 3x, front derailleur speed should be 3-speed
+        if(chainringSpeed === "Triple (3x)" && frontDerailleurSpeed !== "3-speed"){
+            setFdError("Front Derailleur Speed should be 3-speed");
+            return setFdIsCorrect(false);
+        }
+
+        setFdError('');
+        return setFdIsCorrect(true);
+    }
+
+    function cassetteSpeedCorrect(){
+        // rear derailleur speed is 9-speed, cassette speed should be 9-speed, chain speed should be 9-speed
+        if(cassetteSpeed !== rearDerailleurSpeed  || chainSpeed !== rearDerailleurSpeed ){
+            setRdError(`Cassette Speed and Chain Speed should be ${rearDerailleurSpeed}`);
+            return setRdIsCorrect(false);
+        }
+        setRdError('');
+        return setRdIsCorrect(true);
+    }
+
+    useEffect(() => {
+        chainringSpeedCorrect();
+        cassetteSpeedCorrect();
+    },[chainringSpeed, frontDerailleurSpeed, rearDerailleurSpeed, cassetteSpeed, chainSpeed]);
 
     return (
         <>
@@ -403,6 +448,13 @@ const GroupsetForm = ({ waitlistItemID, itemID, itemName, itemPrice, onClose, re
                         <option value="203mm">203mm</option>
                     </select>
                 </div>
+
+                 {(fdError || rdError )&& 
+                <div className="error-message">
+                    <p>{fdError}</p>
+                    <p>{rdError}</p>
+                </div>}
+
 
                 <div className="submit-container">
                     <button type="submit" className="submit-btn">

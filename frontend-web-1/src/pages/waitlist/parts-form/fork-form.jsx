@@ -25,6 +25,12 @@ const ForkForm = ({ waitlistItemID, itemID, itemName, itemPrice, onClose, refres
     const [selectedFile, setSelectedFile] = useState(null);
     const [showConfirmModal, setShowConfirmModal] = useState(false);
 
+    const [forkTubeError, setForkTubeError] = useState('');
+    const [forkAxleError, setForkAxleError] = useState('');
+
+    const [forkTubeIsCorrect, setForkTubeIsCorrect] = useState(false);
+    const [forkAxleIsCorrect, setForkAxleIsCorrect] = useState(false);
+
     function ConfirmationModal({ onHide, onConfirm, ...props }) {
 		return (
 			<Modal
@@ -67,6 +73,8 @@ const ForkForm = ({ waitlistItemID, itemID, itemName, itemPrice, onClose, refres
 
     // Submit part
     const handleSubmit = async () => {
+
+        if(!forkTubeIsCorrect || !forkAxleIsCorrect) return;
 
         const formData = new FormData();
         formData.append('waitlist_item_id', waitlistItemID);
@@ -121,6 +129,38 @@ const ForkForm = ({ waitlistItemID, itemID, itemName, itemPrice, onClose, refres
     const handleFileSelect = (file) => {
         setSelectedFile(file);
     };
+
+        function forkTubeCorrect(){
+        if(forkTubeType === 'Non Tapered' && ftUpperDiameter !== ftLowerDiameter){
+            setForkTubeError("Incorrect specifications for Non Tapered fork.");
+            return setForkTubeIsCorrect(false);
+        }
+        if(forkTubeType === 'Tapered' && ftUpperDiameter === ftLowerDiameter){
+            setForkTubeError("Incorrect specifications for Tapered fork.");
+            return setForkTubeIsCorrect(false);
+        }
+        setForkTubeError('');
+        return setForkTubeIsCorrect(true);
+    }
+
+    function forkAxleCorrect(){
+        if(axleType === 'Quick Release (QR)' && axleDiameter !== '9mm (QR)'){
+            setForkAxleError("Incorrect specifications for Quick Release (QR) axle.");
+            return setForkAxleIsCorrect(false);
+        }
+        if(axleType === 'Thru-Axle (TA)' && axleDiameter === '9mm (QR)'){
+            setForkAxleError("Incorrect specifications for Thru-Axle (TA) axle.");
+            return setForkAxleIsCorrect(false);
+        }
+        setForkAxleError('');
+        return setForkAxleIsCorrect(true);
+
+    }
+
+    useEffect(()=>{
+        forkTubeCorrect();
+        forkAxleCorrect();
+    },[forkTubeType, ftUpperDiameter, ftLowerDiameter, axleType, axleDiameter]);
 
     return (
         <>
@@ -324,7 +364,6 @@ const ForkForm = ({ waitlistItemID, itemID, itemName, itemPrice, onClose, refres
                         <option value="">Select Type</option>
                         <option value="Air">Air</option>
                         <option value="Coil">Coil</option>
-                        <option value="N/A (Rigid)">N/A (Rigid)</option>
                     </select>
                 </div>
 
@@ -392,6 +431,12 @@ const ForkForm = ({ waitlistItemID, itemID, itemName, itemPrice, onClose, refres
                         required
                     />
                 </div>
+                
+                {(forkTubeError || forkAxleError)&& 
+                <div className="error-message">
+                    <p>{forkTubeError}</p>
+                    <p>{forkAxleError}</p>
+                </div>}
 
                 <div className="submit-container">
                     <button type="submit" className="submit-btn">

@@ -1,6 +1,7 @@
 const crypto = require('crypto'); // Required if you later implement signature verification
 const {v4: uuidv4} = require('uuid');
 const pool = require('../config/db');
+const nodemailer = require('nodemailer');
 require('dotenv').config();
 
 const PAYMONGO_SECRET_KEY = process.env.PAYMONGO_WEBHOOK_KEY;
@@ -8,14 +9,13 @@ const PAYMONGO_SECRET_KEY = process.env.PAYMONGO_WEBHOOK_KEY;
 // Handle PayMongo webhook
 const handlePaymongoWebhook = async (req, res) => {
     const signatureHeader = req.headers['paymongo-signature'];
-    const rawBody = JSON.stringify(req.body); // Capture the raw request body as a string
+    const rawBody = JSON.stringify(req.body);
 
     if (!signatureHeader) {
         console.error('No signature header found');
         return res.status(400).send('No signature header found');
-    }   
+    }
 
-     // Step 1: Parse the signature header
     const parts = signatureHeader.split(',');
     const timestampPart = parts.find((part) => part.startsWith('t=')).split('=')[1];
     const testSignaturePart = parts.find((part) => part.startsWith('te=')).split('=')[1];
@@ -24,13 +24,11 @@ const handlePaymongoWebhook = async (req, res) => {
 
     const expectedSignature = isLiveMode ? liveSignaturePart : testSignaturePart;
 
-    // Step 2: Create the HMAC signature
     const message = `${timestampPart}.${rawBody}`;
     const hmac = crypto.createHmac('sha256', PAYMONGO_SECRET_KEY);
     hmac.update(message);
     const computedSignature = hmac.digest('hex');
 
-    // Step 3: Compare signatures
     if (computedSignature !== expectedSignature) {
         console.error('Invalid signature');
         return res.status(400).send('Invalid signature');
@@ -38,13 +36,12 @@ const handlePaymongoWebhook = async (req, res) => {
 
     const event = req.body;
 
-    console.log('Received Webhook Event:', JSON.stringify(event, null, 2)); // Log full event data
+    console.log('Received Webhook Event:', JSON.stringify(event, null, 2));
 
     if (event.data.attributes.type === 'checkout_session.payment.paid') {
-        // Access the first payment in the payments array
         const sessionId = event.data.attributes.data.id;
         const paymentId = event.data.attributes.data.attributes.payments[0].id;
-        const paymentType = event.data.attributes.data.attributes.payments[0].attributes.source.type
+        const paymentType = event.data.attributes.data.attributes.payments[0].attributes.source.type;
 
         try {
             const updateOrderStatus = `
@@ -55,17 +52,70 @@ const handlePaymongoWebhook = async (req, res) => {
                     expires_at = NULL,
                     payment_type = $2
                 WHERE checkout_session_id = $3
-            `
+            `;
+            
+            const getOrderIDandEmail = `
+                SELECT order_name, email
+                FROM orders
+                WHERE checkout_session_id = $1
+            `;
+            
+            const { rows } = await pool.query(getOrderIDandEmail, [sessionId]);
+            
+            if (!rows.length) {
+                console.error('Order not found for session ID:', sessionId);
+                return res.status(404).send('Order not found');
+            }
+
+            const orderName = rows[0].order_name;
+            const email = rows[0].email;
+            
+            const link = `${process.env.CUSTOMER_URL}/orders/${orderName}`;
+
             await pool.query(updateOrderStatus, [paymentId, paymentType, sessionId]);
-            // console.log('Order updated successfully', paymentId, sessionId);
+            await sendEmail(email, orderName, link);
+
+            console.log('Order updated and email sent successfully');
             res.status(200).send('Webhook received');
         } catch (error) {
-            console.error('Error updating order:', error.message);
-            res.status(500).send('Failed to update order');
+            console.error('Error updating order or sending email:', error.message);
+            res.status(500).send('Failed to process webhook');
         }
     } else {
         res.status(400).send('Unhandled event type');
     }
+};
+
+
+const sendEmail = async (email, orderName, link) => {
+  const transporter = nodemailer.createTransport({
+    host: 'smtp.gmail.com',
+    port: 465,
+    secure: true,
+    auth: { 
+      user: process.env.EMAIL_USER, 
+      pass: process.env.EMAIL_PASS 
+    },
+    tls: {
+        rejectUnauthorized: false
+    }
+  });
+
+  try {
+    console.log(`Attempting to send email to: ${email}`);  // Log before sending
+    await transporter.sendMail({
+      from: process.env.EMAIL_USER,
+      to: email,
+      subject: 'Order Status Link',
+      html: `
+          <h3>Your order ${orderName} has been successfully paid!</h3>
+          <p>Click <a href="${link}">here</a> to view your order status.</p>
+      `
+    });
+    console.log(`Email successfully sent to: ${email}`);  // Log success
+  } catch (error) {
+    console.error(`Error sending email to ${email}:`, error.message);  // Log specific error
+  }
 };
 
 module.exports = { handlePaymongoWebhook };

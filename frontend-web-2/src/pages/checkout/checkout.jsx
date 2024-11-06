@@ -59,11 +59,11 @@ const Checkout = () => {
     const [bikeBuildDelivery, setBikeBuildDelivery] = useState('');
 
     const isFormIncomplete = 
-        checkedBuItems.length + checkedBbItems.length === 0 || 
-        name === '' || 
-        email === '' || 
-        phone.length === 0 || phone.length !== 11 ||
-        bikeUpgradeDelivery === 'deliver-home' && address === "";
+        (checkedBuItems.length + checkedBbItems.length === 0) || 
+        (name === '') || 
+        (email === '') || 
+        (phone.length === 0 || phone.length !== 11) ||
+        (bikeUpgradeDelivery === 'deliver-home' && address === "");
     
     const isDeliveryOptionIncomplete = 
         (checkedBuItems.length !== 0 && bikeUpgradeDelivery === 'n/a') || 
@@ -183,13 +183,18 @@ const Checkout = () => {
                         />
                     </div>
                     <div className="input-group">
-                        <label htmlFor="email">Email</label>
+                        <label 
+                            htmlFor="email"
+                        >Email</label>
                         <input type="email" id="email" 
                             value={email}
                             className={email === '' ? 'input-incomplete' : ''}
                             onChange={(e) => setEmail(e.target.value)}
                             // disabled={loading ? true : false}
                             placeholder='Email Address'
+                            data-tooltip-id="my-tooltip"
+                            data-tooltip-content="Use an email address where we can contact you."
+                            data-tooltip-place="right"
                         />
                     </div>
                     <div className="input-group">

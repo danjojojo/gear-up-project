@@ -5,6 +5,8 @@ const pool = require('../config/db');
 require('dotenv').config();
 const speakeasy = require('speakeasy');
 const qrcode = require('qrcode');
+const crypto = require('crypto');
+const nodemailer = require('nodemailer');
 
 const accessTokenRefresh = '7h';
 const refreshTokenRefresh = '7d';
@@ -334,7 +336,71 @@ const verifyAdminOTP = async (req, res) => {
    }
 };
 
+const forgotPassword = async (req, res) => {
+  const {email} = req.body;
+  try {
+    const { rows } = await pool.query('SELECT * FROM admin WHERE admin_email = $1', [email]);
+    if (!rows.length) return res.status(400).json({ error: 'User not found' });
 
+    const token = crypto.randomBytes(32).toString('hex');
+    const hashedToken = await bcrypt.hash(token, 10);
+    const expiration = new Date(Date.now() + 3600000);
+
+    await pool.query('INSERT INTO password_reset_tokens (email, token, expires_at) VALUES ($1, $2, $3)', [email, hashedToken, expiration]);
+
+    const resetLink = `${process.env.ADMIN_URL}/reset-password?token=${token}&email=${email}`;
+    await sendEmail(email, resetLink);
+
+    res.status(200).json({ message: 'Password reset link sent' });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+}
+
+const sendEmail = async (email, link) => {
+  const transporter = nodemailer.createTransport({
+    host: 'smtp.gmail.com',
+    port: 465,
+    secure: true,
+    auth: { 
+      user: process.env.EMAIL_USER, 
+      pass: process.env.EMAIL_PASS 
+    },
+    tls: {
+        rejectUnauthorized: false
+    }
+  });
+
+  await transporter.sendMail({
+    from: process.env.EMAIL_USER,
+    to: email,
+    subject: 'Password Reset Request',
+    html: `<p>Click <a href="${link}">here</a> to reset your password.</p>`
+  });
+};
+
+const resetPassword = async (req, res) => {
+  const { email, token, newPassword } = req.body;
+
+  try {
+    // Check if token is valid and not expired
+    const { rows } = await pool.query('SELECT * FROM password_reset_tokens WHERE email = $1 AND expires_at > NOW()', [email]);
+    if (!rows.length || !(await bcrypt.compare(token, rows[0].token))) {
+      return res.status(400).json({ message: 'Invalid or expired token' });
+    }
+
+    // Hash the new password and update user record
+    const hashedPassword = await bcrypt.hash(newPassword, 10);
+    await pool.query('UPDATE admin SET admin_password = $1 WHERE admin_email = $2', [hashedPassword, email]);
+
+    // Delete used token
+    await pool.query('DELETE FROM password_reset_tokens WHERE email = $1', [email]);
+
+    res.status(200).json({ message: 'Password reset successful' });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
 
 
 module.exports = {
@@ -348,5 +414,7 @@ module.exports = {
   logoutUser,
   refreshToken,
   verifyOTP,
-  verifyAdminOTP
+  verifyAdminOTP,
+  forgotPassword,
+  resetPassword
 };

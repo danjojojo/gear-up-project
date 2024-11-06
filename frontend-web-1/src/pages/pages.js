@@ -27,6 +27,7 @@ import Expenses from './expenses/expenses.jsx';
 import Receipts from './receipts/receipts.jsx';
 import Mechanics from './mechanics/mechanics.jsx';
 import Profile from './profile/profile.jsx';
+import ResetPassword from './reset-password/reset-password.jsx';
 
 const Pages = {
     // Not Found Page
@@ -95,7 +96,10 @@ const Pages = {
     Mechanics,
 
     // Profile Page
-    Profile
+    Profile,
+
+    // Forgot Password Page
+    ResetPassword
 };
 
 export default Pages;

@@ -39,6 +39,12 @@ const Form = ({ selectedItem, setSelectedItem, setItems, refreshWaitlist, onClos
 
     const [showConfirmModal, setShowConfirmModal] = useState(false);
 
+    const [fdError, setFdError] = useState('');
+    const [rdError, setRdError] = useState('');
+
+    const [fdIsCorrect, setFdIsCorrect] = useState(false);
+    const [rdIsCorrect, setRdIsCorrect] = useState(false);
+
     function ConfirmModal({ onHide, onConfirm, ...props }) {
 		return (
 			<Modal
@@ -132,6 +138,8 @@ const Form = ({ selectedItem, setSelectedItem, setItems, refreshWaitlist, onClos
 
     const handleSubmit = async (event) => {
         event.preventDefault();
+
+        if(!fdIsCorrect || !rdIsCorrect) return;
 
         const updatedData = new FormData();
         updatedData.append('description', description);
@@ -247,6 +255,43 @@ const Form = ({ selectedItem, setSelectedItem, setItems, refreshWaitlist, onClos
                 break;
         }
     }
+
+    function chainringSpeedCorrect(){
+        // if chainring is 1x, front derailleur speed should be N/A
+        if(chainringSpeed === "Single (1x)" && frontDerailleurSpeed !== "N/A (1x Chainring speed)"){
+            setFdError("Front Derailleur Speed should be N/A (1x Chainring speed)");
+            return setFdIsCorrect(false);
+        } 
+        // if chainring is 2x, front derailleur speed should be 2-speed
+        if(chainringSpeed === "Double (2x)" && frontDerailleurSpeed !== "2-speed"){
+            setFdError("Front Derailleur Speed should be 2-speed");
+            return setFdIsCorrect(false);
+        }
+
+        // if chainring is 3x, front derailleur speed should be 3-speed
+        if(chainringSpeed === "Triple (3x)" && frontDerailleurSpeed !== "3-speed"){
+            setFdError("Front Derailleur Speed should be 3-speed");
+            return setFdIsCorrect(false);
+        }
+
+        setFdError('');
+        return setFdIsCorrect(true);
+    }
+
+    function cassetteSpeedCorrect(){
+        // rear derailleur speed is 9-speed, cassette speed should be 9-speed, chain speed should be 9-speed
+        if(cassetteSpeed !== rearDerailleurSpeed  || chainSpeed !== rearDerailleurSpeed ){
+            setRdError(`Cassette Speed and Chain Speed should be ${rearDerailleurSpeed}`);
+            return setRdIsCorrect(false);
+        }
+        setRdError('');
+        return setRdIsCorrect(true);
+    }
+
+    useEffect(() => {
+        chainringSpeedCorrect();
+        cassetteSpeedCorrect();
+    },[chainringSpeed, frontDerailleurSpeed, rearDerailleurSpeed, cassetteSpeed, chainSpeed]);
 
     return (
         <form className="form-content" onSubmit={(e) => {
@@ -608,6 +653,12 @@ const Form = ({ selectedItem, setSelectedItem, setItems, refreshWaitlist, onClos
                     <option value="203mm">203mm</option>
                 </select>
             </div>
+
+             {(fdError || rdError )&& 
+            <div className="error-message">
+                <p>{fdError}</p>
+                <p>{rdError}</p>
+            </div>}
 
             {isEditing && (
                 <div className="submit-container">
