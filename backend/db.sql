@@ -385,3 +385,11 @@ CREATE TABLE order_items (
     ON UPDATE CASCADE
     ON DELETE SET NULL
 );
+
+
+-- Forgot pass
+CREATE TABLE password_reset_tokens (
+	email VARCHAR(255),
+	token VARCHAR(255),
+	expires_at TIMESTAMP
+)
