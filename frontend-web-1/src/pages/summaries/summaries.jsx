@@ -1,6 +1,6 @@
 import './summaries.scss'
 import PageLayout from '../../components/page-layout/page-layout';
-import moment from 'moment-timezone';
+import moment from 'moment';
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import { useEffect, useState } from 'react';

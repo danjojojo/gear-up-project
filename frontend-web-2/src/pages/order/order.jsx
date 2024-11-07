@@ -5,7 +5,7 @@ import {
     getOrder
 } from '../../services/orderService';
 import './order.scss';
-import moment from 'moment-timezone';
+import moment from 'moment';
 
 const Order = () => {
     const { orderId } = useParams(); // Get orderId from URL path parameters

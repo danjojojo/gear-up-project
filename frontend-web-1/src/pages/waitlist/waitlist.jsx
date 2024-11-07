@@ -10,7 +10,7 @@ import { getWaitlistItems, deleteWaitlistItem } from '../../services/waitlistSer
 import LoadingPage from '../../components/loading-page/loading-page';
 import {Modal, Button} from 'react-bootstrap';
 import { AuthContext } from '../../context/auth-context';
-import moment from 'moment-timezone';
+import moment from 'moment';
 
 // Parts Form
 import FrameForm from './parts-form/frame-form';
