@@ -307,7 +307,9 @@ const SalesReport = () => {
                                 <tr key={index}>
                                     <td>{item.item_name || ' - '}</td>
                                     <td>{item.quantity || 0}</td>
-                                    <td className='text-end'>{PesoFormat.format(item.total_sales || 0)}</td>
+                                    <td className='text-end'>
+                                        {PesoFormat.format(item.total_sales || 0)}
+                                    </td>
                                 </tr>
                             ))
                         ) : (

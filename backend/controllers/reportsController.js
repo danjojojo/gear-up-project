@@ -11,18 +11,20 @@ const getSalesReport = async (req, res) => {
             `
             SELECT 
                 i.item_name, 
-                SUM(si.item_qty) AS quantity, 
-                SUM(si.item_total_price) AS total_sales
+                SUM((si.item_qty - si.refund_qty)) AS quantity, 
+                SUM((si.item_qty - si.refund_qty) * si.item_unit_price) AS total_sales
             FROM sales_items si
+            JOIN sales S on SI.sale_id = s.sale_id
             JOIN items i ON si.item_id = i.item_id
             JOIN receipts r ON si.sale_id = r.sale_id
             LEFT JOIN receipts r_refund ON r.sale_id = r_refund.sale_id AND r_refund.receipt_type = 'refund'
             WHERE 
-                EXTRACT(MONTH FROM r.date_created) = $1 
-                AND EXTRACT(YEAR FROM r.date_created) = $2
-                AND r.receipt_type = 'sale' AND si.refund_qty = 0
+                EXTRACT(MONTH FROM r.date_created) = 11 
+                AND EXTRACT(YEAR FROM r.date_created) = 2024
+                AND s.status = true AND si.sale_item_type = 'sale'
             GROUP BY i.item_name
             ORDER BY total_sales DESC;
+
             `,
             [month, year]
         );
@@ -33,17 +35,18 @@ const getSalesReport = async (req, res) => {
             SELECT 
                 EXTRACT(DAY FROM r.date_created) AS day,
                 i.item_name, 
-                SUM(si.item_qty) AS quantity, 
+                SUM((si.item_qty - si.refund_qty)) AS quantity, 
                 AVG(si.item_unit_price) AS unit_price, 
-                SUM(si.item_total_price) AS total_sales
+                SUM((si.item_qty - si.refund_qty) * si.item_unit_price) AS total_sales
             FROM sales_items si
+            JOIN sales S on SI.sale_id = s.sale_id
             JOIN items i ON si.item_id = i.item_id
             JOIN receipts r ON si.sale_id = r.sale_id
             LEFT JOIN receipts r_refund ON r.sale_id = r_refund.sale_id AND r_refund.receipt_type = 'refund'
             WHERE 
-                EXTRACT(MONTH FROM r.date_created) = $1 
-                AND EXTRACT(YEAR FROM r.date_created) = $2
-                AND r.receipt_type = 'sale' AND si.refund_qty = 0
+                EXTRACT(MONTH FROM r.date_created) = 11
+                AND EXTRACT(YEAR FROM r.date_created) = 2024
+                AND s.status = true AND si.sale_item_type = 'sale'
             GROUP BY day, i.item_name
             ORDER BY day, i.item_name;
             `,
