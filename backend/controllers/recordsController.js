@@ -40,7 +40,7 @@ const getDashboardData = async (req, res) => {
                             ELSE (si.item_qty - si.refund_qty) * si.item_unit_price
                             END
                         ) AS total_sales,
-                        SUM(si.item_qty) AS total_sold
+                        SUM(si.item_qty - si.refund_qty) AS total_sold
                     FROM sales_items SI
                     JOIN sales S ON SI.sale_id = S.sale_id
                     WHERE s.status = true AND sale_item_type = 'sale';
