@@ -151,7 +151,7 @@ const getReceiptOverview = async (req, res) => {
             FROM 
                 receipts
             WHERE 
-                DATE(date_created) = CURRENT_DATE
+                DATE(date_created) = CURRENT_DATE AND receipt_type = 'sale'
             GROUP BY 
                 EXTRACT(HOUR FROM date_created)
             ORDER BY 
