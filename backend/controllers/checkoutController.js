@@ -131,7 +131,7 @@ const createOrder = async (req, res) => {
         await pool.query("BEGIN;");
         await pool.query(ordersInsert, ordersValues);
         console.log('4');
-        if(ordersBBValues.length) await pool.query(ordersBBInsert, ordersBBValues);
+        // if(ordersBBValues.length) await pool.query(ordersBBInsert, ordersBBValues);
         console.log('5');
         if (ordersItemsValues.length) await pool.query(ordersItemsInsert, ordersItemsValues);
         await pool.query("COMMIT;");
