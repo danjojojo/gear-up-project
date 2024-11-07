@@ -13,7 +13,7 @@ import {
   getReceiptsDashboard
 } from '../../services/receiptService';
 import { AuthContext } from '../../context/auth-context';
-import moment from 'moment';
+import moment from 'moment-timezone';;
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import LoadingPage from '../../components/loading-page/loading-page';

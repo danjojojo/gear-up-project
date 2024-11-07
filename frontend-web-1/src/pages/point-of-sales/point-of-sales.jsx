@@ -6,7 +6,7 @@ import { getAllItems, getAllMechanics, confirmSale } from "../../services/posSer
 import { getReceiptItems, getReceiptDetails } from "../../services/receiptService";
 import LoadingPage from "../../components/loading-page/loading-page";
 import SearchBar from "../../components/search-bar/search-bar";
-import moment from 'moment';
+import moment from 'moment-timezone';;
 
 const PointOfSales = () => {
   const [error, setError] = useState(null)

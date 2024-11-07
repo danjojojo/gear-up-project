@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react'
 import PageLayout from '../../components/page-layout/page-layout'
 import './mechanics.scss'
 import { getMechanics, addMechanic, editMechanic, changeMechanicStatus, deleteMechanic} from '../../services/mechanicsService'
-import moment from 'moment';
+import moment from 'moment-timezone';;
 import {Modal, Button} from 'react-bootstrap';
 import LoadingPage from '../../components/loading-page/loading-page';
 import ErrorLoad from '../../components/error-load/error-load';

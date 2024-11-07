@@ -10,7 +10,7 @@ import { getWaitlistItems, deleteWaitlistItem } from '../../services/waitlistSer
 import LoadingPage from '../../components/loading-page/loading-page';
 import {Modal, Button} from 'react-bootstrap';
 import { AuthContext } from '../../context/auth-context';
-import moment from 'moment';
+import moment from 'moment-timezone';;
 
 // Parts Form
 import FrameForm from './parts-form/frame-form';
@@ -352,11 +352,11 @@ const Waitlist = () => {
                                             </div>
 
                                             <div className="date">
-                                                {moment.tz(item.date_created, "Asia/Manila").format('L')}
+                                                {moment(item.date_created).format('L')}
                                             </div>
 
                                             <div className="time">
-                                                {moment.tz(item.date_created, "Asia/Manila").format('LT')}
+                                                {moment(item.date_created).format('LT')}
                                             </div>
                                         </div>
                                     ))

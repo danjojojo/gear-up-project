@@ -3,7 +3,7 @@ import React, { useState, useEffect, useCallback } from "react";
 import { useNavigate } from 'react-router-dom';
 import { Bar } from 'react-chartjs-2';
 import { Chart as ChartJS, CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend } from 'chart.js';
-import moment from 'moment';
+import moment from 'moment-timezone';;
 import { dashboardData, fetchProductLeaderboard, getSummaryRecords, fetchReceiptOverview } from '../../services/dashboardService';
 ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend);
 
