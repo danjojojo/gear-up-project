@@ -45,7 +45,7 @@ const confirmSale = async (req, res) => {
 
     const decodedToken = jwt.verify(token, process.env.JWT_SECRET);
     const posId = decodedToken.pos_id;
-    const todayDate = new Date(Date.now()).toLocaleString("en-US", { timeZone: "Asia/Manila" });
+    const todayDate = new Date();
 
     console.log("Request body:", req.body); // Log the entire request body
     console.log("POS ID:", posId);

@@ -260,7 +260,7 @@ const cancelVoidReceipt = async(req, res) => {
 const refundReceipt = async(req, res) => {
     try {
         const token = req.cookies.token;
-        const todayDate = new Date(Date.now()).toLocaleString("en-US", { timeZone: "Asia/Manila" });
+        const todayDate = new Date();
         if (!token) {
             return res.status(401).json({ error: "No token provided " });
         }
