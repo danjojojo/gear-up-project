@@ -1,7 +1,7 @@
 import './expenses.scss'
 import ResponsivePageLayout from '../../components/responsive-page-layout/responsive-page-layout';
 import { useEffect, useState, forwardRef, useRef } from 'react';
-import moment from 'moment-timezone';;
+import moment from 'moment-timezone';
 import { NumericFormat } from "react-number-format";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";

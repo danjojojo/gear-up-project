@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
-import moment from 'moment-timezone';;
+import moment from 'moment-timezone';
 import LoadingPage from '../../components/loading-page/loading-page';
 import ErrorLoad from '../../components/error-load/error-load';
 import { getDashboardData, getRecords, getHighlightDates, getInnerRecords, getLeaderBoards } from '../../services/recordsService';

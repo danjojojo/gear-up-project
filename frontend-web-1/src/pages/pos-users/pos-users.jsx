@@ -3,7 +3,7 @@ import PageLayout from '../../components/page-layout/page-layout';
 import { useEffect, useState, forwardRef } from 'react';
 import LoadingPage from '../../components/loading-page/loading-page';
 import { getPosUsers, addPosUser, editPosUserName, editPosUserPassword, editPosUserStatus, deletePosUser, getPosUsersLogs, getPosLogsDates } from '../../services/posUsersService';
-import moment from 'moment-timezone';;
+import moment from 'moment-timezone';
 import { Modal, Button } from 'react-bootstrap';
 import SearchBar from "../../components/search-bar/search-bar";
 import DatePicker from "react-datepicker";

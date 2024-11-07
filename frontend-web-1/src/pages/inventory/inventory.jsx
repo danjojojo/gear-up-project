@@ -19,7 +19,7 @@ import ImagePreviewModal from "../../components/image-preview-modal/image-previe
 import LoadingPage from '../../components/loading-page/loading-page';
 import ErrorLoad from '../../components/error-load/error-load';
 import { Modal, Button } from 'react-bootstrap';
-import moment from 'moment-timezone';;
+import moment from 'moment-timezone';
 
 const Inventory = () => {
     // State management

@@ -2,7 +2,7 @@ import './orders.scss'
 import PageLayout from '../../components/page-layout/page-layout';
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
-import moment from 'moment-timezone';;
+import moment from 'moment-timezone';
 import SearchBar from '../../components/search-bar/search-bar';
 import React, { useState, forwardRef, useEffect } from 'react';
 import {Modal, Button} from 'react-bootstrap';
