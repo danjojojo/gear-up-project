@@ -7,6 +7,7 @@ import arrowDown from '../../../assets/icons/arrow-down.png';
 const Cockpit = ({ onAddToBuild, selectedFrame, selectedFork }) => {
     const [items, setItems] = useState([]);
     const [sortOrder, setSortOrder] = useState("asc");
+    const [loading, setLoading] = useState(true);
 
     const fetchItems = useCallback(async () => {
         try {
@@ -33,6 +34,7 @@ const Cockpit = ({ onAddToBuild, selectedFrame, selectedFork }) => {
             });
 
             setItems(sortedCockpits);
+            setLoading(false);
         } catch (error) {
             console.error("Error fetching cockpit items:", error);
         }
@@ -68,7 +70,12 @@ const Cockpit = ({ onAddToBuild, selectedFrame, selectedFork }) => {
                     )}
                 </button>
             </div>
-            <div className='parts-cards'>
+            {loading && 
+                <div className='loading'>
+                    <i className='fa-solid fa-gear fa-spin'></i>
+                </div>
+            }
+            {!loading && <div className='parts-cards'>
                 {items.map((item) => (
                     <div className="parts-card" key={item.cockpit_id}>
                         <div className="item-image" onClick={() => onAddToBuild(item)}>
@@ -135,7 +142,7 @@ const Cockpit = ({ onAddToBuild, selectedFrame, selectedFork }) => {
                         </Accordion>
                     </div>
                 ))}
-            </div>
+            </div>}
         </div>
     );
 };

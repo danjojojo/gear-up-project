@@ -51,6 +51,8 @@
         }
 
         .add-to-cart {
+            position: relative;
+            /* Set the button to relative for absolute positioning of the badge */
             border-radius: 50px;
             padding: 15px;
             border: none;
@@ -61,12 +63,41 @@
             justify-content: center;
             margin-left: auto;
             background-color: #F9961F;
+        }
 
-            img {
-                height: 20px;
-                width: 20px;
-                align-self: center;
-            }
+        .add-to-cart img {
+            height: 20px;
+            width: 20px;
+            align-self: center;
+        }
+
+        .notification-badge {
+            position: absolute;
+            /* Position the badge absolutely */
+            top: -5px;
+            /* Adjust this value to position it above the icon */
+            right: -5px;
+            /* Adjust this value to position it to the right */
+            background-color: red;
+            /* Background color for the badge */
+            color: white;
+            /* Text color */
+            border-radius: 50%;
+            /* Make it circular */
+            width: 20px;
+            /* Width of the badge */
+            height: 20px;
+            /* Height of the badge */
+            display: flex;
+            /* Center the text */
+            align-items: center;
+            /* Center vertically */
+            justify-content: center;
+            /* Center horizontally */
+            font-size: 12px;
+            /* Font size */
+            font-weight: bold;
+            /* Bold text */
         }
     }
 }

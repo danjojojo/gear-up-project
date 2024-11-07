@@ -7,6 +7,8 @@ import arrowDown from '../../../assets/icons/arrow-down.png';
 const Seat = ({ onAddToBuild, selectedFrame }) => {
     const [items, setItems] = useState([]);
     const [sortOrder, setSortOrder] = useState("asc");
+    const [loading, setLoading] = useState(true);
+
 
     const fetchItems = useCallback(async () => {
         try {
@@ -26,6 +28,7 @@ const Seat = ({ onAddToBuild, selectedFrame }) => {
             });
 
             setItems(sortedSeats);
+            setLoading(false);
         } catch (error) {
             console.error("Error fetching seat items:", error);
         }
@@ -60,7 +63,13 @@ const Seat = ({ onAddToBuild, selectedFrame }) => {
                 </button>
             </div>
 
-            <div className="parts-cards">
+            {loading && 
+                <div className='loading'>
+                    <i className='fa-solid fa-gear fa-spin'></i>
+                </div>
+            }
+
+            {!loading && <div className="parts-cards">
                 {items.map((item) => (
                     <div className="parts-card" key={item.seat_id}>
                         <div className="item-image" onClick={() => onAddToBuild(item)}>
@@ -94,7 +103,7 @@ const Seat = ({ onAddToBuild, selectedFrame }) => {
                         </Accordion>
                     </div>
                 ))}
-            </div>
+            </div>}
         </div>
     );
 };

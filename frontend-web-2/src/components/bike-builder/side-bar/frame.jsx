@@ -7,6 +7,7 @@ import arrowDown from '../../../assets/icons/arrow-down.png';
 const Frame = ({ onAddToBuild }) => {
     const [items, setItems] = useState([]);
     const [sortOrder, setSortOrder] = useState("asc"); // State to manage sort order
+    const [loading, setLoading] = useState(true);
 
     const fetchItems = useCallback(async () => {
         try {
@@ -20,8 +21,9 @@ const Frame = ({ onAddToBuild }) => {
                     return b.item_price - a.item_price;
                 }
             });
-
+            
             setItems(data);
+            setLoading(false);
         } catch (error) {
             console.error("Error fetching frame items:", error);
         }
@@ -56,6 +58,12 @@ const Frame = ({ onAddToBuild }) => {
                 </button>
             </div>
 
+            {loading && 
+                <div className='loading'>
+                    <i className='fa-solid fa-gear fa-spin'></i>
+                </div>
+            }
+            {!loading && 
             <div className="parts-cards">
                 {items.map((item) => (
                     <div className="parts-card" key={item.frame_id}>
@@ -103,6 +111,7 @@ const Frame = ({ onAddToBuild }) => {
                     </div>
                 ))}
             </div>
+            }
         </div>
     );
 };

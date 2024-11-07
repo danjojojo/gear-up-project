@@ -7,6 +7,7 @@ import arrowDown from '../../../assets/icons/arrow-down.png';
 const Fork = ({ onAddToBuild, selectedFramePurpose, selectedFrame }) => {
     const [items, setItems] = useState([]);
     const [sortOrder, setSortOrder] = useState("asc");
+    const [loading, setLoading] = useState(true);
 
     const fetchItems = useCallback(async () => {
         try {
@@ -37,6 +38,7 @@ const Fork = ({ onAddToBuild, selectedFramePurpose, selectedFrame }) => {
             });
 
             setItems(sortedForks);
+            setLoading(false);
         } catch (error) {
             console.error("Error fetching fork items:", error);
         }
@@ -71,7 +73,13 @@ const Fork = ({ onAddToBuild, selectedFramePurpose, selectedFrame }) => {
                 </button>
             </div>
 
-            <div className="parts-cards">
+            {loading && 
+                <div className='loading'>
+                    <i className='fa-solid fa-gear fa-spin'></i>
+                </div>
+            }
+
+            {!loading && <div className="parts-cards">
                 {items.map((item) => (
                     <div className="parts-card" key={item.fork_id}>
                         <div className="item-image" onClick={() => onAddToBuild(item)}>
@@ -113,7 +121,7 @@ const Fork = ({ onAddToBuild, selectedFramePurpose, selectedFrame }) => {
                         </Accordion>
                     </div>
                 ))}
-            </div>
+            </div>}
         </div>
     );
 };

@@ -3,7 +3,6 @@ import React, {useState} from 'react';
 import Accordion from 'react-bootstrap/Accordion';
 import { addToBUCart } from '../../utils/cartDB';
 
-
 const PartDetails = ({ item, partType }) => {
 
     const PesoFormat = new Intl.NumberFormat("en-US", {

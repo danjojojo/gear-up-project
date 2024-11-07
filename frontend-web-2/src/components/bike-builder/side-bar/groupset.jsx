@@ -7,6 +7,7 @@ import arrowDown from '../../../assets/icons/arrow-down.png';
 const Groupset = ({ onAddToBuild, selectedFrame, selectedFork }) => {
     const [items, setItems] = useState([]);
     const [sortOrder, setSortOrder] = useState("asc");
+    const [loading, setLoading] = useState(true);
 
     const fetchItems = useCallback(async () => {
         try {
@@ -32,6 +33,7 @@ const Groupset = ({ onAddToBuild, selectedFrame, selectedFork }) => {
             });
 
             setItems(sortedGroupsets);
+            setLoading(false);
         } catch (error) {
             console.error("Error fetching groupset items:", error);
         }
@@ -65,8 +67,14 @@ const Groupset = ({ onAddToBuild, selectedFrame, selectedFork }) => {
                     )}
                 </button>
             </div>
+
+            {loading && 
+                <div className='loading'>
+                    <i className='fa-solid fa-gear fa-spin'></i>
+                </div>
+            }
             
-            <div className="parts-cards">
+            {!loading && <div className="parts-cards">
                 {items.map((item) => (
                     <div className="parts-card" key={item.groupset_id}>
                         <div className="item-image" onClick={() => onAddToBuild(item)}>
@@ -110,7 +118,7 @@ const Groupset = ({ onAddToBuild, selectedFrame, selectedFork }) => {
                         </Accordion>
                     </div>
                 ))}
-            </div>
+            </div>}
         </div>
     );
 };

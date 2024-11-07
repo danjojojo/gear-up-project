@@ -57,6 +57,7 @@ const Order = () => {
 
                         <div className="order-status">
                             <h4>Order Status</h4>
+                            <h4>Recipient: {orderDetails.cust_name}</h4>
                         </div>
 
                         <div className="statuses">

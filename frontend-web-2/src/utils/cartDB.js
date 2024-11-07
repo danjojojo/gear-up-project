@@ -84,7 +84,7 @@ export async function addToBBCart(build) {
             return false; // Indicates the build was not added due to duplication
         }
         await db.bbCart.add({ ...build, checked: 0, date_added: new Date(Date.now()).toLocaleString("en-US", { timeZone: "Asia/Manila" }) });
-        alert("Build added to BB cart:", build);
+        alert("Build added to cart!", build);
         return true; // Indicates the build was successfully added
     } catch (error) {
         console.error("Error adding build to BB cart:", error);

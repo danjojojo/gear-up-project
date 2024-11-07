@@ -301,7 +301,7 @@ const CanvasContainer = ({
                                         y={partPositions.cockpit.y}
                                         rotation={partPositions.cockpit.rotation}
                                         height={39}
-                                        width={40}
+                                        width={37}
                                         opacity={selectedPart?.name() === 'cockpit' ? 0.85 : 1} // Slight opacity change when selected
                                         draggable={selectedPart?.name() === 'cockpit' && !lockedParts.includes("cockpit")}
                                         listening={!lockedParts.includes("cockpit")}
