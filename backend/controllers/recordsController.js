@@ -369,7 +369,7 @@ const getLeaderBoards = async (req, res) => {
                         FROM sales_items SI
                         JOIN items I ON SI.item_id = I.item_id
                         JOIN sales S ON SI.sale_id = S.sale_id
-                        WHERE si.date_created::date BETWEEN $1 AND $2 AND S.status = true AND Si.sale_item_type = 'sale'
+                        WHERE (SI.date_created AT TIME ZONE 'UTC' AT TIME ZONE 'Asia/Manila')::date BETWEEN $1 AND $2 AND S.status = true AND Si.sale_item_type = 'sale'
                         GROUP BY item_name
                         HAVING SUM(
                             CASE 
@@ -396,7 +396,7 @@ const getLeaderBoards = async (req, res) => {
                         FROM sales_mechanics SM
                         JOIN mechanics me ON SM.mechanic_id = me.mechanic_id
                         JOIN sales S ON SM.sale_id = S.sale_id
-                        WHERE sm.date_created::date BETWEEN $1 AND $2 AND S.status = true
+                        WHERE (SM.date_created AT TIME ZONE 'UTC' AT TIME ZONE 'Asia/Manila')::date BETWEEN $1 AND $2 AND S.status = true
                         GROUP BY mechanic_name
                         ORDER BY SUM(service_price) DESC
                     LIMIT 10;

@@ -86,7 +86,7 @@ const getProductLeaderBoard = async (req, res) => {
             FROM sales_items SI
             JOIN items I ON SI.item_id = I.item_id
             JOIN sales S ON SI.sale_id = S.sale_id
-            WHERE si.date_created::date BETWEEN $1 AND $2 
+            WHERE (SI.date_created AT TIME ZONE 'UTC' AT TIME ZONE 'Asia/Manila')::date BETWEEN $1 AND $2 
             AND S.status = true 
             AND SI.sale_item_type = 'sale'
             GROUP BY item_name
@@ -161,7 +161,7 @@ const getReceiptOverview = async (req, res) => {
             LEFT JOIN 
                 sales_mechanics sm ON sm.sale_id = s.sale_id
             WHERE 
-                DATE(r.date_created AT TIME ZONE 'UTC' AT TIME ZONE 'Asia/Manila') = CURRENT_DATE 
+                DATE(r.date_created AT TIME ZONE 'UTC' AT TIME ZONE 'Asia/Manila') = DATE(NOW() AT TIME ZONE 'Asia/Manila')
                 AND s.status = true 
                 AND si.sale_item_type = 'sale'
             GROUP BY 
