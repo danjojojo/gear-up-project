@@ -7,14 +7,16 @@ $inactive-text-color: grey;
 $qty-bg-color: #a3a3a3;
 $qty-text-color: white;
 $subheading-text-color: #606060;
-$font-size: clamp(0.9em, 1.2vw, 1.1em);
+$font-size: clamp(0.8rem, 1.2vw, 1rem);
 $button-success: #9C9B9B;
 $button-fail: #dee2e6;
 $button-bg-color: #F9961F;
 $bg-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 
 .waitlist {
-
+    *{
+        font-size: $font-size !important;
+    }
     .left-content {
 
         .waitlist-content {
@@ -283,9 +285,10 @@ $bg-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
             overflow: hidden;
 
             .form-content {
-                height: calc(100vh - 160px);
+                height: 100%;
                 overflow-y: auto;
-                display: block;
+                display: flex;
+                flex-direction: column;
                 padding-right: 15px;
 
                 .container-1 {
@@ -325,7 +328,7 @@ $bg-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
                 }
 
                 .upload-container {
-                    height: 20%;
+                    height: 50%;
                 }
 
                 .error-message {

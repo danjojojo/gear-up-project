@@ -11,6 +11,18 @@ import Modal from 'react-bootstrap/Modal';
 import { base64ToFile } from "../../utility/imageUtils";
 import LoadingPage from '../../components/loading-page/loading-page';
 
+const debounce = (func, delay) => {
+	let timeoutId;
+	return (...args) => {
+		if (timeoutId) {
+			clearTimeout(timeoutId);
+		}
+		timeoutId = setTimeout(() => {
+			func.apply(null, args);
+		}, delay);
+	};
+};
+
 const Expenses = () => {
 	// SOME STUFF
 	const [modalShow, setModalShow] = useState(false);
@@ -81,17 +93,21 @@ const Expenses = () => {
 		</h4>
 		)
 	);
+	const [originalHeight, setOriginalHeight] = useState(window.innerHeight);
 
 	const handleResize = () => {
-		if (window.innerWidth <= 900) {
-			setRightContainerStyle("right-container-close");
-			setExpensesContainerStyle("expenses-container");
-			setIsVisible(true);
-		} else {
-			setRightContainerStyle("right-container");
-			setExpensesContainerStyle("expenses-container");
-			setIsVisible(true);
-		}
+		const isKeyboardOpen = window.innerHeight < originalHeight; // Check if keyboard is open
+        if (!isKeyboardOpen) {
+            if (window.innerWidth <= 900) {
+                setRightContainerStyle("right-container-close");
+                setExpensesContainerStyle("expenses-container");
+                setIsVisible(true);
+            } else {
+                setRightContainerStyle("right-container");
+                setExpensesContainerStyle("expenses-container");
+                setIsVisible(true);
+            }
+        }
 	}
 	function openExpenseFormView(){
 		if(window.innerWidth <= 900){
@@ -413,9 +429,25 @@ const Expenses = () => {
 	}, [allExpenses])
 
 	useEffect(() => {
-		handleResize();
-		window.addEventListener("resize", handleResize);
-	}, [isVisible]);
+		// Call handleResize initially on mount
+        handleResize();
+
+        setOriginalHeight(window.innerHeight); // Store original height on mount
+        const handleResizeDebounced = debounce(handleResize, 100);
+        
+        // Setup resize listener only if width is greater than 900
+        const checkWindowSizeAndAddListener = () => {
+            if (window.innerWidth > 900) {
+                window.addEventListener("resize", handleResizeDebounced);
+            }
+        };
+
+        checkWindowSizeAndAddListener(); // Check size and possibly add listener
+
+        return () => {
+            window.removeEventListener("resize", handleResizeDebounced);
+        };
+	}, []);
 
     // DISPLAY LOADING
     if(loading) return <LoadingPage classStyle="loading-in-page"/>
@@ -754,7 +786,7 @@ const Expenses = () => {
 										prefix={"₱"}
 										allowNegative={false}
 										value={expenseAmount}
-										onValueChange={(values) => {
+										onValueChange={(values, e) => {
 											const { formattedValue, value } = values;
 											console.log(formattedValue);
 											setExpenseAmount(Number(value))

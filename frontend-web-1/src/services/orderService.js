@@ -22,9 +22,9 @@ export const getOrdersItems = async (orderId) => {
     }
 }
 
-export const updateOrderStatus = async (orderId, changeStatusTo) => {
+export const updateOrderStatus = async (orderId, changeStatusTo, orderName, email) => {
     try {
-        const response = await api.put(`/orders/update-order-status/${orderId}`, { changeStatusTo });
+        const response = await api.put(`/orders/update-order-status/${orderId}`, { changeStatusTo, orderName, email });
         return response.data;
     } catch (error) {
         console.error('Error updating order status:', error.message);

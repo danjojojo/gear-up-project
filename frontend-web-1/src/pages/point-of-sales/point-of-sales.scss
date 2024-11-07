@@ -84,19 +84,19 @@ $normal-border-color: #dee2e6;
             .categories{
                 display: flex;
                 // border: 1px solid red;
-                margin-bottom: 10px;
+                margin-bottom: 15px;
                 gap: 5px;
                 height: auto;
                 overflow-x: auto;
                 scrollbar-width: none;
 
                 button {
-                    width: 100%;
+                    flex: 1;
                     border-radius: 5px;
                     padding: 5px 10px;
-                    background-color: $tabs-bg-color;
+                    background-color: white;
                     color: $inactive-text-color;
-                    border: none;
+                    border: 2px solid #cccccc56;
                     cursor: pointer;
             
                     &.active {
@@ -104,7 +104,7 @@ $normal-border-color: #dee2e6;
                         border: 2px solid #F9961F;
                         color: $active-text-color;
                         // border: none;
-                        box-shadow: $bg-shadow;
+                        // box-shadow: $bg-shadow;
                         /* Light shadow */
                     }
                 }
@@ -118,7 +118,7 @@ $normal-border-color: #dee2e6;
         }
 
         .search-bar {
-            background-color: white;
+            background-color: $normal-bg-color;
             border: 1px solid $normal-border-color;
             display: flex;
             align-items: center;

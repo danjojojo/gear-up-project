@@ -25,14 +25,18 @@ const getDashboardData = async (req, res) => {
             SELECT 
                 SUM(
                     CASE 
-                        WHEN DATE(si.date_created) = DATE(NOW()) AND si.refund_qty = 0 THEN si.item_qty 
-                        WHEN DATE(si.date_created) = DATE(NOW()) AND si.refund_qty = si.item_qty THEN 0
-                        WHEN DATE(si.date_created) = DATE(NOW()) AND si.refund_qty < si.item_qty THEN (si.item_qty - si.refund_qty)
-                    ELSE 0 
+                        WHEN DATE(si.date_created) = CURRENT_DATE AT TIME ZONE 'Asia/Manila' THEN
+                            CASE 
+                                WHEN si.refund_qty = 0 THEN si.item_qty 
+                                WHEN si.refund_qty = si.item_qty THEN 0
+                                WHEN si.refund_qty < si.item_qty THEN (si.item_qty - si.refund_qty)
+                            END
+                        ELSE 0 
                     END
                 ) AS sold_today
             FROM sales_items si
-            WHERE si.sale_item_type = 'sale'
+            WHERE si.sale_item_type = 'sale';
+
         `;
         const soldTodayResult = await pool.query(soldTodayQuery);
         const soldToday = parseInt(soldTodayResult.rows[0].sold_today, 10) || 0;
@@ -40,7 +44,7 @@ const getDashboardData = async (req, res) => {
         // Query to get rendered_today from sales_mechanics
         const renderedTodayQuery = `
             SELECT 
-                COUNT(CASE WHEN DATE(sm.date_created) = DATE(NOW()) THEN sm.sale_service_id ELSE NULL END) AS rendered_today
+                COUNT(CASE WHEN DATE(sm.date_created) = CURRENT_DATE AT TIME ZONE 'Asia/Manila' THEN sm.sale_service_id ELSE NULL END) AS rendered_today
             FROM sales_mechanics sm
             JOIN sales s ON sm.sale_id = s.sale_id
             WHERE s.status = true

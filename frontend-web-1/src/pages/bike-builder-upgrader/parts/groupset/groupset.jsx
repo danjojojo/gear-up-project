@@ -12,6 +12,18 @@ import Form from './form';
 import LoadingPage from '../../../../components/loading-page/loading-page';
 import {Modal, Button} from 'react-bootstrap';
 
+const debounce = (func, delay) => {
+	let timeoutId;
+	return (...args) => {
+		if (timeoutId) {
+			clearTimeout(timeoutId);
+		}
+		timeoutId = setTimeout(() => {
+			func.apply(null, args);
+		}, delay);
+	};
+};
+
 const Groupset = () => {
     const navigate = useNavigate();
     const [items, setItems] = useState([]);
@@ -127,23 +139,42 @@ const Groupset = () => {
     const [isVisible, setIsVisible] = useState(true);
     const [partsContainerStyle, setPartsContainerStyle] = useState("parts-content");
     const [rightContainerStyle, setRightContainerStyle] = useState("right-container");
+    const [originalHeight, setOriginalHeight] = useState(window.innerHeight);
 
     const handleResize = () => {
-        if (window.innerWidth < 900) {
-            setIsVisible(true);
-            setPartsContainerStyle("parts-content");
-            setRightContainerStyle("right-container-close");
-        } else {
-            setIsVisible(true);
-            setPartsContainerStyle("parts-content");
-            setRightContainerStyle("right-container");
+        const isKeyboardOpen = window.innerHeight < originalHeight; // Check if keyboard is open
+        if (!isKeyboardOpen) {
+            if (window.innerWidth < 900) {
+                setIsVisible(true);
+                setPartsContainerStyle("parts-content");
+                setRightContainerStyle("right-container-close");
+            } else {
+                setIsVisible(true);
+                setPartsContainerStyle("parts-content");
+                setRightContainerStyle("right-container");
+            }
         }
     }
 
     useEffect(() => {
-      handleResize();
-      window.addEventListener("resize", handleResize);
-    }, [isVisible]);
+        handleResize();
+
+        setOriginalHeight(window.innerHeight); // Store original height on mount
+        const handleResizeDebounced = debounce(handleResize, 100);
+        
+        // Setup resize listener only if width is greater than 900
+        const checkWindowSizeAndAddListener = () => {
+            if (window.innerWidth > 900) {
+                window.addEventListener("resize", handleResizeDebounced);
+            }
+        };
+
+        checkWindowSizeAndAddListener(); // Check size and possibly add listener
+
+        return () => {
+            window.removeEventListener("resize", handleResizeDebounced);
+        };
+    }, []);
 
     const [functionKey, setFunctionKey] = useState('');
     const [showResponseModal, setShowResponseModal] = useState(false);

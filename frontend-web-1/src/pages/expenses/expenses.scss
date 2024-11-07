@@ -7,11 +7,14 @@ $inactive-text-color: grey;
 $qty-bg-color: #a3a3a3;
 $qty-text-color: white;
 $subheading-text-color: #606060;
-$font-size: clamp(0.9em, 1.2vw, 1.1em);
+$font-size: clamp(0.9em, 1.2vw, 1em);
 
 $button-bg-color: #F9961F;
 
 .expenses{
+    p{
+        font-size: $font-size !important;
+    }
     .left-content{
         .expenses-container{
             display: flex;

@@ -1,5 +1,6 @@
 const pool = require('../config/db');
 const { decrypt } = require('../utils/encrypt');
+const nodemailer = require('nodemailer');
 
 const getOrders = async (req, res) => {
     try {
@@ -12,14 +13,6 @@ const getOrders = async (req, res) => {
             ORDER BY date_created DESC;
         `
         const { rows } = await pool.query(query, [startDate]);
-
-        // // Decrypt the address for each order
-        // const orders = rows.map(order => {
-        //     return {
-        //         ...order,
-        //         address: decrypt(order.address) // Decrypt the address field
-        //     };
-        // });
 
         res.status(200).json({ orders : rows });
 
@@ -121,10 +114,13 @@ const getOrdersItems = async (req, res) => {
 const updateOrderStatus = async (req, res) => {
     try {
         const { orderId } = req.params;
-        const { changeStatusTo } = req.body;
+        const { changeStatusTo, orderName, email } = req.body;
 
         let query = ``;
         let queryParams = [orderId]; // Start with orderId as the only parameter
+
+        const link = `${process.env.CUSTOMER_URL}/orders/${orderName}`;
+        let statusMessage = '';
 
         switch (changeStatusTo) {
             case 'in-process':
@@ -134,6 +130,7 @@ const updateOrderStatus = async (req, res) => {
                     WHERE order_id = $2
                 `;
                 queryParams = [changeStatusTo, orderId];
+                statusMessage = 'processed';
                 break;
             case 'ready-pickup':
                 query = `
@@ -141,6 +138,7 @@ const updateOrderStatus = async (req, res) => {
                     SET pickup_ready_date = NOW()
                     WHERE order_id = $1
                 `;
+                statusMessage = 'prepared for pickup';
                 break;
             case 'ready-shipped':
                 query = `
@@ -148,6 +146,7 @@ const updateOrderStatus = async (req, res) => {
                     SET shipped_at = NOW()
                     WHERE order_id = $1
                 `;
+                statusMessage = 'shipped';
                 break;
             case 'completed':
                 query = `
@@ -156,6 +155,7 @@ const updateOrderStatus = async (req, res) => {
                     WHERE order_id = $2
                 `;
                 queryParams = [changeStatusTo, orderId];
+                statusMessage = 'completed';
                 break;
             default:
                 query = `
@@ -164,15 +164,48 @@ const updateOrderStatus = async (req, res) => {
                     WHERE order_id = $2
                 `;
                 queryParams = [changeStatusTo, orderId];
+                statusMessage = 'updated';
                 break;
         }
         
         await pool.query(query, queryParams);
+        await sendEmail(email, orderName, link, statusMessage);
         res.status(200).json({ message: 'Order status updated' });
     } catch (error) {
         console.error('Error updating order:', error.message);
         res.status(500).json({ error: error.message });
     }
+};
+
+const sendEmail = async (email, orderName, link, statusMessage) => {
+  const transporter = nodemailer.createTransport({
+    host: 'smtp.gmail.com',
+    port: 465,
+    secure: true,
+    auth: { 
+      user: process.env.EMAIL_USER, 
+      pass: process.env.EMAIL_PASS 
+    },
+    tls: {
+        rejectUnauthorized: false
+    }
+  });
+
+  try {
+    console.log(`Attempting to send email to: ${email}`);  // Log before sending
+    await transporter.sendMail({
+      from: process.env.EMAIL_USER,
+      to: email,
+      subject: 'Order Status Link',
+      html: `
+          <h3>Your order ${orderName} has been successfully ${statusMessage}!</h3>
+          <p>Click <a href="${link}">here</a> to view your order status.</p>
+      `
+    });
+    console.log(`Email successfully sent to: ${email}`);  // Log success
+  } catch (error) {
+    console.error(`Error sending email to ${email}:`, error.message);  // Log specific error
+  }
 };
 
 

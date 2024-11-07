@@ -8,6 +8,18 @@ import LoadingPage from "../../components/loading-page/loading-page";
 import SearchBar from "../../components/search-bar/search-bar";
 import moment from 'moment';
 
+const debounce = (func, delay) => {
+	let timeoutId;
+	return (...args) => {
+		if (timeoutId) {
+			clearTimeout(timeoutId);
+		}
+		timeoutId = setTimeout(() => {
+			func.apply(null, args);
+		}, delay);
+	};
+};
+
 const PointOfSales = () => {
   const [error, setError] = useState(null)
 
@@ -411,18 +423,23 @@ const PointOfSales = () => {
     }
   };
 
+  const [originalHeight, setOriginalHeight] = useState(window.innerHeight);
+
   // FUNCTIONS FOR MOBILE RESPONSIVENESS
   const handleResize = () => {
-    if (window.innerWidth < 900) {
-      setCheckOutContainer("checkout-container-close");
-      setRightContainerStyle("right-container-close");
-      setPosContainer("pos-container");
-      setIsVisible(true);
-    } else {
-      setCheckOutContainer("checkout-container");
-      setRightContainerStyle("right-container");
-      setPosContainer("pos-container");
-      setIsVisible(true);
+    const isKeyboardOpen = window.innerHeight < originalHeight; // Check if keyboard is open
+    if (!isKeyboardOpen) { 
+      if (window.innerWidth < 900) {
+        setCheckOutContainer("checkout-container-close");
+        setRightContainerStyle("right-container-close");
+        setPosContainer("pos-container");
+        setIsVisible(true);
+      } else {
+        setCheckOutContainer("checkout-container");
+        setRightContainerStyle("right-container");
+        setPosContainer("pos-container");
+        setIsVisible(true);
+      }
     }
   };
   const closePos = () => {
@@ -475,8 +492,23 @@ const PointOfSales = () => {
   // WHEN WINDOW IS RESIZED
   useEffect(() => {
     handleResize();
-    window.addEventListener("resize", handleResize);
-  }, [isVisible]);
+
+    setOriginalHeight(window.innerHeight); // Store original height on mount
+    const handleResizeDebounced = debounce(handleResize, 100);
+    
+    // Setup resize listener only if width is greater than 900
+    const checkWindowSizeAndAddListener = () => {
+        if (window.innerWidth > 900) {
+            window.addEventListener("resize", handleResizeDebounced);
+        }
+    };
+
+    checkWindowSizeAndAddListener(); // Check size and possibly add listener
+
+    return () => {
+        window.removeEventListener("resize", handleResizeDebounced);
+    };
+  }, []);
 
   const printReceipt = () => {
     window.print();

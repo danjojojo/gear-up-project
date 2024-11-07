@@ -2,15 +2,16 @@
     display: flex;
     flex-direction: column;
     width: 300px; // Adjust the width as needed
-    height: 100dvh; // Full height of the viewport
+    height: 100svh; // Full height of the viewport
     background-color: white !important; // Light gray background
     border-right: 1px solid #dee2e6; // Border on the right side
-    padding: 15px;
-
+    padding: 15px;  
+    
     .nav {
         background-color: white!important; // Light gray background
         display: flex;
         flex-direction: column;
+        flex-grow: 1;
         width: 100%;
         padding: 0;
         margin: 0;
@@ -53,6 +54,7 @@
         color: #2e2e2e; // Dark gray color for text
         border-bottom: 1px solid #dee2e6; // Border at the bottom
         cursor: pointer;
+        height: auto;
 
         p:nth-child(1) {
            color: #F9961F !important;
@@ -66,7 +68,7 @@
         background-color: #F9961F;
         color: white;
         border: none;
-        margin-top: auto;
+        height: auto;
 
         button {
             border: none;
@@ -100,7 +102,4 @@
             transform: translateX(0);
         }
     }
-
-
-
 }

@@ -38,6 +38,7 @@ const Orders = () => {
 
     const [showChangeStatusModal, setShowChangeStatusModal] = useState(false);
     const [changeStatusTo, setChangeStatusTo] = useState('');
+    const [showEmailResponse, setShowEmailResponse] = useState(false);
 
     const [showMessage, setShowMessage] = useState(false);
     const [courier, setCourier] = useState('');
@@ -84,25 +85,25 @@ const Orders = () => {
             {changeStatusTo === 'in-process' && <div>
               <p>Are you sure you want to mark this order in process?</p>
               <ul>
-                <li>Customer will be able to see that you processed this order through this order's link.</li>
+                <li>Customer will be able to receive an email that you processed this order.</li>
               </ul>
             </div>}
             {changeStatusTo === 'ready-pickup' && <div>
               <p>Are you sure you want to mark this order ready for pickup?</p>
               <ul>
-                <li>Customer will be able to see that this order is ready for pickup through this order's link.</li>
+                <li>Customer will be able to receive an email that this order is ready for pickup.</li>
               </ul>
             </div>}
             {changeStatusTo === 'ready-shipped' && <div>
               <p>Are you sure you want to mark this order shipped?</p>
               <ul>
-                <li>Customer will be able to see that this order is shipped through this order's link.</li>
+                <li>Customer will be able to receive an email that this order is shipped.</li>
               </ul>
             </div>}
             {changeStatusTo === 'completed' && <div>
               <p>Are you sure you want to mark this order completed?</p>
               <ul>
-                <li>Customer will be able to see that this order is completed through this order's link.</li>
+                <li>Customer will be able to receive an email that this order is completed.</li>
                 <li>Order has been received by customer.</li>
                 <li>Order items will be deducted from inventory.</li>
               </ul>
@@ -123,7 +124,28 @@ const Orders = () => {
         </Modal>
       );
     }
-    
+
+    function EmailResponse({ onHide, ...props }) {
+        return (
+            <Modal
+
+                {...props}
+                size="md"
+                aria-labelledby="contained-modal-title-vcenter"
+                centered
+            >
+                <Modal.Header closeButton onClick={onHide}>
+                    <Modal.Title id="contained-modal-title-vcenter">
+                        Email Response
+                    </Modal.Title>
+                </Modal.Header>
+                <Modal.Body>
+                    <p>Email sent successfully!</p>
+                </Modal.Body>
+            </Modal>
+        );
+    }
+
     const getAllOrders = async (paymentStatus = '', orderStatus = '', searchTerm = '', startDate) => {
         try {
             const { orders } = await getOrders(startDate);
@@ -247,7 +269,7 @@ const Orders = () => {
 
     const handleUpdateOrderStatus = async (statusTo) => {
         try {
-            await updateOrderStatus(selectedOrder.order_id, statusTo);
+            await updateOrderStatus(selectedOrder.order_id, statusTo, selectedOrder.order_name, selectedOrder.email);
 
             if(statusTo.includes('ready')) {
                 if(selectedOrder.bu_option === 'deliver-home'){
@@ -260,6 +282,7 @@ const Orders = () => {
             }
 
             setShowChangeStatusModal(false);
+            setShowEmailResponse(true);
             const { orders } = await getOrders(startDate);
             const orderBySelectedID = orders.filter(order => order.order_id === selectedOrder.order_id);
             setSelectedOrder(orderBySelectedID[0]);
@@ -320,6 +343,10 @@ const Orders = () => {
                         show={showChangeStatusModal}
                         onHide={() => setShowChangeStatusModal(false)}
                         onConfirm={() => handleUpdateOrderStatus(changeStatusTo)}
+                    />
+                    <EmailResponse
+                        show={showEmailResponse}
+                        onHide={() => setShowEmailResponse(false)}
                     />
                     {ordersView && <>
                             <div className="nav">

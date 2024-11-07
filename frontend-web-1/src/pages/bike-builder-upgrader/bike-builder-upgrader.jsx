@@ -12,6 +12,18 @@ import cockpit from "../../assets/images/cockpit.png";
 import { getItemCount } from '../../services/bbuService';
 import LoadingPage from '../../components/loading-page/loading-page';
 
+const debounce = (func, delay) => {
+	let timeoutId;
+	return (...args) => {
+		if (timeoutId) {
+			clearTimeout(timeoutId);
+		}
+		timeoutId = setTimeout(() => {
+			func.apply(null, args);
+		}, delay);
+	};
+};
+
 const BikeBuilderUpgrader = () => {
     const navigate = useNavigate();
     const [partCounts, setPartCounts] = useState({
@@ -58,21 +70,40 @@ const BikeBuilderUpgrader = () => {
 
     const [isVisible, setIsVisible] = useState(true);
     const [rightContainerStyle, setRightContainerStyle] = useState("right-container");
+    const [originalHeight, setOriginalHeight] = useState(window.innerHeight);
 
     const handleResize = () => {
-        if (window.innerWidth < 900) {
-            setIsVisible(false);
-            setRightContainerStyle("right-container-close");
-        } else {
-            setIsVisible(true);
-            setRightContainerStyle("right-container");
+        const isKeyboardOpen = window.innerHeight < originalHeight; // Check if keyboard is open
+        if (!isKeyboardOpen) {
+            if (window.innerWidth < 900) {
+                setRightContainerStyle("right-container-close");
+                setIsVisible(true);
+            } else {
+                setRightContainerStyle("right-container");
+                setIsVisible(true);
+            }
         }
     }
 
     useEffect(() => {
-      handleResize();
-      window.addEventListener("resize", handleResize);
-    }, [isVisible]);
+        handleResize();
+
+        setOriginalHeight(window.innerHeight); // Store original height on mount
+        const handleResizeDebounced = debounce(handleResize, 100);
+        
+        // Setup resize listener only if width is greater than 900
+        const checkWindowSizeAndAddListener = () => {
+            if (window.innerWidth > 900) {
+                window.addEventListener("resize", handleResizeDebounced);
+            }
+        };
+
+        checkWindowSizeAndAddListener(); // Check size and possibly add listener
+
+        return () => {
+            window.removeEventListener("resize", handleResizeDebounced);
+        };
+    }, []);
 
     if(loading) return <LoadingPage classStyle={"loading-in-page"}/>
 
