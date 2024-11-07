@@ -356,7 +356,7 @@ const Waitlist = () => {
                                             </div>
 
                                             <div className="time">
-                                                {moment.tz(item.date_created, "Asia/Manila").format('L')}
+                                                {moment.tz(item.date_created, "Asia/Manila").format('LT')}
                                             </div>
                                         </div>
                                     ))
