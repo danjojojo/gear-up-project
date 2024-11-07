@@ -166,7 +166,7 @@ const RevenueReport = () => {
     });
 
     // Calculate Net Revenue
-    const netRevenue = sales - laborCosts - operationalExpenses;
+    const netRevenue = (sales + laborCosts) - laborCosts - operationalExpenses;
 
     return (
         <>
