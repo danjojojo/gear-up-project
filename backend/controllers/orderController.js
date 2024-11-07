@@ -9,7 +9,7 @@ const getOrders = async (req, res) => {
         const query = `
             SELECT * 
             FROM orders
-            WHERE DATE(date_created) = $1
+            WHERE DATE(date_created AT TIME ZONE 'UTC' AT TIME ZONE 'Asia/Manila') = $1
             ORDER BY date_created DESC;
         `
         const { rows } = await pool.query(query, [startDate]);
@@ -61,7 +61,7 @@ const getOrder = async (req, res) => {
 const getOrderDates = async (req, res) => {
     try {
         const query = `
-            SELECT DISTINCT DATE(date_created) AS date_created
+            SELECT DISTINCT DATE(date_created AT TIME ZONE 'UTC' AT TIME ZONE 'Asia/Manila') AS date_created
             FROM orders
             ORDER BY date_created DESC
         `;
@@ -293,8 +293,8 @@ const deductStockForCompletedOrder = async (req, res) => {
 const getOrderStatistics = async (req, res) => {
     const query = `
         SELECT
-            COUNT(*) FILTER (WHERE DATE(date_created) = $1) AS orders_today,
-            COALESCE(SUM(order_amount) FILTER (WHERE DATE(date_created) = $1 AND payment_status = 'paid'), 0) AS total_sales_today,
+            COUNT(*) FILTER (WHERE DATE(date_created AT TIME ZONE 'UTC' AT TIME ZONE 'Asia/Manila') = $1) AS orders_today,
+            COALESCE(SUM(order_amount) FILTER (WHERE DATE(date_created AT TIME ZONE 'UTC' AT TIME ZONE 'Asia/Manila') = $1 AND payment_status = 'paid'), 0) AS total_sales_today,
             COUNT(*) AS total_orders,
             COALESCE(SUM(order_amount) FILTER (WHERE payment_status = 'paid'), 0) AS total_sales
         FROM orders;

@@ -15,18 +15,18 @@ const getSummaryRecords = async (req, res) => {
                     JOIN items I on SI.item_id = i.item_id
                     JOIN sales S on SI.sale_id = s.sale_id
                     JOIN pos_users P on SI.pos_id = p.pos_id
-                    WHERE DATE(si.date_created) = $1 AND s.status = true AND si.sale_item_type = 'sale'
+                    WHERE DATE(si.date_created AT TIME ZONE 'UTC' AT TIME ZONE 'Asia/Manila') = $1 AND s.status = true AND si.sale_item_type = 'sale'
                 UNION
                 SELECT 'mechanic' as record_type, mechanic_name, service_price, sm.date_created as date, pos_name, s.sale_id as record_id, sm.sale_service_id as record_item_id, '0' as refund_qty, '1' as item_qty, service_price as item_unit_price
                     FROM sales_mechanics SM 
                     JOIN mechanics M on SM.mechanic_id = M.mechanic_id
                     JOIN sales S on SM.sale_id = s.sale_id
                     JOIN pos_users P on SM.pos_id = p.pos_id
-                    WHERE DATE(sm.date_created) = $1 AND s.status = true
+                    WHERE DATE(sm.date_created AT TIME ZONE 'UTC' AT TIME ZONE 'Asia/Manila') = $1 AND s.status = true
                 UNION
                 SELECT 'expense' AS record_type, expense_name, expense_amount, e.date_created as date, pos_name, e.expense_id as record_id, e.expense_id as record_item_id, '0' as refund_qty, '1' as item_qty, expense_amount as item_unit_price
                     FROM expenses e JOIN pos_users P on e.pos_id = p.pos_id
-                    WHERE DATE(e.date_created) = $1 AND e.status = 'active'
+                    WHERE DATE(e.date_created AT TIME ZONE 'UTC' AT TIME ZONE 'Asia/Manila') = $1 AND e.status = 'active'
                     ORDER BY date DESC, item_name ASC;
             `
             const values = [date];
@@ -44,17 +44,17 @@ const getHighlightDates = async (req, res) => {
         if(!token) return res.status(401).json({message: "Unauthorized"});
 
         const query = `
-            SELECT DISTINCT date(si.date_created) as date
+            SELECT DISTINCT date(si.date_created AT TIME ZONE 'UTC' AT TIME ZONE 'Asia/Manila') as date
             FROM sales_items SI 
             JOIN sales S on SI.sale_id = S.sale_id
             WHERE S.status = true
             UNION
-            SELECT DISTINCT date(sm.date_created) as date
+            SELECT DISTINCT date(sm.date_created AT TIME ZONE 'UTC' AT TIME ZONE 'Asia/Manila') as date
             FROM sales_mechanics SM
             JOIN sales S on SM.sale_id = S.sale_id
             WHERE S.status = true
             UNION
-            SELECT DISTINCT date(date_created) as date
+            SELECT DISTINCT date(date_created AT TIME ZONE 'UTC' AT TIME ZONE 'Asia/Manila') as date
             FROM expenses
             ORDER BY date DESC;
         `

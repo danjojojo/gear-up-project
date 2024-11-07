@@ -23,7 +23,7 @@ const getExpenses = async (req, res) => {
                 date_created,
                 date_updated 
             FROM expenses
-            WHERE pos_id = $1 and DATE(date_updated) = $2 and status = 'active'
+            WHERE pos_id = $1 and DATE(date_updated AT TIME ZONE 'UTC' AT TIME ZONE 'Asia/Manila') = $2 and status = 'active'
             ORDER BY date_updated DESC
         `;
 
@@ -123,7 +123,7 @@ const getExpensesDates = async (req, res) => {
         const posId = decodedToken.pos_id;
 
         const query = `
-            SELECT DISTINCT DATE(date_updated) AS date_updated
+            SELECT DISTINCT DATE(date_updated AT TIME ZONE 'UTC' AT TIME ZONE 'Asia/Manila') AS date_updated
             FROM expenses
             WHERE pos_id = $1 and status = 'active'
             ORDER BY date_updated DESC

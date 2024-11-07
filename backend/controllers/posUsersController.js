@@ -173,7 +173,7 @@ const getPosUsersLogs = async (req, res) => {
             FROM 
                 pos_logs
             WHERE 
-                DATE(login_time) = $1
+                DATE(login_time AT TIME ZONE 'UTC' AT TIME ZONE 'Asia/Manila') = $1
             ORDER BY 
                 login_time DESC;
         `;
@@ -190,7 +190,7 @@ const getPosUsersLogs = async (req, res) => {
 const getPosLogsDates = async (req, res) => {
     try {
         const query = `
-            SELECT DISTINCT DATE(login_time) AS log_date
+            SELECT DISTINCT DATE(login_time AT TIME ZONE 'UTC' AT TIME ZONE 'Asia/Manila') AS log_date
             FROM pos_logs
             ORDER BY log_date DESC;
         `;
