@@ -48,7 +48,7 @@ const getPosReceipts = async (req, res) => {
                 FROM receipts R1
                 JOIN pos_users P ON R1.pos_id = P.pos_id
                 LEFT JOIN receipts R2 ON R1.receipt_type = 'refund' AND R1.refund_id = R2.receipt_id
-                WHERE DATE(R1.date_created) = $1 
+                WHERE DATE(R1.date_created AT TIME ZONE 'UTC' AT TIME ZONE 'Asia/Manila') = $1 
                 ORDER BY R1.date_created DESC;
             `;
             const { rows } = await pool.query(query, [startDate]);
@@ -64,7 +64,7 @@ const getPosReceipts = async (req, res) => {
                 JOIN pos_users P ON R1.pos_id = P.pos_id
                 LEFT JOIN receipts R2 ON R1.receipt_type = 'refund' AND R1.refund_id = R2.receipt_id
                 WHERE R1.pos_id = $1 
-                AND DATE(R1.date_created) = $2 
+                AND DATE(R1.date_created AT TIME ZONE 'UTC' AT TIME ZONE 'Asia/Manila') = $2 
                 ORDER BY R1.date_created DESC;
             `;
             const { rows } = await pool.query(query,
