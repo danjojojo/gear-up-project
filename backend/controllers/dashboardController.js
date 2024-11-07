@@ -147,15 +147,19 @@ const getReceiptOverview = async (req, res) => {
         const query = `
             SELECT 
                 EXTRACT(HOUR FROM (r.date_created AT TIME ZONE 'UTC' AT TIME ZONE 'Asia/Manila')) AS hour,
-                SUM(r.receipt_total_cost) AS total_cost
+                SUM(((si.item_qty - COALESCE(si.refund_qty, 0)) * si.item_unit_price) + COALESCE(sm.service_price, 0)) AS total_cost
             FROM 
                 receipts r
+            JOIN 
+                sales s ON r.sale_id = s.sale_id
+            JOIN 
+                sales_items si ON si.sale_id = s.sale_id
             LEFT JOIN 
-                receipts r_refund ON r.receipt_id = r_refund.refund_id AND r_refund.receipt_type = 'refund'
+                sales_mechanics sm ON sm.sale_id = s.sale_id
             WHERE 
                 DATE(r.date_created AT TIME ZONE 'UTC' AT TIME ZONE 'Asia/Manila') = CURRENT_DATE 
-                AND r.receipt_type = 'sale'
-                AND r_refund.receipt_id IS NULL -- Ensure only sales with no refunds are included
+                AND s.status = true 
+                AND si.sale_item_type = 'sale'
             GROUP BY 
                 EXTRACT(HOUR FROM (r.date_created AT TIME ZONE 'UTC' AT TIME ZONE 'Asia/Manila'))
             ORDER BY 

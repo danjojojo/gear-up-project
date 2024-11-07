@@ -19,8 +19,8 @@ const getSalesReport = async (req, res) => {
             JOIN receipts r ON si.sale_id = r.sale_id
             LEFT JOIN receipts r_refund ON r.sale_id = r_refund.sale_id AND r_refund.receipt_type = 'refund'
             WHERE 
-                EXTRACT(MONTH FROM r.date_created) = 11 
-                AND EXTRACT(YEAR FROM r.date_created) = 2024
+                EXTRACT(MONTH FROM r.date_created) = $1 
+                AND EXTRACT(YEAR FROM r.date_created) = $2
                 AND s.status = true AND si.sale_item_type = 'sale'
             GROUP BY i.item_name
             ORDER BY total_sales DESC;
@@ -44,8 +44,8 @@ const getSalesReport = async (req, res) => {
             JOIN receipts r ON si.sale_id = r.sale_id
             LEFT JOIN receipts r_refund ON r.sale_id = r_refund.sale_id AND r_refund.receipt_type = 'refund'
             WHERE 
-                EXTRACT(MONTH FROM r.date_created) = 11
-                AND EXTRACT(YEAR FROM r.date_created) = 2024
+                EXTRACT(MONTH FROM r.date_created) = $1
+                AND EXTRACT(YEAR FROM r.date_created) = $2
                 AND s.status = true AND si.sale_item_type = 'sale'
             GROUP BY day, i.item_name
             ORDER BY day, i.item_name;
