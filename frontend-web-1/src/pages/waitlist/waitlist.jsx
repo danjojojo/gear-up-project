@@ -10,6 +10,7 @@ import { getWaitlistItems, deleteWaitlistItem } from '../../services/waitlistSer
 import LoadingPage from '../../components/loading-page/loading-page';
 import {Modal, Button} from 'react-bootstrap';
 import { AuthContext } from '../../context/auth-context';
+import moment from 'moment';
 
 // Parts Form
 import FrameForm from './parts-form/frame-form';
@@ -351,13 +352,11 @@ const Waitlist = () => {
                                             </div>
 
                                             <div className="date">
-                                                {new Date(item.date_created).toLocaleDateString()}
+                                                {moment(item.date_created).format('L')}
                                             </div>
 
                                             <div className="time">
-                                                {new Date(item.date_created).toLocaleTimeString(
-                                                    [], { hour: 'numeric', minute: '2-digit' }
-                                                )}
+                                                {moment(item.date_created).format('LT')}
                                             </div>
                                         </div>
                                     ))
