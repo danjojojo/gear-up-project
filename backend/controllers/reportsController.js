@@ -20,7 +20,7 @@ const getSalesReport = async (req, res) => {
             WHERE 
                 EXTRACT(MONTH FROM r.date_created) = $1 
                 AND EXTRACT(YEAR FROM r.date_created) = $2
-                AND r_refund.sale_id IS NULL -- Ensure only sales without refunds are included
+                AND r.receipt_type = 'sale' AND si.refund_qty = 0
             GROUP BY i.item_name
             ORDER BY total_sales DESC;
             `,
@@ -43,7 +43,7 @@ const getSalesReport = async (req, res) => {
             WHERE 
                 EXTRACT(MONTH FROM r.date_created) = $1 
                 AND EXTRACT(YEAR FROM r.date_created) = $2
-                AND r_refund.sale_id IS NULL -- Ensure only sales without refunds are included
+                AND r.receipt_type = 'sale' AND si.refund_qty = 0
             GROUP BY day, i.item_name
             ORDER BY day, i.item_name;
             `,
