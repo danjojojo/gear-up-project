@@ -66,11 +66,13 @@ const Login = () => {
 
     try {
       await forgotPassword(email);
+      setError(null);
       alert('Reset link sent. Please check your email.');
       navigate('/login');
     } catch (error) {
       console.error('Error sending reset link:', error);
       setError('Failed to send reset link. Please try again.');
+      setLoading(false);
     }
   }
 
@@ -115,11 +117,15 @@ const Login = () => {
   function goToForgotPassword() {
     setLoginView(false);
     setEmail('');
+    setLoading(false);
+    setError(null);
   }
 
   function goToLogin() {
     setLoginView(true);
     setEmail('');
+    setLoading(false);
+    setError(null);
   }
 
   return (
@@ -180,6 +186,7 @@ const Login = () => {
                 <h4 className='header'>Forgot Password</h4>
                 <p className='subtitle'>Enter your email to receive a password reset link.</p>
               </div>
+              {error && <p className="error-msg">{error}</p>}
               <form onSubmit={handleForgotPasswordSubmit}>
                 <div className="form-group">
                   <label htmlFor="email">Email*</label>
