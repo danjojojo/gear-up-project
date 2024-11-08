@@ -1,6 +1,6 @@
 import './dashboard.scss';
 import React, { useState, useEffect, useCallback } from "react";
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useOutletContext } from 'react-router-dom';
 import { Bar } from 'react-chartjs-2';
 import { Chart as ChartJS, CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend } from 'chart.js';
 import moment from 'moment';
@@ -30,6 +30,13 @@ const Dashboard = () => {
     const [netExpenses, setNetExpenses] = useState(0);
     const [netProfit, setNetProfit] = useState(0);
     const [chartData, setChartData] = useState({ labels: [], datasets: [] });
+
+    const { handleNavClick } = useOutletContext();
+
+    const goToSummaries = () => {
+        handleNavClick('Summaries'); // Update title
+        navigate('/summaries'); // Navigate to the new route
+    };
 
     const fetchDashboardData = useCallback(async () => {
         try {
@@ -443,7 +450,7 @@ const Dashboard = () => {
                                     <div className="list">
                                         {filteredRecordsByPOSUser.length === 0 && handleNoRecords()}
                                         {filteredRecordsByPOSUser.filter(filRecord => filRecord.item_qty > filRecord.refund_qty).map((record, index) => (
-                                            <div key={index} className="list-item" onClick={() => navigate("/summaries")}>
+                                            <div key={index} className="list-item" onClick={goToSummaries}>
                                                 <div className="left">
                                                     {record.record_type === 'items' && <i className="fa-solid fa-tag"></i>}
                                                     {record.record_type === 'mechanic' && <i className="fa-solid fa-wrench"></i>}

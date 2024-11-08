@@ -53,6 +53,8 @@ const Orders = () => {
 
     const [loading, setLoading] = useState(true);
 
+    const [disableButton, setDisableButton] = useState(false);
+
     const link = 'https://gearupbuilder.vercel.app/orders/';
     
     const DisabledDateInput = forwardRef(
@@ -115,7 +117,7 @@ const Orders = () => {
               }}>
               Cancel
             </Button>
-            <Button variant="primary" onClick={() => {
+            <Button variant="primary" disabled={disableButton === true ? true : false} onClick={() => {
                 onConfirm();
             }}>
               Confirm
@@ -269,6 +271,7 @@ const Orders = () => {
 
     const handleUpdateOrderStatus = async (statusTo) => {
         try {
+            setDisableButton(true);
             await updateOrderStatus(selectedOrder.order_id, statusTo, selectedOrder.order_name, selectedOrder.email);
 
             if(statusTo.includes('ready')) {
@@ -283,6 +286,7 @@ const Orders = () => {
 
             setShowChangeStatusModal(false);
             setShowEmailResponse(true);
+            setDisableButton(false);
             const { orders } = await getOrders(startDate);
             const orderBySelectedID = orders.filter(order => order.order_id === selectedOrder.order_id);
             setSelectedOrder(orderBySelectedID[0]);

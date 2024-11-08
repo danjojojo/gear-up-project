@@ -34,7 +34,7 @@ const AdminWrapper = () => {
             <div className="content">
                 <UpperNav title={title} onNavClick={handleNavClick}/>
                 <div className='main-content'>
-                    <Outlet />
+                    <Outlet context={{ handleNavClick }} />
                 </div>
             </div>
         </div>
