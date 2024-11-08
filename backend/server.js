@@ -48,7 +48,7 @@ const port = process.env.PORT || 5000;
 const allowedOrigins = 
   [
     'https://gearupmanager.vercel.app',
-    'https://gearupbuilder.vercel.app',
+    'https://gearupbuilder.vercel.app'
   ];
 
 app.use(cors({
