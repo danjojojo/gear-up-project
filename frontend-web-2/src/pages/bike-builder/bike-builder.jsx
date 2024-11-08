@@ -33,11 +33,11 @@ const BikeBuilder = () => {
 
     const hitRegions = {
         frame: { x: 299, y: 146, width: 313, height: 208, rotation: 0 },
-        fork: { x: 545, y: 145, width: 55, height: 220, rotation: -27 },
+        fork: { x: 545, y: 145, width: 60, height: 240, rotation: -27 },
         groupset: { x: 270, y: 295, width: 136, height: 106, rotation: 0 },
-        frontWheel: { x: 539, y: 219, width: 251, height: 231, rotation: 0 },
-        rearWheel: { x: 183, y: 219, width: 251, height: 231, rotation: 0 },
-        seat: { x: 357, y: 149, width: 96, height: 123, rotation: -3 },
+        frontWheel: { x: 539, y: 217, width: 251, height: 235, rotation: 0 },
+        rearWheel: { x: 183, y: 217, width: 251, height: 235, rotation: 0 },
+        seat: { x: 345, y: 149, width: 110, height: 127, rotation: -5 },
         cockpit: { x: 563, y: 117, width: 52, height: 45, rotation: 0 }
     };
 
