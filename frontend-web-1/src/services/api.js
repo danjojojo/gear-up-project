@@ -1,12 +1,12 @@
 import axios from 'axios';
 
 const api = axios.create({
-  baseURL: process.env.REACT_APP_API_URL
-  // , baseURL: process.env.REACT_APP_API_URL || 'http://localhost:5000',
-  // withCredentials: true,
-  // headers: {
-  //       'ngrok-skip-browser-warning': 'true',  // Add this header to bypass ngrok warning
-  // },
+  // baseURL: process.env.REACT_APP_API_URL
+  baseURL: process.env.REACT_APP_API_URL || 'http://localhost:5000',
+  withCredentials: true,
+  headers: {
+        'ngrok-skip-browser-warning': 'true',  // Add this header to bypass ngrok warning
+  },
 });
 
 let alertShown = false;
