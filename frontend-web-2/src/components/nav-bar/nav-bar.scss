@@ -32,10 +32,12 @@
         padding-left: 100px;
         padding-right: 100px;
         // height: 100px;
-        background-color: #2E2E2E;
+        background-color: #171717;
 
         h2 {
             margin: 0;
+            font-family: 'Cooper Black';
+            color: #ededed;
         }
 
         .nav-link {
@@ -43,6 +45,7 @@
             font-size: 20px;
             color: white;
             padding: 5px 10px;
+            border-radius: 10px;
 
             &:hover {
                 background-color: #F9961F;
@@ -62,7 +65,7 @@
             align-items: center;
             justify-content: center;
             margin-left: auto;
-            background-color: #F9961F;
+            background-color: #ffffffe2;
         }
 
         .add-to-cart img {

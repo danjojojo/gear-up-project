@@ -585,7 +585,7 @@ const CanvasContainer = ({
             </div>
 
             <div className="right-container">
-                <div className="guide-container">
+                {currentPart !== "finalize" && <div className="guide-container">
                     <div className="content-container">
 
                         {currentPart === "frame" && (
@@ -609,7 +609,7 @@ const CanvasContainer = ({
 
 
                     </div>
-                </div>
+                </div>}
                 <div className="summary-container">
                     <div className="content-container">
                         <h4>Total Build: {PesoFormat.format(buildStatsPrice)}</h4>

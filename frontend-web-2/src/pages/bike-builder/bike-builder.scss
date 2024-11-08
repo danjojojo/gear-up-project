@@ -568,6 +568,8 @@ $bg-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
                 height: 100%;
                 width: 30%;
                 background-color: #525252;
+                display: flex;
+                flex-direction: column;
 
                 .guide-container {
                     padding: 10px 20px 10px 0;
@@ -596,12 +598,13 @@ $bg-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
                 .summary-container {
                     padding: 10px;
                     margin-right: 20px;
-                    height: 67%;
+                    flex-grow: 1;
                     display: flex;
                     flex-direction: column;
                     border-radius: 15px 15px 0 0;
                     background-color: white;
                     overflow: hidden;
+                    margin-top: 10px;
 
                     .content-container {
                         height: auto;
@@ -643,7 +646,9 @@ $bg-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 
                                 p:nth-child(2) {
                                     // width: fit-content;
+                                    // give this background color fade effect
                                     background-color: #F9961F;
+                                    // background: linear-gradient(-90deg, #F9961F 50%, #ffffff00 100%);
                                     border-radius: 5px;
                                     color: white;
                                     // margin-left: auto;
@@ -818,5 +823,4 @@ $bg-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
         }
 
     }
-
 }
