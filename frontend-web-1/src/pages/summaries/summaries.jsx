@@ -337,7 +337,7 @@ const Summaries = () => {
                                                 <p className='pos'>{record.pos_name}</p>
                                             </div>
                                             <div className="mid">
-                                                <p className='name'>{record.item_name}</p>
+                                                <p className='name'>{record.item_name.length > 30 ? record.item_name.substring(0, 30) + '...' : record.item_name}</p>     
                                             </div>
                                             <div className="right">
                                                 <p className='amount'>{PesoFormat.format((record.item_qty - record.refund_qty) * record.item_unit_price)}</p>

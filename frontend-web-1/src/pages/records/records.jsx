@@ -287,7 +287,7 @@ const Records = () => {
                                  <button
                                     className={selectedRecord === 'sales' ? 'active' : ''}
                                     onClick={()=> handleTabChange('sales')}
-                                 >Items</button>
+                                 >POS Items</button>
                                  <button
                                     className={selectedRecord === 'labor' ? 'active' : ''}
                                     onClick={()=> handleTabChange('labor')}

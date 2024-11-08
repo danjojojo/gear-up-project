@@ -55,7 +55,7 @@ const Reports = () => {
                             onClick={() => setSelectedReport("sales")}
                         >
                             <div className={`main-content ${selectedReport === "sales" ? "active" : ""}`}>
-                                POS Sales Report
+                                POS Items Sales Report
                                 <img src={sales} alt="sales" className="sales-icon" />
                             </div>
                         </div>
