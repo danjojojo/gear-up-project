@@ -574,7 +574,7 @@ $bg-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
                         }
                     }
 
-                    .process, .ready-shipped{
+                    .process, .ready-shipped, .cancel{
                         padding: 5px;
                         border: none;
                         border-radius: 5px;
@@ -584,6 +584,10 @@ $bg-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 
                     .process{
                         background-color: #1f5df9;
+                    }
+
+                    .cancel{
+                        background-color: #ce6868;
                     }
 
                     .ready-shipped{

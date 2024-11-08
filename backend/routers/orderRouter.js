@@ -10,7 +10,8 @@ const {
     deductStockForCompletedOrder,
     getOrderDates,
     getOrderStatistics,
-    getOrder
+    getOrder,
+    deleteExpiredOrder
 } = require('../controllers/orderController');
 
 router.get('/get-orders/:startDate', verifyToken, checkRole('admin'), getOrders);
@@ -28,5 +29,7 @@ router.get('/get-order-dates', verifyToken, checkRole('admin'), getOrderDates);
 router.get('/get-order-statistics/:startDate', verifyToken, checkRole('admin'), getOrderStatistics);
 
 router.get('/:orderId', getOrder);
+
+router.delete('/delete-expired-order/:orderId', verifyToken, checkRole('admin'), deleteExpiredOrder);
 
 module.exports = router;

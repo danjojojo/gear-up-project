@@ -82,7 +82,8 @@ const getOrdersItems = async (req, res) => {
         const query = `
             SELECT 
                 oi.*, 
-                i.item_name, 
+                i.item_name,
+                i.stock_count,
                 CASE 
                     WHEN oi.part = 'Frame' THEN encode(f.image, 'base64')
                     WHEN oi.part = 'Fork' THEN encode(fk.image, 'base64')
@@ -124,6 +125,26 @@ const updateOrderStatus = async (req, res) => {
 
         switch (changeStatusTo) {
             case 'in-process':
+                const orderItemsQuery = `
+                    SELECT O.item_id, item_name, item_qty, stock_count
+                    FROM order_items O 
+                    JOIN items I ON O.item_id = I.item_id
+                    WHERE order_id = $1
+                `;
+                const orderItemsResult = await pool.query(orderItemsQuery, [orderId]);
+        
+                if (orderItemsResult.rows.length === 0) {
+                    return res.status(404).json({ message: 'No items found for this order' });
+                }
+        
+                // loop through the order items and check if stock_count is 0
+                for (let i = 0; i < orderItemsResult.rows.length; i++) {
+                    const item = orderItemsResult.rows[i];
+                    if (item.stock_count < item.item_qty) {
+                        return res.status(200).json({ message: 'no-stock' });
+                    }
+                }
+
                 query = `
                     UPDATE orders
                     SET order_status = $1, processed_at = NOW()
@@ -176,6 +197,21 @@ const updateOrderStatus = async (req, res) => {
         res.status(500).json({ error: error.message });
     }
 };
+
+const deleteExpiredOrder = async (req, res) => {
+    try {
+        const { orderId } = req.params;
+        const query = `
+            DELETE FROM orders
+            WHERE order_id = $1 AND order_status = 'expired'
+        `;
+        await pool.query(query, [orderId]);
+        res.status(200).json({ message: 'Expired order deleted' });
+    } catch (error) {
+        console.error('Error deleting expired order:', error.message);
+        res.status(500).json({ error: 'Failed to delete expired order' });
+    }
+}
 
 const sendEmail = async (email, orderName, link, statusMessage) => {
   const transporter = nodemailer.createTransport({
@@ -271,14 +307,6 @@ const deductStockForCompletedOrder = async (req, res) => {
         // Step 3: Execute the stock update
         await pool.query(updateItemsStockCount, updateItemsStockCountValues);
 
-        // Step 4: Update the order status to 'completed'
-        const updateOrderStatusQuery = `
-            UPDATE orders
-            SET order_status = 'completed', completed_at = NOW()
-            WHERE order_id = $1
-        `;
-        await pool.query(updateOrderStatusQuery, [orderId]);
-
         // Commit transaction
         await pool.query("COMMIT");
 
@@ -318,5 +346,6 @@ module.exports = {
     deductStockForCompletedOrder,
     getOrderDates,
     getOrderStatistics,
-    getOrder
+    getOrder,
+    deleteExpiredOrder
 }

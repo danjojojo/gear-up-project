@@ -13,7 +13,8 @@ import {
     updateOrderShipping,
     deductStockForCompletedOrder,
     getOrderDates,
-    getOrderStatistics
+    getOrderStatistics,
+    deleteExpiredOrder
 } from '../../services/orderService';
 
 import LoadingPage from '../../components/loading-page/loading-page';
@@ -39,6 +40,9 @@ const Orders = () => {
     const [showChangeStatusModal, setShowChangeStatusModal] = useState(false);
     const [changeStatusTo, setChangeStatusTo] = useState('');
     const [showEmailResponse, setShowEmailResponse] = useState(false);
+    const [showNoStockResponse, setShowNoStockResponse] = useState(false);
+    const [noStockMessage, setNoStockMessage] = useState('');
+    const [showDeleteExpiredOrderModal, setShowDeleteExpiredOrderModal] = useState(false);
 
     const [showMessage, setShowMessage] = useState(false);
     const [courier, setCourier] = useState('');
@@ -88,6 +92,7 @@ const Orders = () => {
               <p>Are you sure you want to mark this order in process?</p>
               <ul>
                 <li>Customer will be able to receive an email that you processed this order.</li>
+                <li>Order items will be deducted from inventory.</li>
               </ul>
             </div>}
             {changeStatusTo === 'ready-pickup' && <div>
@@ -107,7 +112,6 @@ const Orders = () => {
               <ul>
                 <li>Customer will be able to receive an email that this order is completed.</li>
                 <li>Order has been received by customer.</li>
-                <li>Order items will be deducted from inventory.</li>
               </ul>
             </div>}
           </Modal.Body>
@@ -121,6 +125,38 @@ const Orders = () => {
                 onConfirm();
             }}>
               Confirm
+            </Button>
+          </Modal.Footer>
+        </Modal>
+      );
+    }
+
+    function DeleteExpiredOrderConfirmation({ onHide, onConfirm, ...props }) {
+      return (
+        <Modal
+          {...props}
+          size="md"
+          aria-labelledby="contained-modal-title-vcenter"
+          centered
+        >
+          <Modal.Header closeButton onClick={onHide}>
+            <Modal.Title id="contained-modal-title-vcenter">
+              Confirmation
+            </Modal.Title>
+          </Modal.Header>
+          <Modal.Body>
+            <p>You are about to delete an expired order. Do you confirm this?</p>
+          </Modal.Body>
+          <Modal.Footer>
+            <Button variant="secondary" disabled={disableButton === true ? true : false} onClick={() => {
+                onConfirm();
+            }}>
+              Confirm
+            </Button>
+            <Button variant="danger" onClick={() => {
+                onHide();
+              }}>
+              Cancel
             </Button>
           </Modal.Footer>
         </Modal>
@@ -143,6 +179,27 @@ const Orders = () => {
                 </Modal.Header>
                 <Modal.Body>
                     <p>Email sent successfully!</p>
+                </Modal.Body>
+            </Modal>
+        );
+    }
+
+    function NoStockResponse({ onHide, ...props }) {
+        return (
+            <Modal
+
+                {...props}
+                size="md"
+                aria-labelledby="contained-modal-title-vcenter"
+                centered
+            >
+                <Modal.Header closeButton onClick={onHide}>
+                    <Modal.Title id="contained-modal-title-vcenter">
+                        Oops!
+                    </Modal.Title>
+                </Modal.Header>
+                <Modal.Body>
+                    <p>You cannot mark this order as in-process because some of your order items are in no stock.</p>
                 </Modal.Body>
             </Modal>
         );
@@ -272,16 +329,25 @@ const Orders = () => {
     const handleUpdateOrderStatus = async (statusTo) => {
         try {
             setDisableButton(true);
-            await updateOrderStatus(selectedOrder.order_id, statusTo, selectedOrder.order_name, selectedOrder.email);
 
-            if(statusTo.includes('ready')) {
-                if(selectedOrder.bu_option === 'deliver-home'){
-                    await updateOrderShipping(selectedOrder.order_id, trackingNumber, courier);
+            const { message } = await updateOrderStatus(selectedOrder.order_id, statusTo, selectedOrder.order_name, selectedOrder.email);
+
+
+            if(message === 'no-stock'){
+                setShowChangeStatusModal(false);
+                setShowNoStockResponse(true);
+                setDisableButton(false);
+                return;
+            } else {
+                if(statusTo === 'in-process') {
+                    await deductStockForCompletedOrder(selectedOrder.order_id);
                 }
-            }
 
-            if(statusTo === 'completed') {
-                await deductStockForCompletedOrder(selectedOrder.order_id);
+                if(statusTo.includes('ready')) {
+                    if(selectedOrder.bu_option === 'deliver-home'){
+                        await updateOrderShipping(selectedOrder.order_id, trackingNumber, courier);
+                    }
+                }
             }
 
             setShowChangeStatusModal(false);
@@ -292,6 +358,16 @@ const Orders = () => {
             setSelectedOrder(orderBySelectedID[0]);
         } catch (error) {
             console.error('Error updating order status:', error.message);
+        }
+    }
+
+    const handleDeleteExpiredOrder = async (orderId) => {
+        try {
+            await deleteExpiredOrder(orderId);
+            setShowDeleteExpiredOrderModal(false);
+            handleCloseOrder();
+        } catch (error) {
+            console.error('Error deleting expired order:', error.message);
         }
     }
 
@@ -351,6 +427,15 @@ const Orders = () => {
                     <EmailResponse
                         show={showEmailResponse}
                         onHide={() => setShowEmailResponse(false)}
+                    />
+                    <NoStockResponse
+                        show={showNoStockResponse}
+                        onHide={() => setShowNoStockResponse(false)}
+                    />
+                    <DeleteExpiredOrderConfirmation
+                        show={showDeleteExpiredOrderModal}
+                        onHide={() => setShowDeleteExpiredOrderModal(false)}
+                        onConfirm={() => handleDeleteExpiredOrder(selectedOrder.order_id)}
                     />
                     {ordersView && <>
                             <div className="nav">
@@ -494,6 +579,7 @@ const Orders = () => {
                                                                 <p className='item-name'>{item.item_name}</p>
                                                                 <p>{PesoFormat.format(item.item_price)}</p>
                                                                 <p>Qty: {item.item_qty}</p>
+                                                                <p>Stock: {item.stock_count}</p>
                                                             </div>
                                                         ))}
                                                     </div>
@@ -523,6 +609,7 @@ const Orders = () => {
                                                 <p className='item-name'>{item.item_name}</p>
                                                 <p>{PesoFormat.format(item.item_price)}</p>
                                                 <p>Qty: {item.item_qty}</p>
+                                                <p>Stock: {item.stock_count}</p>
                                             </div>
                                         ))}
                                     </div>
@@ -578,14 +665,14 @@ const Orders = () => {
                             </div>
                         </div>}
 
-                        {/* {(selectedOrder.order_status === 'expired') && <div className="order-content">
+                        {(selectedOrder.order_status === 'expired') && <div className="order-content">
                             <div className="main-content">
                                 <h5>Order Status</h5>
                                 <div className="inner-details">
-                                    <button className='process' onClick={() => handleChangeStatus('in-process')}>Cancel Order</button>
+                                    <button className='cancel' onClick={()=> setShowDeleteExpiredOrderModal(true)}>Cancel Order</button>
                                 </div>
                             </div>
-                        </div>} */}
+                        </div>}
                         
                         {selectedOrder.order_status === 'in-process' && (
                             <div className="order-content">

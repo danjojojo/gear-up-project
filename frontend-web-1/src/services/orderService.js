@@ -71,3 +71,13 @@ export const getOrderStatistics = async (startDate) => {
         throw new Error('Failed to get order statistics');
     }
 }
+
+export const deleteExpiredOrder = async (orderId) => {
+    try {
+        const response = await api.delete(`/orders/delete-expired-order/${orderId}`);
+        return response.data;
+    } catch (error) {
+        console.error('Error deleting expired order:', error.message);
+        throw new Error('Failed to delete expired order');
+    }
+}
