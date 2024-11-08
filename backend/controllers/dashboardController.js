@@ -3,7 +3,7 @@ const pool = require('../config/db');
 const getDashboardData = async (req, res) => {
     try {
         // Query to get the total number of items available
-        const totalItemsQuery = 'SELECT COUNT(*) FROM items WHERE status = true';
+        const totalItemsQuery = 'SELECT COUNT(*) FROM items WHERE status = true and is_deleted = false';
         const totalItemsResult = await pool.query(totalItemsQuery);
         const totalItems = parseInt(totalItemsResult.rows[0].count, 10) || 0;
 

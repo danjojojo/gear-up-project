@@ -32,29 +32,24 @@ require('dotenv').config();
 const app = express();
 const port = process.env.PORT || 5000;
 
-// app.use(cors());
-
-// Apply CORS configuration
-// app.use(cors({
-//   origin: 'http://localhost:3000',  // Specify the frontend URL
-//   credentials: true,  // Allow cookies (credentials) to be sent
-// }));
-
-// const allowedOrigins = 
-//  [
-//     'http://localhost:3000', 
-//     'http://localhost:3001',  
-//     'https://4274-149-30-138-2.ngrok-free.app', 
-//     'https://gear-up-project.vercel.app',
-//     'https://gearupmanager.vercel.app',
-//     'https://gearupbuilder.vercel.app',
-//   ];
-
 const allowedOrigins = 
  [
+    'http://localhost:3000', 
+    'http://localhost:3001',  
+    'http://192.168.18.7:3001',
+    'https://4274-149-30-138-2.ngrok-free.app',
+    'https://424b-149-30-138-2.ngrok-free.app',
+    'https://2007-149-30-138-2.ngrok-free.app',
+    'https://gear-up-project.vercel.app',
     'https://gearupmanager.vercel.app',
     'https://gearupbuilder.vercel.app',
   ];
+
+// const allowedOrigins = 
+//  [
+//     'https://gearupmanager.vercel.app',
+//     'https://gearupbuilder.vercel.app',
+//   ];
 
 app.use(cors({
   origin: function (origin, callback) {
