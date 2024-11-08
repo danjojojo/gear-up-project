@@ -6,13 +6,13 @@ import { useNavigate } from "react-router-dom";
 import { useCartItems } from "../../utils/cartItems";
 
 const Navbar = () => {
-    const { bbParts, buParts, totalPrice, loading, fetchCartItems } = useCartItems();
+    // const { bbParts, buParts, totalPrice, loading, fetchCartItems } = useCartItems();
 
     const navigate = useNavigate();
 
-    useEffect(() => {
-        fetchCartItems();
-    },[bbParts, buParts]);
+    // useEffect(() => {
+    //     fetchCartItems();
+    // },[bbParts, buParts]);
 
     return (
         <div className="nav-bar">
@@ -45,7 +45,7 @@ const Navbar = () => {
 
                 <button className="add-to-cart" onClick={() => navigate('/cart')}>
                     <img src={addcart} alt="add-cart" />
-                    {bbParts.length + buParts.length != 0 && <p className="notification-badge">{bbParts.length + buParts.length}</p>}
+                    {/* {bbParts.length + buParts.length != 0 && <p className="notification-badge">{bbParts.length + buParts.length}</p>} */}
                 </button>
             </div>
         </div >
