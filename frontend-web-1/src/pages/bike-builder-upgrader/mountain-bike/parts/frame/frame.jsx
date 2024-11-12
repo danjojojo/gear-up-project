@@ -1,15 +1,15 @@
 import React, { useState, useEffect, useCallback, useContext } from 'react';
-import { AuthContext } from "../../../../context/auth-context";
+import { AuthContext } from "../../../../../context/auth-context";
 import { useNavigate } from 'react-router-dom';
-import './seat.scss';
-import ResponsivePageLayout from '../../../../components/responsive-page-layout/responsive-page-layout';
-import sort from '../../../../assets/icons/sort.png';
-import arrowUp from "../../../../assets/icons/arrow-up.png";
-import arrowDown from "../../../../assets/icons/arrow-down.png";
-import SearchBar from '../../../../components/search-bar/search-bar';
-import { getSeatItems } from '../../../../services/bbuService';
+import './frame.scss';
+import ResponsivePageLayout from '../../../../../components/responsive-page-layout/responsive-page-layout';
+import sort from '../../../../../assets/icons/sort.png';
+import arrowUp from "../../../../../assets/icons/arrow-up.png";
+import arrowDown from "../../../../../assets/icons/arrow-down.png";
+import SearchBar from '../../../../../components/search-bar/search-bar';
+import { getFrameItems } from '../../../../../services/bbuService';
 import Form from './form';
-import LoadingPage from '../../../../components/loading-page/loading-page';
+import LoadingPage from '../../../../../components/loading-page/loading-page';
 import {Modal, Button} from 'react-bootstrap';
 
 const debounce = (func, delay) => {
@@ -24,7 +24,7 @@ const debounce = (func, delay) => {
 	};
 };
 
-const Seat = () => {
+const Frame = () => {
     const navigate = useNavigate();
     const [items, setItems] = useState([]);
     const [selectedItem, setSelectedItem] = useState(null);
@@ -41,8 +41,8 @@ const Seat = () => {
 
     const fetchItems = useCallback(async () => {
         try {
-            const data = await getSeatItems(displayItem);
-
+            const data = await getFrameItems(displayItem);
+            console.log(data);
             // Sort items based on selected sort criteria
             const sortedItems = data.sort((a, b) => {
                 let aValue, bValue;
@@ -72,7 +72,7 @@ const Seat = () => {
                 setLoading(false);
             }, 1000);
         } catch (error) {
-            console.error("Error fetching seat items:", error);
+            console.error("Error fetching frame items:", error);
         }
     }, [displayItem, sortCriteria, sortOrder]);
 
@@ -88,14 +88,14 @@ const Seat = () => {
 
 
     const handleBackClick = () => {
-        navigate('/bike-builder-upgrader');
+        navigate('/bike-builder-upgrader/mountain-bike');
     };
 
 
     // Handle click on an item
     const handleItemClick = (item) => {
         setSelectedItem(item);
-        setIsEditing(false)
+        setIsEditing(false);
         setRightContainerStyle("right-container");
     };
 
@@ -194,16 +194,16 @@ const Seat = () => {
 				</Modal.Header>
 				<Modal.Body>
 					{functionKey === 'archive' && 
-                        <p>Seat successfully archived. This seat will be stored in the Archive.</p>
+                        <p>Frame successfully archived. This frame will be stored in the Archive.</p>
                     }
 					{functionKey === 'delete' && 
-                        <p>Seat successfully deleted.</p>
+                        <p>Frame successfully deleted.</p>
                     }
 					{functionKey === 'restore' && 
-                        <p>Seat successfully restored.</p>
+                        <p>Frame successfully restored.</p>
                     }
 					{functionKey === 'edit' && 
-                        <p>Seat successfully edited.</p>
+                        <p>Frame successfully edited.</p>
                     }
 				</Modal.Body>
 			</Modal>
@@ -218,7 +218,7 @@ const Seat = () => {
     if(loading) return <LoadingPage classStyle={"loading-in-page"}/>
 
     return (
-        <div className='seat p-3'>
+        <div className='frame p-3'>
             <ResponsivePageLayout
                 rightContainer={rightContainerStyle}
                 leftContent={
@@ -230,12 +230,11 @@ const Seat = () => {
                             }}
                         />
                         <div className='upper-container d-flex'>
-
-                             <div className='title'>
+                            <div className='title'>
                                 <button className='back-btn' onClick={handleBackClick}>
                                     <i className="fa-solid fa-arrow-left"></i>
                                 </button>
-                                <h4>Seat</h4>
+                                <h4>Frame</h4>
                             </div>
 
                             <div className="bottom">
@@ -306,14 +305,14 @@ const Seat = () => {
 
                         <div className='lower-container'>
                             <div className='lower-content'>
-                            {filteredItems.length === 0 ? (
+                                {filteredItems.length === 0 ? (
                                     <div className="no-items-message">
                                         <p>{displayItem === false ? 'No archived parts' : 'No active parts'}</p>
                                     </div>
                                 ) : (
                                     filteredItems.map((item) => (
                                         <div
-                                            key={item.seat_id}
+                                            key={item.frame_id}
                                             className="item-container d-flex"
                                             onClick={() => handleItemClick(item)}
                                         >
@@ -332,14 +331,14 @@ const Seat = () => {
                                                 </div>
 
                                                 <div className='details'>
-                                                    <div className="item-name fw-bold">
+                                                    <div className="item-name">
                                                         {item.item_name}
                                                     </div>
 
-                                                    <div className="item-price fw-light">
+                                                    <div className="item-price">
                                                         {PesoFormat.format(item.item_price)}
                                                     </div>
-                                                </div>
+                                                </div>  
                                             </div>
                                         </div>
                                     ))
@@ -377,4 +376,4 @@ const Seat = () => {
     );
 };
 
-export default Seat;
+export default Frame;

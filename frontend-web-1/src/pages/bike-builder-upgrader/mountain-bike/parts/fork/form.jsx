@@ -1,34 +1,33 @@
 import React, { useState, useEffect, useContext } from "react";
-import exit from "../../../../assets/icons/exit.png";
-import edit from "../../../../assets/icons/edit.png";
-import cancel from "../../../../assets/icons/cancel.png";
-import del from "../../../../assets/icons/delete.png";
-import archive from "../../../../assets/icons/archive.png";
-import restore from "../../../../assets/icons/restore.png";
-import ImageUploadButton from "../../../../components/img-upload-button/img-upload-button";
-import { base64ToFile } from "../../../../utility/imageUtils";
-import { AuthContext } from "../../../../context/auth-context";
-import { updateGroupsetItem, archiveGroupsetItem, restoreGroupsetItem, deleteGroupsetItem } from "../../../../services/bbuService";
-import ImagePreviewModal from "../../../../components/image-preview-modal/image-preview";
-import "./groupset.scss";
+import exit from "../../../../../assets/icons/exit.png";
+import edit from "../../../../../assets/icons/edit.png";
+import cancel from "../../../../../assets/icons/cancel.png";
+import del from "../../../../../assets/icons/delete.png";
+import restore from "../../../../../assets/icons/restore.png";
+import ImageUploadButton from "../../../../../components/img-upload-button/img-upload-button";
+import { base64ToFile } from "../../../../../utility/imageUtils";
+import { AuthContext } from "../../../../../context/auth-context";
+import { updateForkItem, archiveForkItem, restoreForkItem, deleteForkItem } from "../../../../../services/bbuService";
+import ImagePreviewModal from "../../../../../components/image-preview-modal/image-preview";
+import "./fork.scss";
 import {Modal, Button} from 'react-bootstrap';
 
 const Form = ({ selectedItem, setSelectedItem, setItems, refreshWaitlist, onClose, showArchived, isEditing, setIsEditing, functionKey, setFunctionKey, setShowResponseModal }) => {
     const [name, setName] = useState('');
     const [price, setPrice] = useState('');
     const [description, setDescription] = useState('');
-    const [chainringSpeed, setChainringSpeed] = useState('');
-    const [crankArmLength, setCrankArmLength] = useState('');
-    const [frontDerailleurSpeed, setFrontDerailleurSpeed] = useState('');
-    const [rearDerailleurSpeed, setRearDerailleurSpeed] = useState('');
-    const [cassetteType, setCassetteType] = useState('');
-    const [cassetteSpeed, setCassetteSpeed] = useState('');
-    const [chainSpeed, setChainSpeed] = useState('');
-    const [bottomBracketType, setBottomBracketType] = useState('');
-    const [bottomBracketWidth, setBottomBracketWidth] = useState('');
-    const [brakeType, setBrakeType] = useState('');
-    const [rotorMountType, setRotorMountType] = useState('');
-    const [rotorSize, setRotorSize] = useState('');;
+    const [forkSize, setForkSize] = useState('');
+    const [forkTubeType, setForkTubeType] = useState('');
+    const [ftUpperDiameter, setFtUpperDiameter] = useState('');
+    const [ftLowerDiameter, setFtLowerDiameter] = useState('');
+    const [forkTravel, setForkTravel] = useState('');
+    const [axleType, setAxleType] = useState('');
+    const [axleDiameter, setAxleDiameter] = useState('');
+    const [suspensionType, setSuspensionType] = useState('');
+    const [rotorSize, setRotorSize] = useState('');
+    const [maxTireWidth, setMaxTireWidth] = useState('');
+    const [frontHubWidth, setFrontHubWidth] = useState('');
+    const [material, setMaterial] = useState('');
     const [itemImage, setItemImage] = useState(null)
     const [selectedFile, setSelectedFile] = useState(null);
     const [originalItem, setOriginalItem] = useState(null);
@@ -39,11 +38,12 @@ const Form = ({ selectedItem, setSelectedItem, setItems, refreshWaitlist, onClos
 
     const [showConfirmModal, setShowConfirmModal] = useState(false);
 
-    const [fdError, setFdError] = useState('');
-    const [rdError, setRdError] = useState('');
+    const [forkTubeError, setForkTubeError] = useState('');
+    const [forkAxleError, setForkAxleError] = useState('');
 
-    const [fdIsCorrect, setFdIsCorrect] = useState(false);
-    const [rdIsCorrect, setRdIsCorrect] = useState(false);
+    const [forkTubeIsCorrect, setForkTubeIsCorrect] = useState(false);
+    const [forkAxleIsCorrect, setForkAxleIsCorrect] = useState(false);
+
 
     function ConfirmModal({ onHide, onConfirm, ...props }) {
 		return (
@@ -114,18 +114,18 @@ const Form = ({ selectedItem, setSelectedItem, setItems, refreshWaitlist, onClos
             setName(selectedItem.item_name || '');
             setPrice(selectedItem.item_price || '');
             setDescription(selectedItem.description || '');
-            setChainringSpeed(selectedItem.chainring_speed || '');
-            setCrankArmLength(selectedItem.crank_arm_length || '');
-            setFrontDerailleurSpeed(selectedItem.front_derailleur_speed || '');
-            setRearDerailleurSpeed(selectedItem.rear_derailleur_speed || '');
-            setCassetteType(selectedItem.cassette_type || '');
-            setCassetteSpeed(selectedItem.cassette_speed || '');
-            setChainSpeed(selectedItem.chain_speed || '');
-            setBottomBracketType(selectedItem.bottom_bracket_type || '');
-            setBottomBracketWidth(selectedItem.bottom_bracket_width || '');
-            setBrakeType(selectedItem.brake_type || '');
-            setRotorMountType(selectedItem.rotor_mount_type || '');
+            setForkSize(selectedItem.fork_size || '');
+            setForkTubeType(selectedItem.fork_tube_type || '');
+            setFtUpperDiameter(selectedItem.fork_tube_upper_diameter || '');
+            setFtLowerDiameter(selectedItem.fork_tube_lower_diameter || '');
+            setForkTravel(selectedItem.fork_travel || '');
+            setAxleType(selectedItem.axle_type || '');
+            setAxleDiameter(selectedItem.axle_diameter || '');
+            setSuspensionType(selectedItem.suspension_type || '');
             setRotorSize(selectedItem.rotor_size || '');
+            setMaxTireWidth(selectedItem.max_tire_width || '');
+            setFrontHubWidth(selectedItem.front_hub_width || '');
+            setMaterial(selectedItem.material || '');
             setItemImage(imageBase64);
             setOriginalItem({ ...selectedItem });
 
@@ -139,33 +139,33 @@ const Form = ({ selectedItem, setSelectedItem, setItems, refreshWaitlist, onClos
     const handleSubmit = async (event) => {
         event.preventDefault();
 
-        if(!fdIsCorrect || !rdIsCorrect) return;
+        if(!forkTubeIsCorrect || !forkAxleIsCorrect) return;
 
         const updatedData = new FormData();
         updatedData.append('description', description);
-        updatedData.append('chainring_speed', chainringSpeed);
-        updatedData.append('crank_arm_length', crankArmLength);
-        updatedData.append('front_derailleur_speed', frontDerailleurSpeed);
-        updatedData.append('rear_derailleur_speed', rearDerailleurSpeed);
-        updatedData.append('cassette_type', cassetteType);
-        updatedData.append('cassette_speed', cassetteSpeed);
-        updatedData.append('chain_speed', chainSpeed);
-        updatedData.append('bottom_bracket_type', bottomBracketType);
-        updatedData.append('bottom_bracket_width', bottomBracketWidth);
-        updatedData.append('brake_type', brakeType);
-        updatedData.append('rotor_mount_type', rotorMountType);
+        updatedData.append('fork_size', forkSize);
+        updatedData.append('fork_tube_type', forkTubeType);
+        updatedData.append('fork_tube_upper_diameter', ftUpperDiameter);
+        updatedData.append('fork_tube_lower_diameter', ftLowerDiameter);
+        updatedData.append('fork_travel', forkTravel);
+        updatedData.append('axle_type', axleType);
+        updatedData.append('axle_diameter', axleDiameter);
+        updatedData.append('suspension_type', suspensionType);
         updatedData.append('rotor_size', rotorSize);
+        updatedData.append('max_tire_width', maxTireWidth);
+        updatedData.append('front_hub_width', frontHubWidth);
+        updatedData.append('material', material);
 
         if (selectedFile) {
             updatedData.append('item_image', selectedFile);
         }
 
-        const updatedItem = await updateGroupsetItem(selectedItem.groupset_id, updatedData);
+        const updatedItem = await updateForkItem(selectedItem.fork_id, updatedData);
         setShowResponseModal(true);
 
         setItems((prevItems) =>
             prevItems.map((item) =>
-                item.groupset_id === selectedItem.groupset_id ? updatedItem : item
+                item.fork_id === selectedItem.fork_id ? updatedItem : item
             ),
         );
 
@@ -192,10 +192,11 @@ const Form = ({ selectedItem, setSelectedItem, setItems, refreshWaitlist, onClos
         setIsEditing(false);
     };
 
+
     // Archive item
-    const handleArchiveItem = async (groupset_id) => {
+    const handleArchiveItem = async (fork_id) => {
         try {
-            await archiveGroupsetItem(groupset_id);
+            await archiveForkItem(fork_id);
             setShowConfirmModal(false);
             setShowResponseModal(true);
 
@@ -209,9 +210,9 @@ const Form = ({ selectedItem, setSelectedItem, setItems, refreshWaitlist, onClos
     }
 
     // Restore item
-    const handleRestoreItem = async (groupset_id) => {
+    const handleRestoreItem = async (fork_id) => {
         try {
-            await restoreGroupsetItem(groupset_id);
+            await restoreForkItem(fork_id);
             setShowConfirmModal(false);
             setShowResponseModal(true);
 
@@ -225,9 +226,9 @@ const Form = ({ selectedItem, setSelectedItem, setItems, refreshWaitlist, onClos
     }
 
     // Delete item
-    const handleDeleteItem = async (groupset_id) => {
+    const handleDeleteItem = async (fork_id) => {
         try {
-            await deleteGroupsetItem(groupset_id);
+            await deleteForkItem(fork_id);
             setShowConfirmModal(false);
             setShowResponseModal(true);
 
@@ -243,55 +244,50 @@ const Form = ({ selectedItem, setSelectedItem, setItems, refreshWaitlist, onClos
     function handleConfirmModal(){
         switch(functionKey){
             case 'archive':
-                handleArchiveItem(selectedItem.groupset_id);
+                handleArchiveItem(selectedItem.fork_id);
                 break;
             case 'delete':     
-                handleDeleteItem(selectedItem.groupset_id);
+                handleDeleteItem(selectedItem.fork_id);
                 break;
             case 'restore':
-                handleRestoreItem(selectedItem.groupset_id);
+                handleRestoreItem(selectedItem.fork_id);
                 break;
             default:
                 break;
         }
     }
 
-    function chainringSpeedCorrect(){
-        // if chainring is 1x, front derailleur speed should be N/A
-        if(chainringSpeed === "Single (1x)" && frontDerailleurSpeed !== "N/A (1x Chainring speed)"){
-            setFdError("Front Derailleur Speed should be N/A (1x Chainring speed)");
-            return setFdIsCorrect(false);
-        } 
-        // if chainring is 2x, front derailleur speed should be 2-speed
-        if(chainringSpeed === "Double (2x)" && frontDerailleurSpeed !== "2-speed"){
-            setFdError("Front Derailleur Speed should be 2-speed");
-            return setFdIsCorrect(false);
+    function forkTubeCorrect(){
+        if(forkTubeType === 'Non Tapered' && ftUpperDiameter !== ftLowerDiameter){
+            setForkTubeError("Incorrect specifications for Non Tapered fork.");
+            return setForkTubeIsCorrect(false);
         }
-
-        // if chainring is 3x, front derailleur speed should be 3-speed
-        if(chainringSpeed === "Triple (3x)" && frontDerailleurSpeed !== "3-speed"){
-            setFdError("Front Derailleur Speed should be 3-speed");
-            return setFdIsCorrect(false);
+        if(forkTubeType === 'Tapered' && ftUpperDiameter === ftLowerDiameter){
+            setForkTubeError("Incorrect specifications for Tapered fork.");
+            return setForkTubeIsCorrect(false);
         }
-
-        setFdError('');
-        return setFdIsCorrect(true);
+        setForkTubeError('');
+        return setForkTubeIsCorrect(true);
     }
 
-    function cassetteSpeedCorrect(){
-        // rear derailleur speed is 9-speed, cassette speed should be 9-speed, chain speed should be 9-speed
-        if(cassetteSpeed !== rearDerailleurSpeed  || chainSpeed !== rearDerailleurSpeed ){
-            setRdError(`Cassette Speed and Chain Speed should be ${rearDerailleurSpeed}`);
-            return setRdIsCorrect(false);
+    function forkAxleCorrect(){
+        if(axleType === 'Quick Release (QR)' && axleDiameter !== '9mm (QR)'){
+            setForkAxleError("Incorrect specifications for Quick Release (QR) axle.");
+            return setForkAxleIsCorrect(false);
         }
-        setRdError('');
-        return setRdIsCorrect(true);
+        if(axleType === 'Thru-Axle (TA)' && axleDiameter === '9mm (QR)'){
+            setForkAxleError("Incorrect specifications for Thru-Axle (TA) axle.");
+            return setForkAxleIsCorrect(false);
+        }
+        setForkAxleError('');
+        return setForkAxleIsCorrect(true);
+
     }
 
-    useEffect(() => {
-        chainringSpeedCorrect();
-        cassetteSpeedCorrect();
-    },[chainringSpeed, frontDerailleurSpeed, rearDerailleurSpeed, cassetteSpeed, chainSpeed]);
+    useEffect(()=>{
+        forkTubeCorrect();
+        forkAxleCorrect();
+    },[forkTubeType, ftUpperDiameter, ftLowerDiameter, axleType, axleDiameter]);
 
     return (
         <form className="form-content" onSubmit={(e) => {
@@ -385,7 +381,7 @@ const Form = ({ selectedItem, setSelectedItem, setItems, refreshWaitlist, onClos
                     </div>
                 )
             ) : (
-                <ImageUploadButton onFileSelect={handleFileSelect} part={'groupset'} />
+                <ImageUploadButton onFileSelect={handleFileSelect} part={'fork'}/>
             )}
 
             <ImagePreviewModal
@@ -395,10 +391,10 @@ const Form = ({ selectedItem, setSelectedItem, setItems, refreshWaitlist, onClos
             />
 
             <div className="input-container form-group">
-                <label htmlFor="item-name-groupset">Name</label>
+                <label htmlFor="item-name-fork">Name</label>
                 <input
                     type="text"
-                    id="item-name-groupset"
+                    id="item-name-fork"
                     name="itemName"
                     value={name}
                     onChange={(e) => setName(e.target.value)}
@@ -407,10 +403,10 @@ const Form = ({ selectedItem, setSelectedItem, setItems, refreshWaitlist, onClos
             </div>
 
             <div className="input-container form-group">
-                <label htmlFor="item-price-groupset">Price</label>
+                <label htmlFor="item-price-fork">Price</label>
                 <input
                     type="text"
-                    id="item-price-groupset"
+                    id="item-price-fork"
                     name="itemPrice"
                     value={price}
                     onChange={(e) => setPrice(e.target.value)}
@@ -419,10 +415,10 @@ const Form = ({ selectedItem, setSelectedItem, setItems, refreshWaitlist, onClos
             </div>
 
             <div className="input-container form-group">
-                <label htmlFor="item-description-groupset">Description</label>
+                <label htmlFor="item-description-fork">Description</label>
                 <textarea
                     type="text"
-                    id="item-description-groupset"
+                    id="item-description-fork"
                     name="itemDescription"
                     value={description}
                     onChange={(e) => setDescription(e.target.value)}
@@ -433,211 +429,149 @@ const Form = ({ selectedItem, setSelectedItem, setItems, refreshWaitlist, onClos
             </div>
 
             <div className="dropdown-container d-flex justify-content-between">
-                <div className="title">Chainring Speed</div>
+                <div className="title">Fork Size</div>
                 <select
                     className="dropdown"
-                    id="chainring-speed"
-                    name="chainringSpeed"
-                    value={chainringSpeed}
-                    onChange={(e) => setChainringSpeed(e.target.value)}
+                    id="fork-size"
+                    name="forkSize"
+                    value={forkSize}
+                    onChange={(e) => setForkSize(e.target.value)}
                     required
                     disabled={!isEditing}
                 >
-                    <option value="">Select Speed</option>
-                    <option value="Single (1x)">Single (1x)</option>
-                    <option value="Double (2x)">Double (2x)</option>
-                    <option value="Triple (3x)">Triple (3x)</option>
+                    <option value="">Select Size</option>
+                    <option value='26"'>26"</option>
+                    <option value='27.5"'>27.5"</option>
+                    <option value='29"'>29"</option>
                 </select>
             </div>
 
             <div className="dropdown-container d-flex justify-content-between">
-                <div className="title">Crank Arm Length</div>
+                <div className="title">Fork Tube Type</div>
                 <select
                     className="dropdown"
-                    id="crank-arm-length"
-                    name="crankArmLength"
-                    value={crankArmLength}
-                    onChange={(e) => setCrankArmLength(e.target.value)}
-                    required
-                    disabled={!isEditing}
-                >
-                    <option value="">Select Length</option>
-                    <option value="165mm">165mm</option>
-                    <option value="170mm">170mm</option>
-                    <option value="175mm">175mm</option>
-                    <option value="180mm">180mm</option>
-                </select>
-            </div>
-
-            <div className="dropdown-container d-flex justify-content-between">
-                <div className="title">Front Derailleur Speed</div>
-                <select
-                    className="dropdown"
-                    id="front-derailleur-speed"
-                    name="frontDerailleurSpeed"
-                    value={frontDerailleurSpeed}
-                    onChange={(e) => setFrontDerailleurSpeed(e.target.value)}
-                    required
-                    disabled={!isEditing}
-                >
-                    <option value="">Select Speed</option>
-                    <option value="2-speed">2-speed</option>
-                    <option value="3-speed">3-speed</option>
-                    <option value="N/A (1x Chainring speed)">N/A (1x Chainring speed)</option>
-                </select>
-            </div>
-
-            <div className="dropdown-container d-flex justify-content-between">
-                <div className="title">Rear Derailleur Speed</div>
-                <select
-                    className="dropdown"
-                    id="rear-derailleur-speed"
-                    name="rearDerailleurSpeed"
-                    value={rearDerailleurSpeed}
-                    onChange={(e) => setRearDerailleurSpeed(e.target.value)}
-                    required
-                    disabled={!isEditing}
-                >
-                    <option value="">Select Speed</option>
-                    <option value="8-speed">8-speed</option>
-                    <option value="9-speed">9-speed</option>
-                    <option value="10-speed">10-speed</option>
-                    <option value="11-speed">11-speed</option>
-                    <option value="12-speed">12-speed</option>
-                </select>
-            </div>
-
-            <div className="dropdown-container d-flex justify-content-between">
-                <div className="title">Cassette Type</div>
-                <select
-                    className="dropdown"
-                    id="cassette-type"
-                    name="cassetteType"
-                    value={cassetteType}
-                    onChange={(e) => setCassetteType(e.target.value)}
+                    id="fork-tube-type"
+                    name="forkTubeType"
+                    value={forkTubeType}
+                    onChange={(e) => setForkTubeType(e.target.value)}
                     required
                     disabled={!isEditing}
                 >
                     <option value="">Select Type</option>
-                    <option value="Cassette">Cassette</option>
-                    <option value="Threaded">Threaded</option>
+                    <option value="Non Tapered">Non Tapered</option>
+                    <option value="Tapered">Tapered</option>
                 </select>
             </div>
 
             <div className="dropdown-container d-flex justify-content-between">
-                <div className="title">Cassette Speed</div>
+                <div className="title">Fork Tube Upper Diameter</div>
                 <select
                     className="dropdown"
-                    id="cassette-speed"
-                    name="cassetteSpeed"
-                    value={cassetteSpeed}
-                    onChange={(e) => setCassetteSpeed(e.target.value)}
+                    id="ft-upper-diameter"
+                    name="ftUpperDiameter"
+                    value={ftUpperDiameter}
+                    onChange={(e) => setFtUpperDiameter(e.target.value)}
                     required
                     disabled={!isEditing}
                 >
-                    <option value="">Select Speed</option>
-                    <option value="8-speed">8-speed</option>
-                    <option value="9-speed">9-speed</option>
-                    <option value="10-speed">10-speed</option>
-                    <option value="11-speed">11-speed</option>
-                    <option value="12-speed">12-speed</option>
+                    <option value="">Select Diameter</option>
+                    <option value='1 1/8"'>1 1/8"</option>
+                    <option value='1 1/4"'>1 1/4"</option>
+                    <option value='1.5"'>1.5"</option>
                 </select>
             </div>
 
             <div className="dropdown-container d-flex justify-content-between">
-                <div className="title">Chain Speed</div>
+                <div className="title">Fork Tube Lower Diameter</div>
                 <select
                     className="dropdown"
-                    id="chain-speed"
-                    name="chainrSpeed"
-                    value={chainSpeed}
-                    onChange={(e) => setChainSpeed(e.target.value)}
+                    id="ft-lower-diameter"
+                    name="ftLowerDiameter"
+                    value={ftLowerDiameter}
+                    onChange={(e) => setFtLowerDiameter(e.target.value)}
                     required
                     disabled={!isEditing}
                 >
-                    <option value="">Select Speed</option>
-                    <option value="8-speed">8-speed</option>
-                    <option value="9-speed">9-speed</option>
-                    <option value="10-speed">10-speed</option>
-                    <option value="11-speed">11-speed</option>
-                    <option value="12-speed">12-speed</option>
+                    <option value="">Select Diameter</option>
+                    <option value='1 1/8"'>1 1/8"</option>
+                    <option value='1 1/4"'>1 1/4"</option>
+                    <option value='1.5"'>1.5"</option>
                 </select>
             </div>
 
             <div className="dropdown-container d-flex justify-content-between">
-                <div className="title">Bottom Bracket Type</div>
+                <div className="title">Fork Travel</div>
                 <select
                     className="dropdown"
-                    id="bottom-bracket-type"
-                    name="bottomBracketType"
-                    value={bottomBracketType}
-                    onChange={(e) => setBottomBracketType(e.target.value)}
+                    id="fork-travel"
+                    name="forkTravel"
+                    value={forkTravel}
+                    onChange={(e) => setForkTravel(e.target.value)}
                     required
                     disabled={!isEditing}
                 >
-                    <option value="">Select Type</option>
-                    <option value="Threaded (BSA)">Threaded (BSA)</option>
-                    <option value="Press-Fit (PF30, BB86, BB92)">Press-Fit (PF30, BB86, BB92)</option>
-                    <option value="BB30">BB30</option>
+                    <option value="">Select Travel</option>
+                    <option value="80mm to 120mm">80mm to 120mm</option>
+                    <option value="120mm to 160mm">120mm to 160mm</option>
+                    <option value="150mm to 180mm">150mm to 180mm</option>
+                    <option value="180mm to 200mm">180mm to 200mm</option>
                 </select>
             </div>
 
             <div className="dropdown-container d-flex justify-content-between">
-                <div className="title">Bottom Bracket Width</div>
+                <div className="title">Fork Axle Type</div>
                 <select
                     className="dropdown"
-                    id="bottom-bracket-width"
-                    name="bottomBracketWidth"
-                    value={bottomBracketWidth}
-                    onChange={(e) => setBottomBracketWidth(e.target.value)}
-                    required
-                    disabled={!isEditing}
-                >
-                    <option value="">Select Width</option>
-                    <option value="68mm">68mm</option>
-                    <option value="73mm (MTB)">73mm (MTB)</option>
-                    <option value="83mm (Downhill)">83mm (Downhill)</option>
-                    <option value="86mm (Press-Fit)">86mm (Press-Fit)</option>
-                    <option value="92mm (MTB)">92mm (MTB)</option>
-                </select>
-            </div>
-
-            <div className="dropdown-container d-flex justify-content-between">
-                <div className="title">Brake Type</div>
-                <select
-                    className="dropdown"
-                    id="brake-type"
-                    name="brakeType"
-                    value={brakeType}
-                    onChange={(e) => setBrakeType(e.target.value)}
+                    id="axle-type"
+                    name="axleType"
+                    value={axleType}
+                    onChange={(e) => setAxleType(e.target.value)}
                     required
                     disabled={!isEditing}
                 >
                     <option value="">Select Type</option>
-                    <option value="Mechanical">Mechanical</option>
-                    <option value="Hydraulic">Hydraulic</option>
+                    <option value="Quick Release (QR)">Quick Release (QR)</option>
+                    <option value="Thru-Axle (TA)">Thru-Axle (TA)</option>
                 </select>
             </div>
 
             <div className="dropdown-container d-flex justify-content-between">
-                <div className="title">Rotor Mount Type</div>
+                <div className="title">Fork Axle Diameter</div>
                 <select
                     className="dropdown"
-                    id="rotor-mount-type"
-                    name="rotorMountType"
-                    value={rotorMountType}
-                    onChange={(e) => setRotorMountType(e.target.value)}
+                    id="axle-diameter"
+                    name="axleDiameter"
+                    value={axleDiameter}
+                    onChange={(e) => setAxleDiameter(e.target.value)}
+                    required
+                    disabled={!isEditing}
+                >
+                    <option value="">Select Diameter</option>
+                    <option value="9mm (QR)">9mm (QR)</option>
+                    <option value="15mm (Thru-Axle)">15mm (Thru-Axle)</option>
+                    <option value="20mm (Thru-Axle)">20mm (Thru-Axle)</option>
+                </select>
+            </div>
+
+            <div className="dropdown-container d-flex justify-content-between">
+                <div className="title">Fork Suspension Type</div>
+                <select
+                    className="dropdown"
+                    id="suspension-type"
+                    name="suspensionType"
+                    value={suspensionType}
+                    onChange={(e) => setSuspensionType(e.target.value)}
                     required
                     disabled={!isEditing}
                 >
                     <option value="">Select Type</option>
-                    <option value="6-bolt">6-bolt</option>
-                    <option value="Centerlock">Centerlock</option>
+                    <option value="Air">Air</option>
+                    <option value="Coil">Coil</option>
                 </select>
             </div>
 
             <div className="dropdown-container d-flex justify-content-between">
-                <div className="title">Rotor Size</div>
+                <div className="title">Fork Rotor Size</div>
                 <select
                     className="dropdown"
                     id="rotor-size"
@@ -654,10 +588,61 @@ const Form = ({ selectedItem, setSelectedItem, setItems, refreshWaitlist, onClos
                 </select>
             </div>
 
-             {(fdError || rdError )&& 
+            <div className="dropdown-container d-flex justify-content-between">
+                <div className="title">Fork Max Tire Width</div>
+                <select
+                    className="dropdown"
+                    id="max-tire-width"
+                    name="maxTireWidth"
+                    value={maxTireWidth}
+                    onChange={(e) => setMaxTireWidth(e.target.value)}
+                    required
+                    disabled={!isEditing}
+                >
+                    <option value="">Select Width</option>
+                    <option value='2.1'>2.1</option>
+                    <option value='2.25'>2.25</option>
+                    <option value='2.4'>2.4</option>
+                    <option value='2.6'>2.6</option>
+                    <option value='2.8'>2.8</option>
+                </select>
+            </div>
+
+            <div className="dropdown-container d-flex justify-content-between">
+                <div className="title">Front Hub Width</div>
+                <select
+                    className="dropdown"
+                    id="front-hub-width"
+                    name="frontHubWidth"
+                    value={frontHubWidth}
+                    onChange={(e) => setFrontHubWidth(e.target.value)}
+                    required
+                    disabled={!isEditing}
+                >
+                    <option value="">Select Width</option>
+                    <option value="100mm (Front)">100mm (Front)</option>
+                    <option value="110mm (Boost Front)">110mm (Boost Front)</option>
+                </select>
+            </div>
+
+            <div className="input-container form-group">
+                <label htmlFor="item-material-fork">Material</label>
+                <input
+                    type="text"
+                    id="item-material-fork"
+                    name="itemMaterial"
+                    value={material}
+                    onChange={(e) => setMaterial(e.target.value)}
+                    placeholder="Enter item material"
+                    required
+                    disabled={!isEditing}
+                />
+            </div>
+
+            {(forkTubeError || forkAxleError)&& 
             <div className="error-message">
-                <p>{fdError}</p>
-                <p>{rdError}</p>
+                <p>{forkTubeError}</p>
+                <p>{forkAxleError}</p>
             </div>}
 
             {isEditing && (

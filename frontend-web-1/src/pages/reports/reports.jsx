@@ -10,10 +10,16 @@ import SalesReport from '../../components/reports/sales-report';
 import ExpensesReport from '../../components/reports/expenses-report';
 import LaborReport from '../../components/reports/labor-cost-report';
 import RevenueReport from '../../components/reports/revenue';
+import LoadingPage from '../../components/loading-page/loading-page';
 
 const Reports = () => {
     const [selectedReport, setSelectedReport] = useState("sales");
     const navigate = useNavigate();
+    const [loading, setLoading] = useState(true);
+
+    setTimeout(() => {
+        setLoading(false);
+    }, 1000);
 
     // Memoize reportPaths to avoid unnecessary re-renders
     const reportPaths = useMemo(() => ({
@@ -43,6 +49,8 @@ const Reports = () => {
                 return null;
         }
     };
+
+    if (loading) return <LoadingPage classStyle={"loading-in-page"} />
 
     return (
         <div className='reports p-3'>

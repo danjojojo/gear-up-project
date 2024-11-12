@@ -1,35 +1,35 @@
 import React, { useState, useEffect, useContext } from "react";
-import exit from "../../../../assets/icons/exit.png";
-import edit from "../../../../assets/icons/edit.png";
-import cancel from "../../../../assets/icons/cancel.png";
-import del from "../../../../assets/icons/delete.png";
-import archive from "../../../../assets/icons/archive.png";
-import restore from "../../../../assets/icons/restore.png";
-import ImageUploadButton from "../../../../components/img-upload-button/img-upload-button";
-import { base64ToFile } from "../../../../utility/imageUtils";
-import { AuthContext } from "../../../../context/auth-context";
-import { updateWheelsetItem, archiveWheelsetItem, restoreWheelsetItem, deleteWheelsetItem } from "../../../../services/bbuService";
-import ImagePreviewModal from "../../../../components/image-preview-modal/image-preview";
-import "./wheelset.scss";
+import exit from "../../../../../assets/icons/exit.png";
+import edit from "../../../../../assets/icons/edit.png";
+import cancel from "../../../../../assets/icons/cancel.png";
+import del from "../../../../../assets/icons/delete.png";
+import restore from "../../../../../assets/icons/restore.png";
+import ImageUploadButton from "../../../../../components/img-upload-button/img-upload-button";
+import { base64ToFile } from "../../../../../utility/imageUtils";
+import { AuthContext } from "../../../../../context/auth-context";
+import { updateFrameItem, archiveFrameItem, restoreFrameItem, deleteFrameItem } from "../../../../../services/bbuService";
+import ImagePreviewModal from "../../../../../components/image-preview-modal/image-preview";
+import './frame.scss';
 import {Modal, Button} from 'react-bootstrap';
 
-const Form = ({ selectedItem, setSelectedItem, setItems, refreshWaitlist, onClose, showArchived, isEditing, setIsEditing, functionKey, setFunctionKey, setShowResponseModal  }) => {
+const Form = ({ selectedItem, setSelectedItem, setItems, refreshWaitlist, onClose, showArchived, isEditing, setIsEditing, functionKey, setFunctionKey, setShowResponseModal }) => {
     const [name, setName] = useState('');
     const [price, setPrice] = useState('');
     const [description, setDescription] = useState('');
-    const [hubRotorType, setHubRotorType] = useState('');
-    const [hubCassetteType, setHubCassetteType] = useState('');
-    const [hubHoles, setHubHoles] = useState('');
-    const [frontHubWidth, setFrontHubWidth] = useState('');
-    const [frontHubAxleType, setFrontHubAxleType] = useState('');
-    const [frontHubAxleDiameter, setFrontHubAxleDiameter] = useState('');
+    const [purpose, setPurpose] = useState('');
+    const [frameSize, setFrameSize] = useState('');
+    const [headTubeType, setHeadTubeType] = useState('');
+    const [htUpperDiameter, setHtUpperDiameter] = useState('');
+    const [htLowerDiameter, setHtLowerDiameter] = useState('');
+    const [seatpostDiameter, setSeatpostDiameter] = useState('');
+    const [axleType, setAxleType] = useState('');
+    const [axleDiameter, setAxleDiameter] = useState('');
+    const [bottomBracketType, setBottomBracketType] = useState('');
+    const [bottomBracketWidth, setBottomBracketWidth] = useState('');
+    const [rotorSize, setRotorSize] = useState('');
+    const [maxTireWidth, setMaxTireWidth] = useState('');
     const [rearHubWidth, setRearHubWidth] = useState('');
-    const [rearHubAxleType, setRearHubAxleType] = useState('');
-    const [rearHubAxleDiameter, setRearHubAxleDiameter] = useState('');
-    const [rearHubSpeed, setRearHubSpeed] = useState('');
-    const [tireSize, setTireSize] = useState('');
-    const [tireWidth, setTireWidth] = useState('');
-    const [rimSpokes, setRimSpokes] = useState('');
+    const [material, setMaterial] = useState('');
     const [itemImage, setItemImage] = useState(null)
     const [selectedFile, setSelectedFile] = useState(null);
     const [originalItem, setOriginalItem] = useState(null);
@@ -37,16 +37,15 @@ const Form = ({ selectedItem, setSelectedItem, setItems, refreshWaitlist, onClos
     const [showModal, setShowModal] = useState(false);
     const handleOpenModal = () => setShowModal(true);
     const handleCloseModal = () => setShowModal(false);
+    const [showCropModal, setShowCropModal] = useState(false);
 
     const [showConfirmModal, setShowConfirmModal] = useState(false);
 
-    const [hubHolesError, setHubHolesError] = useState('');
-    const [frontHubAxleError, setFrontHubAxleError] = useState(''); 
-    const [rearHubAxleError, setRearHubAxleError] = useState('');
+    const [headTubeError, setHeadTubeError] = useState('');
+    const [frameAxleError, setFrameAxleError] = useState('');
 
-    const [hubHolesIsCorrect, setHubHolesIsCorrect] = useState(false);
-    const [frontHubAxleIsCorrect, setFrontHubAxleIsCorrect] = useState(false);
-    const [rearHubAxleIsCorrect, setRearHubAxleIsCorrect] = useState(false);
+    const [headTubeIsCorrect, setHeadTubeIsCorrect] = useState(false);
+    const [frameAxleIsCorrect, setFrameAxleIsCorrect] = useState(false);
 
     function ConfirmModal({ onHide, onConfirm, ...props }) {
 		return (
@@ -117,19 +116,20 @@ const Form = ({ selectedItem, setSelectedItem, setItems, refreshWaitlist, onClos
             setName(selectedItem.item_name || '');
             setPrice(selectedItem.item_price || '');
             setDescription(selectedItem.description || '');
-            setHubRotorType(selectedItem.hub_rotor_type || '');
-            setHubCassetteType(selectedItem.hub_cassette_type || '');
-            setHubHoles(selectedItem.hub_holes || '');
-            setFrontHubWidth(selectedItem.front_hub_width || '');
-            setFrontHubAxleType(selectedItem.front_hub_axle_type || '');
-            setFrontHubAxleDiameter(selectedItem.front_hub_axle_diameter || '');
+            setPurpose(selectedItem.purpose || '');
+            setFrameSize(selectedItem.frame_size || '');
+            setHeadTubeType(selectedItem.head_tube_type || '');
+            setHtUpperDiameter(selectedItem.head_tube_upper_diameter || '');
+            setHtLowerDiameter(selectedItem.head_tube_lower_diameter || '');
+            setSeatpostDiameter(selectedItem.seatpost_diameter || '');
+            setAxleType(selectedItem.axle_type || '');
+            setAxleDiameter(selectedItem.axle_diameter || '');
+            setBottomBracketType(selectedItem.bottom_bracket_type || '');
+            setBottomBracketWidth(selectedItem.bottom_bracket_width || '');
+            setRotorSize(selectedItem.rotor_size || '');
+            setMaxTireWidth(selectedItem.max_tire_width || '');
             setRearHubWidth(selectedItem.rear_hub_width || '');
-            setRearHubAxleType(selectedItem.rear_hub_axle_type || '');
-            setRearHubAxleDiameter(selectedItem.rear_hub_axle_diameter || '');
-            setRearHubSpeed(selectedItem.rear_hub_speed || '');
-            setTireSize(selectedItem.tire_size || '');
-            setTireWidth(selectedItem.tire_width || '');
-            setRimSpokes(selectedItem.rim_spokes || '');
+            setMaterial(selectedItem.material || '');
             setItemImage(imageBase64);
             setOriginalItem({ ...selectedItem });
 
@@ -139,38 +139,39 @@ const Form = ({ selectedItem, setSelectedItem, setItems, refreshWaitlist, onClos
         }
     }, [selectedItem]);
 
-
     const handleSubmit = async (event) => {
+
         event.preventDefault();
 
-        if(!hubHolesIsCorrect || !frontHubAxleIsCorrect || !rearHubAxleIsCorrect) return;
-
+        if (!headTubeIsCorrect || !frameAxleIsCorrect) return;
+        
         const updatedData = new FormData();
         updatedData.append('description', description);
-        updatedData.append('hub_rotor_type', hubRotorType);
-        updatedData.append('hub_cassette_type', hubCassetteType);
-        updatedData.append('front_hub_width', frontHubWidth);
-        updatedData.append('front_hub_axle_type', frontHubAxleType);
-        updatedData.append('front_hub_axle_diameter', frontHubAxleDiameter);
+        updatedData.append('purpose', purpose);
+        updatedData.append('frame_size', frameSize);
+        updatedData.append('head_tube_type', headTubeType);
+        updatedData.append('head_tube_upper_diameter', htUpperDiameter);
+        updatedData.append('head_tube_lower_diameter', htLowerDiameter);
+        updatedData.append('seatpost_diameter', seatpostDiameter);
+        updatedData.append('axle_type', axleType);
+        updatedData.append('axle_diameter', axleDiameter);
+        updatedData.append('bottom_bracket_type', bottomBracketType);
+        updatedData.append('bottom_bracket_width', bottomBracketWidth);
+        updatedData.append('rotor_size', rotorSize);
+        updatedData.append('max_tire_width', maxTireWidth);
         updatedData.append('rear_hub_width', rearHubWidth);
-        updatedData.append('rear_hub_axle_type', rearHubAxleType);
-        updatedData.append('rear_hub_axle_diameter', rearHubAxleDiameter);
-        updatedData.append('hub_holes', hubHoles);
-        updatedData.append('rear_hub_speed', rearHubSpeed);
-        updatedData.append('tire_size', tireSize);
-        updatedData.append('tire_width', tireWidth);
-        updatedData.append('rim_spokes', rimSpokes);
+        updatedData.append('material', material);
 
         if (selectedFile) {
             updatedData.append('item_image', selectedFile);
         }
 
-        const updatedItem = await updateWheelsetItem(selectedItem.wheelset_id, updatedData);
+        const updatedItem = await updateFrameItem(selectedItem.frame_id, updatedData);
         setShowResponseModal(true);
 
         setItems((prevItems) =>
             prevItems.map((item) =>
-                item.wheelset_id === selectedItem.wheelset_id ? updatedItem : item
+                item.frame_id === selectedItem.frame_id ? updatedItem : item
             ),
         );
 
@@ -178,7 +179,6 @@ const Form = ({ selectedItem, setSelectedItem, setItems, refreshWaitlist, onClos
         setIsEditing(false);
         onClose();
     };
-
 
     // Select image file
     const handleFileSelect = (file) => {
@@ -198,9 +198,9 @@ const Form = ({ selectedItem, setSelectedItem, setItems, refreshWaitlist, onClos
     };
 
     // Archive item
-    const handleArchiveItem = async (wheelset_id) => {
+    const handleArchiveItem = async (frame_id) => {
         try {
-            await archiveWheelsetItem(wheelset_id);
+            await archiveFrameItem(frame_id);
             setShowConfirmModal(false);
             setShowResponseModal(true);
 
@@ -214,9 +214,9 @@ const Form = ({ selectedItem, setSelectedItem, setItems, refreshWaitlist, onClos
     }
 
     // Restore item
-    const handleRestoreItem = async (wheelset_id) => {
+    const handleRestoreItem = async (frame_id) => {
         try {
-            await restoreWheelsetItem(wheelset_id);
+            await restoreFrameItem(frame_id);
             setShowConfirmModal(false);
             setShowResponseModal(true);
 
@@ -230,13 +230,9 @@ const Form = ({ selectedItem, setSelectedItem, setItems, refreshWaitlist, onClos
     }
 
     // Delete item
-    const handleDeleteItem = async (wheelset_id) => {
-        const confirmDelete = window.confirm("Are you sure you want to delete this item? This action cannot be undone.");
-
-        if (!confirmDelete) return;
-
+    const handleDeleteItem = async (frame_id) => {
         try {
-            await deleteWheelsetItem(wheelset_id);
+            await deleteFrameItem(frame_id);
             setShowConfirmModal(false);
             setShowResponseModal(true);
 
@@ -252,68 +248,49 @@ const Form = ({ selectedItem, setSelectedItem, setItems, refreshWaitlist, onClos
     function handleConfirmModal(){
         switch(functionKey){
             case 'archive':
-                handleArchiveItem(selectedItem.wheelset_id);
+                handleArchiveItem(selectedItem.frame_id);
                 break;
             case 'delete':     
-                handleDeleteItem(selectedItem.wheelset_id);
+                handleDeleteItem(selectedItem.frame_id);
                 break;
             case 'restore':
-                handleRestoreItem(selectedItem.wheelset_id);
+                handleRestoreItem(selectedItem.frame_id);
                 break;
             default:
                 break;
         }
     }
 
-    function hubHolesCorrect(){
-        // if hub holes is 28H, rim spokes should be 28
-        // get strip 28 from 28H
-        let hubHolesStrip = hubHoles.slice(0, 2);
-        if(hubHolesStrip === rimSpokes){
-            setHubHolesError('');
-            return setHubHolesIsCorrect(true);
-        } else {
-            setHubHolesError(`Hub holes and rim spokes must be same`);
-            return setHubHolesIsCorrect(false);
+    function headTubeCorrect(){
+        if(headTubeType === 'Tapered' && htUpperDiameter === '44mm' && htLowerDiameter === '44mm'){
+            setHeadTubeError('Incorrect specifications for Tapered Head Tube Type');
+            return setHeadTubeIsCorrect(false);
         }
+        if(headTubeType === 'Non Tapered' && htUpperDiameter === '44mm' && (htLowerDiameter === '55mm' || htLowerDiameter === '56mm')){
+            setHeadTubeError('Incorrect specifications for Non Tapered Head Tube Type');
+            return setHeadTubeIsCorrect(false);
+        }
+        setHeadTubeError('');
+        return setHeadTubeIsCorrect(true);
     }
 
-    function frontHubAxleCorrect(){
-        // if front hub axle type is Quick Release (QR), front hub axle diameter should be 9mm (QR)
-        if(frontHubAxleType === 'Quick Release (QR)' && frontHubAxleDiameter !== '9mm (QR)'){
-            setFrontHubAxleError('Front hub axle and diameter must be of Quick Release.');
-            return setFrontHubAxleIsCorrect(false);
+    function frameAxleCorrect(){
+        if(axleType === 'Quick Release (QR)' && axleDiameter !== '9mm (QR)'){
+            setFrameAxleError('Incorrect specifications for Quick Release Axle Type');
+            return setFrameAxleIsCorrect(false);
         }
-        // if front hub axle type is Thru-Axle (TA), front hub axle diameter should be 12mm (Thru-Axle) or 15mm (Thru-Axle) or 20mm (Thru-Axle)
-        if(frontHubAxleType === 'Thru-Axle (TA)' && (frontHubAxleDiameter !== '12mm (Thru-Axle)' || frontHubAxleDiameter !== '15mm (Thru-Axle)' || frontHubAxleDiameter !== '20mm (Thru-Axle)')){
-            setFrontHubAxleError('Front hub axle and diameter must be of Thru-Axle.');
-            return setFrontHubAxleIsCorrect(false);
+        if(axleType === 'Thru-Axle (TA)' && (axleDiameter !== '12mm (Thru-Axle)' || axleDiameter !== '15mm (Thru-Axle)' || axleDiameter !== '20mm (Thru-Axle)')){
+            setFrameAxleError('Incorrect specifications for Thru-Axle Axle Type');
+            return setFrameAxleIsCorrect(false);
         }
-        
-        setFrontHubAxleError('');
-        return setFrontHubAxleIsCorrect(true);
-    }
-
-    function rearHubAxleCorrect(){
-        // if rear hub axle type is Quick Release (QR), rear hub axle diameter should be 9mm (QR)
-        if(rearHubAxleType === 'Quick Release (QR)' && rearHubAxleDiameter !== '9mm (QR)'){
-            setRearHubAxleError('Rear hub axle and diameter must be of Quick Release.');
-            return setRearHubAxleIsCorrect(false);
-        }
-        // if rear hub axle type is Thru-Axle (TA), rear hub axle diameter should be 12mm (Thru-Axle) or 15mm (Thru-Axle) or 20mm (Thru-Axle)
-        if(rearHubAxleType === 'Thru-Axle (TA)' && (rearHubAxleDiameter !== '12mm (Thru-Axle)' || rearHubAxleDiameter !== '15mm (Thru-Axle)' || rearHubAxleDiameter !== '20mm (Thru-Axle)')){
-            setRearHubAxleError('Rear hub axle and diameter must be of Thru-Axle.');
-            return setRearHubAxleIsCorrect(false);
-        }
-        setRearHubAxleError('');
-        return setRearHubAxleIsCorrect(true);
+        setFrameAxleError('');
+        return setFrameAxleIsCorrect(true);
     }
 
     useEffect(() => {
-        hubHolesCorrect();
-        frontHubAxleCorrect();
-        rearHubAxleCorrect();
-    }, [hubHoles, rimSpokes, frontHubAxleType, frontHubAxleDiameter, rearHubAxleType, rearHubAxleDiameter]);  
+        headTubeCorrect();
+        frameAxleCorrect();
+    }, [headTubeType, htUpperDiameter, htLowerDiameter, axleType, axleDiameter]);
 
     return (
         <form className="form-content" onSubmit={(e) => {
@@ -394,20 +371,22 @@ const Form = ({ selectedItem, setSelectedItem, setItems, refreshWaitlist, onClos
 
             {!isEditing ? (
                 itemImage ? (
-                    <div className="item-image-container" onClick={handleOpenModal}>
-                        <img
-                            src={itemImage}
-                            alt="Item"
-                            className="item-image"
-                        />
-                    </div>
+                    <>
+                        <div className="item-image-container" onClick={handleOpenModal}>
+                            <img
+                                src={itemImage}
+                                alt="Item"
+                                className="item-image"
+                            />
+                        </div>
+                    </>
                 ) : (
                     <div className="no-image-container">
                         No image attached
                     </div>
                 )
             ) : (
-                <ImageUploadButton onFileSelect={handleFileSelect} part={'wheelset'}/>
+                <ImageUploadButton onFileSelect={handleFileSelect} part={'frame'}/>
             )}
 
             <ImagePreviewModal
@@ -417,10 +396,10 @@ const Form = ({ selectedItem, setSelectedItem, setItems, refreshWaitlist, onClos
             />
 
             <div className="input-container form-group">
-                <label htmlFor="item-name-wheelset">Name</label>
+                <label htmlFor="item-name-frame">Name</label>
                 <input
                     type="text"
-                    id="item-name-wheelset"
+                    id="item-name-frame"
                     name="itemName"
                     value={name}
                     onChange={(e) => setName(e.target.value)}
@@ -429,10 +408,10 @@ const Form = ({ selectedItem, setSelectedItem, setItems, refreshWaitlist, onClos
             </div>
 
             <div className="input-container form-group">
-                <label htmlFor="item-price-wheelset">Price</label>
+                <label htmlFor="item-price-frame">Price</label>
                 <input
                     type="text"
-                    id="item-price-wheelset"
+                    id="item-price-frame"
                     name="itemPrice"
                     value={price}
                     onChange={(e) => setPrice(e.target.value)}
@@ -441,10 +420,10 @@ const Form = ({ selectedItem, setSelectedItem, setItems, refreshWaitlist, onClos
             </div>
 
             <div className="input-container form-group">
-                <label htmlFor="item-description-wheelset">Description</label>
+                <label htmlFor="item-description-frame">Description</label>
                 <textarea
                     type="text"
-                    id="item-description-wheelset"
+                    id="item-description-frame"
                     name="itemDescription"
                     value={description}
                     onChange={(e) => setDescription(e.target.value)}
@@ -455,83 +434,122 @@ const Form = ({ selectedItem, setSelectedItem, setItems, refreshWaitlist, onClos
             </div>
 
             <div className="dropdown-container d-flex justify-content-between">
-                <div className="title">Hub - Rotor Type</div>
+                <div className="title">Purpose</div>
                 <select
                     className="dropdown"
-                    id="hub-rotor-type"
-                    name="hubRotorType"
-                    value={hubRotorType}
-                    onChange={(e) => setHubRotorType(e.target.value)}
+                    id="purpose"
+                    name="purpose"
+                    value={purpose}
+                    onChange={(e) => setPurpose(e.target.value)}
                     required
                     disabled={!isEditing}
                 >
-                    <option value="">Select Holes</option>
-                    <option value="6-bolt">6-bolt</option>
-                    <option value="Centerlock">Centerlock</option>
-
+                    <option value="">Select Purpose</option>
+                    <option value="Cross-country (XC)">Cross-country (XC)</option>
+                    <option value="Trail">Trail</option>
+                    <option value="Enduro">Enduro</option>
+                    <option value="Downhill (DH)">Downhill (DH)</option>
                 </select>
             </div>
 
             <div className="dropdown-container d-flex justify-content-between">
-                <div className="title">Hub - Cassette Type</div>
+                <div className="title">Frame Size</div>
                 <select
                     className="dropdown"
-                    id="hub-cassette-ype"
-                    name="hubCassetteType"
-                    value={hubCassetteType}
-                    onChange={(e) => setHubCassetteType(e.target.value)}
+                    id="frame-size"
+                    name="frameSize"
+                    value={frameSize}
+                    onChange={(e) => setFrameSize(e.target.value)}
+                    required
+                    disabled={!isEditing}
+                >
+                    <option value="">Select Size</option>
+                    <option value='26"'>26"</option>
+                    <option value='27.5"'>27.5"</option>
+                    <option value='29"'>29"</option>
+                </select>
+            </div>
+
+            <div className="dropdown-container d-flex justify-content-between">
+                <div className="title">Head Tube Type</div>
+                <select
+                    className="dropdown"
+                    id="head-tube-type"
+                    name="headTubeType"
+                    value={headTubeType}
+                    onChange={(e) => setHeadTubeType(e.target.value)}
                     required
                     disabled={!isEditing}
                 >
                     <option value="">Select Type</option>
-                    <option value="Cassette">Cassette</option>
-                    <option value="Threaded">Threaded</option>
+                    <option value="Non Tapered">Non Tapered</option>
+                    <option value="Tapered">Tapered</option>
                 </select>
             </div>
 
             <div className="dropdown-container d-flex justify-content-between">
-                <div className="title">Hub Holes</div>
+                <div className="title">Head Tube Upper Diameter</div>
                 <select
                     className="dropdown"
-                    id="hub-holes"
-                    name="hubHoles"
-                    value={hubHoles}
-                    onChange={(e) => setHubHoles(e.target.value)}
+                    id="ht-upper-diameter"
+                    name="htUpperDiameter"
+                    value={htUpperDiameter}
+                    onChange={(e) => setHtUpperDiameter(e.target.value)}
                     required
                     disabled={!isEditing}
                 >
-                    <option value="">Select Holes</option>
-                    <option value="28H">28H</option>
-                    <option value="32H">32H</option>
-                    <option value="36H">36H</option>
+                    <option value="">Select Diameter</option>
+                    <option value="44mm">44mm</option>
+                    <option value="49mm">49mm</option>
+                    <option value="55mm">55mm</option>
                 </select>
             </div>
 
             <div className="dropdown-container d-flex justify-content-between">
-                <div className="title">Front Hub Width</div>
+                <div className="title">Head Tube Lower Diameter</div>
                 <select
                     className="dropdown"
-                    id="front-hub-width"
-                    name="frontHubWidth"
-                    value={frontHubWidth}
-                    onChange={(e) => setFrontHubWidth(e.target.value)}
+                    id="ht-lower-diameter"
+                    name="htLowerDiameter"
+                    value={htLowerDiameter}
+                    onChange={(e) => setHtLowerDiameter(e.target.value)}
                     required
                     disabled={!isEditing}
                 >
-                    <option value="">Select Width</option>
-                    <option value="100mm (Front)">100mm (Front)</option>
-                    <option value="110mm (Boost Front)">110mm (Boost Front)</option>
+                    <option value="">Select Diameter</option>
+                    <option value="44mm">44mm</option>
+                    <option value="55mm">55mm</option>
+                    <option value="56mm">56mm</option>
                 </select>
             </div>
 
             <div className="dropdown-container d-flex justify-content-between">
-                <div className="title">Front Hub - Axle Type</div>
+                <div className="title">Seatpost Diameter</div>
                 <select
                     className="dropdown"
-                    id="front-hub-axle-type"
-                    name="frontHubAxleType"
-                    value={frontHubAxleType}
-                    onChange={(e) => setFrontHubAxleType(e.target.value)}
+                    id="seatpost-diameter"
+                    name="seatpostDiameter"
+                    value={seatpostDiameter}
+                    onChange={(e) => setSeatpostDiameter(e.target.value)}
+                    required
+                    disabled={!isEditing}
+                >
+                    <option value="">Select Diameter</option>
+                    <option value="27.2mm">27.2mm</option>
+                    <option value="30.9mm">30.9mm</option>
+                    <option value="31.6mm">31.6mm</option>
+                    <option value="34.9mm">34.9mm</option>
+                </select>
+            </div>
+
+            <div className="dropdown-container d-flex justify-content-between">
+                <div className="title">Frame Axle Type</div>
+                <select
+                    className="dropdown"
+                    id="axle-type"
+                    name="axleType"
+                    value={axleType}
+                    onChange={(e) => setAxleType(e.target.value)}
                     required
                     disabled={!isEditing}
                 >
@@ -542,13 +560,13 @@ const Form = ({ selectedItem, setSelectedItem, setItems, refreshWaitlist, onClos
             </div>
 
             <div className="dropdown-container d-flex justify-content-between">
-                <div className="title">Front Hub - Axle Diameter</div>
+                <div className="title">Frame Axle Diameter</div>
                 <select
                     className="dropdown"
-                    id="front-hub-axle-diameter"
-                    name="frontHubAxleDiameter"
-                    value={frontHubAxleDiameter}
-                    onChange={(e) => setFrontHubAxleDiameter(e.target.value)}
+                    id="axle-diameter"
+                    name="axleDiameter"
+                    value={axleDiameter}
+                    onChange={(e) => setAxleDiameter(e.target.value)}
                     required
                     disabled={!isEditing}
                 >
@@ -557,6 +575,82 @@ const Form = ({ selectedItem, setSelectedItem, setItems, refreshWaitlist, onClos
                     <option value="12mm (Thru-Axle)">12mm (Thru-Axle)</option>
                     <option value="15mm (Thru-Axle)">15mm (Thru-Axle)</option>
                     <option value="20mm (Thru-Axle)">20mm (Thru-Axle)</option>
+                </select>
+            </div>
+
+            <div className="dropdown-container d-flex justify-content-between">
+                <div className="title">Frame Bottom Bracket Type</div>
+                <select
+                    className="dropdown"
+                    id="bottom-bracket-type"
+                    name="bottomBracketType"
+                    value={bottomBracketType}
+                    onChange={(e) => setBottomBracketType(e.target.value)}
+                    required
+                    disabled={!isEditing}
+                >
+                    <option value="">Select Type</option>
+                    <option value="Threaded (BSA)">Threaded (BSA)</option>
+                    <option value="Press-Fit (PF30, BB86, BB92)">Press-Fit (PF30, BB86, BB92)</option>
+                    <option value="BB30">BB30</option>
+                </select>
+            </div>
+
+            <div className="dropdown-container d-flex justify-content-between">
+                <div className="title">Frame Bottom Bracket Width</div>
+                <select
+                    className="dropdown"
+                    id="bottom-bracket-Width"
+                    name="bottomBracketWidth"
+                    value={bottomBracketWidth}
+                    onChange={(e) => setBottomBracketWidth(e.target.value)}
+                    required
+                    disabled={!isEditing}
+                >
+                    <option value="">Select Width</option>
+                    <option value="68mm">68mm</option>
+                    <option value="73mm (MTB)">73mm (MTB)</option>
+                    <option value="83mm (Downhill)">83mm (Downhill)</option>
+                    <option value="86mm (Press-Fit)">86mm (Press-Fit)</option>
+                    <option value="92mm (MTB)">92mm (MTB)</option>
+                </select>
+            </div>
+
+            <div className="dropdown-container d-flex justify-content-between">
+                <div className="title">Frame Rotor Size</div>
+                <select
+                    className="dropdown"
+                    id="rotor-size"
+                    name="rotorSize"
+                    value={rotorSize}
+                    onChange={(e) => setRotorSize(e.target.value)}
+                    required
+                    disabled={!isEditing}
+                >
+                    <option value="">Select Size</option>
+                    <option value="160mm">160mm</option>
+                    <option value="180mm">180mm</option>
+                    <option value="203mm">203mm</option>
+                </select>
+            </div>
+
+            <div className="dropdown-container d-flex justify-content-between">
+                <div className="title">Frame Max Tire Width</div>
+                <select
+                    className="dropdown"
+                    id="max-tire-width"
+                    name="maxTireWidth"
+                    value={maxTireWidth}
+                    onChange={(e) => setMaxTireWidth(e.target.value)}
+                    required
+                    disabled={!isEditing}
+                >
+                    <option value="">Select Width</option>
+                    <option value='2.1'>2.1</option>
+                    <option value='2.25'>2.25</option>
+                    <option value='2.4'>2.4</option>
+                    <option value='2.6'>2.6</option>
+                    <option value='2.8'>2.8</option>
                 </select>
             </div>
 
@@ -579,127 +673,24 @@ const Form = ({ selectedItem, setSelectedItem, setItems, refreshWaitlist, onClos
                 </select>
             </div>
 
-            <div className="dropdown-container d-flex justify-content-between">
-                <div className="title">Rear Hub - Axle Type</div>
-                <select
-                    className="dropdown"
-                    id="rear-hub-axle-type"
-                    name="rearHubAxleType"
-                    value={rearHubAxleType}
-                    onChange={(e) => setRearHubAxleType(e.target.value)}
+            <div className="input-container form-group">
+                <label htmlFor="item-material-frame">Material</label>
+                <input
+                    type="text"
+                    id="item-material-frame"
+                    name="itemMaterial"
+                    value={material}
+                    onChange={(e) => setMaterial(e.target.value)}
+                    placeholder="Enter item material"
                     required
                     disabled={!isEditing}
-                >
-                    <option value="">Select Type</option>
-                    <option value="Quick Release (QR)">Quick Release (QR)</option>
-                    <option value="Thru-Axle (TA)">Thru-Axle (TA)</option>
-                </select>
+                />
             </div>
 
-            <div className="dropdown-container d-flex justify-content-between">
-                <div className="title">Rear Hub - Axle Diameter</div>
-                <select
-                    className="dropdown"
-                    id="rear-hub-axle-diameter"
-                    name="rearHubAxleDiameter"
-                    value={rearHubAxleDiameter}
-                    onChange={(e) => setRearHubAxleDiameter(e.target.value)}
-                    required
-                    disabled={!isEditing}
-                >
-                    <option value="">Select Diameter</option>
-                    <option value="9mm (QR)">9mm (QR)</option>
-                    <option value="12mm (Thru-Axle)">12mm (Thru-Axle)</option>
-                    <option value="15mm (Thru-Axle)">15mm (Thru-Axle)</option>
-                    <option value="20mm (Thru-Axle)">20mm (Thru-Axle)</option>
-                </select>
-            </div>
-
-            <div className="dropdown-container d-flex justify-content-between">
-                <div className="title">Rear Hub Speed</div>
-                <select
-                    className="dropdown"
-                    id="rear-hub-speed"
-                    name="rearHubSpeed"
-                    value={rearHubSpeed}
-                    onChange={(e) => setRearHubSpeed(e.target.value)}
-                    required
-                    disabled={!isEditing}
-                >
-                    <option value="">Select Speed</option>
-                    <option value="8-speed">8-speed</option>
-                    <option value="9-speed">9-speed</option>
-                    <option value="10-speed">10-speed</option>
-                    <option value="11-speed">11-speed</option>
-                    <option value="12-speed">12-speed</option>
-                </select>
-            </div>
-
-            <div className="dropdown-container d-flex justify-content-between">
-                <div className="title">Tire Size</div>
-                <select
-                    className="dropdown"
-                    id="tire-size"
-                    name="tireSize"
-                    value={tireSize}
-                    onChange={(e) => setTireSize(e.target.value)}
-                    required
-                    disabled={!isEditing}
-                >
-                    <option value="">Select Size</option>
-                    <option value='26"'>26"</option>
-                    <option value='27.5"'>27.5"</option>
-                    <option value='29"'>29"</option>
-                </select>
-            </div>
-
-            <div className="dropdown-container d-flex justify-content-between">
-                <div className="title">Tire Width</div>
-                <select
-                    className="dropdown"
-                    id="tire-width"
-                    name="tireWidth"
-                    value={tireWidth}
-                    onChange={(e) => setTireWidth(e.target.value)}
-                    required
-                    disabled={!isEditing}
-                >
-                    <option value="">Select Width</option>
-                    <option value='1.9'>1.9</option>
-                    <option value='1.95'>1.95</option>
-                    <option value='2.0'>2.0</option>
-                    <option value='2.1'>2.1</option>
-                    <option value='2.125'>2.125</option>
-                    <option value='2.25'>2.25</option>
-                    <option value='2.4'>2.4</option>
-                    <option value='2.6'>2.6</option>
-                    <option value='2.8'>2.8</option>
-                </select>
-            </div>
-
-            <div className="dropdown-container d-flex justify-content-between">
-                <div className="title">Rim Spokes</div>
-                <select
-                    className="dropdown"
-                    id="rim-spokes"
-                    name="rimSpokes"
-                    value={rimSpokes}
-                    onChange={(e) => setRimSpokes(e.target.value)}
-                    required
-                    disabled={!isEditing}
-                >
-                    <option value="">Select Spokes</option>
-                    <option value="28">28</option>
-                    <option value="32">32</option>
-                    <option value="36">36</option>
-                </select>
-            </div>
-
-             {(hubHolesError || frontHubAxleError || rearHubAxleError )&& 
+            {(headTubeError || frameAxleError)&& 
             <div className="error-message">
-                <p>{hubHolesError}</p>
-                <p>{frontHubAxleError}</p>
-                <p>{rearHubAxleError}</p>
+                <p>{headTubeError}</p>
+                <p>{frameAxleError}</p>
             </div>}
 
             {isEditing && (

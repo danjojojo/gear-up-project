@@ -15,12 +15,14 @@ import Reports from './reports/reports.jsx';
 import Records from './records/records.jsx'
 import Waitlist from './waitlist/waitlist.jsx';
 import BikeBuilderUpgrader from './bike-builder-upgrader/bike-builder-upgrader.jsx';
-    import Frame from './bike-builder-upgrader/parts/frame/frame.jsx';
-    import Fork from './bike-builder-upgrader/parts/fork/fork.jsx';
-    import Groupset from './bike-builder-upgrader/parts/groupset/groupset.jsx';
-    import Wheelset from './bike-builder-upgrader/parts/wheelset/wheelset.jsx';
-    import Seat from './bike-builder-upgrader/parts/seat/seat.jsx';
-    import Cockpit from './bike-builder-upgrader/parts/cockpit/cockpit.jsx';
+    import MountainBike from './bike-builder-upgrader/mountain-bike/mountain-bike.jsx';
+        import Frame from './bike-builder-upgrader/mountain-bike/parts/frame/frame.jsx';
+        import Fork from './bike-builder-upgrader/mountain-bike/parts/fork/fork.jsx';
+        import Groupset from './bike-builder-upgrader/mountain-bike/parts/groupset/groupset.jsx';
+        import Wheelset from './bike-builder-upgrader/mountain-bike/parts/wheelset/wheelset.jsx';
+        import Seat from './bike-builder-upgrader/mountain-bike/parts/seat/seat.jsx';
+        import Cockpit from './bike-builder-upgrader/mountain-bike/parts/cockpit/cockpit.jsx';
+    import RoadBike from './bike-builder-upgrader/road-bike/road-bike.jsx';
 import Orders from './orders/orders.jsx';
 import PointOfSales from './point-of-sales/point-of-sales.jsx';
 import Expenses from './expenses/expenses.jsx';
@@ -72,13 +74,18 @@ const Pages = {
     // Bike Builder and Upgrader Page
     BikeBuilderUpgrader,
 
-        // Parts Page
-        Frame,
-        Fork,
-        Groupset,
-        Wheelset,
-        Seat,
-        Cockpit,
+        // Mountain Bike Page
+        MountainBike, 
+            // Parts Page
+            Frame,
+            Fork,
+            Groupset,
+            Wheelset,
+            Seat,
+            Cockpit,
+        
+        // Road Bike Page
+        RoadBike,
 
     // Order Page
     Orders,

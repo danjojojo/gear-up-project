@@ -1,15 +1,14 @@
 import React, { useState, useEffect, useContext } from "react";
-import exit from "../../../../assets/icons/exit.png";
-import edit from "../../../../assets/icons/edit.png";
-import cancel from "../../../../assets/icons/cancel.png";
-import del from "../../../../assets/icons/delete.png";
-import archive from "../../../../assets/icons/archive.png";
-import restore from "../../../../assets/icons/restore.png";
-import ImageUploadButton from "../../../../components/img-upload-button/img-upload-button";
-import { base64ToFile } from "../../../../utility/imageUtils";
-import { AuthContext } from "../../../../context/auth-context";
-import { updateSeatItem, archiveSeatItem, restoreSeatItem, deleteSeatItem } from "../../../../services/bbuService";
-import ImagePreviewModal from "../../../../components/image-preview-modal/image-preview";
+import exit from "../../../../../assets/icons/exit.png";
+import edit from "../../../../../assets/icons/edit.png";
+import cancel from "../../../../../assets/icons/cancel.png";
+import del from "../../../../../assets/icons/delete.png";
+import restore from "../../../../../assets/icons/restore.png";
+import ImageUploadButton from "../../../../../components/img-upload-button/img-upload-button";
+import { base64ToFile } from "../../../../../utility/imageUtils";
+import { AuthContext } from "../../../../../context/auth-context";
+import { updateSeatItem, archiveSeatItem, restoreSeatItem, deleteSeatItem } from "../../../../../services/bbuService";
+import ImagePreviewModal from "../../../../../components/image-preview-modal/image-preview";
 import "./seat.scss";
 import {Modal, Button} from 'react-bootstrap';
 
