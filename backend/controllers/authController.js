@@ -46,10 +46,10 @@ const registerUser = async (req, res) => {
 
     const token = jwt.sign({ admin_id: admin_id }, process.env.JWT_SECRET, { expiresIn: accessTokenRefresh });
     res.cookie('token', token, {
-      httpOnly: true, // httpOnly ensures JavaScript can't access this cookie
-      secure: process.env.NODE_ENV === 'production', // Use secure cookies in production (HTTPS only)
-      sameSite: 'None', // Protect against CSRF
-      maxAge: 3600000, // 1 hour expiration
+      httpOnly: true, 
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: process.env.NODE_ENV === 'production' ? 'None' : 'Strict', 
+      maxAge: 3600000,
     });
 
     const qrCodeDataURL = await qrcode.toDataURL(secret.otpauth_url);
@@ -84,30 +84,28 @@ const loginPOS = async (req, res) => {
       { expiresIn: accessTokenRefresh }
     );
 
-    // Create refresh token (long-lived)
     const refreshToken = jwt.sign(
       { pos_id: user.pos_id },
       process.env.JWT_REFRESH_SECRET,
-      { expiresIn: refreshTokenRefresh } // Refresh token expires in 7 days
+      { expiresIn: refreshTokenRefresh } 
     );
 
-    // Store refresh token in HttpOnly cookie
     res.cookie('refreshToken', refreshToken, {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
-      sameSite: 'None',
+      sameSite: process.env.NODE_ENV === 'production' ? 'None' : 'Strict',
     });
 
     res.cookie('token', token, {
-      httpOnly: true, // httpOnly ensures JavaScript can't access this cookie
-      secure: process.env.NODE_ENV === 'production', // Use secure cookies in production (HTTPS only)
-      sameSite:  'None', // Protect against CSRF
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite:  process.env.NODE_ENV === 'production' ? 'None' : 'Strict',
     });
 
     res.cookie('role', user.role, {
-      httpOnly: true, // httpOnly ensures JavaScript can't access this cookie
-      secure: process.env.NODE_ENV === 'production', // Use secure cookies in production (HTTPS only)
-      sameSite: 'None', // Protect against CSRF
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: process.env.NODE_ENV === 'production' ? 'None' : 'Strict',
     });
 
     res.json({ role: user.role, message: 'Login successful' });
@@ -142,24 +140,21 @@ const getMyName = async (req, res) => {
 }
 
 const logoutUser = (req, res) => {
-  // Decode the token to get the logId
   const token = req.cookies.token;
   if (token) {
     try {
       const decoded = jwt.verify(token, process.env.JWT_SECRET);
       const logId = decoded.logId;
 
-      // Record the logout time in the database
       logUserLogout(logId);
     } catch (err) {
       console.error("Failed to decode token:", err);
     }
   }
 
-  // Clear the token and any other relevant cookies
-  res.clearCookie('token', { httpOnly: true, sameSite:  'None', secure: process.env.NODE_ENV === 'production' });
-  res.clearCookie('refreshToken', { httpOnly: true, sameSite:  'None', secure: process.env.NODE_ENV === 'production' });
-  res.clearCookie('role');  // If you're storing the role in a separate cookie
+  res.clearCookie('token', { httpOnly: true, sameSite:  process.env.NODE_ENV === 'production' ? 'None' : 'Strict', secure: process.env.NODE_ENV === 'production' });
+  res.clearCookie('refreshToken', { httpOnly: true, sameSite:  process.env.NODE_ENV === 'production' ? 'None' : 'Strict', secure: process.env.NODE_ENV === 'production' });
+  res.clearCookie('role');
   res.status(200).json({ message: 'Logged out successfully' });
 };
 
@@ -169,21 +164,18 @@ const refreshToken = (req, res) => {
 
   try {
     console.log(req.cookies.role);
-    // Verify refresh token
     const decoded = jwt.verify(refreshToken, process.env.JWT_REFRESH_SECRET);
 
-        // Create a new access token
         if(role === 'admin'){
             const accessToken = jwt.sign(
                 { admin_id: decoded.admin_id, role: decoded.role },
                 process.env.JWT_SECRET,
                 { expiresIn: accessTokenRefresh }
             );
-            // Return the new access token
             res.cookie('token', accessToken, {
                 httpOnly: true,
                 secure: process.env.NODE_ENV === 'production',
-                sameSite:  'None',
+                sameSite:  process.env.NODE_ENV === 'production' ? 'None' : 'Strict',
             });
         } else {
           const accessToken = jwt.sign(
@@ -191,11 +183,10 @@ const refreshToken = (req, res) => {
               process.env.JWT_SECRET,
               { expiresIn: accessTokenRefresh }
           );
-          // Return the new access token
           res.cookie('token', accessToken, {
               httpOnly: true,
               secure: process.env.NODE_ENV === 'production',
-              sameSite:  'None',
+              sameSite:  process.env.NODE_ENV === 'production' ? 'None' : 'Strict',
           });
         }
 
@@ -205,7 +196,6 @@ const refreshToken = (req, res) => {
   }
 };
 
-// Logs the user's login and returns the log_id for this session
 const logUserLogin = async (pos_id, pos_name) => {
   const query = `
       INSERT INTO pos_logs (pos_id, pos_name, login_time) 
@@ -217,7 +207,6 @@ const logUserLogin = async (pos_id, pos_name) => {
   return rows[0].log_id;
 };
 
-// Updates the logout time in the logs for the specific log_id
 const logUserLogout = async (log_id) => {
   const query = `
       UPDATE pos_logs 
@@ -231,7 +220,7 @@ const logUserLogout = async (log_id) => {
 const verifyOTP = async (req, res) => {
     const { otp } = req.body;
     console.log(otp, req.user);
-    const adminId = req.user.admin_id;  // Get the admin's ID from the auth context or JWT
+    const adminId = req.user.admin_id;
 
     try {
         const { rows } = await pool.query('SELECT admin_2fa_secret FROM admin WHERE admin_id = $1', [adminId]);
@@ -248,7 +237,7 @@ const verifyOTP = async (req, res) => {
         });
 
         if (verified) {
-            res.clearCookie('token', { httpOnly: true, sameSite: 'None', secure: process.env.NODE_ENV === 'production' });
+            res.clearCookie('token', { httpOnly: true, sameSite: process.env.NODE_ENV === 'production' ? 'None' : 'Strict', secure: process.env.NODE_ENV === 'production' });
             await pool.query('UPDATE admin SET admin_2fa_enabled = true WHERE admin_id = $1', [adminId]);
             res.status(200).json({ message: 'OTP verified successfully' });
         } else {
@@ -272,7 +261,7 @@ const loginUser = async (req, res) => {
     const isValid = await bcrypt.compare(password, user.admin_password);
     if (!isValid) return res.status(400).json({ error: 'Invalid password' });
     const token = jwt.sign({ admin_id: user.admin_id, email: user.admin_email, role: user.role }, process.env.JWT_SECRET, { expiresIn: '1h' });
-    res.cookie('token', token, { httpOnly: true, sameSite:  'None'});
+    res.cookie('token', token, { httpOnly: true, sameSite:  process.env.NODE_ENV === 'production' ? 'None' : 'Strict'});
     return res.status(200).json({ message: 'Login successful' });
   } catch (error) {
     console.error(error);
@@ -297,7 +286,6 @@ const verifyAdminOTP = async (req, res) => {
       });
 
       if (verified) {
-      // Generate JWT token upon successful OTP verification
         const token = jwt.sign({ admin_id: user.admin_id, email: user.admin_email, name: user.admin_name, role: user.role }, process.env.JWT_SECRET, { expiresIn: accessTokenRefresh });
 
         const refreshToken = jwt.sign(
@@ -306,23 +294,22 @@ const verifyAdminOTP = async (req, res) => {
           { expiresIn: refreshTokenRefresh }
         );
 
-        // Set tokens in cookies
         res.cookie('refreshToken', refreshToken, {
           httpOnly: true,
           secure: process.env.NODE_ENV === 'production',
-          sameSite:  'None',
+          sameSite:  process.env.NODE_ENV === 'production' ? 'None' : 'Strict',
         });
 
         res.cookie('token', token, {
           httpOnly: true,
           secure: process.env.NODE_ENV === 'production',
-          sameSite:  'None',
+          sameSite:  process.env.NODE_ENV === 'production' ? 'None' : 'Strict',
         });
 
         res.cookie('role', user.role, {
           httpOnly: true,
           secure: process.env.NODE_ENV === 'production',
-          sameSite:  'None',
+          sameSite:  process.env.NODE_ENV === 'production' ? 'None' : 'Strict',
         });
 
           res.status(200).json({ message: 'OTP verified' });
@@ -345,7 +332,6 @@ const forgotPassword = async (req, res) => {
     const token = crypto.randomBytes(32).toString('hex');
     const hashedToken = await bcrypt.hash(token, 10);
     const expiration = new Date(Date.now() + 3600000).toLocaleString("en-US", { timeZone: "Asia/Manila" });
-    // const expiration = new Date(Date.now() + 3600000);
 
     await pool.query('INSERT INTO password_reset_tokens (email, token, expires_at) VALUES ($1, $2, $3)', [email, hashedToken, expiration]);
 
@@ -384,19 +370,15 @@ const resetPassword = async (req, res) => {
   const { email, token, newPassword } = req.body;
 
   try {
-    // Check if token is valid and not expired
     const { rows } = await pool.query('SELECT * FROM password_reset_tokens WHERE email = $1 AND expires_at > NOW()', [email]);
     if (!rows.length || !(await bcrypt.compare(token, rows[0].token))) {
       return res.status(400).json({ message: 'Invalid or expired token' });
     }
 
-    // Hash the new password and update user record
     const hashedPassword = await bcrypt.hash(newPassword, 10);
     await pool.query('UPDATE admin SET admin_password = $1 WHERE admin_email = $2', [hashedPassword, email]);
 
-    // Delete used token
     await pool.query('DELETE FROM password_reset_tokens WHERE email = $1', [email]);
-
     res.status(200).json({ message: 'Password reset successful' });
   } catch (error) {
     res.status(500).json({ message: error.message });

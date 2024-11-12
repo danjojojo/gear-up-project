@@ -20,7 +20,7 @@ const getReceiptDates = async (req, res) => {
             const decodedToken = jwt.verify(token, process.env.JWT_SECRET);
             const posId = decodedToken.pos_id;
             const { rows } = await pool.query(
-                "SELECT DATE(date_created AT TIME ZONE 'UTC' AT TIME ZONE 'Asia/Manila') AS date_created FROM receipts GROUP BY DATE(date_created AT TIME ZONE 'UTC' AT TIME ZONE 'Asia/Manila')", 
+                "SELECT DATE(date_created AT TIME ZONE 'UTC' AT TIME ZONE 'Asia/Manila') AS date_created FROM receipts WHERE pos_id = $1 GROUP BY DATE(date_created AT TIME ZONE 'UTC' AT TIME ZONE 'Asia/Manila')", 
                 [posId.toString()]);
             res.json({ dates: rows });
         }
