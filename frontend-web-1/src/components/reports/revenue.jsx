@@ -3,7 +3,7 @@ import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable'
 import exportpdf from "../../assets/icons/export.png";
 import MonthYearPicker from '../date-picker/date-picker';
-import { getSalesReport, getLaborReport, getExpensesReport } from '../../services/reportsService';
+import { getSalesReport, getLaborReport, getExpensesReport, getOrderReport } from '../../services/reportsService';
 import { AuthContext } from "../../context/auth-context";
 import registerCooperFont from '../fonts/Cooper-ExtraBold-normal';
 import registerRubikFont from '../fonts/Rubik-Regular-normal';
@@ -28,20 +28,25 @@ const RevenueReport = () => {
     const [sales, setSales] = useState(0);
     const [laborCosts, setLaborCosts] = useState(0);
     const [operationalExpenses, setOperationalExpenses] = useState(0);
+    const [orderSales, setOrderSales] = useState(0);
 
     const fetchRevenueData = async (month, year) => {
         try {
             const salesData = await getSalesReport(month, year);
             const laborData = await getLaborReport(month, year);
             const expensesData = await getExpensesReport(month, year);
+            const orderData = await getOrderReport(month, year);
+
 
             const totalSales = salesData.summary.reduce((acc, item) => acc + Number(item.total_sales || 0), 0);
             const totalLaborCosts = laborData.summary.reduce((acc, item) => acc + Number(item.total_service_amount || 0), 0);
             const totalOperationalExpenses = expensesData.summary.reduce((acc, item) => acc + Number(item.total_amount || 0), 0);
+            const totalOrderSales = Number(orderData.summary.total_revenue || 0); // Assuming total_revenue is part of the summary
 
             setSales(totalSales);
             setLaborCosts(totalLaborCosts);
             setOperationalExpenses(totalOperationalExpenses);
+            setOrderSales(totalOrderSales);
         } catch (error) {
             console.error("Error fetching revenue data:", error);
         }
@@ -108,7 +113,8 @@ const RevenueReport = () => {
             startY: yPosition + 7,
             theme: 'grid',
             body: [
-                ['POS Sales', `P ${PesoFormat.format(sales)}`],
+                ['Receipt Sales (POS Items Sales + Labor Costs)', `P ${PesoFormat.format(sales + laborCosts)}`],
+                ['Order Sales', `P ${PesoFormat.format(orderSales)}`],
                 ['Labor Costs', `(P ${PesoFormat.format(laborCosts)})`],
                 ['Operational Expenses', `(P ${PesoFormat.format(operationalExpenses)})`],
                 [{ content: 'NET REVENUE', styles: { font: "Rubik-SemiBold", halign: 'left' } }, { content: `P ${PesoFormat.format(netRevenue)}`, styles: { font: "Rubik-SemiBold", halign: 'right' } }]
@@ -141,8 +147,8 @@ const RevenueReport = () => {
         pdf.text(reserved, margin, yPosition);
 
         // Display PDF in a new window
-        // pdf.output("dataurlnewwindow"); for debug
-        pdf.save("Revenue_Report.pdf");
+        // pdf.output("dataurlnewwindow");
+        pdf.save(`${months[selectedDate.month - 1].label}_${selectedDate.year}_Revenue_Report.pdf`);
     };
 
     const months = [
@@ -166,7 +172,7 @@ const RevenueReport = () => {
     });
 
     // Calculate Net Revenue
-    const netRevenue = (sales + laborCosts) - laborCosts - operationalExpenses;
+    const netRevenue = (sales + laborCosts + orderSales) - laborCosts - operationalExpenses;
 
     return (
         <>
@@ -198,6 +204,10 @@ const RevenueReport = () => {
                         <tr>
                             <td className='text-start'>Receipt Sales (POS Items Sales + Labor Costs)</td>
                             <td className='text-end'>{PesoFormat.format(sales + laborCosts)}</td>
+                        </tr>
+                        <tr>
+                            <td className='text-start'>Order Sales</td>
+                            <td className='text-end'>{PesoFormat.format(orderSales)}</td>
                         </tr>
                         <tr>
                             <td className='text-start'>Labor Costs</td>

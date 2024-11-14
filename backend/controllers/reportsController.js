@@ -165,8 +165,68 @@ const getLaborReport = async (req, res) => {
     }
 };
 
+const getOrderReport = async (req, res) => {
+    const { month, year } = req.query;
+
+    try {
+        // Summary Query
+        const summaryResult = await pool.query(
+            `
+            SELECT 
+                COUNT(DISTINCT CASE WHEN oi.part_type = 'Bike Builder' AND o.payment_status = 'paid' THEN o.order_id END) AS bike_builder_orders,
+                COUNT(DISTINCT CASE WHEN oi.part_type = 'Bike Upgrader' AND o.payment_status = 'paid' THEN o.order_id END) AS bike_upgrader_orders,
+                COUNT(DISTINCT CASE WHEN o.payment_status = 'paid' THEN o.order_id END) AS total_orders,
+                COUNT(CASE WHEN o.payment_status = 'paid' THEN oi.order_item_id END) AS total_order_items,
+                SUM(CASE WHEN o.payment_status = 'paid' THEN (oi.item_qty * oi.item_price) ELSE 0 END) AS total_revenue
+            FROM orders o
+            LEFT JOIN order_items oi ON o.order_id = oi.order_id
+            WHERE 
+                EXTRACT(MONTH FROM o.date_created AT TIME ZONE 'UTC' AT TIME ZONE 'Asia/Manila') = $1 
+                AND EXTRACT(YEAR FROM o.date_created AT TIME ZONE 'UTC' AT TIME ZONE 'Asia/Manila') = $2;
+            `,
+            [month, year]
+        );
+
+        // Detailed Query
+        const detailedResult = await pool.query(
+            `
+            SELECT 
+                EXTRACT(DAY FROM o.date_created AT TIME ZONE 'UTC' AT TIME ZONE 'Asia/Manila') AS day,
+                UPPER(SUBSTRING(o.order_name, 1, 5)) || SUBSTRING(o.order_name, 6) AS order_name, 
+                o.cust_name,
+                o.order_amount AS amount,
+                COUNT(oi.order_item_id) AS num_items,
+                o.processed_at,
+                o.completed_at,
+                MAX(CASE WHEN oi.part_type = 'Bike Builder' THEN 'Yes' ELSE 'No' END) AS bike_builder,
+                MAX(CASE WHEN oi.part_type = 'Bike Upgrader' THEN 'Yes' ELSE 'No' END) AS bike_upgrader
+            FROM orders o
+            LEFT JOIN order_items oi ON o.order_id = oi.order_id
+            WHERE 
+                EXTRACT(MONTH FROM o.date_created AT TIME ZONE 'UTC' AT TIME ZONE 'Asia/Manila') = $1 
+                AND EXTRACT(YEAR FROM o.date_created AT TIME ZONE 'UTC' AT TIME ZONE 'Asia/Manila') = $2
+                AND o.payment_status = 'paid' -- Include only paid orders
+            GROUP BY day, o.order_name, o.cust_name, o.order_amount, o.processed_at, o.completed_at
+            ORDER BY day ASC, o.order_name;
+
+            `,
+            [month, year]
+        );
+
+        res.json({
+            summary: summaryResult.rows[0], // Single row for summary
+            detailed: detailedResult.rows,  // Multiple rows for detailed data
+        });
+    } catch (error) {
+        console.error('Error fetching order report:', error);
+        res.status(500).json({ error: 'Failed to fetch order report' });
+    }
+};
+
+
 module.exports = {
     getSalesReport,
     getExpensesReport,
-    getLaborReport
+    getLaborReport,
+    getOrderReport
 }

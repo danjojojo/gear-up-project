@@ -15,6 +15,7 @@ const AdminRoutes = () => (
                 <Route path="/reports/sales-report" element={<Pages.Reports />} />
                 <Route path="/reports/expenses-report" element={<Pages.Reports />} />
                 <Route path="/reports/labor-cost-report" element={<Pages.Reports />} />
+                <Route path="/reports/order-sales-report" element={<Pages.Reports />} />
                 <Route path="/reports/revenue-report" element={<Pages.Reports />} />
             <Route path="receipts" element={<Pages.Receipts />} />
             <Route path="records">

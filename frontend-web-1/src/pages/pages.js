@@ -11,6 +11,7 @@ import Reports from './reports/reports.jsx';
     import SalesReport from '../components/reports/sales-report.jsx';
     import ExpensesReport from '../components/reports/expenses-report.jsx';
     import LaborReport from '../components/reports/labor-cost-report.jsx';
+    import OrderSalesReport from '../components/reports/order-sales-report.jsx';
     import RevenueReport from '../components/reports/revenue.jsx';
 import Records from './records/records.jsx'
 import Waitlist from './waitlist/waitlist.jsx';
@@ -63,6 +64,7 @@ const Pages = {
         SalesReport,
         ExpensesReport,
         LaborReport,
+        OrderSalesReport,
         RevenueReport,
 
     // Records Page
