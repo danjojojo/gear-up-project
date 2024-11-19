@@ -3,11 +3,24 @@ import { Accordion } from 'react-bootstrap';
 import { getForkItems } from '../../../services/bikeBuilderService';
 import arrowUp from '../../../assets/icons/arrow-up.png';
 import arrowDown from '../../../assets/icons/arrow-down.png';
+import { Modal } from 'react-bootstrap';
 
 const Fork = ({ onAddToBuild, selectedFramePurpose, selectedFrame }) => {
     const [items, setItems] = useState([]);
     const [sortOrder, setSortOrder] = useState("asc");
     const [loading, setLoading] = useState(true);
+    const [selectedItem, setSelectedItem] = useState(null);
+    const [showModal, setShowModal] = useState(false);
+
+    const openModal = (item) => {
+        setSelectedItem(item);
+        setShowModal(true);
+    };
+
+    const closeModal = () => {
+        setSelectedItem(null);
+        setShowModal(false);
+    };
 
     const fetchItems = useCallback(async () => {
         try {
@@ -73,7 +86,7 @@ const Fork = ({ onAddToBuild, selectedFramePurpose, selectedFrame }) => {
                 </button>
             </div>
 
-            {loading && 
+            {loading &&
                 <div className='loading'>
                     <i className='fa-solid fa-gear fa-spin'></i>
                 </div>
@@ -81,15 +94,17 @@ const Fork = ({ onAddToBuild, selectedFramePurpose, selectedFrame }) => {
 
             {!loading && <div className="parts-cards">
                 {items.map((item) => (
-                    <div className="parts-card" key={item.fork_id}>
-                        <div className="item-image" onClick={() => onAddToBuild(item)}>
+                    <div className="parts-card" key={item.fork_id} onClick={() => openModal(item)}>
+                        <div className="item-image" onClick={(e) => { e.stopPropagation(); onAddToBuild(item); }}>
                             {item.item_image ? (
                                 <img src={`data:image/png;base64,${item.item_image}`} alt="frame" />
                             ) : (
                                 <p>No Image Available</p>
                             )}
                         </div>
-                        <div className="item-name">{item.item_name}</div>
+                        <div className="item-name">{item.item_name}
+                            <div className="item-price-1">{PesoFormat.format(item.item_price)}</div>
+                        </div>
                         <div className="item-price">
                             {PesoFormat.format(item.item_price)}
                             <br />
@@ -98,12 +113,12 @@ const Fork = ({ onAddToBuild, selectedFramePurpose, selectedFrame }) => {
 
                         <Accordion>
                             <Accordion.Item eventKey="0">
-                                <Accordion.Header>Details</Accordion.Header>
-                                <Accordion.Body>{item.description}</Accordion.Body>
+                                <Accordion.Header onClick={(e) => e.stopPropagation()}>Details</Accordion.Header>
+                                <Accordion.Body onClick={(e) => e.stopPropagation()}>{item.description}</Accordion.Body>
                             </Accordion.Item>
                             <Accordion.Item eventKey="1">
-                                <Accordion.Header>Tech Specs</Accordion.Header>
-                                <Accordion.Body>
+                                <Accordion.Header onClick={(e) => e.stopPropagation()}>Tech Specs</Accordion.Header>
+                                <Accordion.Body onClick={(e) => e.stopPropagation()}>
                                     <div className='specs-container'>Fork Size: {item.fork_size}</div>
                                     <div className='specs-container'>Fork Tube Type: {item.fork_tube_type}</div>
                                     <div className='specs-container'>Fork Tube Upper Diameter: {item.fork_tube_upper_diameter}</div>
@@ -121,7 +136,64 @@ const Fork = ({ onAddToBuild, selectedFramePurpose, selectedFrame }) => {
                         </Accordion>
                     </div>
                 ))}
-            </div>}
+            </div>
+            }
+
+            {/* Modal Component */}
+            {
+                selectedItem && (
+                    <Modal show={showModal} onHide={closeModal}>
+                        <Modal.Header closeButton>
+                        </Modal.Header>
+                        <Modal.Body>
+                            <div className="modal-content">
+                                <div className="modal-image"
+                                    style={{
+                                        display: "flex",
+                                        justifyContent: "center",
+                                        alignItems: "center",
+                                    }}>
+                                    {selectedItem.item_image ? (
+                                        <img
+                                            src={`data:image/png;base64,${selectedItem.item_image}`}
+                                            alt="frame"
+                                            style={{
+                                                width: "auto",
+                                                height: "300px",
+                                                padding: "50px",
+                                                borderRadius: "10px",
+
+                                            }}
+                                        />
+                                    ) : (
+                                        <p>No Image Available</p>
+                                    )}
+                                </div>
+                                <div className="modal-details">
+                                    <h4 className='ps-3 fw-bold'>{selectedItem.item_name}</h4>
+                                    <h5 className='ps-3'>Price: {PesoFormat.format(selectedItem.item_price)}</h5>
+                                    <h6 className='p-3'>{selectedItem.description}</h6>
+                                    <h6 className='ps-3'>Technical Specifications:</h6>
+                                    <ul>
+                                        <li>Fork Size: {selectedItem.fork_size}</li>
+                                        <li>Fork Tube Type: {selectedItem.fork_tube_type}</li>
+                                        <li>Fork Tube Upper Diameter: {selectedItem.fork_tube_upper_diameter}</li>
+                                        <li>Fork Tube Lower Diameter: {selectedItem.fork_tube_lower_diameter}</li>
+                                        <li>Fork Travel: {selectedItem.fork_travel}</li>
+                                        <li>Fork Axle Type: {selectedItem.axle_type}</li>
+                                        <li>Fork Axle Diameter: {selectedItem.axle_diameter}</li>
+                                        <li>Fork Suspension Type: {selectedItem.suspension_type}</li>
+                                        <li>Fork Rotor Size: {selectedItem.rotor_size}</li>
+                                        <li>Fork Max Tire Width: {selectedItem.max_tire_width}</li>
+                                        <li>Front Hub Width: {selectedItem.front_hub_width}</li>
+                                        <li>Material: {selectedItem.material}</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </Modal.Body>
+                    </Modal>
+                )
+            }
         </div>
     );
 };

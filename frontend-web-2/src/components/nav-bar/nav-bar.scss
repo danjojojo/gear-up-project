@@ -104,3 +104,38 @@
         }
     }
 }
+
+@media screen and (max-width: 768px) {
+    .nav-bar {
+        .upper-nav {
+            padding-left: 30px;
+
+            .nav-link {
+                font-size: .6rem;
+            }
+        }
+
+        .lower-nav {
+            padding-left: 30px;
+            padding-right: 30px;
+            gap: 1rem;
+
+            h2 {
+                font-size: 16px;
+            }
+
+            .nav-link {
+                font-size: 10px;
+            }
+
+            .add-to-cart {
+                padding: 10px;
+
+                img {
+                    height: 12px;
+                    width: 12px;
+                }
+            }
+        }
+    }
+}
