@@ -196,7 +196,7 @@ const BikeTypeModal = ({
                 }
                 {action === 'Delete' &&
                     <div className="form-groups">
-                        <p>Are you sure you want to delete <b>{bikeType.bike_type_name}</b>? Parts added to {bikeType.bike_type_name} will be deleted as well. This cannot be undone.</p>
+                        <p>Are you sure you want to delete <b>{bikeType.bike_type_name}</b>? Parts added to {bikeType.bike_type_name} will be transferred to MTB. This cannot be undone.</p>
                     </div>
                 }
             </Modal.Body>

@@ -173,16 +173,19 @@ const BikeBuilderUpgrader = () => {
                                     {retrievedBikeTypes.map((bikeType, index) => (
                                         <div key={index} className='type'>
                                             <p>{bikeType.bike_type_name}</p>
-                                            <i 
-                                                className="fa-regular fa-pen-to-square"
-                                                onClick={() => handleEditBikeType(bikeType)}
-                                            ></i>
-                                            {/* {isEditing && bikeType.bike_type_tag !== 'mtb' && 
+
+                                            <div className='types-buttons'>
                                                 <i 
-                                                    className="fa-regular fa-trash-can"
-                                                    onClick={() => handleDeleteBikeType(bikeType)}
+                                                    className="fa-regular fa-pen-to-square"
+                                                    onClick={() => handleEditBikeType(bikeType)}
                                                 ></i>
-                                            }      */}
+                                                {bikeType.bike_type_tag !== 'mtb' && 
+                                                    <i 
+                                                        className="fa-regular fa-trash-can"
+                                                        onClick={() => handleDeleteBikeType(bikeType)}
+                                                    ></i>
+                                                }     
+                                            </div>
                                         </div>
                                     ))}
                                 </div>

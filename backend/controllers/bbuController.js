@@ -85,13 +85,20 @@ const deleteBikeType = async (req, res) => {
             return res.status(400).json({ error: 'Cannot delete default bike type' });
         }
 
+        const updateQuery = `
+            UPDATE part_compatibility
+            SET bike_type_id = 1
+            WHERE bike_type_id = $1;
+        `
+        await pool.query(updateQuery, [bikeTypeId]);
+
         const query = `
             DELETE FROM bike_types
             WHERE bike_type_id = $1;
         `
         await pool.query(query, [bikeTypeId]);
         res.status(200).json({ message: 'Bike type deleted successfully' });
-    } catch (error) {
+} catch (error) {
         res.status(500).json({ error: error.message });
     }
 }

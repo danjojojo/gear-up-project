@@ -123,6 +123,11 @@ $font-size: clamp(0.9em, 1.2vw, 1.1em);
                     p{
                         margin: 0;
                     }
+
+                    .types-buttons{
+                        display: flex;
+                        gap: 10px;
+                    }
                 }
             }
         }
