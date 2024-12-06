@@ -8,9 +8,6 @@ const qrcode = require('qrcode');
 const crypto = require('crypto');
 const nodemailer = require('nodemailer');
 
-const accessTokenRefresh = '7h';
-const refreshTokenRefresh = '7d';
-
 const checkAdminExists = async (req, res) => {
   try {
     const { rowCount } = await pool.query('SELECT * FROM admin WHERE admin_2fa_enabled = true');
@@ -44,7 +41,7 @@ const registerUser = async (req, res) => {
 
     const { rows } = await pool.query('INSERT INTO admin (admin_id, admin_name, admin_email, admin_password, admin_2fa_secret) VALUES ($1, $2, $3, $4, $5) RETURNING *', [admin_id, admin_name, email, hashedPassword, secret.base32]);
 
-    const token = jwt.sign({ admin_id: admin_id }, process.env.JWT_SECRET, { expiresIn: accessTokenRefresh });
+    const token = jwt.sign({ admin_id: admin_id }, process.env.JWT_SECRET, { expiresIn: process.env.ACCESS_TOKEN_EXPIRES || '15m' });
     res.cookie('token', token, {
       httpOnly: true, 
       secure: process.env.NODE_ENV === 'production',
@@ -81,13 +78,13 @@ const loginPOS = async (req, res) => {
     const token = jwt.sign(
       { pos_id: user.pos_id, name: user.pos_name, role: user.role, logId },
       process.env.JWT_SECRET,
-      { expiresIn: accessTokenRefresh }
+      { expiresIn: process.env.ACCESS_TOKEN_EXPIRES || '15m' }
     );
 
     const refreshToken = jwt.sign(
-      { pos_id: user.pos_id },
+      { pos_id: user.pos_id, role: user.role },
       process.env.JWT_REFRESH_SECRET,
-      { expiresIn: refreshTokenRefresh } 
+      { expiresIn: process.env.REFRESH_TOKEN_EXPIRES || '7d' } 
     );
 
     res.cookie('refreshToken', refreshToken, {
@@ -160,41 +157,43 @@ const logoutUser = (req, res) => {
 
 const refreshToken = (req, res) => {
   const refreshToken = req.cookies.refreshToken;
-  if (!refreshToken) return res.status(401).json({ error: 'Refresh Token required' });
+
+  if (!refreshToken) {
+    return res.status(401).json({ error: 'Refresh Token required' });
+  }
 
   try {
-    console.log(req.cookies.role);
     const decoded = jwt.verify(refreshToken, process.env.JWT_REFRESH_SECRET);
+    const { role } = decoded;
 
-        if(role === 'admin'){
-            const accessToken = jwt.sign(
-                { admin_id: decoded.admin_id, role: decoded.role },
-                process.env.JWT_SECRET,
-                { expiresIn: accessTokenRefresh }
-            );
-            res.cookie('token', accessToken, {
-                httpOnly: true,
-                secure: process.env.NODE_ENV === 'production',
-                sameSite:  process.env.NODE_ENV === 'production' ? 'None' : 'Strict',
-            });
-        } else {
-          const accessToken = jwt.sign(
-              { pos_id: decoded.pos_id, role: decoded.role },
-              process.env.JWT_SECRET,
-              { expiresIn: accessTokenRefresh }
-          );
-          res.cookie('token', accessToken, {
-              httpOnly: true,
-              secure: process.env.NODE_ENV === 'production',
-              sameSite:  process.env.NODE_ENV === 'production' ? 'None' : 'Strict',
-          });
-        }
+    let accessToken;
+
+    if (role === 'admin') {
+      accessToken = jwt.sign(
+        { admin_id: decoded.admin_id, role },
+        process.env.JWT_SECRET,
+        { expiresIn: process.env.ACCESS_TOKEN_EXPIRES || '15m' }
+      );
+    } else {
+      accessToken = jwt.sign(
+        { pos_id: decoded.pos_id, role },
+        process.env.JWT_SECRET,
+        { expiresIn: process.env.ACCESS_TOKEN_EXPIRES || '15m' }
+      );
+    }
+
+    res.cookie('token', accessToken, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: process.env.NODE_ENV === 'production' ? 'None' : 'Strict',
+    });
 
     res.json({ message: 'Access token refreshed' });
   } catch (err) {
-    res.status(403).json({ error: err.message });
+    res.status(403).json({ error: 'Invalid or expired refresh token.' });
   }
 };
+
 
 const logUserLogin = async (pos_id, pos_name) => {
   const query = `
@@ -260,7 +259,7 @@ const loginUser = async (req, res) => {
     const user = rows[0];
     const isValid = await bcrypt.compare(password, user.admin_password);
     if (!isValid) return res.status(400).json({ error: 'Invalid password' });
-    const token = jwt.sign({ admin_id: user.admin_id, email: user.admin_email, role: user.role }, process.env.JWT_SECRET, { expiresIn: '1h' });
+    const token = jwt.sign({ admin_id: user.admin_id, email: user.admin_email, role: user.role }, process.env.JWT_SECRET, { expiresIn: process.env.ACCESS_TOKEN_EXPIRES || '15m' });
     res.cookie('token', token, { httpOnly: true, sameSite:  process.env.NODE_ENV === 'production' ? 'None' : 'Strict'});
     return res.status(200).json({ message: 'Login successful' });
   } catch (error) {
@@ -286,12 +285,12 @@ const verifyAdminOTP = async (req, res) => {
       });
 
       if (verified) {
-        const token = jwt.sign({ admin_id: user.admin_id, email: user.admin_email, name: user.admin_name, role: user.role }, process.env.JWT_SECRET, { expiresIn: accessTokenRefresh });
+        const token = jwt.sign({ admin_id: user.admin_id, email: user.admin_email, name: user.admin_name, role: user.role }, process.env.JWT_SECRET, { expiresIn: process.env.ACCESS_TOKEN_EXPIRES || '15m' });
 
         const refreshToken = jwt.sign(
-          { admin_id: user.admin_id },
+          { admin_id: user.admin_id, role: user.role },
           process.env.JWT_REFRESH_SECRET,
-          { expiresIn: refreshTokenRefresh }
+          { expiresIn: process.env.REFRESH_TOKEN_EXPIRES || '7d' }
         );
 
         res.cookie('refreshToken', refreshToken, {
@@ -385,6 +384,23 @@ const resetPassword = async (req, res) => {
   }
 };
 
+const changePassword = async (req, res) => {
+  const { newPassword } = req.body;
+
+  try {
+    const token = req.cookies.token;
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+
+    const adminEmail = decoded.email;
+
+    const hashedPassword = await bcrypt.hash(newPassword, 10);
+    await pool.query('UPDATE admin SET admin_password = $1 WHERE admin_email = $2', [hashedPassword, adminEmail]);
+
+    res.status(200).json({ message: 'Password change successful' });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
 
 module.exports = {
   checkAdminExists,
@@ -399,5 +415,6 @@ module.exports = {
   verifyOTP,
   verifyAdminOTP,
   forgotPassword,
-  resetPassword
+  resetPassword,
+  changePassword
 };

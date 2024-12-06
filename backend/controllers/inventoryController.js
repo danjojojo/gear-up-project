@@ -13,12 +13,20 @@ const getDashboardData = async (req, res) => {
 
         // Query to get the total number of low stock items
         const lowStockItemsQuery = `
-            SELECT COUNT(*) FROM items
-            WHERE low_stock_alert = true 
-            AND stock_count > 0 
-            AND stock_count <= low_stock_count
-            AND status = true
-            AND is_deleted = false`;
+            SELECT 
+                COUNT(*)
+            FROM items
+            LEFT JOIN rop_summary_view rop ON rop.item_id = items.item_id
+            WHERE
+                stock_count > 0 
+                AND
+                (
+                    (lead_time_demand + safety_stock = 0 AND stock_count <= 5) -- Fallback case
+                    OR
+                    (lead_time_demand + safety_stock > 0 AND stock_count <= lead_time_demand + safety_stock) -- Normal case
+                )
+                AND status = true
+                AND is_deleted = false`;
 
         const lowStockItemsResult = await pool.query(lowStockItemsQuery);
         const lowStockItems = parseInt(lowStockItemsResult.rows[0].count, 10) || 0;
@@ -41,7 +49,7 @@ const getDashboardData = async (req, res) => {
         });
     } catch (error) {
         console.error('Error fetching dashboard data:', error);
-        res.status(500).json({ error: 'Internal Server Error' });
+        res.status(500).json({ error:  error.message });
     }
 };
 
@@ -140,7 +148,7 @@ const addItem = async (req, res) => {
         res.status(201).json({ items: itemsResult.rows, newItem: result.rows[0] });
     } catch (error) {
         console.error('Error adding item:', error.message);
-        res.status(500).json({ error: 'Internal Server Error' });
+        res.status(500).json({ error: error.message });
     }
 };
 
@@ -239,11 +247,19 @@ const displayItem = async (req, res) => {
                 i.date_created,
                 i.add_part,
                 i.bb_bu_status,
-                c.category_name 
+                c.category_name,
+                CASE
+                    WHEN
+                        lead_time_demand + safety_stock = 0 THEN 5
+                    ELSE 
+                        lead_time_demand + safety_stock
+                END AS threshold
             FROM 
                 items i 
             JOIN 
-                category c ON i.category_id = c.category_id 
+                category c ON i.category_id = c.category_id
+            LEFT JOIN
+                rop_summary_view rop ON rop.item_id = i.item_id
             WHERE 
                 i.status = $1 and i.is_deleted = false;
         `;
@@ -273,10 +289,53 @@ const getItemById = async (req, res) => {
                 i.bike_parts,
                 i.bb_bu_status,
                 encode(i.item_image, 'base64') AS item_image,
-                i.date_created
+                i.date_created,
+                CASE
+                    WHEN
+                        lead_time_demand + safety_stock = 0 THEN 5
+                    ELSE 
+                        lead_time_demand + safety_stock
+                END AS threshold,
+                COALESCE(lts.avg_lead_time_days, 0) AS avg_lead_time_days,
+		        COALESCE(lts.max_lead_time_days, 0) AS max_lead_time_days,
+                COALESCE(sq.avg_sold_qty, 0) AS avg_sold_qty,
+		        COALESCE(sq.max_sold_qty, 0) AS max_sold_qty,
+                COALESCE(ps.max_sold_qty, 0) AS pos_max_sold_qty,
+                COALESCE(os.max_sold_qty, 0) AS order_max_sold_qty,
+                COALESCE(ps.recent_sold_qty, 0) AS pos_sold_qty,
+                COALESCE(os.recent_sold_qty, 0) AS order_sold_qty,
+                COALESCE(ROUND(lts.recent_lead_time_days), 0) AS lead_time_days
             FROM items i
-            JOIN category c ON i.category_id = c.category_id
-            WHERE i.item_id = $1;
+            JOIN 
+                category c ON i.category_id = c.category_id
+            LEFT JOIN
+                rop_summary_view rop ON rop.item_id = i.item_id
+            LEFT JOIN
+		        lead_time_summary_view lts ON i.item_id = lts.item_id
+            LEFT JOIN
+                pos_sales_view ps ON i.item_id = ps.item_id
+            LEFT JOIN
+                order_sales_view os ON i.item_id = os.item_id
+            LEFT JOIN
+		        sold_qty_view sq ON i.item_id = sq.item_id
+            LEFT JOIN
+		        lead_times_view lt ON i.item_id = lt.item_id
+            WHERE i.item_id = $1
+            GROUP BY 
+                i.item_id, 
+                c.category_name, 
+                lead_time_demand, 
+                safety_stock,
+                avg_lead_time_days,
+                max_lead_time_days,
+                sq.avg_sold_qty,
+                sq.max_sold_qty,
+                pos_max_sold_qty,
+                order_max_sold_qty,
+                pos_sold_qty,
+                order_sold_qty,
+                lts.recent_lead_time_days
+                ;
         `;
         const { rows } = await pool.query(query, [id]);
         if (rows.length === 0) {
@@ -339,7 +398,7 @@ const updateItem = async (req, res) => {
             itemAddToBikeBuilder,
             itemBikeParts,
             itemImage,
-            new Date(Date.now()).toLocaleString("en-US", { timeZone: "Asia/Manila" }), // date_updated
+            new Date(Date.now()), // date_updated
             itemCost,
             id
         ];
@@ -380,9 +439,29 @@ const updateItem = async (req, res) => {
         res.status(200).json({ items: itemsResult.rows, updatedItem: result.rows[0] });
     } catch (error) {
         console.error('Error updating item:', error.message);
-        res.status(500).json({ error: 'Internal Server Error' });
+        res.status(500).json({ error: error.message });
     }
 };
+
+const restockItem = async (req, res) => {
+    try {
+        const { item_id } = req.params;
+        const { stockAdded, stockBefore } = req.body;
+        console.log('stockAdded:', stockAdded, 'stockBefore:', stockBefore);
+        console.log('item_id:', item_id);
+        const query = `
+            INSERT INTO restock_logs
+                (item_id, stock_added, stock_before)
+            VALUES 
+                ($1, $2, $3)
+        `
+        const values = [item_id, stockAdded, stockBefore];
+        await pool.query(query, values);
+        res.status(200).json({ message: 'Stock updated successfully' });
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+}
 
 
 module.exports = {
@@ -393,5 +472,6 @@ module.exports = {
     updateItem,
     archiveItem,
     restoreItem,
-    deleteItem
+    deleteItem,
+    restockItem
 };

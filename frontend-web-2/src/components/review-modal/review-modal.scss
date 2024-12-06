@@ -1,0 +1,114 @@
+.review-modal{
+    .item-details{
+        display: flex;
+        gap: 10px;
+
+        img{
+            width: 150px;
+            height: 110px;
+            margin-bottom: 20px;
+            object-fit: contain;
+            border: 1px solid #ccc;
+            border-radius: 10px;
+        }
+    }
+    .review-date{
+        font-style: italic;
+        color: #6a6a6a;
+        font-size: 0.9rem;
+    }
+
+    .rating{
+        margin-bottom: 20px;
+
+        div{
+            display: flex;
+            gap: 10px;
+            align-items: center;
+
+            p{
+                margin: 0;
+                color: #6a6a6a;
+            }
+        }
+    }
+
+    textarea{
+        width: 100%;
+        height: 150px;
+        border: 1px solid #ccc;
+        border-radius: 10px;
+        padding: 0.8rem;
+    }
+
+    .review-text{
+        width: 100%;
+        border: 1px solid #ccc;
+        border-radius: 10px;
+        padding: 0.8rem;
+        margin-top: 20px;
+    }
+
+    .image-input{
+        h6{
+            margin-top: 10px;
+        }
+
+        .upload-image {
+            padding: 20px 10px;
+            border: 2px dashed #ddd;
+            border-radius: 5px;
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            height: 100%;
+            text-align: center;
+            cursor: pointer;
+
+            .title,
+            .subtitle,
+            i {
+                margin: auto 0;
+            }
+
+            &:hover {
+                background-color: #f9f9f9;
+            }
+        }
+        
+        .img-preview{
+            display: flex;
+            flex-direction: column;
+
+            img{
+                width: 100%;
+                border: 2px solid #ddd;
+                border-radius: 5px;
+            }
+
+            button{
+                background-color: #fd5858;
+                border: none;
+                color: white;
+                border-radius: 5px;
+                margin-top: 10px;
+                padding: 5px 10px;
+
+                &:hover{
+                    text-decoration: underline;
+                }
+            }
+        }
+    }
+
+    .error {
+        color: red;
+        margin-top: 10px;
+        font-size: 0.9rem;
+        text-align: left;
+        font-weight: 500;
+        display: flex;
+        justify-content: flex-start;
+    }
+}

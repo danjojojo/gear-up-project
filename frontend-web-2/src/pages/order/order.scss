@@ -19,6 +19,16 @@
             padding: 2rem 2rem 0;
             font-size: 1rem;
             text-transform: uppercase;
+
+            p{
+                margin: 0;
+                color: #F9961F;
+                cursor: pointer;
+
+                &:hover{
+                    text-decoration: underline;
+                }
+            }
         }
         
         .order-id{
@@ -165,27 +175,67 @@
             border-bottom: 1px solid #d1d1d1;
         }
 
+        .tab{
+            display: flex;
+            gap: 20px;
+            border-bottom: 1px solid #d1d1d1;
+            color: #d1d1d1;
+            font-size: 1.1rem;
+            text-transform: uppercase;
+            font-weight: 500;
+
+            h2{
+                border: none;
+                cursor: pointer;
+                padding: 10px;
+    
+                &.active{
+                    background-color: #F9961F;
+                }
+            }
+        }
+
         .items{
             margin-top: 5px;
             overflow-y: auto;
             display: flex;
             flex-direction: column;
             gap: 15px;
+
+            .not-completed{
+                display: flex;
+                justify-content: center;
+                background-color: #f9971f53;
+                color: white;
+                padding: 0.5rem;
+                border-radius: 5px;
+                text-align: center;
+            }
             
             .item{
                 display: flex;
+                flex-direction: column;
                 justify-content: space-between;
                 background-color: #6a6a6a47;
                 padding: 1rem;
                 color: white;
+                gap: 10px;
     
                 p{
                     font-size: 1.2rem;
                     font-weight: 500;
+                    margin: 0;
                 }
 
 
-                .left{
+                .top{
+                    display: flex;
+                    justify-content: space-between;
+                }
+                
+                .bottom{
+                    display: flex;
+                    justify-content: space-between;
                     .TP{
                         background-color: #F9961F;
                         color: rgb(52, 52, 52);
@@ -200,15 +250,23 @@
                         width: fit-content;
                         font-size: 1rem;
                     }
-                }
-
-                .right{
-                    text-align: right;
 
                     p:nth-child(2){
                         font-weight: 600;
                         color: #F9961F;
                     }
+                }
+
+                .rate{
+                    display: flex;
+                    margin-left: auto;
+                    text-align: right;
+                    outline: none !important;
+                    background-color: #F9961F;
+                    border: none !important;
+                    color: white;
+                    padding: 0.2rem 1rem;
+                    border-radius: 5px;
                 }
             }
         }

@@ -3,16 +3,17 @@ import { Accordion } from 'react-bootstrap';
 import { getSeatItems } from '../../../services/bikeBuilderService';
 import arrowUp from '../../../assets/icons/arrow-up.png';
 import arrowDown from '../../../assets/icons/arrow-down.png';
+import { useParams } from 'react-router-dom';
 
 const Seat = ({ onAddToBuild, selectedFrame }) => {
     const [items, setItems] = useState([]);
     const [sortOrder, setSortOrder] = useState("asc");
     const [loading, setLoading] = useState(true);
-
+    const { typeTag } = useParams();
 
     const fetchItems = useCallback(async () => {
         try {
-            const data = await getSeatItems();
+            const data = await getSeatItems(typeTag);
 
             // Apply filtering logic based on selected frame attributes
             const filteredSeats = data.filter(item => {

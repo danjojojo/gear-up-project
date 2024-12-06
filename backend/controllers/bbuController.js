@@ -1,8 +1,104 @@
 const pool = require('../config/db');
 
+const getBikeTypes = async (req, res) => {
+    try {
+        const query = `
+            SELECT 
+                *,
+                SPLIT_PART(bike_type_name, ' ', 1) AS fname,
+                encode(bike_type_image, 'base64') AS bike_type_image
+            FROM bike_types
+            ORDER BY bike_type_id ASC
+            ;
+        `
+        const { rows } = await pool.query(query);
+        res.status(200).json({ bikeTypes: rows });
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+}
+
+const getAllParts = async (req, res) => {
+    try {
+        const query = `
+            SELECT
+                *
+            FROM all_parts;
+        `
+        const { rows } = await pool.query(query);
+        res.status(200).json({ parts: rows });
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+}
+
+const addBikeType = async (req, res) => {
+    try {
+        console.log(req.body);
+        console.log(req.file);
+        const { name } = req.body;
+        const image = req.file ? req.file.buffer : null;
+
+        const bikeTypeTag = name.charAt(0).toLowerCase() + 'b';
+        console.log(bikeTypeTag);
+        const query = `
+            INSERT INTO bike_types (bike_type_name, bike_type_tag, bike_type_image) 
+            VALUES ($1, $2, $3);
+        `
+        await pool.query(query, [name, bikeTypeTag, image]);
+        res.status(201).json({ message: 'Bike type added successfully' });
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+}
+
+const editBikeType = async (req, res) => {
+    try {
+        console.log(req.body);
+        const { bikeTypeId } = req.params;
+        const image = req.file ? req.file.buffer : null;
+
+        const query = `
+            UPDATE bike_types
+            SET bike_type_image = $1
+            WHERE bike_type_id = $2;
+        `
+        await pool.query(query, [image, bikeTypeId]);
+        res.status(200).json({ message: 'Bike type updated successfully' });
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+}
+
+const deleteBikeType = async (req, res) => {
+    try {
+        const { bikeTypeId } = req.params;
+        const findTagQuery = `
+            SELECT bike_type_tag
+            FROM bike_types
+            WHERE bike_type_id = $1;
+        `
+        const { rows } = await pool.query(findTagQuery, [bikeTypeId]);
+        const bikeTypeTag = rows[0].bike_type_tag;
+
+        if(bikeTypeTag === 'mtb') {
+            return res.status(400).json({ error: 'Cannot delete default bike type' });
+        }
+
+        const query = `
+            DELETE FROM bike_types
+            WHERE bike_type_id = $1;
+        `
+        await pool.query(query, [bikeTypeId]);
+        res.status(200).json({ message: 'Bike type deleted successfully' });
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+}
+
 // Get parts item count
 const getPartsCount = async (req, res) => {
-    const { partType } = req.params;
+    const { partType, bikeType } = req.params;
 
     const validPartTypes = [
         'frame', 'fork', 'groupset', 'wheelset', 'seat',
@@ -15,26 +111,46 @@ const getPartsCount = async (req, res) => {
     }
 
     try {
-        // Use a parameterized query to avoid SQL injection
+        // Step 1: Get bike_type_id
+        const getBikeTypeIdQuery = `
+            SELECT
+                bike_type_id
+            FROM
+                bike_types
+            WHERE
+                bike_type_tag = $1;
+        `;
+        const { rows } = await pool.query(getBikeTypeIdQuery, [bikeType]);
+
+        if (rows.length === 0) {
+            return res.status(404).json({ error: 'Bike type not found' });
+        }
+
+        const bikeTypeId = rows[0].bike_type_id;
+
+        // Step 2: Get count of parts for the given bike type
+        const partIdColumn = `${partType}_id`; // Example: frame_id, fork_id
+
         const query = `
-        SELECT 
-            COUNT(*) AS count
-        FROM 
-            ${partType} p
-        JOIN 
-            items i
-        ON 
-            p.item_id = i.item_id
-        WHERE 
-            i.status = true 
-            AND p.status = true;
+            SELECT 
+                COUNT(*) AS count
+            FROM 
+                ${partType} p
+            JOIN 
+                items i ON p.item_id = i.item_id
+            JOIN 
+                part_compatibility pc ON pc.part_id = p.${partIdColumn}
+            WHERE 
+                i.status = true
+                AND p.is_deleted = false
+                AND p.status = true
+                AND pc.bike_type_id = $1;
         `;
 
-        const result = await pool.query(query);
+        const result = await pool.query(query, [bikeTypeId]);
 
-        // Check if the result has any rows
         if (result.rows.length === 0) {
-            return res.json({ count: 0 }); // Return 0 count if no rows found
+            return res.json({ count: 0 });
         }
 
         res.json({ count: parseInt(result.rows[0].count, 10) });
@@ -44,9 +160,10 @@ const getPartsCount = async (req, res) => {
     }
 };
 
+
 // Get frame items
 const getFrameItems = async (req, res) => {
-    const { archived } = req.query;
+    const { archived, bikeType } = req.query;
 
     try {
         const query = `
@@ -54,49 +171,70 @@ const getFrameItems = async (req, res) => {
                 f.*,
                 i.item_name,
                 i.item_price,
-                encode(f.image, 'base64') AS item_image
+                encode(f.image, 'base64') AS item_image,
+                CASE 
+                    WHEN i.total_rating = 0 AND i.reviews_count = 0 THEN 0
+                    ELSE (i.total_rating::decimal / i.reviews_count)::decimal(10, 1)
+                END AS average_rating,
+                i.reviews_count
             FROM 
                 frame f
             JOIN 
-                items i
-            ON 
-                f.item_id = i.item_id
+                items i ON f.item_id = i.item_id
+            JOIN 
+                part_compatibility pc ON pc.part_id = f.frame_id
+            JOIN 
+                bike_types bt ON pc.bike_type_id = bt.bike_type_id
             WHERE 
                 i.status = true 
-                AND f.status = $1;
+                AND f.status = $1
+                AND f.is_deleted = false
+                AND bt.bike_type_tag = $2
+                AND pc.part_type = 'frame';
         `;
 
-        const { rows } = await pool.query(query, [archived === 'true']);
+        const { rows } = await pool.query(query, [archived === 'true', bikeType]);
         res.json(rows);
     } catch (error) {
         console.error('Error fetching frame items:', error);
-        res.status(500).json({ error: 'Internal Server Error' });
+        res.status(500).json({ error: error.message });
     }
 };
 
+
 // Get fork items
 const getForkItems = async (req, res) => {
-    const { archived } = req.query;
-        
+    const { archived, bikeType } = req.query;
+
     try {
         const query = `
             SELECT 
                 f.*,
                 i.item_name,
                 i.item_price,
-                encode(f.image, 'base64') AS item_image
+                encode(f.image, 'base64') AS item_image,
+                CASE 
+                    WHEN i.total_rating = 0 AND i.reviews_count = 0 THEN 0
+                    ELSE (i.total_rating::decimal / i.reviews_count)::decimal(10, 1)
+                END AS average_rating,
+                i.reviews_count
             FROM 
                 fork f
             JOIN 
-                items i
-            ON 
-                f.item_id = i.item_id
+                items i ON f.item_id = i.item_id
+            JOIN 
+                part_compatibility pc ON pc.part_id = f.fork_id
+            JOIN 
+                bike_types bt ON pc.bike_type_id = bt.bike_type_id
             WHERE 
                 i.status = true 
-                AND f.status = $1;
+                AND f.status = $1
+                AND f.is_deleted = false
+                AND bt.bike_type_tag = $2
+                AND pc.part_type = 'fork';
         `;
 
-        const { rows } = await pool.query(query, [archived === 'true']);
+        const { rows } = await pool.query(query, [archived === 'true', bikeType]);
         res.json(rows);
     } catch (error) {
         console.error('Error fetching fork items:', error);
@@ -104,9 +242,10 @@ const getForkItems = async (req, res) => {
     }
 };
 
+
 // Get groupset items
 const getGroupsetItems = async (req, res) => {
-    const { archived } = req.query;
+    const { archived, bikeType } = req.query;
 
     try {
         const query = `
@@ -114,19 +253,29 @@ const getGroupsetItems = async (req, res) => {
                 g.*,
                 i.item_name,
                 i.item_price,
-                encode(g.image, 'base64') AS item_image
-                FROM 
-                    groupset g
-                JOIN 
-                    items i
-                ON 
-                    g.item_id = i.item_id
-                WHERE 
-                    i.status = true 
-                    AND g.status = $1;
+                encode(g.image, 'base64') AS item_image,
+                CASE 
+                    WHEN i.total_rating = 0 AND i.reviews_count = 0 THEN 0
+                    ELSE (i.total_rating::decimal / i.reviews_count)::decimal(10, 1)
+                END AS average_rating,
+                i.reviews_count
+            FROM 
+                groupset g
+            JOIN 
+                items i ON g.item_id = i.item_id
+            JOIN 
+                part_compatibility pc ON pc.part_id = g.groupset_id
+            JOIN 
+                bike_types bt ON pc.bike_type_id = bt.bike_type_id
+            WHERE 
+                i.status = true 
+                AND g.status = $1
+                AND g.is_deleted = false
+                AND bt.bike_type_tag = $2
+                AND pc.part_type = 'groupset';
         `;
 
-        const { rows } = await pool.query(query, [archived === 'true']);
+        const { rows } = await pool.query(query, [archived === 'true', bikeType]);
         res.json(rows);
     } catch (error) {
         console.error('Error fetching groupset items:', error);
@@ -134,9 +283,10 @@ const getGroupsetItems = async (req, res) => {
     }
 };
 
+
 // Get wheelset items
 const getWheelsetItems = async (req, res) => {
-    const { archived } = req.query;
+    const { archived, bikeType } = req.query;
 
     try {
         const query = `
@@ -144,19 +294,29 @@ const getWheelsetItems = async (req, res) => {
                 w.*,
                 i.item_name,
                 i.item_price,
-                encode(w.image, 'base64') AS item_image
-                FROM 
-                    wheelset w
-                JOIN 
-                    items i
-                ON 
-                    w.item_id = i.item_id
-                WHERE 
-                    i.status = true 
-                    AND w.status = $1;
+                encode(w.image, 'base64') AS item_image,
+                CASE 
+                    WHEN i.total_rating = 0 AND i.reviews_count = 0 THEN 0
+                    ELSE (i.total_rating::decimal / i.reviews_count)::decimal(10, 1)
+                END AS average_rating,
+                i.reviews_count
+            FROM 
+                wheelset w
+            JOIN 
+                items i ON w.item_id = i.item_id
+            JOIN 
+                part_compatibility pc ON pc.part_id = w.wheelset_id
+            JOIN 
+                bike_types bt ON pc.bike_type_id = bt.bike_type_id
+            WHERE 
+                i.status = true 
+                AND w.status = $1
+                AND w.is_deleted = false
+                AND bt.bike_type_tag = $2
+                AND pc.part_type = 'wheelset';
         `;
 
-        const { rows } = await pool.query(query, [archived === 'true']);
+        const { rows } = await pool.query(query, [archived === 'true', bikeType]);
         res.json(rows);
     } catch (error) {
         console.error('Error fetching wheelset items:', error);
@@ -164,9 +324,10 @@ const getWheelsetItems = async (req, res) => {
     }
 };
 
+
 // Get seat items
 const getSeatItems = async (req, res) => {
-    const { archived } = req.query;
+    const { archived, bikeType } = req.query;
 
     try {
         const query = `
@@ -174,19 +335,29 @@ const getSeatItems = async (req, res) => {
                 s.*,
                 i.item_name,
                 i.item_price,
-                encode(s.image, 'base64') AS item_image
-                FROM 
-                    seat s
-                JOIN 
-                    items i
-                ON 
-                    s.item_id = i.item_id
-                WHERE 
-                    i.status = true 
-                    AND s.status = $1;
+                encode(s.image, 'base64') AS item_image,
+                CASE 
+                    WHEN i.total_rating = 0 AND i.reviews_count = 0 THEN 0
+                    ELSE (i.total_rating::decimal / i.reviews_count)::decimal(10, 1)
+                END AS average_rating,
+                i.reviews_count
+            FROM 
+                seat s
+            JOIN 
+                items i ON s.item_id = i.item_id
+            JOIN 
+                part_compatibility pc ON pc.part_id = s.seat_id
+            JOIN 
+                bike_types bt ON pc.bike_type_id = bt.bike_type_id
+            WHERE 
+                i.status = true 
+                AND s.status = $1
+                AND s.is_deleted = false
+                AND bt.bike_type_tag = $2
+                AND pc.part_type = 'seat';
         `;
 
-        const { rows } = await pool.query(query, [archived === 'true']);
+        const { rows } = await pool.query(query, [archived === 'true', bikeType]);
         res.json(rows);
     } catch (error) {
         console.error('Error fetching seat items:', error);
@@ -194,9 +365,10 @@ const getSeatItems = async (req, res) => {
     }
 };
 
+
 // Get cockpit items
 const getCockpitItems = async (req, res) => {
-    const { archived } = req.query;
+    const { archived, bikeType } = req.query;
 
     try {
         const query = `
@@ -204,25 +376,36 @@ const getCockpitItems = async (req, res) => {
                 c.*,
                 i.item_name,
                 i.item_price,
-                encode(c.image, 'base64') AS item_image
-                FROM 
-                    cockpit c
-                JOIN 
-                    items i
-                ON 
-                    c.item_id = i.item_id
-                WHERE 
-                    i.status = true 
-                    AND c.status = $1;
+                encode(c.image, 'base64') AS item_image,
+                CASE 
+                    WHEN i.total_rating = 0 AND i.reviews_count = 0 THEN 0
+                    ELSE (i.total_rating::decimal / i.reviews_count)::decimal(10, 1)
+                END AS average_rating,
+                i.reviews_count
+            FROM 
+                cockpit c
+            JOIN 
+                items i ON c.item_id = i.item_id
+            JOIN 
+                part_compatibility pc ON pc.part_id = c.cockpit_id
+            JOIN 
+                bike_types bt ON pc.bike_type_id = bt.bike_type_id
+            WHERE 
+                i.status = true 
+                AND c.status = $1
+                AND c.is_deleted = false
+                AND bt.bike_type_tag = $2
+                AND pc.part_type = 'cockpit';
         `;
 
-        const { rows } = await pool.query(query, [archived === 'true']);
+        const { rows } = await pool.query(query, [archived === 'true', bikeType]);
         res.json(rows);
     } catch (error) {
         console.error('Error fetching cockpit items:', error);
         res.status(500).json({ error: 'Internal Server Error' });
     }
 };
+
 
 // Update frame item
 const updateFrameItem = async (req, res) => {
@@ -980,7 +1163,7 @@ const deleteFrameItem = async (req, res) => {
 
     try {
         const getItemQuery = `
-            SELECT item_id FROM frame WHERE frame_id = $1;
+            SELECT item_id FROM frame WHERE frame_id = $1 AND is_deleted = false;
         `;
         const getItemResult = await pool.query(getItemQuery, [frame_id]);
 
@@ -991,7 +1174,7 @@ const deleteFrameItem = async (req, res) => {
         const item_id = getItemResult.rows[0].item_id;
 
         const deleteQuery = `
-            DELETE FROM frame WHERE frame_id = $1 RETURNING *;
+            UPDATE frame SET is_deleted = true WHERE frame_id = $1;
         `;
         const deleteResult = await pool.query(deleteQuery, [frame_id]);
 
@@ -1020,7 +1203,7 @@ const deleteForkItem = async (req, res) => {
 
     try {
         const getItemQuery = `
-            SELECT item_id FROM fork WHERE fork_id = $1;
+            SELECT item_id FROM fork WHERE fork_id = $1 AND is_deleted = false;
         `;
         const getItemResult = await pool.query(getItemQuery, [fork_id]);
 
@@ -1031,7 +1214,7 @@ const deleteForkItem = async (req, res) => {
         const item_id = getItemResult.rows[0].item_id;
 
         const deleteQuery = `
-            DELETE FROM fork WHERE fork_id = $1 RETURNING *;
+            UPDATE fork SET is_deleted = true WHERE fork_id = $1;
         `;
         const deleteResult = await pool.query(deleteQuery, [fork_id]);
 
@@ -1060,7 +1243,7 @@ const deleteGroupsetItem = async (req, res) => {
 
     try {
         const getItemQuery = `
-            SELECT item_id FROM groupset WHERE groupset_id = $1;
+            SELECT item_id FROM groupset WHERE groupset_id = $1 AND is_deleted = false;
         `;
         const getItemResult = await pool.query(getItemQuery, [groupset_id]);
 
@@ -1071,7 +1254,7 @@ const deleteGroupsetItem = async (req, res) => {
         const item_id = getItemResult.rows[0].item_id;
 
         const deleteQuery = `
-            DELETE FROM groupset WHERE groupset_id = $1 RETURNING *;
+            UPDATE groupset SET is_deleted = true WHERE groupset_id = $1;
         `;
         const deleteResult = await pool.query(deleteQuery, [groupset_id]);
 
@@ -1100,7 +1283,7 @@ const deleteWheelsetItem = async (req, res) => {
 
     try {
         const getItemQuery = `
-            SELECT item_id FROM wheelset WHERE wheelset_id = $1;
+            SELECT item_id FROM wheelset WHERE wheelset_id = $1 AND is_deleted = false;
         `;
         const getItemResult = await pool.query(getItemQuery, [wheelset_id]);
 
@@ -1111,7 +1294,7 @@ const deleteWheelsetItem = async (req, res) => {
         const item_id = getItemResult.rows[0].item_id;
 
         const deleteQuery = `
-            DELETE FROM wheelset WHERE wheelset_id = $1 RETURNING *;
+            UPDATE wheelset SET is_deleted = true WHERE wheelset_id = $1;
         `;
         const deleteResult = await pool.query(deleteQuery, [wheelset_id]);
 
@@ -1140,7 +1323,7 @@ const deleteSeatItem = async (req, res) => {
 
     try {
         const getItemQuery = `
-            SELECT item_id FROM seat WHERE seat_id = $1;
+            SELECT item_id FROM seat WHERE seat_id = $1 AND is_deleted = false;
         `;
         const getItemResult = await pool.query(getItemQuery, [seat_id]);
 
@@ -1151,7 +1334,7 @@ const deleteSeatItem = async (req, res) => {
         const item_id = getItemResult.rows[0].item_id;
 
         const deleteQuery = `
-            DELETE FROM seat WHERE seat_id = $1 RETURNING *;
+            UPDATE seat SET is_deleted = true WHERE seat_id = $1;
         `;
         const deleteResult = await pool.query(deleteQuery, [seat_id]);
 
@@ -1180,7 +1363,7 @@ const deleteCockpitItem = async (req, res) => {
 
     try {
         const getItemQuery = `
-            SELECT item_id FROM cockpit WHERE cockpit_id = $1;
+            SELECT item_id FROM cockpit WHERE cockpit_id = $1 AND is_deleted = false;
         `;
         const getItemResult = await pool.query(getItemQuery, [cockpit_id]);
 
@@ -1191,7 +1374,7 @@ const deleteCockpitItem = async (req, res) => {
         const item_id = getItemResult.rows[0].item_id;
 
         const deleteQuery = `
-            DELETE FROM cockpit WHERE cockpit_id = $1 RETURNING *;
+            UPDATE cockpit SET is_deleted = true WHERE cockpit_id = $1;
         `;
         const deleteResult = await pool.query(deleteQuery, [cockpit_id]);
 
@@ -1214,8 +1397,155 @@ const deleteCockpitItem = async (req, res) => {
     }
 };
 
+const getPartSpecs = async (req, res) => {
+    try {
+        const { partName, specId } = req.params;
+        console.log(partName, specId);
+        let query;
+
+        if(specId === '0'){
+            console.log('no spec id');
+            query = `
+                SELECT column_name
+                FROM information_schema.columns
+                WHERE table_name = $1 AND column_name NOT IN ('item_id', 'is_deleted', 'status', 'date_created', 'date_updated', 'description', 'material', 'image') AND column_name NOT LIKE '%_id'
+                
+            `
+            const { rows } = await pool.query(query, [partName.toLowerCase()]);
+            return res.status(200).json({ specs: rows });
+        } else {
+            console.log('with spec id');
+            query = `
+                SELECT column_name
+                FROM information_schema.columns
+                WHERE table_name = $1 AND column_name NOT IN ('item_id', 'is_deleted', 'status', 'date_created', 'date_updated', 'description', 'material', 'image') AND column_name NOT LIKE '%_id'
+                
+            `
+            const { rows } = await pool.query(query, [partName.toLowerCase()]);
+            return res.status(200).json({ specs: rows });
+        }
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+}
+
+const getCompatibilitySpecs = async(req, res) => {
+    try {
+        const { bikeType } = req.params;
+
+        if(!bikeType){
+            bikeType = 'mtb';
+        }
+        
+        console.log(bikeType);
+        const query = `
+            SELECT cs.*, bt.bike_type_tag 
+            FROM compatibility_specs cs
+            JOIN bike_types bt ON cs.bike_type_id = bt.bike_type_id
+            WHERE bt.bike_type_tag = $1;
+            ;
+        `
+        const { rows } = await pool.query(query, [bikeType]);
+        res.status(200).json({ specs: rows });
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+}
+
+const addUpgraderSpecForm = async(req, res) => {
+    try {
+        const { bikeType, indPart, depPart, indSpec, depSpec } = req.body;
+
+        const getBikeTypeIdQuery = `
+            SELECT bike_type_id FROM bike_types WHERE bike_type_tag = $1;
+        `
+        const { rows } = await pool.query(getBikeTypeIdQuery, [bikeType]);
+        const bikeTypeId = rows[0].bike_type_id;
+
+        const insertOgQuery = `
+            INSERT INTO compatibility_specs (bike_type_id, ref_spec_id, part_type_from, part_type_to, attribute_from, attribute_to)
+            VALUES ($1, $2, $3, $4, $5, $6)
+            RETURNING *;
+        `;
+        const insertOgValues = [bikeTypeId, 0, indPart, depPart, indSpec, depSpec];
+        const insertRows = await pool.query(insertOgQuery, insertOgValues);
+
+        const insertedRowId = insertRows.rows[0].spec_id;
+        const insertRefQuery = `
+            INSERT INTO compatibility_specs (bike_type_id, ref_spec_id, part_type_from, part_type_to, attribute_from, attribute_to)
+            VALUES ($1, $2, $4, $3, $6, $5)
+            RETURNING *;
+        `;
+        const insertRefValues = [bikeTypeId, insertedRowId, indPart, depPart, indSpec, depSpec];
+        await pool.query(insertRefQuery, insertRefValues);
+
+        res.status(200).json({ message: 'Upgrader spec added successfully' });
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+}
+
+const updateUpgraderSpecForm = async (req, res) => {
+    try {
+        const { specId } = req.params;
+        const { depPart, indSpec, depSpec } = req.body;
+
+
+        const updateOgQuery = `
+            UPDATE compatibility_specs
+            SET part_type_to = $1, attribute_from = $2, attribute_to = $3
+            WHERE spec_id = $4;
+        `;
+        const updateRefQuery = `
+            UPDATE compatibility_specs
+            SET part_type_from = $1, attribute_from = $3, attribute_to = $2
+            WHERE ref_spec_id = $4;
+        `;
+
+        const updateOgValues = [depPart, indSpec, depSpec, specId];
+
+        await pool.query(updateOgQuery, updateOgValues);
+        await pool.query(updateRefQuery, updateOgValues);
+        res.status(200).json({ message: 'Upgrader spec updated successfully' });
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+}
+
+const deleteUpgraderSpecForm = async (req, res) => {
+    try {
+        const { specId } = req.params;
+
+        const deleteOgQuery = `
+            DELETE FROM compatibility_specs WHERE spec_id = $1;
+        `;
+        const deleteRefQuery = `
+            DELETE FROM compatibility_specs WHERE ref_spec_id = $1;
+        `;
+
+        await pool.query(deleteOgQuery, [specId]);
+        await pool.query(deleteRefQuery, [specId]);
+        res.status(200).json({ message: 'Upgrader spec deleted successfully' });
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+
+}
+
 module.exports = {
+    getBikeTypes,
+    getPartSpecs,
+    getAllParts,
+    addBikeType,
+    editBikeType,
+    deleteBikeType,
     getPartsCount,
+    getCompatibilitySpecs,
+
+    addUpgraderSpecForm,
+    updateUpgraderSpecForm,
+    deleteUpgraderSpecForm,
+
     getFrameItems,
     getForkItems,
     getGroupsetItems,

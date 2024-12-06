@@ -8,11 +8,10 @@ const UpperNav = ({ onNavClick, title }) => {
     const { userName, userRole } = useContext(AuthContext);
     const [newTitle, setTitle] = useState(title);
     const navigate = useNavigate();
-    console.log(userName);
 
-    const goToProfile = () => {
-        onNavClick('Profile');
-        navigate('/profile');
+    const goToSettings = () => {
+        onNavClick('Settings');
+        navigate('/settings');
     }
 
     return (
@@ -24,7 +23,7 @@ const UpperNav = ({ onNavClick, title }) => {
                 <div className='ms-5'>
                     <div className='username m-0' onClick={() => {
                         if(userRole === 'admin'){
-                            goToProfile();
+                            goToSettings();
                         }
                     }}>
                         {userRole === 'admin' && <i className='fa-solid fa-circle-user '></i>}

@@ -1,0 +1,83 @@
+.bike-type-modal{
+
+    .form-groups{
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+
+        .form-group{
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .error-msg {
+            color: #cb2020;
+            font-size: 1rem;
+            margin: 5px 0;
+            padding: 10px 0;
+            text-align: center;
+            background-color: #ff5a5a45;
+            border-radius: 5px;
+
+        }
+
+        .image-input {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            
+            h6 {
+                margin-top: 10px;
+            }
+
+            .upload-image {
+                padding: 20px 10px;
+                border: 2px dashed #ddd;
+                border-radius: 5px;
+                width: 100%;
+                display: flex;
+                flex-direction: column;
+                justify-content: center;
+                height: 100%;
+                gap: 10px;
+                text-align: center;
+                cursor: pointer;
+
+                .title,
+                .subtitle,
+                i {
+                    margin: auto 0;
+                }
+
+                &:hover {
+                    background-color: #f9f9f9;
+                }
+            }
+
+            .img-preview {
+                display: flex;
+                flex-direction: column;
+
+                img {
+                    width: 100%;
+                    border: 2px solid #ddd;
+                    border-radius: 5px;
+                }
+
+                button {
+                    background-color: #fd5858;
+                    border: none;
+                    color: white;
+                    border-radius: 5px;
+                    margin-top: 10px;
+                    padding: 5px 10px;
+
+                    &:hover {
+                        text-decoration: underline;
+                    }
+                }
+            }
+        }
+    }
+}

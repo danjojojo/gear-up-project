@@ -1,5 +1,6 @@
 import './summaries.scss'
 import PageLayout from '../../components/page-layout/page-layout';
+import { AuthContext } from '../../context/auth-context';
 import moment from 'moment';
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
@@ -8,8 +9,10 @@ import { getSummaryRecords, getHighlightDates, getReceiptDetails, getReceiptItem
 import {Modal} from 'react-bootstrap'
 import LoadingPage from '../../components/loading-page/loading-page';
 import ErrorLoad from '../../components/error-load/error-load';
+import { useContext } from 'react';
 
 const Summaries = () => {
+    const { displayExpenses } = useContext(AuthContext);
     const todayDate = new Date();
     const [startDate, setStartDate] = useState(moment(todayDate).format("YYYY-MM-DD"));
     const formattedDate = moment(startDate).format('MMMM DD, YYYY');
@@ -19,9 +22,11 @@ const Summaries = () => {
     const [distinctPOSUsers, setDistinctPOSUsers] = useState([]);
     const [filteredRecordsByPOSUser, setFilteredRecordsByPOSUser] = useState([]);
     const [netSales, setNetSales] = useState(0);
-    const [netLabor, setNetLabor] = useState(0);
+    const [deductedNetLabor, setDeductedNetLabor] = useState(0);
+    const [originalNetLabor, setOriginalNetLabor] = useState(0);
     const [netExpenses, setNetExpenses] = useState(0);
     const [netProfit, setNetProfit] = useState(0);
+    const [currentMechanicPercentage, setCurrentMechanicPercentage] = useState(0);
 
     const [recordName, setRecordName] = useState('');
     const [totalCost, setTotalCost] = useState(0);
@@ -41,6 +46,8 @@ const Summaries = () => {
     const [modalShow, setModalShow] = useState(false);
     const [loading, setLoading] = useState(true);
     const [errorLoad, setErrorLoad] = useState(false);
+
+    const [newReceiptTotal, setNewReceiptTotal] = useState(0);
 
     const PesoFormat = new Intl.NumberFormat("en-US", {
       style: "currency",
@@ -71,11 +78,19 @@ const Summaries = () => {
 
     const handleGetSummaryRecords = async (startDate) => {
         try {
-            const { records } = await getSummaryRecords(startDate);
+            const { records, mechanicPercentage } = await getSummaryRecords(startDate);
             setDistinctPOSUsers([...new Set(records.map(record => record.pos_name))].sort());
-            setFilteredRecordsByPOSUser(records);
-            setSummaryRecords(records);
+
+            if(displayExpenses){
+                setFilteredRecordsByPOSUser(records);
+                setSummaryRecords(records);
+            } else {
+                setFilteredRecordsByPOSUser(records.filter(record => record.record_type !== 'expense'));
+                setSummaryRecords(records.filter(record => record.record_type !== 'expense'));
+            }
+
             setSummaryData();
+            setCurrentMechanicPercentage(mechanicPercentage);
             setTimeout(() => {
                 setLoading(false);
                 setErrorLoad(false);   
@@ -88,7 +103,13 @@ const Summaries = () => {
     const handleGetHighlightDates = async () => {
         try {
             const { dates } = await getHighlightDates();
-            const formattedDates = dates.map((date) =>
+
+            let retrievedDates = dates;
+            if(!displayExpenses){
+                retrievedDates = dates.filter(date => date.record_type !== 'expense');
+            }
+
+            const formattedDates = retrievedDates.map((date) =>
                 moment(date.date).toDate()
             );
             setHighlightedDates(formattedDates);
@@ -122,6 +143,18 @@ const Summaries = () => {
         try {
             const { items } = await getReceiptItems(saleId);
             setReceiptItems(items);
+            let newTotal = items.reduce((acc, item) => {
+                if(item.refund_qty > 0) {
+                    acc += (item.qty - item.refund_qty) * item.item_unit_price
+                } else if (item.return_qty > 0) {
+                    acc += (item.qty - item.return_qty) * item.item_unit_price
+                } else {  
+                    acc += item.item_total_price
+                }
+
+                return acc;
+            }, 0);
+            setNewReceiptTotal(newTotal);
         } catch (error) {
             console.error('Error getting receipt items: ', error);
         }
@@ -167,45 +200,39 @@ const Summaries = () => {
         }
     }
 
-    function setSummaryData(){
+    function setSummaryData() {
         let filteredRecords = [];
-        if(selectedPOSUser === 'all'){
+        if (selectedPOSUser === 'all') {
             filteredRecords = summaryRecords.filter((record) => moment(record.date).format("YYYY-MM-DD") === startDate);
-        } else{
+        } else {
             filteredRecords = summaryRecords.filter((record) => record.pos_name === selectedPOSUser && moment(record.date).format("YYYY-MM-DD") === startDate);
         }
-        const netSales = 
+        const currentNetSales =
             filteredRecords
-            .filter((record) => record.record_type === 'items')
-            .reduce((acc, record) => {
-                const qty = record.item_qty || 0; // Default to 0 if undefined
-                const refundQty = record.refund_qty || 0; // Default to 0 if undefined
-                const itemTotalPrice = record.item_total_price || 0; // Default to 0 if undefined
-                const itemUnitPrice = record.item_unit_price || 0; // Default to 0 if undefined
+                .filter((record) => record.record_type === 'items')
+                .reduce((acc, record) => {
+                    const qty = record.item_qty || 0; // Default to 0 if undefined
+                    const refundQty = record.refund_qty || 0; // Default to 0 if undefined
+                    const itemTotalPrice = record.item_total_price || 0; // Default to 0 if undefined
+                    const itemUnitPrice = record.item_unit_price || 0; // Default to 0 if undefined
+                    const returnQty = record.return_qty || 0; // Default to 0 if undefined
 
-                // Log values to understand what's happening
-                console.log(`Processing Record:`, { qty, refundQty, itemTotalPrice, itemUnitPrice });
+                    // Log values to understand what's happening
+                    // console.log(`Processing Record:`, { qty, refundQty, itemTotalPrice, itemUnitPrice });
+                    return acc + (qty - refundQty - returnQty) * itemUnitPrice;       
+                }, 0); // Initial value of acc set to 0
 
-                if (refundQty === 0) {
-                    // No refunds, add the total price
-                    return acc + itemTotalPrice;
-                } else if (refundQty === qty) {
-                    // Fully refunded, subtract the total price
-                    return acc + 0;
-                } else {
-                    // Partially refunded, calculate the net price of non-refunded items
-                    const nonRefundedValue = (qty - refundQty) * itemUnitPrice;
-                    return acc + nonRefundedValue;
-                }
-            }, 0); // Initial value of acc set to 0
+        const currentOriginalNetLabor = filteredRecords.filter((record) => record.record_type === 'mechanic').reduce((acc, record) => acc + record.item_total_price, 0);
 
+        const currentNetLaborWithMechanicPercentage = filteredRecords.filter((record) => record.record_type === 'mechanic').reduce((acc, record) => acc + (record.item_total_price * currentMechanicPercentage / 100), 0);
+        const currentNetExpenses = filteredRecords.filter((record) => record.record_type === 'expense').reduce((acc, record) => acc + record.item_total_price, 0);
 
-        const netLabor = filteredRecords.filter((record) => record.record_type === 'mechanic').reduce((acc, record) => acc + record.item_total_price, 0);
-        const netExpenses = filteredRecords.filter((record) => record.record_type === 'expense').reduce((acc, record) => acc + record.item_total_price, 0);
-        setNetSales(netSales);
-        setNetLabor(netLabor);
-        setNetExpenses(netExpenses);
-        setNetProfit((netSales + netLabor) - (netLabor + netExpenses));
+        setNetSales(currentNetSales + currentOriginalNetLabor);
+        setOriginalNetLabor(currentOriginalNetLabor);
+        setDeductedNetLabor(currentNetLaborWithMechanicPercentage);
+        setNetExpenses(currentNetExpenses);
+
+        setNetProfit((currentNetSales + currentOriginalNetLabor) - (currentNetLaborWithMechanicPercentage + currentNetExpenses));
     }
 
     function handleItemClick(record){
@@ -290,16 +317,18 @@ const Summaries = () => {
                                     <div className="four">
                                         <div className="green">
                                             <p className="left">Receipt Sales</p>
-                                            <p className="right">{netSales + netLabor}</p>
+                                            <p className="right">{netSales}</p>
                                         </div>
                                         <div className="red">
                                             <p className="left">Labor Cost</p>
-                                            <p className="right">({netLabor})</p>
+                                            <p className="right">({deductedNetLabor.toFixed(0)})</p>
                                         </div>
-                                        <div className="red">
-                                            <p className="left">Expenses</p>
-                                            <p className="right">({netExpenses})</p>
-                                        </div>
+                                        {displayExpenses && 
+                                            <div className="red">
+                                                <p className="left">Expenses</p>
+                                                <p className="right">({netExpenses})</p>
+                                            </div>
+                                        }
                                         <div className="net">
                                             <p className="left">Net Revenue</p>
                                             <p className={netProfit === 0 ? "right" : (netProfit > 0 ? "right green" : "right red")}>{PesoFormat.format(netProfit)}</p>
@@ -328,7 +357,7 @@ const Summaries = () => {
                             <div className='content'>
                                 <div className="list">
                                     {filteredRecordsByPOSUser.length === 0 && handleNoRecords()}
-                                    {filteredRecordsByPOSUser.filter(filRecord => filRecord.item_qty > filRecord.refund_qty).map((record, index) => (
+                                    {filteredRecordsByPOSUser.filter(filRecord => (filRecord.item_qty > filRecord.refund_qty) && (filRecord.item_qty > filRecord.return_qty)).map((record, index) => (
                                         <div key={index} className="list-item" onClick={() => handleItemClick(record)}>
                                             <div className="left">
                                                 {record.record_type === 'items' && <i className="fa-solid fa-tag"></i>}
@@ -340,7 +369,8 @@ const Summaries = () => {
                                                 <p className='name'>{record.item_name.length > 30 ? record.item_name.substring(0, 30) + '...' : record.item_name}</p>     
                                             </div>
                                             <div className="right">
-                                                <p className='amount'>{PesoFormat.format((record.item_qty - record.refund_qty) * record.item_unit_price)}</p>
+                                                {record.record_type !== 'mechanic' && <p className='amount'>{PesoFormat.format((record.item_qty - record.refund_qty) * record.item_unit_price)}</p>}
+                                                {record.record_type === 'mechanic' && <p className='amount'>{PesoFormat.format(record.item_unit_price * currentMechanicPercentage / 100)}</p>}
                                                 {moment(record.date).format("LL") === formattedDate ?
                                                     <p className='date'>{moment(record.date).startOf('minute').fromNow()}</p>
                                                     :
@@ -378,6 +408,7 @@ const Summaries = () => {
                         <div className="bottom">
                             <div className="total">
                                 <h4 className="value">{PesoFormat.format(totalCost)}</h4>
+                                {newReceiptTotal !== totalCost && <p className="new-total">Now {PesoFormat.format(newReceiptTotal)}</p>}
                                 <p>Total</p>
                             </div>
                             <div className="items">
@@ -388,12 +419,19 @@ const Summaries = () => {
                                             {item.record_type === 'item' && 
                                             <p className="qty-unit-price">{item.qty} x {item.item_unit_price}
                                                 <span className='refund-qty'> {item.refund_qty > 0 && 'Refunded x' + item.refund_qty}</span>
+                                                <span className='refund-qty'> {item.return_qty > 0 && 'Returned x' + item.return_qty}</span>
                                             </p>}
                                             {item.record_type === 'mechanic' && <p className="qty-unit-price">Mechanic Service</p>}
                                         </div>
                                         <div className="right">
                                             <p className='total-price'>{PesoFormat.format(item.item_total_price)}</p>
                                             {item.refund_qty > 0 && <p className='refund-total'>Now {PesoFormat.format((item.qty - item.refund_qty) * item.item_unit_price)}</p>}
+                                            {item.return_qty > 0 && <p className='refund-total'>Now {PesoFormat.format((item.qty - item.return_qty) * item.item_unit_price)}</p>}
+                                            {item.record_type === 'mechanic' && 
+                                                <p className='refund-total'>
+                                                    Earned {currentMechanicPercentage}% {PesoFormat.format(item.item_unit_price * currentMechanicPercentage / 100)}
+                                                </p>
+                                            }
                                         </div>
                                     </div>    
                                 ))}

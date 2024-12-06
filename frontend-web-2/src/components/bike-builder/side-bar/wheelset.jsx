@@ -3,16 +3,17 @@ import { Accordion } from 'react-bootstrap';
 import { getWheelsetItems } from '../../../services/bikeBuilderService';
 import arrowUp from '../../../assets/icons/arrow-up.png';
 import arrowDown from '../../../assets/icons/arrow-down.png';
+import { useParams } from 'react-router-dom';
 
 const Wheelset = ({ onAddToBuild, selectedFrame, selectedFork, selectedGroupset }) => {
     const [items, setItems] = useState([]);
     const [sortOrder, setSortOrder] = useState("asc");
     const [loading, setLoading] = useState(true);
-
+    const { typeTag } = useParams();
 
     const fetchItems = useCallback(async () => {
         try {
-            const data = await getWheelsetItems();
+            const data = await getWheelsetItems(typeTag);
 
             // Apply filtering logic based on selected frame, fork, and groupset attributes
             const filteredWheelsets = data.filter(item => {

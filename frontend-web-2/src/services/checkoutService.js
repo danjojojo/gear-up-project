@@ -19,3 +19,12 @@ export async function createOrder(sessionOrder, orderBbDetails, orderItems) {
         throw new Error('Failed to create order', error.message);
     }
 }
+
+export const getSettings = async () => {
+    try {
+        const response = await api.get('/settings/get-settings');
+        return response.data;
+    } catch (error) {
+        throw error;
+    }
+}

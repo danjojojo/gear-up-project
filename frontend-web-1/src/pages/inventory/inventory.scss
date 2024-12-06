@@ -519,7 +519,7 @@ $bg-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
                     border: 1px solid #ccc;
                     padding: 5px;
                     border-radius: 5px;
-                    display: none;
+                    display: none !important;
                     
                     .item-image {
                         border-radius: 5px;
@@ -539,7 +539,7 @@ $bg-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
                     background-color: #f9f9f9;
                     border: 1px solid #ccc;
                     border-radius: 5px;
-                    display: none;
+                    display: none !important;
                 }
 
                 .item-name,
@@ -552,7 +552,7 @@ $bg-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
                         display: block;
                         font-size: 1rem;
                         color: #393939;
-                        margin-bottom: 8px;
+                        margin-bottom: 5px;
                         font-weight: 500;
                     }
 
@@ -637,7 +637,7 @@ $bg-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
                     height: auto;
                     align-items: center;
                     padding: 10px 0;
-                    gap: 10px;
+                    gap: 5px;
 
                     input {
                         height: 30px;
@@ -721,6 +721,12 @@ $bg-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
                         font-size: 1rem;
                         display: flex;
                         align-items: center;
+                        margin-right: 10px;
+
+                        i{
+                            cursor: pointer;
+                            opacity: 0.5;
+                        }
                     }
 
                     .switch {
@@ -728,6 +734,37 @@ $bg-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
                         align-items: center;
                         padding: 5px;
                         color: $button-bg-color;
+                    }
+                }
+
+                .low-stock-container{
+                    p{
+                        margin: 0;
+                    }
+
+                    display: flex;
+                    flex-direction: column;
+                    gap: 5px;
+
+
+
+                    .guide{
+                        border: 1px solid #ccc;
+                        padding: 5px;
+                        border-radius: 6px;
+                        display: flex;
+                        justify-content: center;
+                        text-align: center;
+                    }
+                    .reorder{
+                        background-color: #f9971f30;
+                        padding: 10px;
+                        border-radius: 6px;
+                        color: #e5820a;
+                        display: flex;
+                        flex-direction: column;
+                        justify-content: center;
+                        text-align: center;
                     }
                 }
 

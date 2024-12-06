@@ -18,11 +18,13 @@ const summaryRoutes = require('./routers/summaryRouter');
 const mechanicRoutes = require('./routers/mechanicsRouter');
 const reportsRoutes = require('./routers/reportsRouter');
 const orderRoutes = require('./routers/orderRouter');
+const settingRoutes = require('./routers/settingsRouter');
 
 // web 2
 const bikeBuilderRouter = require('./routers/bikeBuilderRouter');
 const checkoutRouter = require('./routers/checkoutRouter');
 const webhookRouter = require('./routers/webhookRouter');
+const userRouter = require('./routers/userRouter');
 
 // util
 const startOrderExpiryScheduler = require('./utils/orderScheduler');
@@ -63,6 +65,11 @@ app.use(cors({
   credentials: true,
 }));
 
+app.use((req, res, next) => {
+    res.setHeader('Cross-Origin-Opener-Policy', 'same-origin-allow-popups');
+    next();
+});
+
 app.use(compression());
 app.use(express.json({ limit: '10mb' }));
 app.use(cookieParser());
@@ -83,11 +90,13 @@ app.use('/summary', summaryRoutes);
 app.use('/mechanics', mechanicRoutes);
 app.use('/reports', reportsRoutes);
 app.use('/orders', orderRoutes);
+app.use('/settings', settingRoutes);
 
 // web 2
 app.use('/bike-builder', bikeBuilderRouter);
 app.use('/checkout', checkoutRouter);
 app.use('/webhook', webhookRouter);
+app.use('/user', userRouter);
 
 startOrderExpiryScheduler();
 

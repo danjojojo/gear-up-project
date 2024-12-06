@@ -5,7 +5,7 @@ import ImageUploadButton from '../../../components/img-upload-button/img-upload-
 import { addSeat } from '../../../services/waitlistService';
 import {Modal, Button} from 'react-bootstrap';
 
-const SeatForm = ({ waitlistItemID, itemID, itemName, itemPrice, onClose, refreshWaitlist, deleteItem, role, setShowDeleteModal, setShowResponseModal}) => {
+const SeatForm = ({ waitlistItemID, itemID, itemName, itemPrice, onClose, refreshWaitlist, deleteItem, role, setShowDeleteModal, setShowResponseModal, retrievedBikeTypes}) => {
     // States management
     const [name, setName] = useState('');
     const [price, setPrice] = useState('');
@@ -57,6 +57,8 @@ const SeatForm = ({ waitlistItemID, itemID, itemName, itemPrice, onClose, refres
         setPrice(itemPrice);
     }, [itemName, itemPrice]);
 
+    const [bikeType, setBikeType] = useState('');
+
     // Submit part
     const handleSubmit = async () => {
 
@@ -71,6 +73,7 @@ const SeatForm = ({ waitlistItemID, itemID, itemName, itemPrice, onClose, refres
         if (selectedFile) {
             formData.append('image', selectedFile);
         }
+        formData.append('type', bikeType);
 
         console.log('Form data being sent:', [...formData]);
 
@@ -169,6 +172,28 @@ const SeatForm = ({ waitlistItemID, itemID, itemName, itemPrice, onClose, refres
                         placeholder="Enter item description"
                         required
                     ></textarea>
+                </div>
+
+                <div className="dropdown-container d-flex justify-content-between">
+                    <div className="title">Bike Type</div>
+                    <select
+                        className="dropdown"
+                        id="type"
+                        name="type"
+                        defaultValue=""
+                        required
+                        onChange={(e) => {
+                            setBikeType(e.target.value)
+                            console.log(e.target.value)
+                        }}
+                    >   
+                        <option value="">Select Bike Type</option>
+                        {retrievedBikeTypes.map((bikeType, index) => (
+                            <option key={index} value={bikeType.bike_type_id}>
+                                {bikeType.bike_type_name}
+                            </option>
+                        ))}
+                    </select>
                 </div>
 
                 <div className="dropdown-container d-flex justify-content-between">

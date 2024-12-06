@@ -16,20 +16,19 @@ import Reports from './reports/reports.jsx';
 import Records from './records/records.jsx'
 import Waitlist from './waitlist/waitlist.jsx';
 import BikeBuilderUpgrader from './bike-builder-upgrader/bike-builder-upgrader.jsx';
-    import MountainBike from './bike-builder-upgrader/mountain-bike/mountain-bike.jsx';
-        import Frame from './bike-builder-upgrader/mountain-bike/parts/frame/frame.jsx';
-        import Fork from './bike-builder-upgrader/mountain-bike/parts/fork/fork.jsx';
-        import Groupset from './bike-builder-upgrader/mountain-bike/parts/groupset/groupset.jsx';
-        import Wheelset from './bike-builder-upgrader/mountain-bike/parts/wheelset/wheelset.jsx';
-        import Seat from './bike-builder-upgrader/mountain-bike/parts/seat/seat.jsx';
-        import Cockpit from './bike-builder-upgrader/mountain-bike/parts/cockpit/cockpit.jsx';
-    import RoadBike from './bike-builder-upgrader/road-bike/road-bike.jsx';
+    import BikeType from './bike-builder-upgrader/bike-types/bike-types.jsx';
+        import Frame from './bike-builder-upgrader/bike-types/parts/frame/frame.jsx';
+        import Fork from './bike-builder-upgrader/bike-types/parts/fork/fork.jsx';
+        import Groupset from './bike-builder-upgrader/bike-types/parts/groupset/groupset.jsx';
+        import Wheelset from './bike-builder-upgrader/bike-types/parts/wheelset/wheelset.jsx';
+        import Seat from './bike-builder-upgrader/bike-types/parts/seat/seat.jsx';
+        import Cockpit from './bike-builder-upgrader/bike-types/parts/cockpit/cockpit.jsx';
 import Orders from './orders/orders.jsx';
 import PointOfSales from './point-of-sales/point-of-sales.jsx';
 import Expenses from './expenses/expenses.jsx';
 import Receipts from './receipts/receipts.jsx';
 import Mechanics from './mechanics/mechanics.jsx';
-import Profile from './profile/profile.jsx';
+import Profile from './settings/settings.jsx';
 import ResetPassword from './reset-password/reset-password.jsx';
 
 const Pages = {
@@ -76,8 +75,8 @@ const Pages = {
     // Bike Builder and Upgrader Page
     BikeBuilderUpgrader,
 
-        // Mountain Bike Page
-        MountainBike, 
+        // Bike Types Page
+        BikeType, 
             // Parts Page
             Frame,
             Fork,
@@ -86,8 +85,6 @@ const Pages = {
             Seat,
             Cockpit,
         
-        // Road Bike Page
-        RoadBike,
 
     // Order Page
     Orders,

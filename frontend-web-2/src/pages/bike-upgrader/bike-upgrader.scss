@@ -335,6 +335,49 @@
                             }
                         }
 
+                        .review{
+                            display: flex;
+                            flex-direction: column;
+                            justify-content: center;
+                            align-items: center;
+                            gap: 10px;
+                            margin-bottom: 10px;
+
+                            .rate { 
+                                display: flex; 
+                                gap: 5px; 
+                                align-items: center; 
+
+                                p{
+                                    span{
+                                        color: #c5c5c5;
+                                        font-size: 0.85rem;
+                                        font-weight: 500;
+                                    }
+                                }
+                            }
+
+                            p{
+                                margin: 0;
+                            }
+
+                            button{
+                                background-color: #2E2E2E;
+                                color: white;
+                                padding: 5px 20px;
+                                border-radius: 10px;
+                                cursor: pointer;
+                                text-decoration: none;
+                                border: none;
+                                color: #F9961F;
+                                text-transform: uppercase;
+                            
+                                &:hover {
+                                    text-decoration: underline;
+                                }
+                            }
+                        }
+
                         .accordion {
                             margin-bottom: 20px;
                             width: 100%;

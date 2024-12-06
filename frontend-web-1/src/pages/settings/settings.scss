@@ -1,0 +1,232 @@
+$normal-bg-color: #f8f9fa;
+$normal-border-color: #dee2e6;
+$active-bg-color: white;
+$active-text-color: rgb(65, 65, 65);
+$error-border-color: #ce6868;
+$inactive-text-color: grey;
+$qty-bg-color: #a3a3a3;
+$qty-text-color: white;
+$subheading-text-color: #606060;
+$font-size: clamp(0.9em, 1.2vw, 1.1em);
+$button-success: #9C9B9B;
+$button-fail: #dee2e6;
+$button-bg-color: #F9961F;
+$bg-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+
+.profile {
+    .left-content {
+        display: flex;
+        flex-direction: column;
+        height: 100%; // Ensure it matches parent height
+
+        .settings-page {
+            display: flex;
+            flex-direction: column;
+            height: 100%; // Occupies full height of .left-content
+
+            h4 {
+                flex-shrink: 0; // Prevent header from shrinking
+                margin-bottom: 10px;
+                font-weight: 700;
+            }
+
+            .inner-container {
+                flex-grow: 1; // Takes up remaining space below header
+                overflow-y: auto; // Enables scrolling within this container
+                padding: 10px;
+
+                .form-groups {
+                    display: flex;
+                    flex-direction: column;
+                    gap: 15px;
+
+                    .error-msg {
+                        color: #cb2020;
+                        font-size: 1rem;
+                        margin-top: 15px;
+                        padding: 10px 0;
+                        text-align: center;
+                        background-color: #ff5a5a45;
+                        border-radius: 5px;
+                
+                    }
+                    
+                    .form-group {
+                        display: flex;
+                        flex-direction: column;
+                        gap: 10px;
+
+                        .switch {
+                            display: flex;
+                            justify-content: space-between;
+                            color: $button-bg-color;
+                            padding: 0;
+                            
+                            input{
+                                width: 50px;
+                                height: 25px;
+                            }
+                        }
+
+                        .label-edit{
+                            display: flex;
+                            justify-content: space-between;
+
+                            p{
+                                margin: 0;
+
+                                &:hover {
+                                    cursor: pointer;
+                                    color: #F9961F;
+                                    text-decoration: underline;
+                                }
+                            }
+                        }
+
+                        .guide {
+                            display: flex;
+                            flex-wrap: wrap;
+                            margin-top: 10px;
+                            font-size: 0.9rem;
+
+                            /* Allows items to wrap to the next line */
+                            .good {
+                                color: green;
+                            }
+
+                            .fail {
+                                color: #fa4545;
+                            }
+
+                            .password-guide,
+                            .password-g {
+                                // list-style-type: none;
+                                /* Removes default list styling */
+                                display: flex;
+                                flex-wrap: wrap;
+                                margin: 0;
+                            }
+
+                            .password-guide li {
+                                width: 50%;
+                                font-size: 0.9rem;
+                            }
+                        }
+
+                        p{
+                            margin: 0;
+                        }
+                            
+                        label {
+                            font-size: 1rem;
+                            color: #393939;
+                            font-weight: 500;
+                        }
+
+                        input {
+                            width: 100%;
+                            padding: 8px;
+                            font-size: 0.9rem;
+                            border: 1px solid #ddd;
+                            border-radius: 10px;
+                        }
+
+                        .show-password {
+                            display: flex;
+                            align-self: start;
+                            height: fit-content;
+                            margin-bottom: 0px;
+
+                            input {
+                                width: auto;
+                                margin-right: 10px;
+                            }
+
+                            span {
+                                width: 100%;
+                            }
+
+                        }
+
+                        button{
+                            display: flex;
+                            margin-right: auto;
+                            padding: 8px 15px;
+                            border: none;
+                            border-radius: 8px;
+                            background-color: #F9961F;
+                            color: white;
+                            font-size: 0.9rem;
+                            font-weight: 500;
+                            cursor: pointer;
+
+                            &:hover {
+                                text-decoration: underline;
+                            }
+                        }
+
+                        .error{
+                            border: 2px solid #e52727;
+                        }
+
+                        .error-message{
+                            color: #e52727;
+                            font-size: 0.9rem;
+                            margin: 0;
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    .right-content {
+        display: flex;
+        flex-direction: column;
+
+        .tabs-container {
+            height: 100%;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+
+            .tab {
+                height: auto;
+                cursor: pointer;
+                border: 1px solid $normal-border-color;
+                border-radius: 10px;
+                padding: 30px 20px 10px;
+                align-content: end;
+                font-weight: 700;
+                position: relative;
+                font-size: 20px;
+                background-color: white;
+                transition: border-color 0.3s ease, transform 0.3s ease;
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+
+                p{
+                    margin: 0;
+                }
+
+                i{
+                    font-size: 2rem;
+                    color: #9c9c9c;
+                }
+
+                &:hover {
+                    box-shadow: 0 5px 10px rgba(0, 0, 0, 0.1);
+                }
+
+                &.active {
+                    p, i{
+                        color: #F9961F;
+                    }
+                    border: solid 2px #F9961F;
+                }
+            }
+        }
+    }
+}

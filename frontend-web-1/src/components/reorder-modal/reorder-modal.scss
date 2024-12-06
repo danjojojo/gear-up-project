@@ -1,0 +1,198 @@
+.reorder-modal {
+    height: 100%;
+    overflow-y: auto;
+    scrollbar-width: thin;
+
+    .custom-content {
+        padding: 15px !important;
+
+        .info {
+            h4 {
+                font-weight: bold !important;
+            }
+
+            p {
+                margin: 0 !important;
+            }
+        }
+
+        details{
+            margin: 10px 0;
+            font-style: italic;
+            color: rgb(99, 99, 99);
+        }
+
+        .formula-1{
+            background-color: #f9971f30;
+            padding: 10px;
+            border-radius: 6px;
+            text-align: center;
+            color: #e5820a;
+            margin: 10px 0;
+        }
+
+        .formula-2{
+            background-color: #08761a30;
+            padding: 10px;
+            border-radius: 6px;
+            text-align: center;
+            color: #08761a;
+            border: 1px solid #a0c5a6;
+            margin: 10px 0;
+        }
+
+        .guide-1, .guide-2{
+            color: #0d6efd;
+            background-color: #0d6efd30;
+            padding: 10px 20px;
+            border-radius: 6px;
+            display: flex;
+            flex-direction: column;
+            margin: 10px 0;
+            
+            p{
+                margin: 0;
+            }
+        }
+        
+        .guide-1{
+            color: #3c6ab0;
+            background-color: #0d6dfd17;
+            border: 1px solid #93abce;
+        }
+
+        .guide-2 {
+            display: flex;
+            flex-direction: row;
+            gap: 10px;
+            color: #e5820a;
+            background-color: #f9971f30;
+            margin-bottom: 20px;
+        }
+
+
+        .stats{
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+       
+        
+        .stat-content{
+            display: flex;
+            justify-content: space-between;
+            gap: 10px;
+
+            div{
+                flex: 1;
+                border: 1px solid #ccc;
+                border-radius: 7px;
+                padding: 10px;
+
+                p{
+                    margin: 0;
+                    display: flex;
+                    flex-direction: row;
+                    justify-content: space-between;
+                    
+                    &:nth-child(1){
+                        // font-weight: bold;
+
+                        justify-content: center;
+                        text-transform: uppercase;
+                        font-size: 0.9rem;
+                        border-bottom: 1px solid #ccc;
+                        margin-bottom: 10px;
+                    }
+                }
+            }
+        }
+        
+        .stat:nth-child(3) {
+            .stat-content{
+                display: flex;
+                justify-content: space-between;
+                gap: 10px;
+    
+                div{
+                    flex: 1;
+                    border: 1px solid #ccc;
+                    border-radius: 7px;
+                    padding: 10px 180px;
+    
+                    p{
+                        margin: 0;
+                        display: flex;
+                        flex-direction: row;
+                        justify-content: space-between;
+                        
+                        &:nth-child(1){
+                            // font-weight: bold;
+    
+                            justify-content: center;
+                            text-transform: uppercase;
+                            font-size: 0.9rem;
+                            border-bottom: 1px solid #ccc;
+                            margin-bottom: 10px;
+                        }
+                    }
+                }
+            }
+        }
+
+        .subtotal {
+            display: flex !important;
+            flex-direction: column !important;
+            justify-content: center !important;
+            align-items: center !important;
+            border-bottom: 1px solid #dee2e6 !important;
+
+            .value {
+                font-size: 1.5rem !important;
+                font-weight: 700 !important;
+                margin: 0 !important;
+            }
+
+            .label {
+                font-size: 1.1rem !important;
+                color: grey !important;
+                margin: 0 !important;
+                padding-bottom: 10px !important;
+            }
+        }
+
+        .items {
+            .item {
+                margin: 10px 0 !important;
+
+                .top {
+                    display: flex !important;
+                    justify-content: space-between !important;
+
+                    p {
+                        margin: 0 !important;
+
+                        &.total-price {
+                            font-weight: 700 !important;
+                        }
+                    }
+                }
+
+                .bottom {
+                    display: flex !important;
+                    justify-content: space-between !important;
+
+                    p {
+                        color: grey !important;
+                    }
+
+                    .refund-qty,
+                    .refund-total {
+                        color: #ffbc11 !important;
+                    }
+                }
+            }
+        }
+    }
+}

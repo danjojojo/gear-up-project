@@ -1,10 +1,12 @@
 import "./bike-builder.scss";
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import BudgetContainer from "../../components/bike-builder/contents/budget-container";
 import BuilderSidebar from "../../components/bike-builder/contents/builder-sidebar";
 import CanvasContainer from "../../components/bike-builder/contents/canvas-container";
 import BuildSummary from "../../components/bike-builder/contents/summary-container"
+import BikeTypes from "../../components/bike-builder/contents/bike-types";
 import useBase64Image from "../../hooks/useImage";
+import { useNavigate, useParams } from "react-router-dom";
 
 const BikeBuilder = () => {
     const [isBuildFinalized, setIsBuildFinalized] = useState(false);
@@ -20,7 +22,10 @@ const BikeBuilder = () => {
         cockpit: null
     });
     const [buildStatsPrice, setBuildStatsPrice] = useState(0); // Store the total price
+    const [isSelectingBikeType, setIsSelectingBikeType] = useState(true);
 
+    const navigate = useNavigate();
+    const { typeTag } = useParams() || null;
     const [partPositions, setPartPositions] = useState({
         frame: { x: 0, y: 0, rotation: 0 },
         fork: { x: 0, y: 0, rotation: 0 },
@@ -47,10 +52,18 @@ const BikeBuilder = () => {
     const [finalBuildImage, setFinalBuildImage] = useState(null);
     const captureImageRef = useRef(null);
 
+    useEffect(() => {
+        if(typeTag && isSelectingBikeType){
+            navigate('/bike-builder');
+        }
+    }, []);
+
     // Handle the Back Button and Reset Everything ( when going back )
     const handleReset = () => {
         setShowBudgetStep(true);  // Show budget step again
         setIsSettingBudget(false);
+        setIsSelectingBikeType(true);
+        navigate('/bike-builder')
         setBudget("");            // Reset the budget
         setLockedParts([]);       // Clear locked parts
         setIsHitRegionCorrect(false);  // Reset hit region status
@@ -502,47 +515,54 @@ const BikeBuilder = () => {
                     setShowBudgetStep={setShowBudgetStep}
                 />
             ) : (
-                showBudgetStep ? (
-                    <BudgetContainer
-                        isSettingBudget={isSettingBudget}
-                        budget={budget}
-                        setBudget={setBudget}
-                        handleProceed={handleProceed}
-                        setIsSettingBudget={setIsSettingBudget}
-                    />
-                ) : (
-                    <div className="builder-container d-flex">
-                        <BuilderSidebar
-                            currentPart={currentPart}
-                            goBackToPreviousPart={goBackToPreviousPart}
-                            proceedToNextPart={proceedToNextPart}
-                            isPartSelectedForCurrentPart={isPartSelectedForCurrentPart}
-                            handleAddToBuild={handleAddToBuild}
-                            handleReset={handleReset}
-                            selectedParts={selectedParts}
-                            lockedParts={lockedParts}
-                            handleFinalizeBuild={handleFinalizeBuild} // Pass the finalize handler to sidebar
+                // showBudgetStep ? (
+                //     <BudgetContainer
+                //         isSettingBudget={isSettingBudget}
+                //         budget={budget}
+                //         setBudget={setBudget}
+                //         handleProceed={handleProceed}
+                //         setIsSettingBudget={setIsSettingBudget}
+                //     />
+                // ) : (
+                    isSelectingBikeType ? (
+                        <BikeTypes
+                            isSelectingBikeType={isSelectingBikeType}
+                            setIsSelectingBikeType={setIsSelectingBikeType}
                         />
-                        <CanvasContainer
-                            captureCallback={captureImageRef}
-                            frameImage={frameImage}
-                            forkImage={forkImage}
-                            groupsetImage={groupsetImage}
-                            wheelsetImage={wheelsetImage}
-                            seatImage={seatImage}
-                            cockpitImage={cockpitImage}
-                            partPositions={partPositions}
-                            handleDragEnd={handleDragEnd}
-                            budget={budget}
-                            buildStatsPrice={buildStatsPrice}
-                            hitRegions={hitRegions}
-                            currentPart={currentPart}
-                            lockedParts={lockedParts}
-                            resetBuild={resetBuild}
-                            partSelected={selectedParts}
-                        />
-                    </div>
-                )
+                    ) : (
+                        <div className="builder-container d-flex">
+                            <BuilderSidebar
+                                currentPart={currentPart}
+                                goBackToPreviousPart={goBackToPreviousPart}
+                                proceedToNextPart={proceedToNextPart}
+                                isPartSelectedForCurrentPart={isPartSelectedForCurrentPart}
+                                handleAddToBuild={handleAddToBuild}
+                                handleReset={handleReset}
+                                selectedParts={selectedParts}
+                                lockedParts={lockedParts}
+                                handleFinalizeBuild={handleFinalizeBuild} // Pass the finalize handler to sidebar
+                            />
+                            <CanvasContainer
+                                captureCallback={captureImageRef}
+                                frameImage={frameImage}
+                                forkImage={forkImage}
+                                groupsetImage={groupsetImage}
+                                wheelsetImage={wheelsetImage}
+                                seatImage={seatImage}
+                                cockpitImage={cockpitImage}
+                                partPositions={partPositions}
+                                handleDragEnd={handleDragEnd}
+                                budget={budget}
+                                buildStatsPrice={buildStatsPrice}
+                                hitRegions={hitRegions}
+                                currentPart={currentPart}
+                                lockedParts={lockedParts}
+                                resetBuild={resetBuild}
+                                partSelected={selectedParts}
+                            />
+                        </div>
+                    )
+                // )
             )}
         </div>
     );

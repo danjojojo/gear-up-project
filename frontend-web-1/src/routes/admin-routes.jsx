@@ -24,16 +24,15 @@ const AdminRoutes = () => (
             </Route>
             <Route path="waitlist" element={<Pages.Waitlist />} />
             <Route path="bike-builder-upgrader" element={<Pages.BikeBuilderUpgrader />} />
-                <Route path="bike-builder-upgrader/mountain-bike" element={<Pages.MountainBike />} />
-                    <Route path="bike-builder-upgrader/mountain-bike/parts/frame" element={<Pages.Frame />} />
-                    <Route path="bike-builder-upgrader/mountain-bike/parts/fork" element={<Pages.Fork />} />
-                    <Route path="bike-builder-upgrader/mountain-bike/parts/groupset" element={<Pages.Groupset />} />
-                    <Route path="bike-builder-upgrader/mountain-bike/parts/wheelset" element={<Pages.Wheelset />} />
-                    <Route path="bike-builder-upgrader/mountain-bike/parts/seat" element={<Pages.Seat />} />
-                    <Route path="bike-builder-upgrader/mountain-bike/parts/cockpit" element={<Pages.Cockpit />} />
-                <Route path="bike-builder-upgrader/road-bike" element={<Pages.RoadBike />} />
+                <Route path="bike-builder-upgrader/:type" element={<Pages.BikeType />} />
+                    <Route path="bike-builder-upgrader/:type/parts/frame" element={<Pages.Frame />} />
+                    <Route path="bike-builder-upgrader/:type/parts/fork" element={<Pages.Fork />} />
+                    <Route path="bike-builder-upgrader/:type/parts/groupset" element={<Pages.Groupset />} />
+                    <Route path="bike-builder-upgrader/:type/parts/wheelset" element={<Pages.Wheelset />} />
+                    <Route path="bike-builder-upgrader/:type/parts/seat" element={<Pages.Seat />} />
+                    <Route path="bike-builder-upgrader/:type/parts/cockpit" element={<Pages.Cockpit />} />
             <Route path="orders" element={<Pages.Orders />} />
-            <Route path="profile" element={<Pages.Profile />} />
+            <Route path="settings" element={<Pages.Profile />} />
         </Route>
         <Route path="*" element={<Pages.NotFound />} />
     </Routes >

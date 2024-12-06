@@ -11,8 +11,8 @@ const getSalesReport = async (req, res) => {
             `
             SELECT 
                 i.item_name, 
-                SUM((si.item_qty - si.refund_qty)) AS quantity, 
-                SUM((si.item_qty - si.refund_qty) * si.item_unit_price) AS total_sales
+                SUM((si.item_qty - si.refund_qty - si.return_qty)) AS quantity, 
+                SUM((si.item_qty - si.refund_qty - si.return_qty) * si.item_unit_price) AS total_sales
             FROM sales_items si
             JOIN sales S on SI.sale_id = s.sale_id
             JOIN items i ON si.item_id = i.item_id
@@ -22,6 +22,7 @@ const getSalesReport = async (req, res) => {
                 EXTRACT(MONTH FROM r.date_created AT TIME ZONE 'UTC' AT TIME ZONE 'Asia/Manila') = $1 
                 AND EXTRACT(YEAR FROM r.date_created AT TIME ZONE 'UTC' AT TIME ZONE 'Asia/Manila') = $2
                 AND s.status = true AND si.sale_item_type = 'sale'
+                AND si.item_qty > si.refund_qty AND si.item_qty > si.return_qty
             GROUP BY i.item_name
             ORDER BY total_sales DESC;
 
@@ -35,9 +36,9 @@ const getSalesReport = async (req, res) => {
             SELECT 
                 EXTRACT(DAY FROM r.date_created AT TIME ZONE 'UTC' AT TIME ZONE 'Asia/Manila') AS day,
                 i.item_name, 
-                SUM((si.item_qty - si.refund_qty)) AS quantity, 
-                AVG(si.item_unit_price) AS unit_price, 
-                SUM((si.item_qty - si.refund_qty) * si.item_unit_price) AS total_sales
+                SUM((si.item_qty - si.refund_qty - si.return_qty)) AS quantity, 
+                SUM((si.item_qty - si.refund_qty - si.return_qty) * si.item_unit_price) AS total_sales,
+                AVG(si.item_unit_price) AS unit_price
             FROM sales_items si
             JOIN sales S on SI.sale_id = s.sale_id
             JOIN items i ON si.item_id = i.item_id
@@ -47,6 +48,7 @@ const getSalesReport = async (req, res) => {
                 EXTRACT(MONTH FROM r.date_created AT TIME ZONE 'UTC' AT TIME ZONE 'Asia/Manila') = $1
                 AND EXTRACT(YEAR FROM r.date_created AT TIME ZONE 'UTC' AT TIME ZONE 'Asia/Manila') = $2
                 AND s.status = true AND si.sale_item_type = 'sale'
+                AND si.item_qty > si.refund_qty AND si.item_qty > si.return_qty
             GROUP BY day, i.item_name
             ORDER BY day, i.item_name;
             `,
@@ -59,7 +61,7 @@ const getSalesReport = async (req, res) => {
         });
     } catch (error) {
         console.error('Error fetching sales report:', error);
-        res.status(500).json({ error: 'Failed to fetch sales report' });
+        res.status(500).json({ error: error.message });
     }
 };
 
@@ -121,6 +123,15 @@ const getLaborReport = async (req, res) => {
     const { month, year } = req.query;
 
     try {
+        const getMechanicPercentage = `
+            SELECT 
+                setting_value
+            FROM settings
+            WHERE setting_key = 'mechanic_percentage';
+        `;
+        const value = await pool.query(getMechanicPercentage);
+        const mechanicPercentage = value.rows[0].setting_value;
+
         // Summary Query: Aggregate total service costs and days worked per mechanic
         const summaryResult = await pool.query(
             `
@@ -158,6 +169,7 @@ const getLaborReport = async (req, res) => {
         res.json({
             summary: summaryResult.rows,
             detailed: detailedResult.rows,
+            mechanicPercentage,
         });
     } catch (error) {
         console.error('Error fetching labor report:', error);
@@ -205,7 +217,7 @@ const getOrderReport = async (req, res) => {
             WHERE 
                 EXTRACT(MONTH FROM o.date_created AT TIME ZONE 'UTC' AT TIME ZONE 'Asia/Manila') = $1 
                 AND EXTRACT(YEAR FROM o.date_created AT TIME ZONE 'UTC' AT TIME ZONE 'Asia/Manila') = $2
-                AND o.payment_status = 'paid' -- Include only paid orders
+                AND o.payment_status = 'paid'
             GROUP BY day, o.order_name, o.cust_name, o.order_amount, o.processed_at, o.completed_at
             ORDER BY day ASC, o.order_name;
 

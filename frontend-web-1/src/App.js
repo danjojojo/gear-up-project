@@ -39,7 +39,6 @@ function App() {
 
 const AuthRoutes = ({ adminExists }) => {
   const { userRole, authenticated, loading } = useContext(AuthContext);
-  console.log(authenticated);
   if (loading) return <LoadingPage classStyle="loading-screen" />
 
   return (

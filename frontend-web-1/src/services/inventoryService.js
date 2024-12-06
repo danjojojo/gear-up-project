@@ -90,3 +90,14 @@ export const deleteItem = async (item_id) => {
         throw error; 
     }
 };
+
+// Restock item
+export const restockItem = async (item_id, stockAdded, stockBefore) => { 
+    try {
+        const response = await api.put(`/inventory/restock-item/${item_id}`, { stockAdded, stockBefore });
+        return response.data; 
+    } catch (error) {
+        console.error('Error restocking item:', error);
+        throw error; 
+    }
+};

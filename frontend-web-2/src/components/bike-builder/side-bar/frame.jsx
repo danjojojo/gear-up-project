@@ -3,15 +3,17 @@ import { Accordion } from 'react-bootstrap';
 import { getFrameItems } from '../../../services/bikeBuilderService';
 import arrowUp from '../../../assets/icons/arrow-up.png';
 import arrowDown from '../../../assets/icons/arrow-down.png';
+import { useParams } from 'react-router-dom';
 
 const Frame = ({ onAddToBuild }) => {
     const [items, setItems] = useState([]);
     const [sortOrder, setSortOrder] = useState("asc"); // State to manage sort order
     const [loading, setLoading] = useState(true);
+    const { typeTag } = useParams();
 
     const fetchItems = useCallback(async () => {
         try {
-            let data = await getFrameItems();
+            let data = await getFrameItems(typeTag);
 
             // Apply sorting based on the sortOrder state
             data = data.sort((a, b) => {

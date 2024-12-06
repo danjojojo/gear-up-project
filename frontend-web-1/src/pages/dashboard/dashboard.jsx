@@ -1,5 +1,6 @@
 import './dashboard.scss';
-import React, { useState, useEffect, useCallback } from "react";
+import { AuthContext } from '../../context/auth-context';
+import React, { useState, useEffect, useCallback, useContext } from "react";
 import { useNavigate, useOutletContext } from 'react-router-dom';
 import { Bar } from 'react-chartjs-2';
 import { Chart as ChartJS, CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend } from 'chart.js';
@@ -25,11 +26,15 @@ const Dashboard = () => {
     const [distinctPOSUsers, setDistinctPOSUsers] = useState([]);
     const [filteredRecordsByPOSUser, setFilteredRecordsByPOSUser] = useState([]);
     const [summaryRecords, setSummaryRecords] = useState([]);
+    const [chartData, setChartData] = useState({ labels: [], datasets: [] });
     const [netSales, setNetSales] = useState(0);
-    const [netLabor, setNetLabor] = useState(0);
+    const [deductedNetLabor, setDeductedNetLabor] = useState(0);
+    const [originalNetLabor, setOriginalNetLabor] = useState(0);
     const [netExpenses, setNetExpenses] = useState(0);
     const [netProfit, setNetProfit] = useState(0);
-    const [chartData, setChartData] = useState({ labels: [], datasets: [] });
+    const [currentMechanicPercentage, setCurrentMechanicPercentage] = useState(0);
+
+    const { displayExpenses } = useContext(AuthContext);
 
     const { handleNavClick } = useOutletContext();
 
@@ -58,10 +63,18 @@ const Dashboard = () => {
 
     const handleGetSummaryRecords = async (startDate) => {
         try {
-            const { records } = await getSummaryRecords(startDate);
+            const { records, mechanicPercentage } = await getSummaryRecords(startDate);
             setDistinctPOSUsers([...new Set(records.map(record => record.pos_name))].sort());
-            setFilteredRecordsByPOSUser(records);
-            setSummaryRecords(records);
+
+            if(displayExpenses) {
+                setFilteredRecordsByPOSUser(records);
+                setSummaryRecords(records);
+            } else {
+                setFilteredRecordsByPOSUser(records.filter(record => record.record_type !== 'expense'));
+                setSummaryRecords(records.filter(record => record.record_type !== 'expense'));
+            }
+            
+            setCurrentMechanicPercentage(mechanicPercentage);
             console.log(records);
             setSummaryData();
         } catch (error) {
@@ -172,7 +185,7 @@ const Dashboard = () => {
         } else {
             filteredRecords = summaryRecords.filter((record) => record.pos_name === selectedPOSUser && moment(record.date).format("YYYY-MM-DD") === startDate);
         }
-        const netSales =
+        const currentNetSales =
             filteredRecords
                 .filter((record) => record.record_type === 'items')
                 .reduce((acc, record) => {
@@ -180,30 +193,24 @@ const Dashboard = () => {
                     const refundQty = record.refund_qty || 0; // Default to 0 if undefined
                     const itemTotalPrice = record.item_total_price || 0; // Default to 0 if undefined
                     const itemUnitPrice = record.item_unit_price || 0; // Default to 0 if undefined
+                    const returnQty = record.return_qty || 0; // Default to 0 if undefined
 
                     // Log values to understand what's happening
-                    console.log(`Processing Record:`, { qty, refundQty, itemTotalPrice, itemUnitPrice });
-
-                    if (refundQty === 0) {
-                        // No refunds, add the total price
-                        return acc + itemTotalPrice;
-                    } else if (refundQty === qty) {
-                        // Fully refunded, subtract the total price
-                        return acc + 0;
-                    } else {
-                        // Partially refunded, calculate the net price of non-refunded items
-                        const nonRefundedValue = (qty - refundQty) * itemUnitPrice;
-                        return acc + nonRefundedValue;
-                    }
+                    // console.log(`Processing Record:`, { qty, refundQty, itemTotalPrice, itemUnitPrice });
+                    return acc + (qty - refundQty - returnQty) * itemUnitPrice;  
                 }, 0); // Initial value of acc set to 0
 
+        const currentOriginalNetLabor = filteredRecords.filter((record) => record.record_type === 'mechanic').reduce((acc, record) => acc + record.item_total_price, 0);
 
-        const netLabor = filteredRecords.filter((record) => record.record_type === 'mechanic').reduce((acc, record) => acc + record.item_total_price, 0);
-        const netExpenses = filteredRecords.filter((record) => record.record_type === 'expense').reduce((acc, record) => acc + record.item_total_price, 0);
-        setNetSales(netSales);
-        setNetLabor(netLabor);
-        setNetExpenses(netExpenses);
-        setNetProfit((netSales + netLabor) - (netLabor + netExpenses));
+        const currentNetLaborWithMechanicPercentage = filteredRecords.filter((record) => record.record_type === 'mechanic').reduce((acc, record) => acc + (record.item_total_price * currentMechanicPercentage / 100), 0);
+        const currentNetExpenses = filteredRecords.filter((record) => record.record_type === 'expense').reduce((acc, record) => acc + record.item_total_price, 0);
+
+        setNetSales(currentNetSales + currentOriginalNetLabor);
+        setOriginalNetLabor(currentOriginalNetLabor);
+        setDeductedNetLabor(currentNetLaborWithMechanicPercentage);
+        setNetExpenses(currentNetExpenses);
+
+        setNetProfit((currentNetSales + currentOriginalNetLabor) - (currentNetLaborWithMechanicPercentage + currentNetExpenses));
     }
 
     useEffect(() => {
@@ -224,7 +231,12 @@ const Dashboard = () => {
     function handleNoRecords() {
         return (
             <div className='no-records'>
-                <p>No recorded sales, labor, and expenses.</p>
+                {displayExpenses && 
+                    <p>No recorded POS sales, labor, and expenses.</p>
+                }
+                {!displayExpenses && 
+                    <p>No recorded POS sales and labor.</p>
+                }
             </div>
         )
     }
@@ -426,16 +438,18 @@ const Dashboard = () => {
                                     <div className="four">
                                         <div className="green">
                                             <p className="left">Receipt Sales</p>
-                                            <p className="right">{netSales + netLabor}</p>
+                                            <p className="right">{netSales}</p>
                                         </div>
                                         <div className="red">
                                             <p className="left">Labor Cost</p>
-                                            <p className="right">({netLabor})</p>
+                                            <p className="right">({deductedNetLabor})</p>
                                         </div>
-                                        <div className="red">
-                                            <p className="left">Expenses</p>
-                                            <p className="right">({netExpenses})</p>
-                                        </div>
+                                        {displayExpenses && 
+                                            <div className="red">
+                                                <p className="left">Expenses</p>
+                                                <p className="right">({netExpenses})</p>
+                                            </div>
+                                        }
                                         <div className="net">
                                             <p className="left">Net Revenue</p>
                                             <p className={netProfit === 0 ? "right" : (netProfit > 0 ? "right green" : "right red")}>{PesoFormat.format(netProfit)}</p>
@@ -449,7 +463,7 @@ const Dashboard = () => {
                                 <div className='main-content'>
                                     <div className="list">
                                         {filteredRecordsByPOSUser.length === 0 && handleNoRecords()}
-                                        {filteredRecordsByPOSUser.filter(filRecord => filRecord.item_qty > filRecord.refund_qty).map((record, index) => (
+                                        {filteredRecordsByPOSUser.filter(filRecord => (filRecord.item_qty > filRecord.refund_qty) && (filRecord.item_qty > filRecord.return_qty)).map((record, index) => (
                                             <div key={index} className="list-item" onClick={goToSummaries}>
                                                 <div className="left">
                                                     {record.record_type === 'items' && <i className="fa-solid fa-tag"></i>}
@@ -461,7 +475,8 @@ const Dashboard = () => {
                                                     <p className='name'>{record.item_name.length > 20 ? record.item_name.substring(0, 20) + '...' : record.item_name}</p>                                          
                                                 </div>
                                                 <div className="right">
-                                                    <p className='amount'>{PesoFormat.format((record.item_qty - record.refund_qty) * record.item_unit_price)}</p>
+                                                    {record.record_type !== 'mechanic' && <p className='amount'>{PesoFormat.format((record.item_qty - record.refund_qty) * record.item_unit_price)}</p>}
+                                                    {record.record_type === 'mechanic' && <p className='amount'>{PesoFormat.format(record.item_unit_price * currentMechanicPercentage / 100)}</p>}
                                                     {moment(record.date).format("LL") === formattedDate ?
                                                         <p className='date'>{moment(record.date).startOf('minute').fromNow()}</p>
                                                         :

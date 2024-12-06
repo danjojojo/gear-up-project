@@ -145,3 +145,14 @@ export const resetPassword = async (email, token, newPassword) => {
     throw error;
   }
 }
+
+// Change password
+export const changePassword = async (newPassword) => {
+  try {
+    const response = await api.post('/auth/change-password', {newPassword });
+    return response.data;
+  } catch (error) {
+    console.error('Error changing password:', error);
+    throw error;
+  }
+}

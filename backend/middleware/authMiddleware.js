@@ -1,41 +1,61 @@
 const jwt = require('jsonwebtoken');
+const { refreshToken } = require('../controllers/authController');
 
-const verifyToken = (req, res, next) => {
+const verifyToken = async (req, res, next) => {
   const token = req.cookies.token;
+  const retrievedRefreshToken = req.cookies.refreshToken;
 
-  if (!token) {
-    return res.status(401).json({ message: 'Unauthorized. No token provided.' });
+  if (!token && !retrievedRefreshToken) {
+    return res.status(401).json({ message: 'Unauthorized. Tokens are missing.' });
   }
 
   try {
+    // Verify the access token
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    req.user = decoded; 
+    req.user = decoded;
     console.log('Verified token');
-    next(); // Proceed to the next middleware or route handler
+    return next();
   } catch (error) {
     if (error.name === 'TokenExpiredError') {
-      // Token has expired; clear only the access token cookie
-      console.log(error);
-      res.clearCookie('token', {
-        httpOnly: true,
-        sameSite: 'Strict',
-        secure: process.env.NODE_ENV === 'production',
-      });
+      console.log('Access token expired.');
 
-      return res.status(401).json({ message: 'Access token expired. Please use the refresh token to obtain a new access token.' });
+      // Try refreshing the token using the refresh token
+      try {
+        const decodedRefresh = jwt.verify(retrievedRefreshToken, process.env.JWT_REFRESH_SECRET);
+        req.user = decodedRefresh; // Attach decoded refresh token payload to the request
+
+        console.log('Refreshing access token...');
+        return refreshToken(req, res); // Refresh the token
+      } catch (refreshError) {
+        console.error('Error verifying refresh token:', refreshError.message);
+
+        // Clear tokens and send error response
+        res.clearCookie('token', {
+          httpOnly: true,
+          secure: process.env.NODE_ENV === 'production',
+          sameSite: process.env.NODE_ENV === 'production' ? 'None' : 'Strict',
+        });
+        res.clearCookie('refreshToken', {
+          httpOnly: true,
+          secure: process.env.NODE_ENV === 'production',
+          sameSite: process.env.NODE_ENV === 'production' ? 'None' : 'Strict',
+        });
+        return res.status(403).json({ message: 'Refresh token invalid or expired.' });
+      }
     } else {
-      // For other token errors, clear both cookies and send a 403 status
+      console.error('Invalid token:', error.message);
+
+      // Clear tokens and send error response
       res.clearCookie('token', {
         httpOnly: true,
-        sameSite: 'Strict',
         secure: process.env.NODE_ENV === 'production',
+        sameSite: process.env.NODE_ENV === 'production' ? 'None' : 'Strict',
       });
       res.clearCookie('refreshToken', {
         httpOnly: true,
-        sameSite: 'Strict',
         secure: process.env.NODE_ENV === 'production',
+        sameSite: process.env.NODE_ENV === 'production' ? 'None' : 'Strict',
       });
-
       return res.status(403).json({ message: 'Invalid token.' });
     }
   }

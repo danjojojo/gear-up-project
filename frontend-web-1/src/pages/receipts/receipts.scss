@@ -201,6 +201,17 @@ $bg-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
                                 text-transform: uppercase;
                             }
 
+                            .return{
+                                background-color: #fd613e;
+                                color : white;
+                                font-weight: 500;
+                                padding: 0px 10px;
+                                border-radius: $tag2-radius;
+                                font-size: 0.8rem;
+                                margin: 0;
+                                text-transform: uppercase;
+                            }
+
                             .void-request {
                                 width: auto;
                                 margin: 0;
@@ -333,6 +344,9 @@ $bg-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
                     }
 
                     .original-receipt{
+                        span{
+                            text-transform: capitalize;
+                        }
                         color: #e08d11;
                     }
 
@@ -392,7 +406,26 @@ $bg-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
                     
                         .total-price {
                             font-weight: 700;
+
+                            button{
+                                background-color: $button-bg-color;
+                                color: white;
+                                border: none;
+                                border-radius: 5px;
+                                padding: 5px 10px;
+                                cursor: pointer;
+
+                                &.disable{
+                                    background-color: #9e9e9e6e;
+                                    color: white;
+                                    border: none;
+                                    border-radius: 5px;
+                                    padding: 5px 10px;
+                                    cursor: not-allowed;
+                                }
+                            }
                         }
+
                     
                         p {
                             margin: 0;
@@ -424,6 +457,12 @@ $bg-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
                             #item-qty{
                                 color: rgb(150, 150, 150)
                             }
+
+                        }
+                        
+                        .qty-unit-price{
+                            // border: 1px solid black;
+                            color: #F9961F !important;
                         }
                         
                             
@@ -437,7 +476,7 @@ $bg-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
                                 color: #ffbc11;
                             }
 
-                            .refund-qty{
+                            .refund-qty, .return-qty{
                                 display: flex;
                                 align-items: center;
                                 gap: 10px;
@@ -488,6 +527,31 @@ $bg-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
                         }
     
                     }
+                }
+
+                .return-reason{
+                    display: flex;
+                    justify-content: space-between;
+                    margin-bottom: 20px;
+
+                    select{
+                        padding: 3px;
+                        width: fit-content;
+                        background-color: $normal-bg-color;
+                        border: 1px solid $normal-border-color;
+                        font-size: $font-size;
+                        border-radius: 7px;
+                    }
+                }
+
+                .return-button{
+                    background-color: $button-bg-color;
+                    color: white;
+                    border: none;
+                    border-radius: 5px;
+                    padding: 5px;
+                    cursor: pointer;
+                    margin-top: auto;
                 }
     
                 .total-paid-change {
@@ -553,6 +617,15 @@ $bg-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 
                 button:nth-child(2){
                     background-color: $button-bg-color;
+                    color: white;
+                    border: none;
+                    border-radius: 5px;
+                    padding: 5px;
+                    cursor: pointer;
+                }
+
+                button:nth-child(3){
+                    background-color: #f9471f;
                     color: white;
                     border: none;
                     border-radius: 5px;

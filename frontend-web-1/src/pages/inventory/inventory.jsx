@@ -14,12 +14,15 @@ import restore from "../../assets/icons/restore.png";
 import ImageUploadButton from "../../components/img-upload-button/img-upload-button";
 import { addItem, displayItems, dashboardData, getItemDetails, updateItem } from "../../services/inventoryService";
 import { base64ToFile } from "../../utility/imageUtils";
-import { archiveItem, restoreItem, deleteItem } from "../../services/inventoryService";
+import { archiveItem, restoreItem, deleteItem, restockItem } from "../../services/inventoryService";
 import ImagePreviewModal from "../../components/image-preview-modal/image-preview";
 import LoadingPage from '../../components/loading-page/loading-page';
 import ErrorLoad from '../../components/error-load/error-load';
 import { Modal, Button } from 'react-bootstrap';
 import moment from 'moment';
+import {Tooltip} from 'react-tooltip';
+import 'react-tooltip/dist/react-tooltip.css'
+import ReorderModal from "../../components/reorder-modal/reorder-modal";
 
 const Inventory = () => {
     // State management
@@ -54,7 +57,18 @@ const Inventory = () => {
         add_part: false,
         bike_parts: "",
         item_image: "",
-        bb_bu_status: ""
+        bb_bu_status: "",
+        threshold: "",
+        pos_sold_qty: "",
+        order_sold_qty: "",
+        avg_lead_time_days: "",
+        max_lead_time_days: "",
+        avg_sold_qty: "",
+        max_sold_qty: "",
+        lead_time_days: "",
+        pos_max_sold_qty: "",
+        order_max_sold_qty: ""
+
     });
     const [data, setData] = useState({
         totalItems: 0,
@@ -101,6 +115,7 @@ const Inventory = () => {
     const [functionKey, setFunctionKey] = useState('');
     const [showConfirmModal, setShowConfirmModal] = useState(false);
     const [showResponseModal, setShowResponseModal] = useState(false);
+    const [showReorderModal, setShowReorderModal] = useState(false);
 
     const [addedItemName, setAddedItemName] = useState('');
 
@@ -123,6 +138,9 @@ const Inventory = () => {
                         {functionKey === 'restore' &&
                             'Restore item?'
                         }
+                        {functionKey === 'restock' &&
+                            'Restock item?'
+                        }
                     </Modal.Title>
                 </Modal.Header>
                 <Modal.Body>
@@ -138,19 +156,28 @@ const Inventory = () => {
                     {functionKey === 'restore' &&
                         <p>If you restore this item, it can be used again in your POS. You will also be able to edit its details.</p>
                     }
+                    {functionKey === 'restock' &&
+                        <p>You restocked this item. The new stock amount will be added to the item's current stock. 
+                            <br /> 
+                            <br />
+                            Do you confirm that your reordered new stocks were fulfilled? 
+                            <br />
+                            This cannot be undone unless Edit Item view is cancelled.
+                        </p>
+                    }
                 </Modal.Body>
                 <Modal.Footer>
                     <Button variant="secondary" onClick={() => {
                         onHide();
                         if (functionKey === "delete") onConfirm();
                     }}>
-                        {(functionKey === "archive" || functionKey === "restore") ? "Cancel" : "Confirm"}
+                        {(functionKey === "archive" || functionKey === "restore" || functionKey === "restock") ? "Cancel" : "Confirm"}
                     </Button>
                     <Button variant={functionKey === 'delete' || functionKey === 'archive' ? "danger" : "primary"} onClick={() => {
                         onHide();
-                        if (functionKey === "archive" || functionKey === "restore") onConfirm();
+                        if (functionKey === "archive" || functionKey === "restore" || functionKey === "restock") onConfirm();
                     }}>
-                        {(functionKey === "archive" || functionKey === "restore") ? "Confirm" : "Cancel"}
+                        {(functionKey === "archive" || functionKey === "restore" || functionKey === "restock") ? "Confirm" : "Cancel"}
                     </Button>
                 </Modal.Footer>
             </Modal>
@@ -180,7 +207,7 @@ const Inventory = () => {
                         <p>{selectedItem.item_name} was restored successfully.</p>
                     }
                     {functionKey === 'edit' &&
-                        <p>{selectedItem.item_name} was edited successfully.</p>
+                        <p>{selectedItem.item_name} was updated successfully.</p>
                     }
                     {functionKey === 'add' &&
                         <p>{addedItemName} was added successfully.</p>
@@ -189,7 +216,6 @@ const Inventory = () => {
             </Modal>
         );
     }
-
 
     // Fetch dashboard data
     const fetchDashboardData = async () => {
@@ -211,8 +237,8 @@ const Inventory = () => {
                 const categoryMatch = selectedCategory ? item.category_name === selectedCategory : true;
                 const stockMatch = selectedStockCount === "" ||
                     (selectedStockCount === "no" && item.stock_count === 0) ||
-                    (selectedStockCount === "low" && item.stock_count <= item.low_stock_count && item.stock_count > 0) ||
-                    (selectedStockCount === "in" && item.stock_count > item.low_stock_count && item.stock_count > 0);
+                    (selectedStockCount === "low" && item.stock_count <= item.threshold && item.stock_count > 0) ||
+                    (selectedStockCount === "in" && item.stock_count > item.threshold && item.stock_count > 0);
                 return categoryMatch && stockMatch;
             });
 
@@ -328,6 +354,7 @@ const Inventory = () => {
             item_price: item.item_price,
             item_cost: item.item_cost,
             stock_count: item.stock_count,
+            stock_input: 0,
             category_name: item.category_name,
             low_stock_alert: item.low_stock_alert,
             low_stock_count: item.low_stock_count || "",
@@ -335,6 +362,16 @@ const Inventory = () => {
             bike_parts: item.bike_parts || "",
             item_image: imageBase64,
             bb_bu_status: item.bb_bu_status,
+            threshold: item.threshold,
+            pos_sold_qty: item.pos_sold_qty,
+            order_sold_qty: item.order_sold_qty,
+            avg_lead_time_days: item.avg_lead_time_days,
+            max_lead_time_days: item.max_lead_time_days,
+            avg_sold_qty: item.avg_sold_qty,
+            max_sold_qty: item.max_sold_qty,
+            lead_time_days: item.lead_time_days,
+            pos_max_sold_qty: item.pos_max_sold_qty,
+            order_max_sold_qty: item.order_max_sold_qty
         }));
 
         setItemImage(imageBase64);
@@ -376,6 +413,7 @@ const Inventory = () => {
     const handleSaveClick = async (event) => {
         event.preventDefault();
         setFunctionKey('edit');
+        let addedStock =  selectedItem.stock_count - originalItem.stock_count;
 
         let costOfItem = 0;
         const updatedData = new FormData();
@@ -417,6 +455,10 @@ const Inventory = () => {
         console.log(selectedItem.bike_parts);
 
         try {
+            if(originalItem.stock_count !== selectedItem.stock_count) {
+                // Add the input value to the existing stock count
+                await restockItem(selectedItem.item_id, addedStock, originalItem.stock_count);
+            }
             await updateItem(selectedItem.item_id, updatedData);
             setShowResponseModal(true);
 
@@ -429,7 +471,7 @@ const Inventory = () => {
             await fetchDashboardData();
             setIsEditing(false);
             setIsAddingStock(false);
-            setViewingItem(false)
+            setViewingItem(false);
         } catch (error) {
             alert("An error occurred while updating the item");
         }
@@ -544,6 +586,13 @@ const Inventory = () => {
     };
 
     const handleConfirm = () => {
+        // alert('Added ' + stockInput + ' stocks');
+        setSelectedItem((prev) => ({
+            ...prev,
+            stock_count: parseInt(prev.stock_count, 10) + parseInt(prev.stock_input || 0, 10), // Add input to stock count
+            stock_input: 0,
+        }));
+        setIsAddingStock(false);
         setConfirmedStock(stockInput);
         setIsAddingStock(false);
     };
@@ -563,6 +612,9 @@ const Inventory = () => {
                 break;
             case 'restore':
                 handleRestoreItem(selectedItem.item_id);
+                break;
+            case 'restock':
+                handleConfirm();
                 break;
             default:
                 break;
@@ -589,6 +641,22 @@ const Inventory = () => {
                             onHide={() => {
                                 setShowResponseModal(false);
                             }}
+                        />
+                        <ReorderModal
+                            show={showReorderModal}
+                            onHide={() => {
+                                setShowReorderModal(false);
+                            }}
+                            itemName={selectedItem.item_name}
+                            posSoldUnits={selectedItem.pos_sold_qty}
+                            orderSoldUnits={selectedItem.order_sold_qty}
+                            averageSoldQty={selectedItem.avg_sold_qty}
+                            maxSoldQty={selectedItem.max_sold_qty}
+                            leadTime={selectedItem.lead_time_days}
+                            averageLeadTime={selectedItem.avg_lead_time_days}
+                            maxLeadTime={selectedItem.max_lead_time_days}
+                            posMaxSoldQty={selectedItem.pos_max_sold_qty}
+                            orderMaxSoldQty={selectedItem.order_max_sold_qty}
                         />
                         <div className="upper-container d-flex">
                             <button className="add-btn" onClick={handleAddItemClick}>
@@ -779,21 +847,13 @@ const Inventory = () => {
                                                         backgroundColor:
                                                             item.stock_count === 0
                                                                 ? "#DA7777" // No stock
-                                                                : item.low_stock_alert && item.stock_count <= item.low_stock_count
+                                                                : item.stock_count <= item.threshold
                                                                     ? "#DABE77" // Low stock
                                                                     : "#77DA87", // In stock
                                                     }}
                                                 >
-                                                    {item.low_stock_alert
-                                                        ? item.stock_count === 0
-                                                            ? "No stock"
-                                                            : item.stock_count <= item.low_stock_count
-                                                                ? "Low stock"
-                                                                : "In stock"
-                                                        : item.stock_count === 0
-                                                            ? "No stock"
-                                                            : "In stock"}
-
+                                                    {item.stock_count === 0 ? "No stock"
+                                                        : item.stock_count <= item.threshold ? "Low stock" : "In stock"}
                                                 </div>
                                             </div>
                                         </div>
@@ -880,7 +940,7 @@ const Inventory = () => {
                                 <p>Created {moment(selectedItem.date_created).format("LLL")}</p>
                                 <form className="form-content">
 
-                                    {!isEditing ? (
+                                    {/* {!isEditing ? (
                                         itemImage ? (
                                             <div className="item-image-container" onClick={handleOpenModal}>
                                                 <img
@@ -903,7 +963,7 @@ const Inventory = () => {
                                         show={showModal}
                                         handleClose={handleCloseModal}
                                         src={itemImage}
-                                    />
+                                    /> */}
 
                                     <div className="item-name form-group">
                                         <label htmlFor="item-name">Name</label>
@@ -952,9 +1012,8 @@ const Inventory = () => {
                                         />
                                     </div>
 
-                                    <div className="item-cost form-group">
-                                        {/* HIDDEN FOR NOW */}
-                                        {/* <label htmlFor="item-cost">Cost</label> */}
+                                    {/* <div className="item-cost form-group">
+                                        <label htmlFor="item-cost">Cost</label>
                                         <input
                                             type="hidden"
                                             id="item-cost"
@@ -974,7 +1033,25 @@ const Inventory = () => {
                                             disabled={!isEditing}
                                         // required
                                         />
+                                    </div> */}
+
+                                    <div className="low-stock-container">
+                                        <div className="title">
+                                            <p className="title">Reorder Point</p>
+                                            <i className="fa-solid fa-circle-question"
+                                                data-tooltip-id="my-tooltip"
+                                                data-tooltip-content="Click the icon to view its details."
+                                                data-tooltip-place="top"
+                                                onClick={() => setShowReorderModal(true)}
+                                            ></i>
+                                        </div>
+                                        
+                                        <div className="reorder">
+                                            <p>You can restock this item when it is at <br /> <strong>{Number(selectedItem.threshold).toFixed(0) + ' units' || 'N/A'}. </strong></p>
+                                        </div>
+                                        <Tooltip id="my-tooltip" style={{ width : '50%' }}/>
                                     </div>
+
 
                                     <div className="stock-container d-flex justify-content-between">
                                         <div className="title">Stock Count</div>
@@ -986,13 +1063,11 @@ const Inventory = () => {
                                             type="button"
                                             disabled={!isEditing}
                                             onClick={() => {
-                                                if (isAddingStock) {
+                                                if (isAddingStock && selectedItem.stock_input !== 0) {
                                                     // Add the input value to the existing stock count
-                                                    setSelectedItem((prev) => ({
-                                                        ...prev,
-                                                        stock_count: parseInt(prev.stock_count, 10) + parseInt(prev.stock_input || 0, 10), // Add input to stock count
-                                                        stock_input: 0, // Reset the input after adding
-                                                    }));
+                                                    setShowConfirmModal(true);
+                                                    setFunctionKey('restock');
+                                                } else if (isAddingStock && selectedItem.stock_input === 0) {
                                                     setIsAddingStock(false);
                                                 } else {
                                                     // Switch to stock adding mode
@@ -1000,7 +1075,7 @@ const Inventory = () => {
                                                 }
                                             }}
                                         >
-                                            {isAddingStock ? "Confirm" : "Add Stock"}
+                                            {isAddingStock ? "Confirm" : "Restock"}
                                         </button>
                                     </div>
 
@@ -1069,7 +1144,7 @@ const Inventory = () => {
                                         </select>
                                     </div>
 
-                                    <div className="low-stock-container d-flex justify-content-between">
+                                    {/* <div className="low-stock-container d-flex justify-content-between">
                                         <div className="title">Low Stock Alert</div>
                                         <div className="switch form-check form-switch">
                                             <input
@@ -1087,9 +1162,9 @@ const Inventory = () => {
                                                 disabled={!isEditing}
                                             />
                                         </div>
-                                    </div>
+                                    </div> */}
 
-                                    {selectedItem.low_stock_alert && (
+                                    {/* {selectedItem.low_stock_alert && (
                                         <div className="low-stock-threshold form-group">
                                             <input
                                                 type="text"
@@ -1111,7 +1186,7 @@ const Inventory = () => {
                                                 required
                                             />
                                         </div>
-                                    )}
+                                    )} */}
 
                                     {viewingItem && (
                                         <>
@@ -1326,7 +1401,7 @@ const Inventory = () => {
                                             </select>
                                         </div>
 
-                                        <div className="low-stock-container d-flex justify-content-between">
+                                        {/* <div className="low-stock-container d-flex justify-content-between">
                                             <div className="title">Low Stock Alert</div>
                                             <div className="switch form-check form-switch">
                                                 <input
@@ -1338,7 +1413,7 @@ const Inventory = () => {
                                                     onChange={() => setLowStockAlert(!lowStockAlert)}
                                                 />
                                             </div>
-                                        </div>
+                                        </div> */}
 
                                         {lowStockAlert && (
                                             <div className="low-stock-threshold form-group">

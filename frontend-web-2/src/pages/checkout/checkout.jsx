@@ -1,19 +1,40 @@
-import React, {useState, useEffect} from 'react'
+import React, {useState, useEffect, useContext} from 'react'
 import './checkout.scss';
 import {useNavigate} from 'react-router-dom';
 import { useCartItems } from "../../utils/cartItems";
-import { createCheckoutSession, createOrder } from "../../services/checkoutService";
+import { createCheckoutSession, createOrder, getSettings } from "../../services/checkoutService";
 import {Tooltip} from 'react-tooltip';
 import 'react-tooltip/dist/react-tooltip.css'
 import compressBase64Image from '../../utils/compressImage';
+import {
+    getProfile
+} from '../../services/userService';
+import { AuthContext } from '../../context/auth-context';
 
 const Checkout = () => {
     const { totalPrice, loading, checkedBuItems, checkedBbItems, checkedBuItemsTotal, checkedBbItemsTotal  } = useCartItems();
+
+    const { loggedIn } = useContext(AuthContext);
+
+    const [storeAddress, setStoreAddress] = useState('');
 
     const PesoFormat = new Intl.NumberFormat("en-US", {
         style: "currency",
         currency: "PHP",
     });
+
+    const getCurrentSettings = async () => {
+        try {
+            const { settings } = await getSettings();
+            setStoreAddress(settings.find(setting => setting.setting_key === 'store_address').setting_value);
+        } catch (error) {
+            console.error(error);
+        }
+    }
+
+    useEffect(() => {
+        getCurrentSettings();
+    }, []);
 
     const getLineItems = () => {
         let lineItems = [];
@@ -276,7 +297,7 @@ const Checkout = () => {
                     </div>}
                     {(bikeUpgradeDelivery === 'pickup-store' || bikeBuildDelivery === 'pickup-store') && <div className="input-group">
                         <label htmlFor="">Store Location</label>
-                        <p>123 Main St, Cityville, Province, 12345</p>
+                        <p>{storeAddress}</p>
                     </div>}
                     {bikeUpgradeDelivery === 'deliver-home' && <div className="input-group">
                         <label htmlFor="address">Your Address</label>
@@ -316,6 +337,10 @@ const Checkout = () => {
                 </button>
             </div>
             <div className="right">
+                 <div className="message-3">
+                    <i className="fa-solid fa-info"></i>
+                    <p>Make sure to double check your billing information before proceeding to payment.</p>
+                </div>
                 <div className="nav">
                     <div className="title">
                         <i className="fa-solid fa-cart-shopping"></i>
@@ -326,6 +351,18 @@ const Checkout = () => {
                         <p>Total: {PesoFormat.format(totalPrice)}</p>
                     </div>}
                 </div>
+                { !loggedIn && 
+                    <div className="message-1">
+                        <i className="fa-regular fa-lightbulb"></i>
+                        <p>You can log in to save your order to your Order History page.</p>           
+                    </div>
+                }
+                { loggedIn && 
+                    <div className="message-2">
+                        <i className="fa-regular fa-bookmark"></i>
+                        <p>This order will be saved to your Order History page.</p>           
+                    </div>
+                }
                 {loading && <div className="loading">
                     <i className="fa-solid fa-gear fa-spin"></i>
                     <p>Getting your cart items...</p>

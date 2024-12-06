@@ -230,6 +230,56 @@
                     text-decoration: underline;
                 }
             }
+
+        }
+
+        .message-1{
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
+            margin-top: 10px;
+            background-color: #e4702df5;
+            padding: 15px;
+            border-radius: 10px;
+            color: white;
+
+            p{
+                margin: 0;
+            }
+        }
+        
+        .message-2{
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
+            margin-top: 10px;
+            background-color: #36b220f5;
+            padding: 15px;
+            border-radius: 10px;
+            color: white;
+
+            p{
+                margin: 0;
+            }
+        }
+
+        .message-3{
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 10px;
+            background-color: #f9971f7c;
+            border: 2px solid #F9961F;
+            padding: 5px;
+            border-radius: 10px;
+            color: white;
+
+            p{
+                margin: 0;
+            }
         }
 
         .loading {

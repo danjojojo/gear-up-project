@@ -4,7 +4,7 @@ import {
     getAnyItems
 } from "../../services/bikeBuilderService";
 import { Modal } from 'react-bootstrap';
-import { compatibilitySpecs, formOptions } from "../../utils/compatibilityUtils";
+import { useCompatibilitySpecs, formOptions } from "../../utils/compatibilityUtils";
 import PartDetails from "./part-details";
 
 const BikeUpgrader = () => {
@@ -17,6 +17,7 @@ const BikeUpgrader = () => {
         'Cockpit'
     ]
 
+    const compatibilitySpecs = useCompatibilitySpecs('mtb');
     const [ownedParts, setOwnedParts] = useState([]);
     const [desiredPart, setDesiredPart] = useState('');
     const [dynamicFormFields, setDynamicFormFields] = useState([]);
@@ -134,7 +135,7 @@ const BikeUpgrader = () => {
                 {/* this regex will get the words that has capital letters (/([A-Z])/g) tapos magdadagdag siya ng space before it (' $1') */}
                 {!ownedParts.includes(field) ?
                     <>
-                        <label>{field.replace(/([A-Z])/g, ' $1')}</label>
+                        <label>{field.replace(/([_])/g, ' ')}</label>
                         <select defaultValue={'none'} onChange={(e) => handleSetSpecification(field, e.target.value)}>
                             <option value="none" disabled>Set specification</option>
                             {/* check if field is a property in formOptions */}
@@ -321,7 +322,7 @@ const BikeUpgrader = () => {
                                         )}
                                     </div>
 
-                                    <PartDetails item={item} partType={desiredPart} />
+                                    <PartDetails item={item} partType={desiredPart}/>
                                 </div>
                             )
                         })}

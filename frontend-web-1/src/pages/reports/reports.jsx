@@ -1,5 +1,6 @@
 import './reports.scss';
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo, useContext } from 'react';
+import { AuthContext } from '../../context/auth-context';
 import { useNavigate } from 'react-router-dom';
 import PageLayout from '../../components/page-layout/page-layout';
 import sales from "../../assets/icons/sales.png";
@@ -18,6 +19,8 @@ const Reports = () => {
     const [selectedReport, setSelectedReport] = useState("sales");
     const navigate = useNavigate();
     const [loading, setLoading] = useState(true);
+
+    const { displayExpenses }= useContext(AuthContext);
 
     setTimeout(() => {
         setLoading(false);
@@ -43,7 +46,7 @@ const Reports = () => {
             case "sales":
                 return <SalesReport />;
             case "expenses":
-                return <ExpensesReport />;
+                if(displayExpenses) return <ExpensesReport />;
             case "labor":
                 return <LaborReport />;
             case "order":
@@ -81,15 +84,17 @@ const Reports = () => {
                                 <img src={order} alt="order" className="order-icon" />
                             </div>
                         </div>
-                        <div
-                            className="container-content"
-                            onClick={() => setSelectedReport("expenses")}
-                        >
-                            <div className={`main-content ${selectedReport === "expenses" ? "active" : ""}`}>
-                                Expenses Report
-                                <img src={expenses} alt="expenses" className="expenses-icon" />
+                        {displayExpenses && 
+                            <div
+                                className="container-content"
+                                onClick={() => setSelectedReport("expenses")}
+                            >
+                                <div className={`main-content ${selectedReport === "expenses" ? "active" : ""}`}>
+                                    Expenses Report
+                                    <img src={expenses} alt="expenses" className="expenses-icon" />
+                                </div>
                             </div>
-                        </div>
+                        }
                         <div
                             className="container-content"
                             onClick={() => setSelectedReport("labor")}

@@ -1,6 +1,7 @@
 import './records.scss';
+import { AuthContext } from '../../context/auth-context';
 import PageLayout from '../../components/page-layout/page-layout';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useContext } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
@@ -10,7 +11,12 @@ import ErrorLoad from '../../components/error-load/error-load';
 import { getDashboardData, getRecords, getHighlightDates, getInnerRecords, getLeaderBoards } from '../../services/recordsService';
 import RecordModal from '../../components/record-modal/record-modal';
 
+
 const Records = () => {
+    const { displayExpenses } = useContext(AuthContext);
+
+    const pathList = ['sales', 'labor', 'expenses'];
+
     const [selectedRecord, setSelectedRecord] = useState('sales');
     const navigate = useNavigate();
     const location = useLocation();
@@ -21,6 +27,10 @@ const Records = () => {
         if (path && ['sales', 'labor', 'expenses'].includes(path)) {
             setSelectedRecord(path);
             navigate(`/records/${path}`);
+            if(!displayExpenses && path === 'expenses'){
+                setSelectedRecord('sales');
+                navigate('/records/sales');
+            }
         } else {
             // Default to 'sales' if the path is invalid
             setSelectedRecord('sales');
@@ -67,6 +77,8 @@ const Records = () => {
     const [innerRecords, setInnerRecords] = useState([]);
     const [leaderboard, setLeaderboard] = useState([]);
     const [selectedLBfilter, setSelectedLBfilter] = useState('calendar');
+
+    const [currentMechanicPercentage, setCurrentMechanicPercentage] = useState(0);
 
     const defaultSelectValue = 'all';
 
@@ -157,7 +169,8 @@ const Records = () => {
     const handleLeaderboard = async (selectedRecord, start, end) => {
         try {
             const sourcePath = path !== null ? path : selectedRecord;
-            const { leaderBoards } = await getLeaderBoards(sourcePath, start, end);
+            const { leaderBoards, mechanicPercentage } = await getLeaderBoards(sourcePath, start, end);
+            setCurrentMechanicPercentage(mechanicPercentage || 0);
             setLeaderboard(leaderBoards);
             setTimeout(() => {
                 setLoading(false);
@@ -280,6 +293,7 @@ const Records = () => {
                             posName={modalPOSName}
                             subtotal={modalSubtotal}
                             items={innerRecords}
+                            currentMechanicPercentage={currentMechanicPercentage}
                         />
                         
                         <div className='upper-container'>
@@ -292,10 +306,12 @@ const Records = () => {
                                     className={selectedRecord === 'labor' ? 'active' : ''}
                                     onClick={()=> handleTabChange('labor')}
                                  >Labor</button>
-                                 <button
-                                    className={selectedRecord === 'expenses' ? 'active' : ''}
-                                    onClick={()=> handleTabChange('expenses')}
-                                 >Expenses</button>
+                                 {displayExpenses && 
+                                    <button
+                                        className={selectedRecord === 'expenses' ? 'active' : ''}
+                                        onClick={()=> handleTabChange('expenses')}
+                                    >Expenses</button>
+                                 }
                             </div>
                         </div>
 

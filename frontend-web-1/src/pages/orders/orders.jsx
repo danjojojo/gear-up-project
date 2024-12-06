@@ -355,6 +355,7 @@ const Orders = () => {
             setDisableButton(false);
             const { orders } = await getOrders(startDate);
             const orderBySelectedID = orders.filter(order => order.order_id === selectedOrder.order_id);
+            getOrderItems(selectedOrder.order_id);
             setSelectedOrder(orderBySelectedID[0]);
         } catch (error) {
             console.error('Error updating order status:', error.message);

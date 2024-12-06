@@ -1,9 +1,83 @@
 import api from './api';
 
-// Fetch item count
-export const getItemCount = async (partType) => {
+// Fetch bike types
+export const getBikeTypes = async () => {
     try {
-        const response = await api.get(`/bike-builder-upgrader/part-count/${partType}`);
+        const response = await api.get('/bike-builder-upgrader/bike-types');
+        return response.data;
+    } catch (error) {
+        console.error('Error fetching bike types:', error);
+        throw error;
+    }
+};
+
+// Fetch all parts
+export const getAllParts = async () => {
+    try {
+        const response = await api.get('/bike-builder-upgrader/all-parts');
+        return response.data;
+    } catch (error) {
+        console.error('Error fetching all parts:', error);
+        throw error;
+    }
+};
+
+// Fetch part specs
+export const getPartSpecs = async (partName, specId) => {
+    try {
+        const response = await api.get(`/bike-builder-upgrader/part-specs/${partName}&${specId}`);
+        return response.data;
+    } catch (error) {
+        console.error('Error fetching part specs:', error);
+        throw error;
+    }
+};
+
+// Add bike type
+export const addBikeType = async (bikeTypeData) => {
+    try {
+        const response = await api.post('/bike-builder-upgrader/add-bike-type', bikeTypeData, {
+            headers: {
+                'Content-Type': 'multipart/form-data',
+            }
+        });
+        return response.data;
+    } catch (error) {
+        console.error('Error adding bike type:', error);
+        throw error;
+    }
+}
+
+// Edit bike type
+export const editBikeType = async (bikeTypeId, bikeTypeData) => {
+    try {
+        const response = await api.put(`/bike-builder-upgrader/edit-bike-type/${bikeTypeId}`, bikeTypeData, {
+            headers: {
+                'Content-Type': 'multipart/form-data',
+            }
+        });
+        return response.data;
+    } catch (error) {
+        console.error('Error editing bike type:', error);
+        throw error;
+    }
+}
+
+// Delete bike type
+export const deleteBikeType = async (bikeTypeId) => {
+    try {
+        const response = await api.delete(`/bike-builder-upgrader/delete-bike-type/${bikeTypeId}`);
+        return response.data;
+    } catch (error) {
+        console.error('Error deleting bike type:', error);
+        throw error;
+    }
+}
+
+// Fetch item count
+export const getItemCount = async (partType, bikeType) => {
+    try {
+        const response = await api.get(`/bike-builder-upgrader/part-count/${partType}&${bikeType}`);
         return response.data;
     } catch (error) {
         console.error(`Error fetching item count for ${partType}:`, error);
@@ -11,11 +85,59 @@ export const getItemCount = async (partType) => {
     }
 };
 
+// Fetch compatibility specs
+export const getCompatibilitySpecs = async (bikeType) => {
+    try {
+        const response = await api.get(`/bike-builder-upgrader/compatibility-specs/${bikeType}`);
+        return response.data;
+    } catch (error) {
+        console.error('Error fetching compatibility specs:', error);
+        throw error;
+    }
+}
+
+// Add upgrader spec form
+export const addUpgraderSpecForm = async (bikeType, indPart, depPart, indSpec, depSpec ) => {
+    try {
+        const response = await api.post('/bike-builder-upgrader/add-upgrader-spec-form', {
+             bikeType, indPart, depPart, indSpec, depSpec 
+        });
+        return response.data;
+    } catch (error) {
+        console.error('Error adding upgrader spec form:', error);
+        throw error;
+    }
+}
+
+// Update upgrader spec form
+export const updateUpgraderSpecForm = async (specId, depPart, indSpec, depSpec) => {
+    try {
+        const response = await api.put(`/bike-builder-upgrader/update-upgrader-spec-form/${specId}`, {
+              depPart, indSpec, depSpec 
+        });
+        return response.data;
+    } catch (error) {
+        console.error('Error updating upgrader spec form:', error);
+        throw error;
+    }
+}
+
+// Delete upgrader spec form
+export const deleteUpgraderSpecForm = async (specId) => {
+    try {
+        const response = await api.delete(`/bike-builder-upgrader/delete-upgrader-spec-form/${specId}`);
+        return response.data;
+    } catch (error) {
+        console.error('Error deleting upgrader spec form:', error);
+        throw error;
+    }
+}
+
 // Fetch frame items
-export const getFrameItems = async (archived) => {
+export const getFrameItems = async (archived, bikeType) => {
     try {
         const response = await api.get('/bike-builder-upgrader/frame-item', {
-            params: { archived }
+            params: { archived, bikeType },
         });
         return response.data;
     } catch (error) {
@@ -25,10 +147,10 @@ export const getFrameItems = async (archived) => {
 };
 
 // Fetch fork items
-export const getForkItems = async (archived) => {
+export const getForkItems = async (archived, bikeType) => {
     try {
         const response = await api.get('/bike-builder-upgrader/fork-item', {
-            params: { archived }
+            params: { archived, bikeType }
         });
         return response.data;
     } catch (error) {
@@ -38,10 +160,10 @@ export const getForkItems = async (archived) => {
 };
 
 // Fetch groupset items
-export const getGroupsetItems = async (archived) => {
+export const getGroupsetItems = async (archived, bikeType) => {
     try {
         const response = await api.get('/bike-builder-upgrader/groupset-item', {
-            params: { archived }
+            params: { archived, bikeType }
         });
         return response.data;
     } catch (error) {
@@ -51,10 +173,10 @@ export const getGroupsetItems = async (archived) => {
 };
 
 // Fetch wheelset items
-export const getWheelsetItems = async (archived) => {
+export const getWheelsetItems = async (archived, bikeType) => {
     try {
         const response = await api.get('/bike-builder-upgrader/wheelset-item', {
-            params: { archived }
+            params: { archived, bikeType }
         });
         return response.data;
     } catch (error) {
@@ -64,10 +186,10 @@ export const getWheelsetItems = async (archived) => {
 };
 
 // Fetch seat items
-export const getSeatItems = async (archived) => {
+export const getSeatItems = async (archived, bikeType) => {
     try {
         const response = await api.get('/bike-builder-upgrader/seat-item', {
-            params: { archived }
+            params: { archived, bikeType }
         });
         return response.data;
     } catch (error) {
@@ -77,10 +199,10 @@ export const getSeatItems = async (archived) => {
 };
 
 // Fetch cockpit items
-export const getCockpitItems = async (archived) => {
+export const getCockpitItems = async (archived, bikeType) => {
     try {
         const response = await api.get('/bike-builder-upgrader/cockpit-item', {
-            params: { archived }
+            params: { archived, bikeType }
         });
         return response.data;
     } catch (error) {
@@ -352,4 +474,16 @@ export const deleteCockpitItem = async (cockpit_id) => {
         throw error;
     }
 };
+
+// get item reviews
+export const getItemReviews = async (itemId) => {
+    try {
+        const response = await api.get(`/bike-builder/reviews/${itemId}`);
+        return response.data;
+    } catch (error) {
+        console.error('Error fetching item reviews:', error);
+        throw error;
+    }
+};
+
 

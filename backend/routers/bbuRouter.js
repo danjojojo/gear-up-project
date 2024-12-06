@@ -2,7 +2,19 @@ const express = require('express');
 const router = express.Router();
 const upload = require('../middleware/imgUploadMiddleware');
 const {
+    getBikeTypes,
+    getPartSpecs,
+    getAllParts,
+    addBikeType,
+    editBikeType,
+    deleteBikeType,
     getPartsCount,
+    getCompatibilitySpecs,
+
+    addUpgraderSpecForm,
+    updateUpgraderSpecForm,
+    deleteUpgraderSpecForm,
+
     getFrameItems,
     getForkItems,
     getGroupsetItems,
@@ -41,7 +53,18 @@ const {
 } = require('../controllers/bbuController');
 
 
-router.get('/part-count/:partType', getPartsCount);
+router.get('/bike-types', getBikeTypes);
+router.get('/all-parts', getAllParts);
+router.get('/part-specs/:partName&:specId', getPartSpecs);
+router.post('/add-bike-type', upload.single('image'), addBikeType);
+router.put('/edit-bike-type/:bikeTypeId', upload.single('image'), editBikeType);
+router.delete('/delete-bike-type/:bikeTypeId', deleteBikeType);
+router.get('/part-count/:partType&:bikeType', getPartsCount);
+router.get('/compatibility-specs/:bikeType', getCompatibilitySpecs);
+
+router.post('/add-upgrader-spec-form', addUpgraderSpecForm);
+router.put('/update-upgrader-spec-form/:specId', updateUpgraderSpecForm);
+router.delete('/delete-upgrader-spec-form/:specId', deleteUpgraderSpecForm);
 
 router.get('/frame-item', getFrameItems);
 router.get('/fork-item', getForkItems);

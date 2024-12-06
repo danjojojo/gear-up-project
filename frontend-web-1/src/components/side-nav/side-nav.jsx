@@ -8,7 +8,7 @@ import { AuthContext } from '../../context/auth-context';
 
 const SideNav = ({ onNavClick, isAdmin }) => {
     const navigate = useNavigate();
-    const { logout } = useContext(AuthContext);
+    const { logout, displayExpenses } = useContext(AuthContext);
 
     const handleLogout = () => {
         logout();
@@ -36,7 +36,7 @@ const SideNav = ({ onNavClick, isAdmin }) => {
                     ) : (
                         <>
                             <Nav.Link as={Link} to="/point-of-sales" onClick={() => onNavClick('Point of Sales')}><i className="fa-solid fa-cash-register"></i>Point of Sales</Nav.Link>
-                            <Nav.Link as={Link} to="/expenses" onClick={() => onNavClick('Expenses')}><i className="fa-solid fa-money-bill-1"></i>Expenses</Nav.Link>
+                            {displayExpenses && <Nav.Link as={Link} to="/expenses" onClick={() => onNavClick('Expenses')}><i className="fa-solid fa-money-bill-1"></i>Expenses</Nav.Link>}
                             <Nav.Link as={Link} to="/receipts" onClick={() => onNavClick('Receipts')}><i className="fa-solid fa-receipt"></i>Receipts</Nav.Link>
                             <Nav.Link as={Link} to="/waitlist" onClick={() => onNavClick('Waitlist')}><i className="fa-solid fa-ruler-horizontal"></i>Waitlist</Nav.Link>
                             <Nav.Link as={Link} to="/bike-builder-upgrader" onClick={() => onNavClick('Bike Builder & Upgrader')}><i className="fa-solid fa-bicycle"></i>Bike Builder & Upgrader</Nav.Link>

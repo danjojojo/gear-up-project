@@ -1,0 +1,64 @@
+.specifications-modal {
+    .content{
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        
+        .parts {
+            display: flex;
+            width: 100%;
+            gap: 10px;
+    
+            .part {
+                flex: 1;
+                outline: none;
+    
+                button {
+                    width: 100%;
+                    padding: 10px 15px;
+                    color: white;
+                    background-color: #575757;
+                    border: none;
+    
+                    &:hover {
+                        background-color: #FF941F;
+                        color: white;
+                        text-decoration: underline;
+                    }
+                }
+            }
+        }
+    
+        .specs-list{
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            /* 3 equal columns */
+            gap: 10px;
+    
+            .spec{
+                padding: 10px;
+                // background-color: #575757;
+                border: 1px solid #ccc;
+                // color: white;
+                border-radius: 10px;
+                text-align: center;
+
+                .spec-groups{
+                    display: flex;
+                    flex-direction: column;
+                    gap: 10px;
+
+                    .spec-group{
+                        padding: 10px;
+                        background-color: #ccc;
+                        border: 1px solid #ccc;
+                        color: rgb(61, 61, 61);
+                        border-radius: 5px;
+                        text-align: center;
+                    }
+                }
+    
+            }
+        }
+    }
+}

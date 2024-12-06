@@ -19,6 +19,10 @@ import "react-datepicker/dist/react-datepicker.css";
 import LoadingPage from '../../components/loading-page/loading-page';
 import SearchBar from "../../components/search-bar/search-bar";
 import {Modal, Button} from 'react-bootstrap';
+import Return from '../../components/return/return';
+import {
+  getSettings
+} from '../../services/settingsService';
 
 const Receipts = () => {
     // SOME STUFF
@@ -43,10 +47,15 @@ const Receipts = () => {
 
     // VIEWS
     const [refundView, setRefundView] = useState(false);
+    const [returnView, setReturnView] = useState(false);
 
     // REFUND
     const [refundItems, setRefundItems] = useState({});
     const [refundItemsDetails, setRefundItemsDetails] = useState([]);
+
+    // RETURN
+    const [returnItems, setReturnItems] = useState({});
+    const [returnItemsDetails, setReturnItemsDetails] = useState([]);
 
     // DATE FOR REACT-DATEPICKER
     const [startDate, setStartDate] = useState(moment(todayDate).format("YYYY-MM-DD"));
@@ -89,10 +98,16 @@ const Receipts = () => {
 
     const { userRole } = useContext(AuthContext);
 
+    const [storeName, setStoreName] = useState('');
+    const [storeAddress, setStoreAddress] = useState('');
+
     // FETCH SHIT FROM DATABASE
     const getReceipts = async (startDate) => {
         try{
             const { receipts } = await getPosReceipts(startDate);
+            const { settings } = await getSettings();
+            setStoreAddress(settings.find(setting => setting.setting_key === 'store_address').setting_value);
+            setStoreName(settings.find(setting => setting.setting_key === 'store_name').setting_value);
             setRetrievedReceipts(receipts);
             setFilteredReceipts(receipts);
             setAllReceipts(receipts);
@@ -364,12 +379,7 @@ const Receipts = () => {
         setRefundItemsDetails(refundItemsDetails.filter((refundItem) => refundItem.id !== item.item_id));
       }
     }
-
-    useEffect(() => {
-      console.log(refundItems);
-      console.log(refundItemsDetails);
-    }, [refundItems, refundItemsDetails]);
-
+    
     function VoidConfirmation({ onHide, onConfirm, ...props }) {
       return (
         <Modal
@@ -410,7 +420,6 @@ const Receipts = () => {
         </Modal>
       );
     }
-
     function RefundConfirmation({ onHide, onConfirm, ...props }) {
       return (
         <Modal
@@ -446,7 +455,6 @@ const Receipts = () => {
         </Modal>
       );
     }
-
     function RefundError({ ...props }) {
       return (
         <Modal
@@ -513,6 +521,10 @@ const Receipts = () => {
     const [modalCancelRefundShow, setModalCancelRefundShow] = useState(false);
     const [modalRefundErrorShow, setModalRefundErrorShow] = useState(false);
 
+    const handleReturnView = () => {
+        setReturnView(true);
+    }
+
     // DISPLAY LOADING IF SHIT AINT WORKING
     if(loading) return <LoadingPage classStyle="loading-in-page"/>
 
@@ -553,6 +565,7 @@ const Receipts = () => {
                     setReceiptDetails([]);
                     setRefundView(false);
                     setShowDashboardDataToday(true);
+                    setReturnView(false);
                   }}
                   dateFormat="MMMM d, yyyy"
                   maxDate={new Date()}
@@ -656,7 +669,7 @@ const Receipts = () => {
                               <div className="name">
                                     <p className='receipt-name'>{receipt.receipt_name}</p>
                                   <div className='name-row'>
-                                    <p className={receipt.receipt_type}>{receipt.receipt_type === 'refund' ? receipt.receipt_type + ' ' + receipt.original_receipt_name : receipt.receipt_type }</p>
+                                    <p className={receipt.receipt_type}>{receipt.receipt_type !== 'sale' ? receipt.receipt_type + ' ' + receipt.original_receipt_name : receipt.receipt_type }</p>
                                     {receipt.status === 'pending' &&
                                     <p className='void-request'>Cancel Requested</p>
                                     }
@@ -746,7 +759,7 @@ const Receipts = () => {
                   </div>
                 </>
               )}
-              {(!refundView && receiptDetails.length !== 0) && (
+              {(receiptDetails.length !== 0 && !refundView && !returnView) && (
                 <>
                   <div className="receipt-nav">
                     <h4>Receipt Details</h4>
@@ -768,11 +781,12 @@ const Receipts = () => {
                   <div className="receipt-details-info">
                     <div className="receipt-details-info-header">
                       <p>{receiptDetails.receipt_name}</p>
-                      {receiptDetails.receipt_type === 'refund' && <p className='original-receipt'>Refund {receiptDetails.original_receipt_name}</p>}
+                      {receiptDetails.receipt_type !== 'sale' && <p className='original-receipt'><span>{receiptDetails.receipt_type}</span> {receiptDetails.original_receipt_name}</p>}
                       <p>
                         {moment(receiptDetails.date_created).format("LL")} -{" "}
                         {moment(receiptDetails.date_created).format("LT")}
                       </p>
+                      <p>{storeAddress}</p>
                       <p className='name'>{receiptDetails.pos_name}</p>
                       {receiptStatus === 'pending' && <p className='voided'>Cancel requested on {receiptVoidDate || moment(receiptDetails.date_updated).format("LLL")}.</p>}
                       {receiptStatus === 'voided' && <p className='voided'>Receipt voided on {receiptVoidDate || moment(receiptDetails.date_updated).format("LLL")}.</p>}
@@ -825,6 +839,8 @@ const Receipts = () => {
                         >Request Cancel</button>
                         {receiptDetails.receipt_type === 'sale' && <button onClick={() => setRefundView(true)}
                         >Refund</button>}
+                        {receiptDetails.receipt_type === 'sale' && <button onClick={handleReturnView}
+                        >Return</button>}
                       </>
                     }
                     {(userRole === 'staff' && receiptStatus === 'pending') &&
@@ -863,7 +879,7 @@ const Receipts = () => {
                   </div>
                 </>
               )}
-              {(refundView) && (
+              {(refundView && !returnView) && (
                 <>
                   <div className="receipt-nav">
                     <h4>Refund Receipt</h4>
@@ -885,17 +901,18 @@ const Receipts = () => {
                         </div>
                       }
                       {retrievedReceiptItems.length > 0 &&
-                      retrievedReceiptItems.filter((item) => item.record_type === 'item').map((item, itemIndex) => {
+                        retrievedReceiptItems.filter((item) => item.record_type === 'item').map((item, itemIndex) => {
                         return (
                           <div className='refund-details-item' key={itemIndex}>
                               <input
                                 type="checkbox"
                                 onChange={() => handleCheckboxChange(item)}  // Toggle the checkbox state
-                                disabled={item.refund_qty === item.qty ? true : false}
+                                disabled={item.refund_qty === item.qty || item.return_qty === item.qty || item.refund_qty + item.return_qty === item.qty? true : false}
                               />
                               <div className="left">    
                                   <p className="name">{item.item_name} <span id='item-qty'>x {item.qty}</span></p>
                                   {item.refund_qty > 0 && <p className="qty-unit-price">Refunded x {item.refund_qty}</p>}
+                                  {item.return_qty > 0 && <p className="qty-unit-price">Returned x {item.return_qty}</p>}
                                   {refundItems[item.item_id] &&                         
                                     <div className='refund-input'>
                                       <div className="refund-qty">
@@ -964,18 +981,28 @@ const Receipts = () => {
                   }
                 </>
               )}
+              {(!refundView && returnView) && (
+                <Return 
+                  setReturnView={setReturnView}
+                  receiptDetails={receiptDetails}
+                  retrievedReceiptItems={retrievedReceiptItems}
+                  PesoFormat={PesoFormat}
+                  getReceipts={getReceipts}
+                  startDate={startDate}
+                />
+              )}
               {/* Hidden print area - to be fixed */}
               <div id="print-area" className="print-only">
                 {receiptDetails.length !== 0 && (
                   <div className="receipt-details-info">
-                    <h1><span>ARON</span><span>BIKES</span></h1>
+                    <h1>{storeName}</h1>
                   <div className="receipt-details-info-header">
                     <p>{receiptDetails.receipt_name}</p>
                     <p>
                       {moment(receiptDetails.date_created).format("LL")} -{" "}
                       {moment(receiptDetails.date_created).format("LT")}
                     </p>
-                    <p>AronBikes</p>
+                    <p>{storeAddress}</p>
                     <p>{receiptDetails.pos_name}</p>
                     <div className="total">
                       <p>{PesoFormat.format(receiptDetails.receipt_total_cost)}</p>

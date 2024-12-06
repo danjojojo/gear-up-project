@@ -12,6 +12,7 @@ import Cart from "./cart/cart";
 import Checkout from "./checkout/checkout";
 import CheckoutSuccess from "./checkout-success/checkout-success";
 import Order from "./order/order";
+import OrderHistory from "./order-history/order-history";
 
 const Pages = {
 
@@ -46,7 +47,10 @@ const Pages = {
     CheckoutSuccess,
 
     // Order Page
-    Order
+    Order,
+
+    // Order History Page
+    OrderHistory
 
 };
 

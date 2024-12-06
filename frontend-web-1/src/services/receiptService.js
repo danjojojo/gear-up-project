@@ -107,3 +107,23 @@ export const getReceiptDetails = async (receiptSaleId) => {
         throw error;
     }
 }
+
+// Staff return item
+export const returnItem = async (receiptId, receiptSaleId, receiptItemId, unitPrice, returnQty, returnReason) => {
+    try {
+        const response = await api.post(`/receipt/return-item`, {
+            receiptId,
+            receiptSaleId,
+            returnData : {
+                itemId : receiptItemId,
+                unitPrice : unitPrice,
+                returnQty : returnQty,
+                returnReason : returnReason
+            }
+        });
+        return response.data;
+    } catch (error) {
+        console.error("Error returning item", error);
+        throw error;
+    }
+}

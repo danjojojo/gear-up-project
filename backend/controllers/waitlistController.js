@@ -42,6 +42,7 @@ const addFrame = async (req, res) => {
     const {
         waitlist_item_id,
         item_id,
+        type,
         description,
         purpose,
         frame_size,
@@ -97,7 +98,6 @@ const addFrame = async (req, res) => {
             image
         ];
 
-
         const result = await pool.query(query, values);
 
         // Update bb_bu_status in items table
@@ -107,6 +107,10 @@ const addFrame = async (req, res) => {
         // Delete the waitlist item
         const deleteQuery = `DELETE FROM waitlist WHERE waitlist_item_id = $1;`;
         await pool.query(deleteQuery, [waitlist_item_id]);
+
+        // Add part to parts compatibility table
+        const partQuery = `INSERT INTO part_compatibility (bike_type_id, part_id, part_type) VALUES ($1, $2, 'frame');`;
+        await pool.query(partQuery, [type, frame_id]);
 
         res.status(201).json(result.rows[0]);
     } catch (error) {
@@ -121,6 +125,7 @@ const addFork = async (req, res) => {
     const {
         waitlist_item_id,
         item_id,
+        type,
         description,
         fork_size,
         fork_tube_type,
@@ -182,6 +187,9 @@ const addFork = async (req, res) => {
         const deleteQuery = `DELETE FROM waitlist WHERE waitlist_item_id = $1;`;
         await pool.query(deleteQuery, [waitlist_item_id]);
 
+        const partQuery = `INSERT INTO part_compatibility (bike_type_id, part_id, part_type) VALUES ($1, $2, 'fork');`;
+        await pool.query(partQuery, [type, fork_id]);
+
         res.status(201).json(result.rows[0]);
     } catch (error) {
         console.error('Error adding fork:', error);
@@ -195,6 +203,7 @@ const addGroupset = async (req, res) => {
     const {
         waitlist_item_id,
         item_id,
+        type,
         description,
         chainring_speed,
         crank_arm_length,
@@ -257,6 +266,9 @@ const addGroupset = async (req, res) => {
         const deleteQuery = `DELETE FROM waitlist WHERE waitlist_item_id = $1;`;
         await pool.query(deleteQuery, [waitlist_item_id]);
 
+        const partQuery = `INSERT INTO part_compatibility (bike_type_id, part_id, part_type) VALUES ($1, $2, 'groupset');`;
+        await pool.query(partQuery, [type, groupset_id]);
+
         res.status(201).json(result.rows[0]);
     } catch (error) {
         console.error('Error adding groupset:', error);
@@ -270,6 +282,7 @@ const addWheelset = async (req, res) => {
     const {
         waitlist_item_id,
         item_id,
+        type,
         description,
         hub_rotor_type,
         hub_cassette_type,
@@ -333,6 +346,9 @@ const addWheelset = async (req, res) => {
         const deleteQuery = `DELETE FROM waitlist WHERE waitlist_item_id = $1;`;
         await pool.query(deleteQuery, [waitlist_item_id]);
 
+        const partQuery = `INSERT INTO part_compatibility (bike_type_id, part_id, part_type) VALUES ($1, $2, 'wheelset');`;
+        await pool.query(partQuery, [type, wheelset_id]);
+
         res.status(201).json(result.rows[0]);
     } catch (error) {
         console.error('Error adding wheelset:', error);
@@ -346,6 +362,7 @@ const addSeat = async (req, res) => {
     const {
         waitlist_item_id,
         item_id,
+        type,
         description,
         seatpost_diameter,
         seatpost_length,
@@ -388,6 +405,9 @@ const addSeat = async (req, res) => {
         const deleteQuery = `DELETE FROM waitlist WHERE waitlist_item_id = $1;`;
         await pool.query(deleteQuery, [waitlist_item_id]);
 
+        const partQuery = `INSERT INTO part_compatibility (bike_type_id, part_id, part_type) VALUES ($1, $2, 'seat');`;
+        await pool.query(partQuery, [type, seat_id]);
+
         res.status(201).json(result.rows[0]);
     } catch (error) {
         console.error('Error adding seat:', error);
@@ -401,6 +421,7 @@ const addCockpit = async (req, res) => {
     const {
         waitlist_item_id,
         item_id,
+        type,
         description,
         handlebar_length,
         handlebar_clamp_diameter,
@@ -460,6 +481,9 @@ const addCockpit = async (req, res) => {
         // Delete the waitlist item
         const deleteQuery = `DELETE FROM waitlist WHERE waitlist_item_id = $1;`;
         await pool.query(deleteQuery, [waitlist_item_id]);
+
+        const partQuery = `INSERT INTO part_compatibility (bike_type_id, part_id, part_type) VALUES ($1, $2, 'cockpit');`;
+        await pool.query(partQuery, [type, cockpit_id]);
 
         res.status(201).json(result.rows[0]);
     } catch (error) {

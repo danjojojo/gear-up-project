@@ -1,4 +1,5 @@
 const pool = require('../config/db');
+const jwt = require('jsonwebtoken');
 const { decrypt } = require('../utils/encrypt');
 const nodemailer = require('nodemailer');
 
@@ -9,7 +10,7 @@ const getOrders = async (req, res) => {
         const query = `
             SELECT * 
             FROM orders
-            WHERE DATE(date_created AT TIME ZONE 'UTC' AT TIME ZONE 'Asia/Manila') = $1
+            WHERE DATE(date_created) = $1
             ORDER BY date_created DESC;
         `
         const { rows } = await pool.query(query, [startDate]);
@@ -25,7 +26,6 @@ const getOrders = async (req, res) => {
 const getOrder = async (req, res) => {
     try {
         const { orderId } = req.params;
-        console.log('orderId:', orderId);
         console.log(orderId);
         const orderQuery = `
             SELECT * 
@@ -33,7 +33,7 @@ const getOrder = async (req, res) => {
             WHERE order_name = $1
         `
         const oResult = await pool.query(orderQuery, [orderId]);
-       
+
         const itemsQuery = `
             SELECT 
                 oi.*, 
@@ -51,9 +51,75 @@ const getOrder = async (req, res) => {
         `
         const iResult = await pool.query(itemsQuery, [orderId]);
 
-        res.status(200).json({ order : oResult.rows[0], items: iResult.rows });
+        // if there is token and order is completed, get reviews
+        const token = req.cookies.token;
+
+        try {
+            if(token){
+                const decoded = jwt.verify(token, process.env.JWT_SECRET);
+                const userId = decoded.id;
+
+                const checkUserLoggedIn = `
+                    SELECT order_id 
+                    FROM orders 
+                    WHERE order_name = $1 AND user_id = $2
+                `;
+                const userResult = await pool.query(checkUserLoggedIn, [orderId, userId.toString()]);
+
+                let emptyReviews = [];
+
+                if(userResult.rows.length === 0){
+                    return res.status(200).json({ order : oResult.rows[0], items: iResult.rows, reviews: emptyReviews, allowedToReview: false });
+                }
+
+                const uniqueItems = `
+                   SELECT 
+                        DISTINCT(i.item_name), 
+                        i.item_name,
+                        CASE 
+                            WHEN oi.part = 'Frame' THEN encode(f.image, 'base64')
+                            WHEN oi.part = 'Fork' THEN encode(fk.image, 'base64')
+                            WHEN oi.part = 'Groupset' THEN encode(g.image, 'base64')
+                            WHEN oi.part = 'Wheelset' THEN encode(w.image, 'base64')
+                            WHEN oi.part = 'Seat' THEN encode(s.image, 'base64')
+                            WHEN oi.part = 'Cockpit' THEN encode(c.image, 'base64') 
+                            ELSE encode(i.item_image, 'base64')
+                        END AS image,
+                        CASE 
+                            WHEN oi.part = 'Frame' THEN f.description
+                            WHEN oi.part = 'Fork' THEN fk.description
+                            WHEN oi.part = 'Groupset' THEN g.description
+                            WHEN oi.part = 'Wheelset' THEN w.description
+                            WHEN oi.part = 'Seat' THEN s.description
+                            WHEN oi.part = 'Cockpit' THEN c.description
+                            ELSE f.description
+                        END AS description,
+                        oi.review_id,
+                        r.rating,
+                        r.comment,
+                        COALESCE(encode(r.image, 'base64'), null) AS review_image,
+                        COALESCE(r.date_created, null) AS review_date
+                    FROM order_items oi
+                    JOIN orders o ON oi.order_id = o.order_id
+                    JOIN items i ON oi.item_id = i.item_id
+                    LEFT JOIN reviews r ON oi.item_id = r.item_id
+                    LEFT JOIN frame f ON i.item_id = f.item_id AND i.bike_parts = 'Frame'
+                    LEFT JOIN fork fk ON i.item_id = fk.item_id AND i.bike_parts = 'Fork'
+                    LEFT JOIN groupset g ON i.item_id = g.item_id AND i.bike_parts = 'Groupset'
+                    LEFT JOIN wheelset w ON i.item_id = w.item_id AND i.bike_parts = 'Wheelset'
+                    LEFT JOIN seat s ON i.item_id = s.item_id AND i.bike_parts = 'Seat'
+                    LEFT JOIN cockpit c ON i.item_id = c.item_id AND i.bike_parts = 'Cockpit'
+                    WHERE o.order_name = $1 AND o.order_status = 'completed' AND r.user_id = $2
+                `;
+                console.log('Got here ', userId);
+                const uResult = await pool.query(uniqueItems, [orderId, userId]);
+                return res.status(200).json({ order : oResult.rows[0], items: iResult.rows, reviews: uResult.rows, allowedToReview: true });
+            }
+        } catch (error) {
+            return res.status(200).json({ order : oResult.rows[0], items: iResult.rows });
+        }
+        return res.status(200).json({ order : oResult.rows[0], items: iResult.rows });
     } catch (error) {
-        console.error('Error getting orders:', error.message);
         res.status(500).json({ error: error.message });
     }
 }
@@ -61,7 +127,7 @@ const getOrder = async (req, res) => {
 const getOrderDates = async (req, res) => {
     try {
         const query = `
-            SELECT DISTINCT DATE(date_created AT TIME ZONE 'UTC' AT TIME ZONE 'Asia/Manila') AS date_created
+            SELECT DISTINCT DATE(date_created) AS date_created
             FROM orders
             ORDER BY date_created DESC
         `;

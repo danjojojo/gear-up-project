@@ -2,6 +2,8 @@
 import React, {useState} from 'react';
 import Accordion from 'react-bootstrap/Accordion';
 import { addToBUCart } from '../../utils/cartDB';
+import { Rating } from 'react-simple-star-rating';
+import ReviewsModal from "../../components/reviews-modal/reviews-modal";
 
 const PartDetails = ({ item, partType }) => {
 
@@ -118,39 +120,70 @@ const PartDetails = ({ item, partType }) => {
         addToBUCart(part);
     };
 
-    return (
-        <div className="part-details">
-            <div className='item-name'>{item.item_name}</div>
-            <div className='item-price'>{PesoFormat.format(item.item_price)}</div>
-            <div className="stock-status">
-                <span className='text'>
-                    {item.stock_count > 0 ? "In Stock" : "Out of Stock"}
-                </span>
-            </div>
-            <Accordion>
-                <Accordion.Item eventKey="0">
-                    <Accordion.Header>Details</Accordion.Header>
-                    <Accordion.Body>{item.description}</Accordion.Body>
-                </Accordion.Item>
-                <Accordion.Item eventKey="1">
-                    <Accordion.Header>Tech Specs</Accordion.Header>
-                    <Accordion.Body>
-                        {renderTechSpecs()}
-                    </Accordion.Body>
-                </Accordion.Item>
-            </Accordion>
+    const totalRating = item.total_rating;
+    const reviewsCount = item.reviews_count;
+    const avgRating = totalRating > 0 && reviewsCount > 0 ? (totalRating / reviewsCount).toFixed(1) : 0;
+    // show decimal places if avgRating is not a whole number
+    
+    const [showReviews, setShowReviews] = useState(false);
 
-            <button className='add-to-cart'
-                onClick={() => {
-                    if(item.stock_count > 0) {
-                        addToCart(item); 
-                    }
-                    else alert("This item is out of stock.");
-                }}
-            >
-                Add to cart
-            </button>
-        </div>
+    return (
+        <> 
+            <ReviewsModal
+                show={showReviews}
+                onHide={() => setShowReviews(false)}
+                item={item}
+                reviewsCount={reviewsCount}
+            />
+            <div className="part-details">
+                <div className='item-name'>{item.item_name}</div>
+                <div className='item-price'>{PesoFormat.format(item.item_price)}</div>
+                <div className="stock-status">
+                    <span className='text'>
+                        {item.stock_count > 0 ? "In Stock" : "Out of Stock"}
+                    </span>
+                </div>
+                {/* reviews */}
+                <div className="review">
+                    <div className="rate">
+                        {avgRating !== 0 ? <p>{avgRating}/ <span>5</span></p> : <p>No reviews yet</p>}
+                        {avgRating !== 0 && <Rating
+                            ratingValue={avgRating}
+                            initialValue={avgRating}
+                            readonly={true}
+                            allowFraction={true}
+                            size={30}
+                            fillColor='#F9961F'
+                            emptyColor='#CCC'
+                        />}
+                    </div>
+                    {avgRating !== 0 && <button onClick={() => setShowReviews(true)}>View Reviews ({reviewsCount}) </button>}
+                </div>
+                <Accordion>
+                    <Accordion.Item eventKey="0">
+                        <Accordion.Header>Details</Accordion.Header>
+                        <Accordion.Body>{item.description}</Accordion.Body>
+                    </Accordion.Item>
+                    <Accordion.Item eventKey="1">
+                        <Accordion.Header>Tech Specs</Accordion.Header>
+                        <Accordion.Body>
+                            {renderTechSpecs()}
+                        </Accordion.Body>
+                    </Accordion.Item>
+                </Accordion>
+
+                <button className='add-to-cart'
+                    onClick={() => {
+                        if(item.stock_count > 0) {
+                            addToCart(item); 
+                        }
+                        else alert("This item is out of stock.");
+                    }}
+                >
+                    Add to cart
+                </button>
+            </div>
+        </>
     );
 };
 

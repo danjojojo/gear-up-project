@@ -9,6 +9,7 @@ import registerCooperFont from '../fonts/Cooper-ExtraBold-normal';
 import registerRubikFont from '../fonts/Rubik-Regular-normal';
 import registerRubikBoldFont from '../fonts/Rubik-Bold-normal';
 import registerRubikSemiBoldFont from '../fonts/Rubik-SemiBold-normal';
+import { getSettings } from '../../services/settingsService';
 
 const OrderSalesReport = () => {
     const reportRef = useRef();
@@ -18,6 +19,9 @@ const OrderSalesReport = () => {
         month: new Date().getMonth(), // Adjust for 1-indexed months
         year: new Date().getFullYear(),
     });
+
+    const [storeName, setStoreName] = useState('');
+    const [storeAddress, setStoreAddress] = useState('');
 
     useEffect(() => {
         registerCooperFont();
@@ -30,6 +34,9 @@ const OrderSalesReport = () => {
         try {
             const data = await getOrderReport(month, year);
             setOrderData(data);
+            const { settings } = await getSettings();
+            setStoreName(settings.find(setting => setting.setting_key === 'store_name').setting_value);
+            setStoreAddress(settings.find(setting => setting.setting_key === 'store_address').setting_value);
         } catch (error) {
             console.error('Error fetching order data:', error);
         }
@@ -49,10 +56,10 @@ const OrderSalesReport = () => {
 
         // Header section
         pdf.setFontSize(22);
-        pdf.setFont('Cooper-ExtraBold');
+        pdf.setFont('Rubik-Bold');
         pdf.setTextColor('#F9961F');
-        const title1 = 'ARON';
-        const title2 = 'BIKES';
+        const title1 = '';
+        const title2 = storeName;
         pdf.text(title1, (pdfWidth - pdf.getTextWidth(title1 + title2)) / 2, yPosition);
 
         pdf.setTextColor('#2E2E2E');
@@ -61,7 +68,7 @@ const OrderSalesReport = () => {
         pdf.setFontSize(8);
         pdf.setFont('Rubik-Regular');
         yPosition += 6;
-        const subtitle = 'Antipolo City';
+        const subtitle = storeAddress;
         pdf.text(subtitle, (pdfWidth - pdf.getTextWidth(subtitle)) / 2, yPosition);
 
         pdf.setFontSize(16);
@@ -156,8 +163,8 @@ const OrderSalesReport = () => {
                 order.empty ? '-' : order.cust_name,
                 order.empty ? '-' : `P ${PesoFormat.format(order.amount || 0)}`,
                 order.empty ? '-' : order.num_items || 0,
-                order.empty ? '-' : new Date(order.processed_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
-                order.empty ? '-' : new Date(order.completed_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
+                order.empty ? '-' : !order.processed_at ? 'Not yet' : new Date(order.processed_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
+                order.empty ? '-' : !order.completed_at ? 'Not yet' : new Date(order.completed_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
                 order.empty ? '-' : order.bike_builder,
                 order.empty ? '-' : order.bike_upgrader
             ]),
@@ -275,8 +282,8 @@ const OrderSalesReport = () => {
 
             <div ref={reportRef} className="pdf-content">
                 <div className="upper-text" style={{ textAlign: 'center', marginBottom: '20px' }}>
-                    <h1><span>ARON</span><span>BIKES</span></h1>
-                    <p>Antipolo City</p>
+                    <h1>{storeName}</h1>
+                    <p>{storeAddress}</p>
                     <h3>Monthly Order Sales Report</h3>
                     <h6>({`${months[selectedDate.month - 1].label} ${selectedDate.year}`})</h6>
                     <p>Summary of order sales performance.</p>
@@ -343,8 +350,8 @@ const OrderSalesReport = () => {
                                 <td>{order.empty ? '-' : order.cust_name || 'N/A'}</td>
                                 <td className='text-end'>{order.empty ? '-' : PesoFormat.format(order.amount || 0)}</td>
                                 <td className='text-center'>{order.empty ? '-' : order.num_items || 0}</td>
-                                <td>{order.empty ? '-' : new Date(order.processed_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}</td>
-                                <td>{order.empty ? '-' : new Date(order.completed_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}</td>
+                                <td>{order.empty ? '-' : (!order.processed_at ? 'Not yet' : new Date(order.processed_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }))}</td>
+                                <td>{order.empty ? '-' : (!order.completed_at ? 'Not yet' : new Date(order.completed_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }))}</td>
                                 <td className='text-center'>{order.empty ? '-' : order.bike_builder}</td>
                                 <td className='text-center'>{order.empty ? '-' : order.bike_upgrader}</td>
                             </tr>

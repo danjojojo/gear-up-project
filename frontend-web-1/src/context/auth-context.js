@@ -1,5 +1,6 @@
 import React, { createContext, useEffect, useState } from 'react';
 import { login, loginPOS, getMyRole, logoutUser, getMyName, refreshToken, verifyAdminOTP } from '../services/authService';
+import { getSettings } from '../services/settingsService';
 // import { setupAxiosInterceptors } from '../services/api';
 
 const AuthContext = createContext();
@@ -12,6 +13,8 @@ const AuthProvider = ({ children }) => {
   const [userName, setUserName] = useState(null);
   const [otpRequired, setOtpRequired] = useState(false);
 
+  const [displayExpenses, setDisplayExpenses] = useState(false);
+
   const handleTokenRefresh = async () => {
     try {
       await refreshToken(); // Call to refresh the token
@@ -19,6 +22,7 @@ const AuthProvider = ({ children }) => {
       console.log('Token refreshed successfully');
       setUserRole(role);
       setAuthenticated(true);
+      window.location.reload();  // Reload the page only on successful token refresh
     } catch (error) {
       console.error('Failed to refresh token:', error);
     }
@@ -35,19 +39,28 @@ const AuthProvider = ({ children }) => {
       if (error.response && error.response.status === 401) {
         // If access token expired, attempt to refresh the token
         await handleTokenRefresh();
-      } else {
-        console.log('Failed role fetch');
-      }
+      } 
     } finally {
       setLoading(false);
     }
   };
 
+  const fetchSettings = async () => {
+    try {
+      const { settings } = await getSettings();
+      let retrievedCurrentValue = settings.filter(setting => setting.setting_key === 'display_expenses');
+      setDisplayExpenses(retrievedCurrentValue[0].setting_value === 'yes' ? true : false);
+    } catch (error) {
+      setDisplayExpenses(false);
+    }
+  }
+
   useEffect(() => {
     fetchRole();
+    fetchSettings();
     // Periodic token refresh (e.g., every 50 minutes)
-    const interval = setInterval(() => handleTokenRefresh(), 50 * 60 * 1000);
-    return () => clearInterval(interval);
+    const interval = setInterval(() => handleTokenRefresh(), 60 * 1000 * 40);
+    return () => clearInterval(interval); 
   }, []);
 
   const loginAdmin = async (email, password) => {
@@ -122,7 +135,7 @@ const AuthProvider = ({ children }) => {
   };
 
   return (
-    <AuthContext.Provider value={{ userRole, authenticated, loading, error, loginAdmin, handleVerifyAdminOTP, loginPOSUser, logout, userName }}>
+    <AuthContext.Provider value={{ userRole, authenticated, loading, error, loginAdmin, handleVerifyAdminOTP, loginPOSUser, logout, userName, displayExpenses }}>
       {children}
     </AuthContext.Provider>
   );

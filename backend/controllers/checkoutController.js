@@ -24,7 +24,7 @@ const createCheckoutSession = async (req, res) => {
                     send_email_receipt: true,
                     show_description: true,
                     show_line_items: true,
-                    description: 'Checkout from AronBikes',
+                    description: 'Checkout',
                     line_items: lineItems, // Ensure each item matches the required format
                     payment_method_types: ['gcash', 'paymaya'],
                     cancel_url: `${process.env.CUSTOMER_URL}/checkout`,
@@ -51,9 +51,16 @@ const createCheckoutSession = async (req, res) => {
 
 const createOrder = async (req, res) => {
     try {
+        const token = req.cookies.token || null;
+        let decoded = null;
+        if(token) {
+            decoded = jwt.verify(token, process.env.JWT_SECRET);
+        }
+
         const { sessionOrder, orderBbDetails, orderItems } = req.body;
 
         const orderId = 'order-' + uuidv4(); // Generate a unique order ID
+        const userId = decoded ? decoded.id : null;
         const paymentId = 'none';
         const sessionOrderFirstItem = sessionOrder[0];
         const sessionID = sessionOrderFirstItem.checkoutSessionId;
@@ -67,15 +74,17 @@ const createOrder = async (req, res) => {
         const bbOption = sessionOrderFirstItem.bikeBuildDelivery;
         const buOption = sessionOrderFirstItem.bikeUpgradeDelivery;
         const orderAmount = sessionOrderFirstItem.amount;
-        const expiresAt = new Date(Date.now() + 15 * 60 * 1000).toLocaleString("en-US", { timeZone: "Asia/Manila" }); // Expires in 15 minutes
+        const expiresAt = new Date(Date.now() + 15 * 60 * 1000); // Expires in 15 minutes
 
         const ordersInsert = `
-            INSERT INTO orders (order_id, payment_id, checkout_session_id, order_name, order_amount, cust_name, email, phone, cust_address, payment_status, order_status, bb_option, bu_option, expires_at)
-            VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14)
+            INSERT INTO orders (order_id, user_id, payment_id, checkout_session_id, order_name, order_amount, cust_name, email, phone, cust_address, payment_status, order_status, bb_option, bu_option, expires_at)
+            VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15)
         `
         const ordersValues = [
-            orderId, paymentId, sessionID, orderName, orderAmount, custName, email, phone, custAddress, paymentStatus, orderStatus, bbOption, buOption, expiresAt
+            orderId, userId, paymentId, sessionID, orderName, orderAmount, custName, email, phone, custAddress, paymentStatus, orderStatus, bbOption, buOption, expiresAt
         ];
+
+        console.log('Creating order:', ordersInsert, ordersValues);
 
         console.log('1');
         let ordersBBInsert = `INSERT INTO orders_bb (build_id, order_id, build_name, build_image, build_price) VALUES `

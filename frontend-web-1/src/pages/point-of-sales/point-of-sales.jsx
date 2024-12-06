@@ -3,6 +3,9 @@ import ResponsivePageLayout from "../../components/responsive-page-layout/respon
 import { useState, useEffect } from "react";
 import { NumericFormat } from "react-number-format";
 import { getAllItems, getAllMechanics, confirmSale } from "../../services/posService";
+import {
+    getSettings
+} from '../../services/settingsService';
 import { getReceiptItems, getReceiptDetails } from "../../services/receiptService";
 import LoadingPage from "../../components/loading-page/loading-page";
 import SearchBar from "../../components/search-bar/search-bar";
@@ -101,6 +104,11 @@ const PointOfSales = () => {
   const [allReceiptItems, setAllReceiptItems] = useState([]);
   const [retrievedReceiptItems, setRetrievedReceiptItems] = useState([]);
   const [receiptDetails, setReceiptDetails] = useState({});
+
+  const [currentDisplayValue, setCurrentDisplayValue] = useState(false);
+
+  const [storeAddress, setStoreAddress] = useState('');
+  const [storeName, setStoreName] = useState('');
 
   // POS AND CHECKOUT INTERACTIONS
   function addItem(newItem) {
@@ -361,6 +369,13 @@ const PointOfSales = () => {
   const retrieveAllItems = async () => {
     try {
       const { items } = await getAllItems();
+      const { settings } = await getSettings();
+      let retrievedValue = settings.filter(setting => setting.setting_key === 'display_stock_level_pos');
+      let retrievedStoreName = settings.filter(setting => setting.setting_key === 'store_name');
+      let retrievedStoreAddress = settings.filter(setting => setting.setting_key === 'store_address');
+      setCurrentDisplayValue(retrievedValue[0].setting_value);
+      setStoreAddress(retrievedStoreAddress[0].setting_value);
+      setStoreName(retrievedStoreName[0].setting_value);
       setRetrievedItemsList(items);
       setAllItemsList(items);
       // GET THE CATEGORY NAMES FOR EACH ITEM AND REMOVE DUPLICATES
@@ -688,9 +703,9 @@ const PointOfSales = () => {
                             <div className="price">
                               {PesoFormat.format(retrievedItem.item_price)}
                             </div>
-                            <div className="qty">
+                            {currentDisplayValue === 'yes' && <div className="qty">
                               {retrievedItem.stock_count} items
-                            </div>
+                            </div>}
                           </div>
                         </div>
                       );
@@ -1241,14 +1256,14 @@ const PointOfSales = () => {
             <div id="print-area" className="print-only">
               {receiptDetails.length !== 0 && (
                 <div className="receipt-details-info">
-                  <h1><span>ARON</span><span>BIKES</span></h1>
+                  <h1>{storeName}</h1>
                 <div className="receipt-details-info-header">
                   <p>{receiptDetails.receipt_name}</p>
                   <p>
                     {moment(receiptDetails.date_created).format("LL")} -{" "}
                     {moment(receiptDetails.date_created).format("LT")}
                   </p>
-                  <p>AronBikes</p>
+                  <p>{storeAddress}</p>
                   <p>{receiptDetails.pos_name}</p>
                   <div className="total">
                     <p>{PesoFormat.format(receiptDetails.receipt_total_cost)}</p>

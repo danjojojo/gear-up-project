@@ -11,6 +11,7 @@ import LoadingPage from '../../components/loading-page/loading-page';
 import {Modal, Button} from 'react-bootstrap';
 import { AuthContext } from '../../context/auth-context';
 import moment from 'moment';
+import { getBikeTypes } from '../../services/bbuService';
 
 // Parts Form
 import FrameForm from './parts-form/frame-form';
@@ -247,6 +248,22 @@ const Waitlist = () => {
         };
     }, []);
 
+    const [retrievedBikeTypes, setRetrievedBikeTypes] = useState([]);
+
+    const handleGetBikeTypes = async () => {
+        try {
+            const { bikeTypes } = await getBikeTypes();
+            setRetrievedBikeTypes(bikeTypes);
+            console.log(bikeTypes);
+        } catch (error) {
+            console.error(error);
+        }
+    }
+
+    useEffect(() => {
+        handleGetBikeTypes();
+    },[]);
+
     if(loading) return <LoadingPage classStyle={"loading-in-page"}/>
 
     return (
@@ -418,6 +435,7 @@ const Waitlist = () => {
                                     role={userRole}
                                     setShowDeleteModal={setShowDeleteModal}
                                     setShowResponseModal={setShowResponseModal}
+                                    retrievedBikeTypes={retrievedBikeTypes}
                                 />
                             )}
 
@@ -433,6 +451,7 @@ const Waitlist = () => {
                                     role={userRole}
                                     setShowDeleteModal={setShowDeleteModal}
                                     setShowResponseModal={setShowResponseModal}
+                                    retrievedBikeTypes={retrievedBikeTypes}
                                 />
                             )}
 
@@ -448,6 +467,7 @@ const Waitlist = () => {
                                     role={userRole}
                                     setShowDeleteModal={setShowDeleteModal}
                                     setShowResponseModal={setShowResponseModal}
+                                    retrievedBikeTypes={retrievedBikeTypes}
                                 />
                             )}
 
@@ -463,6 +483,7 @@ const Waitlist = () => {
                                     role={userRole}
                                     setShowDeleteModal={setShowDeleteModal}
                                     setShowResponseModal={setShowResponseModal}
+                                    retrievedBikeTypes={retrievedBikeTypes}
                                 />
                             )}
 
@@ -478,6 +499,7 @@ const Waitlist = () => {
                                     role={userRole}
                                     setShowDeleteModal={setShowDeleteModal}
                                     setShowResponseModal={setShowResponseModal}
+                                    retrievedBikeTypes={retrievedBikeTypes}
                                 />
                             )}
 
@@ -493,6 +515,7 @@ const Waitlist = () => {
                                     role={userRole}
                                     setShowDeleteModal={setShowDeleteModal}
                                     setShowResponseModal={setShowResponseModal}
+                                    retrievedBikeTypes={retrievedBikeTypes}
                                 />
                             )}
 

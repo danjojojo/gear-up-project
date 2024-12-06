@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react'
 import {Modal} from 'react-bootstrap'
 import './record-modal.scss'
 
-export default function RecordModal({name, date, posName, subtotal, items, selectedRecord, ...props}) {
+export default function RecordModal({name, date, posName, subtotal, items, selectedRecord, currentMechanicPercentage, ...props}) {
     const PesoFormat = new Intl.NumberFormat("en-US", {
       style: "currency",
       currency: "PHP",
@@ -63,6 +63,9 @@ export default function RecordModal({name, date, posName, subtotal, items, selec
                                         <span className='refund-qty'> 
                                             {item.refund_qty > 0 && 'Refunded' +  (item.refund_qty === item.item_qty ? ' All' : ' x' + item.refund_qty)}
                                         </span>
+                                        <span className='refund-qty'> 
+                                            {item.return_qty > 0 && 'Returned' +  (item.return_qty === item.item_qty ? ' All' : ' x' + item.return_qty)}
+                                        </span>
                                     </p>
                                     {item.refund_qty > 0 && <p className='refund-total'>Now {PesoFormat.format((item.item_qty - item.refund_qty) * item.item_unit_price)}</p>}
                                 </div>
@@ -76,6 +79,7 @@ export default function RecordModal({name, date, posName, subtotal, items, selec
                                 </div>
                                 <div className="bottom">
                                     <p>Mechanic Service</p>
+                                    <p className='refund-qty'>Earned 80% {PesoFormat.format(item.service_price * currentMechanicPercentage / 100)}</p>
                                 </div>
                             </div>
                         ))}

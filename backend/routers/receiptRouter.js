@@ -12,7 +12,8 @@ const {
   refundReceipt,
   adminCancelRefundReceipt,
   getReceiptsDashboard,
-  getReceiptDetails
+  getReceiptDetails,
+  returnItem
 } = require("../controllers/receiptController");
 
 router.get("/get-receipt-dates", verifyToken, checkRole('staff', 'admin'), getReceiptDates);
@@ -25,5 +26,7 @@ router.post("/refund-receipt", verifyToken, checkRole('staff'), refundReceipt);
 router.put("/admin-cancel-refund-receipt/:receiptId", verifyToken, checkRole('admin'), adminCancelRefundReceipt);
 router.get("/get-receipts-dashboard", verifyToken, checkRole('staff','admin'), getReceiptsDashboard);
 router.get("/get-receipt-details/:receiptSaleId", verifyToken, checkRole('staff', 'admin'), getReceiptDetails);
+
+router.post("/return-item", verifyToken, checkRole('staff'), returnItem);
 
 module.exports = router;

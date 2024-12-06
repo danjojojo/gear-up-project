@@ -14,13 +14,13 @@ const getReceiptDates = async (req, res) => {
 
         if(role === 'admin') {
             const { rows } = await pool.query(
-                "SELECT DATE(date_created AT TIME ZONE 'UTC' AT TIME ZONE 'Asia/Manila') AS date_created FROM receipts GROUP BY DATE(date_created AT TIME ZONE 'UTC' AT TIME ZONE 'Asia/Manila')");
+                "SELECT DATE(date_created) AS date_created FROM receipts GROUP BY DATE(date_created)");
             res.json({ dates: rows });
         } else {
             const decodedToken = jwt.verify(token, process.env.JWT_SECRET);
             const posId = decodedToken.pos_id;
             const { rows } = await pool.query(
-                "SELECT DATE(date_created AT TIME ZONE 'UTC' AT TIME ZONE 'Asia/Manila') AS date_created FROM receipts WHERE pos_id = $1 GROUP BY DATE(date_created AT TIME ZONE 'UTC' AT TIME ZONE 'Asia/Manila')", 
+                "SELECT DATE(date_created) AS date_created FROM receipts WHERE pos_id = $1 GROUP BY DATE(date_created)", 
                 [posId.toString()]);
             res.json({ dates: rows });
         }
@@ -44,11 +44,17 @@ const getPosReceipts = async (req, res) => {
             const query = `
                 SELECT R1.receipt_id, R1.receipt_name, R1.receipt_total_cost, R1.receipt_paid_amount, 
                     R1.receipt_change, R1.sale_id, P.pos_name, R1.date_created, R1.date_updated, 
-                    R1.status, R1.receipt_type, R2.receipt_name AS original_receipt_name
+                    R1.status, R1.receipt_type,
+                    CASE
+                        WHEN R1.receipt_type = 'refund' THEN R2.receipt_name
+                        WHEN R1.receipt_type = 'return' THEN R3.receipt_name
+                        ELSE NULL
+                    END as original_receipt_name
                 FROM receipts R1
                 JOIN pos_users P ON R1.pos_id = P.pos_id
                 LEFT JOIN receipts R2 ON R1.receipt_type = 'refund' AND R1.refund_id = R2.receipt_id
-                WHERE DATE(R1.date_created AT TIME ZONE 'UTC' AT TIME ZONE 'Asia/Manila') = $1 
+                LEFT JOIN receipts R3 ON R1.receipt_type = 'return' AND R1.return_id = R3.receipt_id
+                WHERE DATE(R1.date_created) = $1 
                 ORDER BY R1.date_created DESC;
             `;
             const { rows } = await pool.query(query, [startDate]);
@@ -59,12 +65,18 @@ const getPosReceipts = async (req, res) => {
             const query = `
                 SELECT R1.receipt_id, R1.receipt_name, R1.receipt_total_cost, R1.receipt_paid_amount, 
                     R1.receipt_change, R1.sale_id, P.pos_name, R1.date_created, R1.date_updated, 
-                    R1.status, R1.receipt_type, R2.receipt_name AS original_receipt_name
+                    R1.status, R1.receipt_type,
+                    CASE
+                        WHEN R1.receipt_type = 'refund' THEN R2.receipt_name
+                        WHEN R1.receipt_type = 'return' THEN R3.receipt_name
+                        ELSE NULL
+                    END as original_receipt_name
                 FROM receipts R1
                 JOIN pos_users P ON R1.pos_id = P.pos_id
                 LEFT JOIN receipts R2 ON R1.receipt_type = 'refund' AND R1.refund_id = R2.receipt_id
+                LEFT JOIN receipts R3 ON R1.receipt_type = 'return' AND R1.return_id = R3.receipt_id
                 WHERE R1.pos_id = $1 
-                AND DATE(R1.date_created AT TIME ZONE 'UTC' AT TIME ZONE 'Asia/Manila') = $2 
+                AND DATE(R1.date_created) = $2 
                 ORDER BY R1.date_created DESC;
             `;
             const { rows } = await pool.query(query,
@@ -87,10 +99,16 @@ const getReceiptDetails = async(req, res) => {
         const query = `
             SELECT R1.receipt_id, R1.receipt_name, R1.receipt_total_cost, R1.receipt_paid_amount, 
                 R1.receipt_change, R1.sale_id, P.pos_name, R1.date_created, R1.date_updated, 
-                R1.status, R1.receipt_type, R2.receipt_name AS original_receipt_name
+                R1.status, R1.receipt_type,
+                CASE 
+                    WHEN R1.receipt_type = 'refund' THEN R2.receipt_name
+                    WHEN R1.receipt_type = 'return' THEN R3.receipt_name
+                    ELSE NULL
+                END AS original_receipt_name
             FROM receipts R1
             JOIN pos_users P ON R1.pos_id = P.pos_id
             LEFT JOIN receipts R2 ON R1.receipt_type = 'refund' AND R1.refund_id = R2.receipt_id
+            LEFT JOIN receipts R3 ON R1.receipt_type = 'return' AND R1.return_id = R3.receipt_id
             WHERE R1.sale_id = $1;
         `;
         const { rows } = await pool.query(query, [receiptSaleId]);
@@ -109,12 +127,12 @@ const getReceiptItems = async(req, res) => {
         }
 
         const query = `
-            SELECT I.item_id, I.item_name as item_name, SI.item_qty as qty, SI.item_unit_price as item_unit_price , SI.item_total_price as item_total_price, 'item' as record_type, stock_count as item_stock_count, SI.refund_qty as refund_qty
+            SELECT I.item_id, I.item_name as item_name, SI.item_qty as qty, SI.item_unit_price as item_unit_price , SI.item_total_price as item_total_price, 'item' as record_type, stock_count as item_stock_count, SI.refund_qty as refund_qty, SI.return_qty as return_qty
             FROM sales_items SI 
             JOIN items I ON SI.item_id = I.item_id 
             WHERE SI.sale_id = $1
                 UNION
-            SELECT M.mechanic_id, M.mechanic_name as item_name, '1' as qty, SM.service_price as item_unit_price, SM.service_price as item_total_price, 'mechanic' as record_type, '1' as item_stock_count, '0' as refund_qty
+            SELECT M.mechanic_id, M.mechanic_name as item_name, '1' as qty, SM.service_price as item_unit_price, SM.service_price as item_total_price, 'mechanic' as record_type, '1' as item_stock_count, '0' as refund_qty, '0' as return_qty
             FROM sales_mechanics SM 
             JOIN mechanics M ON SM.mechanic_id = M.mechanic_id 
             WHERE SM.sale_id = $1
@@ -227,7 +245,7 @@ const adminVoidReceipt = async(req, res) => {
         await pool.query(query, [receiptId]);
         await pool.query(updateSalesIDtoFalse, [receiptId]);
         await pool.query("COMMIT;");
-        res.json({ status: "voided", dateVoided: new Date(Date.now()).toLocaleString("en-US", { timeZone: "Asia/Manila" }) });
+        res.json({ status: "voided", dateVoided: new Date(Date.now()) });
     } catch (error) {
         await pool.query("ROLLBACK;");
         res.status(500).json({ message: error.message });
@@ -267,14 +285,11 @@ const refundReceipt = async(req, res) => {
         const decodedToken = jwt.verify(token, process.env.JWT_SECRET);
         
         const { receiptId, receiptSaleId, refundData } = req.body;
-        console.log(refundData);
-        console.log(receiptId);
+        
         let totalPrice = 0;
         for(let i = 0; i < refundData.length; i++){
-            console.log(i, refundData[i].id, refundData[i].qty);
             totalPrice += refundData[i].qty * refundData[i].unit_price;
         }
-        console.log(totalPrice);
         
         const originalReceiptID = receiptId;
         const saleID = "sale-" + uuidv4();
@@ -381,6 +396,96 @@ const refundReceipt = async(req, res) => {
     }
 }
 
+const returnItem = async(req, res) => {
+    try {
+        // Get token
+        const token = req.cookies.token;
+        if (!token) {
+            return res.status(401).json({ error: "No token provided " });
+        }
+        const decodedToken = jwt.verify(token, process.env.JWT_SECRET);
+
+        // Get today's date
+        const todayDate = new Date();
+
+        // Get request body
+        // returnData - itemId(item.item_id), returnQty(selectedRefundItemQty), returnReason
+        const { receiptId, receiptSaleId, returnData } = req.body;
+        const returnItem = returnData.itemId;
+        const returnItemUnitPrice = returnData.unitPrice;
+        const returnItemQty = returnData.returnQty;
+        const returnReason = returnData.returnReason;
+        const returnTotalAmount = returnData.returnQty * returnData.unitPrice;
+
+        // POS User, Receipt, Sale IDs
+        const posId = decodedToken.pos_id;
+        const originalReceiptID = receiptId;
+        const saleId = "sale-" + uuidv4();
+
+        // Receipt details
+        const receiptName = "RET-" + (todayDate.getMonth() + 1) + "" + todayDate.getDate() + "" + todayDate.getFullYear() + "-" + todayDate.getHours() + "" + todayDate.getMinutes() + "" + todayDate.getSeconds();
+        const totalPriceReturned = returnTotalAmount;
+        const amountReceived = returnTotalAmount;
+        const change = 0;
+        const receiptType = 'return';
+        const returnReceiptId = "receipt-" + uuidv4();
+
+        // Sales item details
+        const saleItemId = "sale-item-0" + Date.now();
+        const saleItemType = 'return';
+
+        // Update sales_items refund_qty
+        const updateSaleItemsRefundQty = 
+            `
+                UPDATE sales_items
+                SET return_qty = return_qty + $1
+                WHERE sale_id = $2 AND item_id = $3
+            `;
+        const updateSaleItemsRefundQtyValues = [returnItemQty, receiptSaleId, returnItem];
+
+        // Insert into sales
+        const insertSales =
+            `
+            INSERT INTO sales
+                (sale_id, pos_id, sale_amount)
+            VALUES
+                ($1, $2, $3)
+            `;
+        const insertSalesValues = [saleId, posId, totalPriceReturned];
+
+        // Insert into sales items
+        const insertIntoSalesItems =
+            `
+            INSERT INTO sales_items 
+                (sale_item_id, sale_id, pos_id, item_id, item_qty, item_unit_price, item_total_price, sale_item_type, return_reason) 
+            VALUES
+                ($1, $2, $3, $4, $5, $6, $7, $8, $9) 
+            `;
+        const insertIntoSalesItemsValues = [saleItemId, saleId, posId, returnItem, returnItemQty, returnItemUnitPrice, returnTotalAmount, saleItemType, returnReason];
+
+        // Insert into receipts
+        const insertReturnToReceipts =
+            `
+            INSERT INTO receipts
+                (receipt_id, sale_id, pos_id, receipt_name, receipt_total_cost, receipt_paid_amount, receipt_change, receipt_type, return_id)
+            VALUES
+                ($1, $2, $3, $4, $5, $6, $7, $8, $9)
+            `;
+        const insertReturnToReceiptsValues = [returnReceiptId, saleId, posId, receiptName, totalPriceReturned, amountReceived, change, receiptType, originalReceiptID];
+
+        await pool.query("BEGIN;");
+        await pool.query(updateSaleItemsRefundQty, updateSaleItemsRefundQtyValues);
+        await pool.query(insertSales, insertSalesValues);
+        await pool.query(insertIntoSalesItems, insertIntoSalesItemsValues);
+        await pool.query(insertReturnToReceipts, insertReturnToReceiptsValues);
+        await pool.query("COMMIT;");
+        res.status(200).json({ message: "Return Successful" });
+    } catch (error) {
+        // await pool.query("ROLLBACK;");
+        res.status(500).json({ message: error.message });
+    }
+}
+
 const adminCancelRefundReceipt = async(req, res) => {
     try {
         const { receiptId } = req.params;
@@ -474,10 +579,10 @@ const getReceiptsDashboard = async (req, res) => {
         const { date } = req.query;
         const query = `
             SELECT 
-                COUNT(CASE WHEN DATE(r.date_created AT TIME ZONE 'UTC' AT TIME ZONE 'Asia/Manila') = $1 THEN receipt_id ELSE NULL END) as receipts_today,
-                COUNT(CASE WHEN DATE(r.date_created AT TIME ZONE 'UTC' AT TIME ZONE 'Asia/Manila') = $1 AND receipt_type = 'sale' THEN receipt_id ELSE NULL END) as sale_receipts_today,
-                COUNT(CASE WHEN DATE(r.date_created AT TIME ZONE 'UTC' AT TIME ZONE 'Asia/Manila') = $1 AND receipt_type = 'refund' THEN receipt_id ELSE NULL END) as refund_receipts_today,
-                COUNT(CASE WHEN DATE(r.date_created AT TIME ZONE 'UTC' AT TIME ZONE 'Asia/Manila') = $1 AND s.status = false THEN receipt_id ELSE NULL END) as cancelled_receipts_today,
+                COUNT(CASE WHEN DATE(r.date_created) = $1 THEN receipt_id ELSE NULL END) as receipts_today,
+                COUNT(CASE WHEN DATE(r.date_created) = $1 AND receipt_type = 'sale' THEN receipt_id ELSE NULL END) as sale_receipts_today,
+                COUNT(CASE WHEN DATE(r.date_created) = $1 AND receipt_type = 'refund' THEN receipt_id ELSE NULL END) as refund_receipts_today,
+                COUNT(CASE WHEN DATE(r.date_created) = $1 AND s.status = false THEN receipt_id ELSE NULL END) as cancelled_receipts_today,
                 COUNT(receipt_id) as receipts_total,
                 COUNT(CASE WHEN receipt_type = 'sale' THEN receipt_id ELSE NULL END) as sale_receipts_total,
                 COUNT(CASE WHEN receipt_type = 'refund' THEN receipt_id ELSE NULL END) as refund_receipts_total,
@@ -503,5 +608,6 @@ module.exports = {
   refundReceipt,
   adminCancelRefundReceipt,
   getReceiptsDashboard,
-  getReceiptDetails
+  getReceiptDetails,
+  returnItem
 };

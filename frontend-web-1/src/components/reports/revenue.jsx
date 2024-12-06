@@ -9,14 +9,18 @@ import registerCooperFont from '../fonts/Cooper-ExtraBold-normal';
 import registerRubikFont from '../fonts/Rubik-Regular-normal';
 import registerRubikBoldFont from '../fonts/Rubik-Bold-normal';
 import registerRubikSemiBoldFont from '../fonts/Rubik-SemiBold-normal';
+import { getSettings } from '../../services/settingsService';
 
 const RevenueReport = () => {
     const reportRef = useRef();
-    const { userRole } = useContext(AuthContext);
+    const { userRole, displayExpenses } = useContext(AuthContext);
     const [selectedDate, setSelectedDate] = useState({
         month: new Date().getMonth() + 1, // Month is 0-indexed, so add 1
         year: new Date().getFullYear(),
     });
+
+    const [storeName, setStoreName] = useState('');
+    const [storeAddress, setStoreAddress] = useState('');
 
     useEffect(() => {
         registerCooperFont();
@@ -37,6 +41,9 @@ const RevenueReport = () => {
             const expensesData = await getExpensesReport(month, year);
             const orderData = await getOrderReport(month, year);
 
+            const { settings } = await getSettings();
+            setStoreName(settings.find(setting => setting.setting_key === 'store_name').setting_value);
+            setStoreAddress(settings.find(setting => setting.setting_key === 'store_address').setting_value);
 
             const totalSales = salesData.summary.reduce((acc, item) => acc + Number(item.total_sales || 0), 0);
             const totalLaborCosts = laborData.summary.reduce((acc, item) => acc + Number(item.total_service_amount || 0), 0);
@@ -45,7 +52,7 @@ const RevenueReport = () => {
 
             setSales(totalSales);
             setLaborCosts(totalLaborCosts);
-            setOperationalExpenses(totalOperationalExpenses);
+            setOperationalExpenses(displayExpenses ? totalOperationalExpenses : 0);
             setOrderSales(totalOrderSales);
         } catch (error) {
             console.error("Error fetching revenue data:", error);
@@ -66,10 +73,10 @@ const RevenueReport = () => {
 
         // Header section
         pdf.setFontSize(22);
-        pdf.setFont('Cooper-ExtraBold');
+        pdf.setFont('Rubik-Bold');
         pdf.setTextColor('#F9961F');
-        const title1 = 'ARON';
-        const title2 = 'BIKES';
+        const title1 = '';
+        const title2 = storeName;
         pdf.text(title1, (pdfWidth - pdf.getTextWidth(title1 + title2)) / 2, yPosition);
 
         pdf.setTextColor('#2E2E2E');
@@ -78,7 +85,7 @@ const RevenueReport = () => {
         pdf.setFontSize(8);
         pdf.setFont('Rubik-Regular');
         yPosition += 6;
-        const subtitle = 'Antipolo City';
+        const subtitle = storeAddress;
         pdf.text(subtitle, (pdfWidth - pdf.getTextWidth(subtitle)) / 2, yPosition);
 
         pdf.setFontSize(16);
@@ -186,8 +193,8 @@ const RevenueReport = () => {
 
             <div ref={reportRef} className="pdf-content">
                 <div className="upper-text" style={{ textAlign: 'center', marginBottom: '20px' }}>
-                    <h1><span>ARON</span><span>BIKES</span></h1>
-                    <p>Antipolo City</p>
+                    <h1>{storeName}</h1>
+                    <p>{storeAddress}</p>
                     <h3>Monthly Revenue Report</h3>
                     <h6>({`${months[selectedDate.month - 1].label} ${selectedDate.year}`})</h6>
                     <p>Overview of revenue, costs, and net income.</p>

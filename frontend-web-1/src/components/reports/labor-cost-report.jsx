@@ -9,6 +9,7 @@ import registerCooperFont from '../fonts/Cooper-ExtraBold-normal';
 import registerRubikFont from '../fonts/Rubik-Regular-normal';
 import registerRubikBoldFont from '../fonts/Rubik-Bold-normal';
 import registerRubikSemiBoldFont from '../fonts/Rubik-SemiBold-normal';
+import { getSettings } from '../../services/settingsService';
 
 const LaborReport = () => {
     const reportRef = useRef();
@@ -18,6 +19,10 @@ const LaborReport = () => {
         month: new Date().getMonth(), // Adjust for 1-indexed months
         year: new Date().getFullYear(),
     });
+    const [mechPercentage, setMechPercentage] = useState(0);
+
+    const [storeName, setStoreName] = useState('');
+    const [storeAddress, setStoreAddress] = useState('');
 
     useEffect(() => {
         registerCooperFont();
@@ -30,6 +35,11 @@ const LaborReport = () => {
         try {
             const data = await getLaborReport(month, year);
             setLaborData(data);
+            const { settings } = await getSettings();
+            setStoreName(settings.find(setting => setting.setting_key === 'store_name').setting_value);
+            setStoreAddress(settings.find(setting => setting.setting_key === 'store_address').setting_value);
+            setMechPercentage(Number(data.mechanicPercentage));
+            console.log(Number(data.mechanicPercentage));
         } catch (error) {
             console.error('Error fetching labor data:', error);
         }
@@ -48,10 +58,10 @@ const LaborReport = () => {
 
         // Header section
         pdf.setFontSize(22);
-        pdf.setFont('Cooper-ExtraBold');
+        pdf.setFont('Rubik-Bold');
         pdf.setTextColor('#F9961F');
-        const title1 = 'ARON';
-        const title2 = 'BIKES';
+        const title1 = '';
+        const title2 = storeName;
         pdf.text(title1, (pdfWidth - pdf.getTextWidth(title1 + title2)) / 2, yPosition);
 
         pdf.setTextColor('#2E2E2E');
@@ -60,7 +70,7 @@ const LaborReport = () => {
         pdf.setFontSize(8);
         pdf.setFont('Rubik-Regular');
         yPosition += 6;
-        const subtitle = 'Antipolo City';
+        const subtitle = storeAddress;
         pdf.text(subtitle, (pdfWidth - pdf.getTextWidth(subtitle)) / 2, yPosition);
 
         pdf.setFontSize(16);
@@ -97,8 +107,17 @@ const LaborReport = () => {
         const label = 'Total Labor Costs:';
         pdf.text(label, margin, yPosition);
         pdf.setFont('Rubik-SemiBold');
-        const value = `P ${PesoFormat.format(laborData.summary.reduce((acc, item) => acc + Number(item.total_service_amount || 0), 0))}`;
+        const value = `P ${PesoFormat.format(laborData.summary.reduce((acc, item) => acc + Number(item.total_service_amount * mechPercentage / 100 || 0), 0))}`;
         pdf.text(value, margin + pdf.getTextWidth(label), yPosition);
+
+        pdf.setFontSize(9);
+        pdf.setFont('Rubik-Regular');
+        yPosition += 10;
+        const mechPercentLabel = 'Mechanic Percentage: ';
+        pdf.text(mechPercentLabel, margin, yPosition);
+        pdf.setFont('Rubik-SemiBold');
+        const mechPercentValue = `${mechPercentage}%`;
+        pdf.text(mechPercentValue, margin + pdf.getTextWidth(mechPercentLabel), yPosition);
 
         // "Summary of Labor Costs per Mechanic" section header
         pdf.setFontSize(9);
@@ -111,12 +130,12 @@ const LaborReport = () => {
         autoTable(pdf, {
             startY: yPosition + 4,
             theme: 'grid',
-            head: [['Mechanic', 'Days of Work Rendered', 'Service Amount Paid']],
+            head: [['Mechanic', 'Days of Work Rendered', 'Service Amount Earned']],
             body: laborData.summary.length > 0
                 ? laborData.summary.map(item => [
                     item.mechanic_name || '-',
                     item.days_worked || '-',
-                    item.total_service_amount !== undefined ? `P ${PesoFormat.format(item.total_service_amount)}` : '-'
+                    item.total_service_amount !== undefined ? `P ${PesoFormat.format(item.total_service_amount * mechPercentage / 100)}` : '-'
                 ])
                 : [['-', '-', '-']],
             headStyles: {
@@ -157,11 +176,11 @@ const LaborReport = () => {
         autoTable(pdf, {
             startY: yPosition + 4,
             theme: 'grid',
-            head: [['Day', 'Expense', 'Amount']],
+            head: [['Day', 'Mechanic', 'Amount']],
             body: organizedLaborData.map(item => [
                 formatDate(item.day, selectedDate.month, selectedDate.year),
                 item.mechanic_name || '-',
-                item.service_price ? `P ${PesoFormat.format(item.service_price)}` : '-'
+                item.service_price ? `P ${PesoFormat.format(item.service_price * mechPercentage / 100)}` : '-'
             ]),
             headStyles: {
                 fillColor: [46, 46, 46],
@@ -267,8 +286,8 @@ const LaborReport = () => {
 
             <div ref={reportRef} className="pdf-content">
                 <div className="upper-text" style={{ textAlign: 'center', marginBottom: '20px' }}>
-                    <h1><span>ARON</span><span>BIKES</span></h1>
-                    <p>Antipolo City</p>
+                    <h1>{storeName}</h1>
+                    <p>{storeAddress}</p>
                     <h3>Monthly Labor Costs Report</h3>
                     <h6>({`${months[selectedDate.month - 1].label} ${selectedDate.year}`})</h6>
                     <p>Payment to the service rendered by the mechanics.</p>
@@ -281,7 +300,11 @@ const LaborReport = () => {
                 </div>
 
                 <div className='mb-4 fs-6'>
-                    Total Labor Costs: <b>{PesoFormat.format(laborData.summary.reduce((acc, item) => acc + Number(item.total_service_amount || 0), 0))}</b>
+                    Total Labor Costs: <b>{PesoFormat.format(laborData.summary.reduce((acc, item) => acc + Number(item.total_service_amount * mechPercentage / 100 || 0), 0))}</b>
+                </div>
+
+                <div className='mb-4 fs-6'>
+                    Mechanic Percentage: <b>{mechPercentage}%</b>
                 </div>
 
                 <div className='fs-6 fw-bold mb-3'>
@@ -293,7 +316,7 @@ const LaborReport = () => {
                         <tr>
                             <th>Mechanic</th>
                             <th>Days of Work Rendered</th>
-                            <th className='text-end'>Service Amount Paid</th>
+                            <th className='text-end'>Service Amount Earned</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -302,7 +325,7 @@ const LaborReport = () => {
                                 <tr key={index}>
                                     <td>{item.mechanic_name}</td>
                                     <td>{item.days_worked}</td>
-                                    <td className='text-end'>{PesoFormat.format(item.total_service_amount)}</td>
+                                    <td className='text-end'>{PesoFormat.format(item.total_service_amount * mechPercentage / 100 )}</td>
                                 </tr>
                             ))
                         ) : (
@@ -323,7 +346,7 @@ const LaborReport = () => {
                     <thead>
                         <tr>
                             <th>Day</th>
-                            <th>Expense</th>
+                            <th>Mechanic</th>
                             <th>Amount</th>
                         </tr>
                     </thead>
@@ -332,7 +355,7 @@ const LaborReport = () => {
                             <tr key={index}>
                                 <td>{item.empty ? formatDate(item.day, selectedDate.month, selectedDate.year) : formatDate(item.day, selectedDate.month, selectedDate.year)}</td>
                                 <td>{item.empty ? '-' : item.mechanic_name}</td>
-                                <td className='text-end'>{item.empty ? '-' : PesoFormat.format(item.service_price)}</td>
+                                <td className='text-end'>{item.empty ? '-' : PesoFormat.format(item.service_price * mechPercentage / 100 )}</td>
                             </tr>
                         ))}
                     </tbody>

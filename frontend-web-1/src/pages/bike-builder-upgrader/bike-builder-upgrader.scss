@@ -82,9 +82,49 @@ $font-size: clamp(0.9em, 1.2vw, 1.1em);
 
     .right-content {
 
-        .description {
+        .bike-types {
             font-size: 1rem;
-            color: black;
+
+            i{
+                cursor: pointer;
+
+                &:hover{
+                    color: $button-bg-color;
+                }
+            }
+
+            .nav{
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                margin-bottom: 10px;
+
+                .btns{
+                    display: flex;
+                    gap: 10px;
+
+                }
+            }
+
+            .types{
+                display: flex;
+                flex-direction: column;
+                gap: 10px;
+                
+                .type{
+                    display: flex;
+                    justify-content: space-between;
+                    align-items: center;
+                    padding: 10px;
+                    background-color: $normal-bg-color;
+                    border: 1px solid $normal-border-color;
+                    border-radius: 12px;
+    
+                    p{
+                        margin: 0;
+                    }
+                }
+            }
         }
     }
 }
