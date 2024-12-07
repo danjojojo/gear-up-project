@@ -1,4 +1,5 @@
 import "./cart.scss"
+import "./cart-1.scss"
 import React, {useState, useEffect, useRef} from "react";
 import { 
     getBUCartItems,
@@ -25,6 +26,8 @@ const Cart = () => {
     
     const [checkedBuParts, setCheckedBuParts] = useState(0);
     const [checkedBuPartsTotalPrice, setCheckedBuPartsTotalPrice] = useState(0);
+
+    const [showCart, setShowCart] = useState(false);
 
     const navigate = useNavigate();
    
@@ -169,10 +172,22 @@ const Cart = () => {
             <div className="cart">
                 <div className="title">
                     <h4>Cart [{buParts.length + bbParts.length}]</h4>
+                    <div className="btn-container">
+                        <button  
+                            className={`btn ${!showCart ? "active" : ""}`}
+                            onClick={() => setShowCart(false)}>
+                            Bike Builder
+                        </button>
+                        <button  
+                            className={`btn ${!showCart ? "" : "active"}`}
+                            onClick={() => setShowCart(true)}>
+                            Bike Upgrader
+                        </button>
+                    </div>
                 </div>
                 <div className="upper">
 
-                    <div className="left">
+                    <div className={`left ${showCart ? 'hidden' : ''}`}>
                         <div className="nav">
                             <h4>Bike Builder [{bbParts.length}]</h4>
                             {!editBbParts && <p onClick={() => setEditBbParts(true)}>Edit</p>}
@@ -231,7 +246,7 @@ const Cart = () => {
                             <p>{PesoFormat.format(checkedBbPartsTotalPrice)}</p>
                         </div>
                     </div>
-                    <div className="right">
+                    <div className={`right ${showCart ? '' : 'hidden'}`}>
                         <div className="nav">
                             <h4>Bike Upgrader [{buParts.length}]</h4>
                             {!editBuParts && <p onClick={() => setEditBuParts(true)}>Edit</p>}
