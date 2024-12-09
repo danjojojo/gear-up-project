@@ -4,6 +4,8 @@
     padding: 30px;
     gap: 10px;
     background-color: #2E2E2E;
+    overflow-y: auto;
+    scrollbar-width: thin;
 
     h4 {
         height: auto;

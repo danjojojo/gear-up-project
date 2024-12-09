@@ -415,5 +415,13 @@
             width: 100%;
             padding: 20px;
         }
+
+        .right{
+            order: 1; 
+        }
+
+        .left{
+            order: 2;
+        }
     }
 }
