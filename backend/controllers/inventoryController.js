@@ -398,7 +398,7 @@ const updateItem = async (req, res) => {
             itemAddToBikeBuilder,
             itemBikeParts,
             itemImage,
-            new Date(Date.now()), // date_updated
+            new Date(Date.now()).toLocaleString("en-US", { timeZone: "Asia/Manila" }), // date_updated
             itemCost,
             id
         ];

@@ -10,7 +10,7 @@ const getOrders = async (req, res) => {
         const query = `
             SELECT * 
             FROM orders
-            WHERE DATE(date_created) = $1
+            WHERE DATE(date_created AT TIME ZONE 'UTC' AT TIME ZONE 'Asia/Manila') = $1
             ORDER BY date_created DESC;
         `
         const { rows } = await pool.query(query, [startDate]);
@@ -127,7 +127,7 @@ const getOrder = async (req, res) => {
 const getOrderDates = async (req, res) => {
     try {
         const query = `
-            SELECT DISTINCT DATE(date_created) AS date_created
+            SELECT DISTINCT DATE(date_created AT TIME ZONE 'UTC' AT TIME ZONE 'Asia/Manila') AS date_created
             FROM orders
             ORDER BY date_created DESC
         `;

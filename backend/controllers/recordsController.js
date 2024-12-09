@@ -17,19 +17,19 @@ const getDashboardData = async (req, res) => {
                     SELECT 
                         SUM(
                             CASE 
-                                WHEN DATE(si.date_created) = $1 AND si.refund_qty = 0 AND si.return_qty = 0 THEN si.item_total_price
-                                WHEN DATE(si.date_created) = $1 AND si.refund_qty = si.item_qty OR si.return_qty = si.item_qty THEN 0
-                                WHEN DATE(si.date_created) = $1 AND si.refund_qty < si.item_qty THEN (si.item_qty - si.refund_qty) * si.item_unit_price 
-                                WHEN DATE(si.date_created) = $1 AND si.return_qty < si.item_qty THEN (si.item_qty - si.return_qty) * si.item_unit_price 
+                                WHEN DATE(si.date_created AT TIME ZONE 'UTC' AT TIME ZONE 'Asia/Manila') = $1 AND si.refund_qty = 0 AND si.return_qty = 0 THEN si.item_total_price
+                                WHEN DATE(si.date_created AT TIME ZONE 'UTC' AT TIME ZONE 'Asia/Manila') = $1 AND si.refund_qty = si.item_qty OR si.return_qty = si.item_qty THEN 0
+                                WHEN DATE(si.date_created AT TIME ZONE 'UTC' AT TIME ZONE 'Asia/Manila') = $1 AND si.refund_qty < si.item_qty THEN (si.item_qty - si.refund_qty) * si.item_unit_price 
+                                WHEN DATE(si.date_created AT TIME ZONE 'UTC' AT TIME ZONE 'Asia/Manila') = $1 AND si.return_qty < si.item_qty THEN (si.item_qty - si.return_qty) * si.item_unit_price 
                             ELSE 0 
                             END
                             ) AS sales_today,
                         SUM(
                             CASE 
-                            WHEN DATE(si.date_created) = $1 AND si.refund_qty = 0 AND si.return_qty = 0 THEN item_qty 
-                            WHEN DATE(si.date_created) = $1 AND si.refund_qty = si.item_qty OR si.return_qty = si.item_qty THEN 0
-                            WHEN DATE(si.date_created) = $1 AND si.refund_qty < si.item_qty THEN (si.item_qty - si.refund_qty)
-                            WHEN DATE(si.date_created) = $1 AND si.return_qty < si.item_qty THEN (si.item_qty - si.return_qty)
+                            WHEN DATE(si.date_created AT TIME ZONE 'UTC' AT TIME ZONE 'Asia/Manila') = $1 AND si.refund_qty = 0 AND si.return_qty = 0 THEN item_qty 
+                            WHEN DATE(si.date_created AT TIME ZONE 'UTC' AT TIME ZONE 'Asia/Manila') = $1 AND si.refund_qty = si.item_qty OR si.return_qty = si.item_qty THEN 0
+                            WHEN DATE(si.date_created AT TIME ZONE 'UTC' AT TIME ZONE 'Asia/Manila') = $1 AND si.refund_qty < si.item_qty THEN (si.item_qty - si.refund_qty)
+                            WHEN DATE(si.date_created AT TIME ZONE 'UTC' AT TIME ZONE 'Asia/Manila') = $1 AND si.return_qty < si.item_qty THEN (si.item_qty - si.return_qty)
                             ELSE 0 
                             END
                         ) AS sold_today,
@@ -74,8 +74,8 @@ const getDashboardData = async (req, res) => {
 
                 const query = `
                     SELECT 
-                        COUNT(CASE WHEN DATE(sm.date_created) = $1 THEN sale_service_id ELSE NULL END) AS rendered_today,
-                        SUM(CASE WHEN DATE(sm.date_created) = $1 THEN (service_price * ${mechanicPercentage} / 100) ELSE 0 END) AS earned_today,
+                        COUNT(CASE WHEN DATE(sm.date_created AT TIME ZONE 'UTC' AT TIME ZONE 'Asia/Manila') = $1 THEN sale_service_id ELSE NULL END) AS rendered_today,
+                        SUM(CASE WHEN DATE(sm.date_created AT TIME ZONE 'UTC' AT TIME ZONE 'Asia/Manila') = $1 THEN (service_price * ${mechanicPercentage} / 100) ELSE 0 END) AS earned_today,
                         COUNT(sm.sale_service_id) AS total_rendered,
                         SUM(sm.service_price * ${mechanicPercentage} / 100) AS total_earned
                     FROM sales_mechanics SM
@@ -100,8 +100,8 @@ const getDashboardData = async (req, res) => {
             try {
                 const query = `
                     SELECT 
-                        SUM(CASE WHEN DATE(date_created) = $1 THEN expense_amount ELSE 0 END) AS expenses_today,
-                        COUNT(CASE WHEN DATE(date_created) = $1 THEN expense_id ELSE NULL END) AS entries_today,
+                        SUM(CASE WHEN DATE(date_created AT TIME ZONE 'UTC' AT TIME ZONE 'Asia/Manila') = $1 THEN expense_amount ELSE 0 END) AS expenses_today,
+                        COUNT(CASE WHEN DATE(date_created AT TIME ZONE 'UTC' AT TIME ZONE 'Asia/Manila') = $1 THEN expense_id ELSE NULL END) AS entries_today,
                         SUM(expense_amount) AS total_expenses,
                         COUNT(expense_id) AS total_entries
                     FROM expenses
@@ -156,7 +156,7 @@ const getRecords = async (req, res) => {
                         JOIN pos_users P ON R.pos_id = P.pos_id
                         JOIN sales S ON R.sale_id = S.sale_id
                         JOIN sales_items SI ON SI.sale_id = S.sale_id
-                        WHERE DATE(R.date_created) = $1 AND S.status = true AND r.receipt_type = 'sale'
+                        WHERE DATE(R.date_created AT TIME ZONE 'UTC' AT TIME ZONE 'Asia/Manila') = $1 AND S.status = true AND r.receipt_type = 'sale'
                     GROUP BY R.receipt_name, P.pos_name, R.date_created, R.sale_id
                     ORDER BY R.date_created DESC
                 `;
@@ -178,7 +178,7 @@ const getRecords = async (req, res) => {
                         JOIN pos_users P ON R.pos_id = P.pos_id
                         JOIN sales S ON R.sale_id = S.sale_id
                         JOIN sales_mechanics SM ON SM.sale_id = S.sale_id
-                        WHERE DATE(R.date_created) = $1 AND S.status = true
+                        WHERE DATE(R.date_created AT TIME ZONE 'UTC' AT TIME ZONE 'Asia/Manila') = $1 AND S.status = true
                     GROUP BY R.receipt_name, P.pos_name, R.date_created, R.sale_id
                     ORDER BY R.date_created DESC
                 `;
@@ -198,7 +198,7 @@ const getRecords = async (req, res) => {
                     SELECT e.expense_name AS record_name, e.expense_amount AS record_total_amount, p.pos_name, e.date_created, e.expense_id AS record_id, e.status AS status
                         FROM expenses E
                         JOIN pos_users P ON E.pos_id = P.pos_id
-                    WHERE DATE(e.date_created) = $1
+                    WHERE DATE(e.date_created AT TIME ZONE 'UTC' AT TIME ZONE 'Asia/Manila') = $1
                     ORDER BY e.date_created DESC
                 `;
                 const values = [date];
@@ -231,12 +231,12 @@ const getHighlightDates = async (req, res) => {
         case 'sales':
             try {
                 const query = `
-                    SELECT DATE(R.date_created) AS date_created 
+                    SELECT DATE(R.date_created AT TIME ZONE 'UTC' AT TIME ZONE 'Asia/Manila') AS date_created 
                         FROM receipts R
                         JOIN sales S ON R.sale_id = S.sale_id
                         JOIN sales_items SI ON SI.sale_id = S.sale_id
                         WHERE S.status = true
-                    GROUP BY DATE(R.date_created)
+                    GROUP BY DATE(R.date_created AT TIME ZONE 'UTC' AT TIME ZONE 'Asia/Manila')
                 `;
                 const { rows } = await pool.query(query);
 
@@ -250,12 +250,12 @@ const getHighlightDates = async (req, res) => {
         case 'labor':
             try {
                 const query = `
-                    SELECT DATE(R.date_created) AS date_created 
+                    SELECT DATE(R.date_created AT TIME ZONE 'UTC' AT TIME ZONE 'Asia/Manila') AS date_created 
                         FROM receipts R
                         JOIN sales S ON R.sale_id = S.sale_id
                         JOIN sales_mechanics SM ON SM.sale_id = S.sale_id
                         WHERE S.status = true
-                    GROUP BY DATE(R.date_created)
+                    GROUP BY DATE(R.date_created AT TIME ZONE 'UTC' AT TIME ZONE 'Asia/Manila')
                 `;
                 const { rows } = await pool.query(query);
 

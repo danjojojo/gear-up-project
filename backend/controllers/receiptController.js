@@ -14,13 +14,13 @@ const getReceiptDates = async (req, res) => {
 
         if(role === 'admin') {
             const { rows } = await pool.query(
-                "SELECT DATE(date_created) AS date_created FROM receipts GROUP BY DATE(date_created)");
+                "SELECT DATE(date_created AT TIME ZONE 'UTC' AT TIME ZONE 'Asia/Manila') AS date_created FROM receipts GROUP BY DATE(date_created AT TIME ZONE 'UTC' AT TIME ZONE 'Asia/Manila')");
             res.json({ dates: rows });
         } else {
             const decodedToken = jwt.verify(token, process.env.JWT_SECRET);
             const posId = decodedToken.pos_id;
             const { rows } = await pool.query(
-                "SELECT DATE(date_created) AS date_created FROM receipts WHERE pos_id = $1 GROUP BY DATE(date_created)", 
+                "SELECT DATE(date_created AT TIME ZONE 'UTC' AT TIME ZONE 'Asia/Manila') AS date_created FROM receipts GROUP BY DATE(date_created AT TIME ZONE 'UTC' AT TIME ZONE 'Asia/Manila')", 
                 [posId.toString()]);
             res.json({ dates: rows });
         }
@@ -54,7 +54,7 @@ const getPosReceipts = async (req, res) => {
                 JOIN pos_users P ON R1.pos_id = P.pos_id
                 LEFT JOIN receipts R2 ON R1.receipt_type = 'refund' AND R1.refund_id = R2.receipt_id
                 LEFT JOIN receipts R3 ON R1.receipt_type = 'return' AND R1.return_id = R3.receipt_id
-                WHERE DATE(R1.date_created) = $1 
+                WHERE DATE(R1.date_created AT TIME ZONE 'UTC' AT TIME ZONE 'Asia/Manila') = $1 
                 ORDER BY R1.date_created DESC;
             `;
             const { rows } = await pool.query(query, [startDate]);
@@ -76,7 +76,7 @@ const getPosReceipts = async (req, res) => {
                 LEFT JOIN receipts R2 ON R1.receipt_type = 'refund' AND R1.refund_id = R2.receipt_id
                 LEFT JOIN receipts R3 ON R1.receipt_type = 'return' AND R1.return_id = R3.receipt_id
                 WHERE R1.pos_id = $1 
-                AND DATE(R1.date_created) = $2 
+                AND DATE(R1.date_created AT TIME ZONE 'UTC' AT TIME ZONE 'Asia/Manila') = $2 
                 ORDER BY R1.date_created DESC;
             `;
             const { rows } = await pool.query(query,
@@ -245,7 +245,7 @@ const adminVoidReceipt = async(req, res) => {
         await pool.query(query, [receiptId]);
         await pool.query(updateSalesIDtoFalse, [receiptId]);
         await pool.query("COMMIT;");
-        res.json({ status: "voided", dateVoided: new Date(Date.now()) });
+        res.json({ status: "voided", dateVoided: new Date(Date.now()).toLocaleString("en-US", { timeZone: "Asia/Manila" }) });
     } catch (error) {
         await pool.query("ROLLBACK;");
         res.status(500).json({ message: error.message });
@@ -579,10 +579,10 @@ const getReceiptsDashboard = async (req, res) => {
         const { date } = req.query;
         const query = `
             SELECT 
-                COUNT(CASE WHEN DATE(r.date_created) = $1 THEN receipt_id ELSE NULL END) as receipts_today,
-                COUNT(CASE WHEN DATE(r.date_created) = $1 AND receipt_type = 'sale' THEN receipt_id ELSE NULL END) as sale_receipts_today,
-                COUNT(CASE WHEN DATE(r.date_created) = $1 AND receipt_type = 'refund' THEN receipt_id ELSE NULL END) as refund_receipts_today,
-                COUNT(CASE WHEN DATE(r.date_created) = $1 AND s.status = false THEN receipt_id ELSE NULL END) as cancelled_receipts_today,
+                COUNT(CASE WHEN DATE(r.date_created AT TIME ZONE 'UTC' AT TIME ZONE 'Asia/Manila') = $1 THEN receipt_id ELSE NULL END) as receipts_today,
+                COUNT(CASE WHEN DATE(r.date_created AT TIME ZONE 'UTC' AT TIME ZONE 'Asia/Manila') = $1 AND receipt_type = 'sale' THEN receipt_id ELSE NULL END) as sale_receipts_today,
+                COUNT(CASE WHEN DATE(r.date_created AT TIME ZONE 'UTC' AT TIME ZONE 'Asia/Manila') = $1 AND receipt_type = 'refund' THEN receipt_id ELSE NULL END) as refund_receipts_today,
+                COUNT(CASE WHEN DATE(r.date_created AT TIME ZONE 'UTC' AT TIME ZONE 'Asia/Manila') = $1 AND s.status = false THEN receipt_id ELSE NULL END) as cancelled_receipts_today,
                 COUNT(receipt_id) as receipts_total,
                 COUNT(CASE WHEN receipt_type = 'sale' THEN receipt_id ELSE NULL END) as sale_receipts_total,
                 COUNT(CASE WHEN receipt_type = 'refund' THEN receipt_id ELSE NULL END) as refund_receipts_total,

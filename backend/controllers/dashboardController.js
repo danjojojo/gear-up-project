@@ -34,7 +34,7 @@ const getDashboardData = async (req, res) => {
             SELECT 
                 SUM(
                     CASE 
-                        WHEN DATE(si.date_created ) = DATE(NOW()) THEN
+                        WHEN DATE(si.date_created AT TIME ZONE 'UTC' AT TIME ZONE 'Asia/Manila') = DATE(NOW() AT TIME ZONE 'Asia/Manila') THEN
                             CASE 
                                 WHEN si.refund_qty = 0 AND si.return_qty = 0 THEN si.item_qty 
                                 WHEN si.refund_qty = si.item_qty OR si.return_qty = si.item_qty THEN 0
@@ -54,7 +54,7 @@ const getDashboardData = async (req, res) => {
         // Query to get rendered_today from sales_mechanics
         const renderedTodayQuery = `
             SELECT 
-                COUNT(CASE WHEN DATE(sm.date_created ) = DATE(NOW()) THEN sm.sale_service_id ELSE NULL END) AS rendered_today
+                COUNT(CASE WHEN DATE(sm.date_created AT TIME ZONE 'UTC' AT TIME ZONE 'Asia/Manila') = DATE(NOW() AT TIME ZONE 'Asia/Manila') = DATE(NOW()) THEN sm.sale_service_id ELSE NULL END) AS rendered_today
             FROM sales_mechanics sm
             JOIN sales s ON sm.sale_id = s.sale_id
             WHERE s.status = true
@@ -145,18 +145,18 @@ const getSummaryRecords = async (req, res) => {
                 JOIN items I on SI.item_id = i.item_id
                 JOIN sales S on SI.sale_id = s.sale_id
                 JOIN pos_users P on SI.pos_id = p.pos_id
-                WHERE DATE(si.date_created) = $1 AND s.status = true AND si.sale_item_type = 'sale'
+                WHERE DATE(si.date_created AT TIME ZONE 'UTC' AT TIME ZONE 'Asia/Manila') = $1 AND s.status = true AND si.sale_item_type = 'sale'
             UNION
             SELECT 'mechanic' as record_type, mechanic_name, service_price, sm.date_created as date, pos_name, s.sale_id as record_id, sm.sale_service_id as record_item_id, '0' as refund_qty, '1' as item_qty, service_price as item_unit_price, '0' as return_qty
                 FROM sales_mechanics SM 
                 JOIN mechanics M on SM.mechanic_id = M.mechanic_id
                 JOIN sales S on SM.sale_id = s.sale_id
                 JOIN pos_users P on SM.pos_id = p.pos_id
-                WHERE DATE(sm.date_created) = $1 AND s.status = true
+                WHERE DATE(sm.date_created AT TIME ZONE 'UTC' AT TIME ZONE 'Asia/Manila') = $1 AND s.status = true
             UNION
             SELECT 'expense' AS record_type, expense_name, expense_amount, e.date_created as date, pos_name, e.expense_id as record_id, e.expense_id as record_item_id, '0' as refund_qty, '1' as item_qty, expense_amount as item_unit_price, '0' as return_qty
                 FROM expenses e JOIN pos_users P on e.pos_id = p.pos_id
-                WHERE DATE(e.date_created) = $1 AND e.status = 'active'
+                WHERE DATE(e.date_created AT TIME ZONE 'UTC' AT TIME ZONE 'Asia/Manila') = $1 AND e.status = 'active'
                 ORDER BY date DESC, item_name ASC;
         `
         const values = [date];
@@ -185,7 +185,7 @@ const getReceiptOverview = async (req, res) => {
             LEFT JOIN 
                 sales_mechanics sm ON sm.sale_id = s.sale_id
             WHERE 
-                DATE(r.date_created) = CURRENT_DATE
+                DATE(r.date_created AT TIME ZONE 'UTC' AT TIME ZONE 'Asia/Manila') = DATE(NOW() AT TIME ZONE 'Asia/Manila')
                 AND s.status = true 
                 AND 
                 (

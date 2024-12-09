@@ -74,7 +74,9 @@ const createOrder = async (req, res) => {
         const bbOption = sessionOrderFirstItem.bikeBuildDelivery;
         const buOption = sessionOrderFirstItem.bikeUpgradeDelivery;
         const orderAmount = sessionOrderFirstItem.amount;
-        const expiresAt = new Date(Date.now() + 15 * 60 * 1000); // Expires in 15 minutes
+        // const expiresAt = new Date(Date.now() + 15 * 60 * 1000); // Expires in 15 minutes
+        const expiresAt = new Date(Date.now() + 15 * 60 * 1000).toLocaleString("en-US", { timeZone: "Asia/Manila" }); // Expires in 15 minutes
+
 
         const ordersInsert = `
             INSERT INTO orders (order_id, user_id, payment_id, checkout_session_id, order_name, order_amount, cust_name, email, phone, cust_address, payment_status, order_status, bb_option, bu_option, expires_at)
