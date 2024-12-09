@@ -1,0 +1,164 @@
+@media screen and (max-width: 768px) {
+    .cart {
+        padding: 20px;
+
+        .title {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+
+            h4 {
+                font-size: 16px;
+                margin: 0;
+            }
+
+            .btn-container {
+                padding: 0;
+                display: block;
+
+                .btn {
+                    font-size: 12px;
+                    border: none;
+                    margin-left: 10px;
+                    padding: 3px 25px;
+                    border-radius: 20px;
+                    cursor: pointer;
+                    background-color: #f0f0f0;
+
+                }
+
+                .btn.active {
+                    background-color: #f9961f;
+                    color: #fff;
+                }
+            }
+
+        }
+
+
+        .upper {
+            display: block;
+
+            .left,
+            .right {
+                width: 100%;
+
+                .nav {
+
+                    h4,
+                    p {
+                        font-size: 12px;
+                    }
+                }
+
+                .cart-items {
+
+                    p {
+                        font-size: 12px;
+                    }
+
+                    .item {
+                        display: block;
+
+                        input {
+                            margin-top: 10px;
+                            margin-bottom: 10px;
+                        }
+
+                        .left-item-content {
+                            display: block;
+
+                            .img-container {
+                                width: 100%;
+                                padding: 10px;
+                                margin-bottom: 10px;
+                            }
+                        }
+
+                        .right-item-content {
+
+                            .top-nav {
+                                margin-bottom: 10px;
+
+                                h5 {
+                                    font-size: 16px;
+                                    margin: 0;
+                                }
+
+                                i {
+                                    font-size: 16px;
+                                }
+                            }
+
+                            p {
+                                margin-bottom: 25px;
+                            }
+
+                            .bottom {
+                                align-items: center;
+                                margin-bottom: 5px;
+                                p {
+                                    margin: 0;
+                                }
+
+                                .qty{
+                                    display: flex;
+                                    align-items: center;
+    
+                                    p{
+                                        padding: 4px 10px;
+                                    }
+    
+                                    .max{
+                                        color: #F9961F;
+                                        background-color: transparent;
+                                        border: none;
+                                    }
+    
+                                    button{
+                                        padding: 1px 10px;
+    
+                                        &:hover{
+                                            background-color: #F9961F;
+                                            color: white;
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+
+                .subtotal {
+                    h4 {
+                        font-size: 20px;
+                    }
+
+                    p {
+                        font-size: 16px;
+                    }
+                }
+            }
+
+            .hidden {
+                display: none;
+            }
+        }
+
+        .lower {
+            justify-content: space-between;
+
+            h4 {
+                font-size: 16px;
+                margin: 0;
+            }
+
+            .disabled,
+            .enabled {
+                font-size: 12px;
+                padding: 10px;
+                width: 50%;
+            }
+        }
+    }
+}

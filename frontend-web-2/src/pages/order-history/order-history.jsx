@@ -67,7 +67,7 @@ const OrderHistory = () => {
                             <div className="order" key={index}>
                                 <div className="top">
                                     <p className='name'>{order.order_name}</p>
-                                    <p>{moment(order.date_created).format("LLL")}</p>
+                                    <p>{moment(order.date_created).format("lll")}</p>
                                 </div>
                                 <p className='amount'>Paid {PesoFormat.format(order.order_amount)} via  <span>{order.payment_type}</span></p>
                                 <div className="bottom">

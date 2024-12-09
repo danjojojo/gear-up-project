@@ -1,4 +1,5 @@
 import "./bike-upgrader.scss"
+import "./bike-upgrader-1.scss"
 import React, { useState, useEffect } from "react";
 import {
     getAnyItems
@@ -6,6 +7,7 @@ import {
 import { Modal } from 'react-bootstrap';
 import { useCompatibilitySpecs, formOptions } from "../../utils/compatibilityUtils";
 import PartDetails from "./part-details";
+import backbutton from "../../assets/icons/back-button.png";
 
 const BikeUpgrader = () => {
     const ownedPartsSelection = [
@@ -224,6 +226,7 @@ const BikeUpgrader = () => {
     }
 
     const [showModal, setShowModal] = useState(false);
+    const [showRightContainer, setShowRightContainer] = useState(false);
 
     return (
         <div className="bike-upgrader">
@@ -231,7 +234,7 @@ const BikeUpgrader = () => {
                 show={showModal}
                 onHide={() => setShowModal(false)}
             />
-            <div className="left-container">
+            <div className={`left-container ${showRightContainer ? 'hidden' : ''}`}>
                 <div className="row-1">
                     <div className="left">
                         <div className="top">
@@ -289,14 +292,23 @@ const BikeUpgrader = () => {
                 </div>
                 <div className="row-3">
                     <button
-                        className="upgrade-part" onClick={handleFindParts}
+                        className="upgrade-part" onClick={() => {
+                            handleFindParts();
+                            setShowRightContainer(true);
+                        }}
                         disabled={Object.keys(formValues).length === 0 || dynamicFormFields.length === 0 ? true : false}
                     >Find parts</button>
                 </div>
             </div>
-            <div className="right-container">
+            <div className={`right-container ${showRightContainer ? '' : 'hidden'}`}>
                 <h4>{desiredPart === '' ? 'Parts' : desiredPart + 's'}</h4>
                 <div className="parts-container">
+                    <button
+                        className="close-button"
+                        onClick={() => setShowRightContainer(false)} // Hide right container
+                    >
+                        <img src={backbutton} alt="back-button" />
+                    </button>
                     <div className="parts">
                         {!findPartsClicked && items.length === 0 && < div className="specs-not-set">
                             <p>Enter your specifications and press <strong>Find Parts</strong>.</p>

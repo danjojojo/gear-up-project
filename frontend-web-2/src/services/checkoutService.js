@@ -28,3 +28,12 @@ export const getSettings = async () => {
         throw error;
     }
 }
+
+export const getStoreAddress = async () => {
+    try {
+        const response = await api.get('/settings/get-store-address');
+        return response.data;
+    } catch (error) {
+        throw error;
+    }
+}

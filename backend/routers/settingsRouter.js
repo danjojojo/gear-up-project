@@ -10,7 +10,8 @@ const {
     setDisplayStockLevelPOS,
     setDisplayExpenses,
     setNewStoreName,
-    setNewStoreAddress
+    setNewStoreAddress,
+    getStoreAddress
 } = require("../controllers/settingsController");
 
 router.get('/get-settings', verifyToken, checkRole('staff', 'admin'), getSettings);
@@ -21,5 +22,6 @@ router.put('/set-display-stock-level-pos', verifyToken, checkRole('admin'), setD
 router.put('/set-display-expenses', verifyToken, checkRole('admin'), setDisplayExpenses);
 router.put('/set-new-store-name', verifyToken, checkRole('admin'), setNewStoreName);
 router.put('/set-new-store-address', verifyToken, checkRole('admin'), setNewStoreAddress);
+router.get('/get-store-address', getStoreAddress);
 
 module.exports = router;

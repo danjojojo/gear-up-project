@@ -1,7 +1,9 @@
 import "./bike-builder.scss";
-import React, { useState, useRef, useEffect } from 'react';
+import "./bike-builder-1.scss";
+import React, { useState, useRef, useCallback, useEffect } from 'react';
 import BudgetContainer from "../../components/bike-builder/contents/budget-container";
 import BuilderSidebar from "../../components/bike-builder/contents/builder-sidebar";
+import BuilderLowerbar from "../../components/bike-builder/contents/builder-lowerbar";
 import CanvasContainer from "../../components/bike-builder/contents/canvas-container";
 import BuildSummary from "../../components/bike-builder/contents/summary-container"
 import BikeTypes from "../../components/bike-builder/contents/bike-types";
@@ -35,6 +37,19 @@ const BikeBuilder = () => {
         seat: { x: 0, y: 0, rotation: 0 },
         cockpit: { x: 0, y: 0, rotation: 0 },
     });
+
+    const [adjustedHitRegions, setAdjustedHitRegions] = useState(null); // State to hold adjusted hit regions
+
+    // Callback to receive adjusted hit regions
+    const handleAdjustedHitRegions = useCallback((regions) => {
+        setAdjustedHitRegions((prevRegions) => {
+            // Only update if regions actually change
+            if (JSON.stringify(prevRegions) !== JSON.stringify(regions)) {
+                return regions;
+            }
+            return prevRegions;
+        });
+    }, []);
 
     const hitRegions = {
         frame: { x: 299, y: 146, width: 313, height: 208, rotation: 0 },
@@ -462,7 +477,7 @@ const BikeBuilder = () => {
 
 
     const isInHitRegion = (partType, pos) => {
-        const region = hitRegions[partType];
+        const region = adjustedHitRegions?.[partType] || hitRegions[partType]; // Use adjusted or default regions
         return (
             pos.x >= region.x &&
             pos.x <= region.x + region.width &&
@@ -510,7 +525,7 @@ const BikeBuilder = () => {
                     buildStatsPrice={buildStatsPrice}
                     finalBuildImage={finalBuildImage}
                     goBackToBuild={goBackToBuild}
-                    handleReset={ handleReset}
+                    handleReset={handleReset}
                     setIsBuildFinalized={setIsBuildFinalized}
                     setShowBudgetStep={setShowBudgetStep}
                 />
@@ -530,38 +545,54 @@ const BikeBuilder = () => {
                             setIsSelectingBikeType={setIsSelectingBikeType}
                         />
                     ) : (
+                        <>
                         <div className="builder-container d-flex">
-                            <BuilderSidebar
+                                <BuilderSidebar
+                                    currentPart={currentPart}
+                                    goBackToPreviousPart={goBackToPreviousPart}
+                                    proceedToNextPart={proceedToNextPart}
+                                    isPartSelectedForCurrentPart={isPartSelectedForCurrentPart}
+                                    handleAddToBuild={handleAddToBuild}
+                                    handleReset={handleReset}
+                                    selectedParts={selectedParts}
+                                    lockedParts={lockedParts}
+                                    handleFinalizeBuild={handleFinalizeBuild} // Pass the finalize handler to sidebar
+                                />
+                                <CanvasContainer
+                                    captureCallback={captureImageRef}
+                                    frameImage={frameImage}
+                                    forkImage={forkImage}
+                                    groupsetImage={groupsetImage}
+                                    wheelsetImage={wheelsetImage}
+                                    seatImage={seatImage}
+                                    cockpitImage={cockpitImage}
+                                    partPositions={partPositions}
+                                    handleDragEnd={handleDragEnd}
+                                    budget={budget}
+                                    buildStatsPrice={buildStatsPrice}
+                                    hitRegions={hitRegions}
+                                    onUpdateAdjustedHitRegions={handleAdjustedHitRegions}
                                 currentPart={currentPart}
-                                goBackToPreviousPart={goBackToPreviousPart}
-                                proceedToNextPart={proceedToNextPart}
-                                isPartSelectedForCurrentPart={isPartSelectedForCurrentPart}
-                                handleAddToBuild={handleAddToBuild}
-                                handleReset={handleReset}
-                                selectedParts={selectedParts}
-                                lockedParts={lockedParts}
-                                handleFinalizeBuild={handleFinalizeBuild} // Pass the finalize handler to sidebar
-                            />
-                            <CanvasContainer
-                                captureCallback={captureImageRef}
-                                frameImage={frameImage}
-                                forkImage={forkImage}
-                                groupsetImage={groupsetImage}
-                                wheelsetImage={wheelsetImage}
-                                seatImage={seatImage}
-                                cockpitImage={cockpitImage}
-                                partPositions={partPositions}
-                                handleDragEnd={handleDragEnd}
-                                budget={budget}
-                                buildStatsPrice={buildStatsPrice}
-                                hitRegions={hitRegions}
-                                currentPart={currentPart}
-                                lockedParts={lockedParts}
-                                resetBuild={resetBuild}
-                                partSelected={selectedParts}
-                            />
+                                    lockedParts={lockedParts}
+                                    resetBuild={resetBuild}
+                                    partSelected={selectedParts}
+                                />
+    
                         </div>
-                    )
+                            <BuilderLowerbar
+                            currentPart={currentPart}
+                            goBackToPreviousPart={goBackToPreviousPart}
+                            proceedToNextPart={proceedToNextPart}
+                            isPartSelectedForCurrentPart={isPartSelectedForCurrentPart}
+                            handleAddToBuild={handleAddToBuild}
+                            handleReset={handleReset}
+                            selectedParts={selectedParts}
+                            lockedParts={lockedParts}
+                            handleFinalizeBuild={handleFinalizeBuild} // Pass the finalize handler to sidebar
+                        />
+                    </>
+
+                )
                 // )
             )}
         </div>

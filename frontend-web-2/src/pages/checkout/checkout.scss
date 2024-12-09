@@ -3,6 +3,7 @@
     background-color: #2E2E2E;
     display: flex;
     flex-direction: row;
+    overflow-y: auto;
     
     .left{
         width: 40%;
@@ -397,6 +398,22 @@
                     }
                 }
             }
+        }
+    }
+}
+
+@media screen and (max-width: 768px) {
+    .checkout{
+        flex-direction: column-reverse;
+        gap: 20px;
+
+        p, label, h5, button, input{
+            font-size: clamp(0.8rem, 1vw, 1rem) !important;
+        }
+
+        .left, .right{
+            width: 100%;
+            padding: 20px;
         }
     }
 }

@@ -5,7 +5,7 @@ import {
     getOrder
 } from '../../services/orderService';
 import {
-    getSettings
+    getStoreAddress
 } from '../../services/checkoutService';
 import './order.scss';
 import moment from 'moment';
@@ -43,8 +43,10 @@ const Order = () => {
     const fetchOrderDetails = async () => {
         try {
             const { order, items, reviews, allowedToReview } = await getOrder(orderId);
-            const { settings } = await getSettings();
-            setStoreAddress(settings.find(setting => setting.setting_key === 'store_address').setting_value);
+            const { storeAddress } = await getStoreAddress();
+            let retrievedStoreAddress = storeAddress.setting_value;
+            setStoreAddress(retrievedStoreAddress);
+            
             setOrderDetails(order);
             setOrderItems(items);
             setReviewItems(reviews);
@@ -55,7 +57,9 @@ const Order = () => {
                 setLoading(false);
             }, 500);
         } catch (err) {
+            console.error(err);
             setError("Order not found or an error occurred.");
+            setLoading(false);
         }
     };
 
@@ -220,24 +224,26 @@ const Order = () => {
                                         </div>
                                         <div className="bottom">
                                             {item.review_id === null && 
-                                                <>  
+                                                <div className='r'>  
                                                     <p>Rating: N/A</p>
                                                     <button className='rate' onClick={() => handleReviewModal(item)}>Rate</button>
-                                                </>
+                                                </div>
                                             }
                                             {item.review_id && 
-                                                <>
-                                                    <p>Rating:</p>
-                                                    <Rating
-                                                        readonly={true}
-                                                        initialValue={item.rating}
-                                                        iconsCount={5}
-                                                        size={30}
-                                                        fillColor='#F9961F'
-                                                        emptyColor='#CCC'
-                                                    />
+                                                <div className='r'>
+                                                    <div className="rating">
+                                                        <p>Rating:</p>
+                                                        <Rating
+                                                            readonly={true}
+                                                            initialValue={item.rating}
+                                                            iconsCount={5}
+                                                            size={30}
+                                                            fillColor='#F9961F'
+                                                            emptyColor='#CCC'
+                                                        />
+                                                    </div>
                                                     <button className='rate' onClick={() => handleReviewModal(item)}>View Review</button>
-                                                </>
+                                                </div>
                                             }
                                         </div>
                                     </div>

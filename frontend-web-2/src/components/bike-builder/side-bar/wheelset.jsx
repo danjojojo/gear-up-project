@@ -4,12 +4,25 @@ import { getWheelsetItems } from '../../../services/bikeBuilderService';
 import arrowUp from '../../../assets/icons/arrow-up.png';
 import arrowDown from '../../../assets/icons/arrow-down.png';
 import { useParams } from 'react-router-dom';
+import { Modal } from 'react-bootstrap';
 
 const Wheelset = ({ onAddToBuild, selectedFrame, selectedFork, selectedGroupset }) => {
     const [items, setItems] = useState([]);
     const [sortOrder, setSortOrder] = useState("asc");
     const [loading, setLoading] = useState(true);
     const { typeTag } = useParams();
+    const [selectedItem, setSelectedItem] = useState(null);
+    const [showModal, setShowModal] = useState(false);
+
+    const openModal = (item) => {
+        setSelectedItem(item);
+        setShowModal(true);
+    };
+
+    const closeModal = () => {
+        setSelectedItem(null);
+        setShowModal(false);
+    };
 
     const fetchItems = useCallback(async () => {
         try {
@@ -83,23 +96,25 @@ const Wheelset = ({ onAddToBuild, selectedFrame, selectedFork, selectedGroupset 
                 </button>
             </div>
 
-            {loading && 
+            {loading &&
                 <div className='loading'>
                     <i className='fa-solid fa-gear fa-spin'></i>
                 </div>
             }
 
-            {!loading &&<div className="parts-cards">
+            {!loading && <div className="parts-cards">
                 {items.map((item) => (
-                    <div className="parts-card" key={item.wheelset_id}>
-                        <div className="item-image"  onClick={() => onAddToBuild(item)}>
+                    <div className="parts-card" key={item.wheelset_id} onClick={() => openModal(item)}>
+                        <div className="item-image" onClick={(e) => { e.stopPropagation(); onAddToBuild(item); }}>
                             {item.item_image ? (
                                 <img src={`data:image/png;base64,${item.item_image}`} alt="Wheelset" />
                             ) : (
                                 <p>No Image Available</p>
                             )}
                         </div>
-                        <div className="item-name">{item.item_name}</div>
+                        <div className="item-name">{item.item_name}
+                            <div className="item-price-1">{PesoFormat.format(item.item_price)}</div>
+                        </div>
                         <div className="item-price">
                             {PesoFormat.format(item.item_price)}
                             <br />
@@ -108,12 +123,12 @@ const Wheelset = ({ onAddToBuild, selectedFrame, selectedFork, selectedGroupset 
 
                         <Accordion>
                             <Accordion.Item eventKey="0">
-                                <Accordion.Header>Details</Accordion.Header>
-                                <Accordion.Body>{item.description}</Accordion.Body>
+                                <Accordion.Header onClick={(e) => e.stopPropagation()}>Details</Accordion.Header>
+                                <Accordion.Body onClick={(e) => e.stopPropagation()}>{item.description}</Accordion.Body>
                             </Accordion.Item>
                             <Accordion.Item eventKey="1">
-                                <Accordion.Header>Tech Specs</Accordion.Header>
-                                <Accordion.Body>
+                                <Accordion.Header onClick={(e) => e.stopPropagation()}>Tech Specs</Accordion.Header>
+                                <Accordion.Body onClick={(e) => e.stopPropagation()}>
                                     <div className='specs-container'>Hub - Rotor Type: {item.hub_rotor_type}</div>
                                     <div className='specs-container'>Hub - Cassette Type: {item.hub_cassette_type}</div>
                                     <div className='specs-container'>Hub Holes: {item.hub_holes}</div>
@@ -132,7 +147,59 @@ const Wheelset = ({ onAddToBuild, selectedFrame, selectedFork, selectedGroupset 
                         </Accordion>
                     </div>
                 ))}
-            </div>}
+            </div>
+            }
+
+            {/* Modal Component */}
+            {
+                selectedItem && (
+                    <Modal show={showModal} onHide={closeModal}>
+                        <Modal.Header closeButton>
+                        </Modal.Header>
+                        <Modal.Body>
+                            <div className="modal-content">
+                                <div className="modal-image">
+                                    {selectedItem.item_image ? (
+                                        <img
+                                            src={`data:image/png;base64,${selectedItem.item_image}`}
+                                            alt="frame"
+                                            style={{
+                                                width: "100%",
+                                                height: "auto",
+                                                padding: "50px",
+                                                borderRadius: "10px",
+                                            }}
+                                        />
+                                    ) : (
+                                        <p>No Image Available</p>
+                                    )}
+                                </div>
+                                <div className="modal-details">
+                                    <h4 className='ps-3 fw-bold'>{selectedItem.item_name}</h4>
+                                    <h5 className='ps-3'>Price: {PesoFormat.format(selectedItem.item_price)}</h5>
+                                    <h6 className='p-3'>{selectedItem.description}</h6>
+                                    <h6 className='ps-3'>Technical Specifications:</h6>
+                                    <ul>
+                                        <li>Hub - Rotor Type: {selectedItem.hub_rotor_type}</li>
+                                        <li>Hub - Cassette Type: {selectedItem.hub_cassette_type}</li>
+                                        <li>Hub Holes: {selectedItem.hub_holes}</li>
+                                        <li>Front Hub Width: {selectedItem.front_hub_width}</li>
+                                        <li>Front Hub - Axle Type: {selectedItem.front_hub_axle_type}</li>
+                                        <li>Front Hub - Axle Diameter: {selectedItem.front_hub_axle_diameter}</li>
+                                        <li>Rear Hub Width: {selectedItem.rear_hub_width}</li>
+                                        <li>Rear Hub - Axle Type: {selectedItem.rear_hub_axle_type}</li>
+                                        <li>Rear Hub - Axle Diameter: {selectedItem.rear_hub_axle_diameter}</li>
+                                        <li>Rear Hub Speed: {selectedItem.rear_hub_speed}</li>
+                                        <li>Tire Size: {selectedItem.tire_size}</li>
+                                        <li>Tire Width: {selectedItem.tire_width}</li>
+                                        <li>Rim Spokes: {selectedItem.rim_spokes}</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </Modal.Body>
+                    </Modal>
+                )
+            }
         </div>
     );
 };

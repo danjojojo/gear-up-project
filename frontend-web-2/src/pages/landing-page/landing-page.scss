@@ -28,6 +28,7 @@
         left: 5%;
         // font-family: "poppins";
         color: white !important;
+        text-align: justify;
     }
 
     p {
@@ -40,5 +41,23 @@
         font-weight: normal;
         width: 50%;
         text-wrap: pretty;
+        text-align: justify;
+    }
+}
+
+
+@media screen and (max-width: 768px) {
+    .landing-page {
+        background-position: 20% 50%;
+
+        h1 {
+            font-size: 28px;
+        }
+
+        p {
+            font-size: 12px;
+            width: 280px;
+            text-align: justify;
+        }
     }
 }

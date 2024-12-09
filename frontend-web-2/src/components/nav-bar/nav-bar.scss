@@ -5,7 +5,7 @@
         display: flex;
         align-items: center;
         justify-content: space-between;
-        gap: 2rem;
+        // gap: 2rem;
         padding: 15px 100px;
         background-color: #F9961F;
 
@@ -28,7 +28,7 @@
         }
 
         .login{
-
+            
             span{
                 margin-right: 10px;
             }
@@ -49,15 +49,14 @@
         .profile{
             display: flex;
             align-items: center;
-            justify-content: space-between;
+            // justify-content: space-between;
             // background-color: #171717;
             color: #F9961F;
-            padding: 0px 10px;
             border-radius: 50px;
             font-weight: 500;
             text-decoration: none;
             border: none;
-
+            
             img{
                 width: 30px;
                 height: 30px;
@@ -174,6 +173,79 @@
             /* Font size */
             font-weight: bold;
             /* Bold text */
+        }
+    }
+}
+
+@media screen and (max-width: 768px) {
+    .nav-bar {
+        .upper-nav {
+            padding-left: 30px;
+            padding-right: 30px;
+
+            .nav-link {
+                font-size: .6rem;
+            }
+
+            .login {
+
+               font-size: 0.6rem;
+            }
+
+            .profile {
+                
+
+                img {
+                    width: 20px;
+                    height: 20px;
+                    margin-right: 10px;
+                    // border: 1px solid white;
+                }
+
+                p {
+                    display: none;
+                }
+
+                .logout {
+                    background-color: transparent;
+                    color: #171717;
+                    padding: 5px;
+                    border-radius: 500px;
+                    font-weight: 500;
+                    text-decoration: none;
+                    border: none;
+                    margin-left: 5px;
+
+                    &:hover {
+                        text-decoration: underline;
+                        background-color: #171717;
+                        color: #F9961F;
+                    }
+                }
+            }
+        }
+
+        .lower-nav {
+            padding-left: 30px;
+            padding-right: 30px;
+            gap: 1rem;
+
+            h2 {
+                font-size: 16px;
+            }
+
+            .nav-link {
+                font-size: 10px;
+            }
+
+            .add-to-cart {
+                padding: 10px;
+
+                img {
+                    height: 12px;
+                    width: 12px;
+                }
+            }
         }
     }
 }

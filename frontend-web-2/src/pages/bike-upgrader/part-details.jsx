@@ -1,5 +1,5 @@
 // src/components/PartDetailsAccordion.jsx
-import React, {useState} from 'react';
+import React, { useState } from 'react';
 import Accordion from 'react-bootstrap/Accordion';
 import { addToBUCart } from '../../utils/cartDB';
 import { Rating } from 'react-simple-star-rating';
@@ -162,7 +162,7 @@ const PartDetails = ({ item, partType }) => {
                 <Accordion>
                     <Accordion.Item eventKey="0">
                         <Accordion.Header>Details</Accordion.Header>
-                        <Accordion.Body>{item.description}</Accordion.Body>
+                        <Accordion.Body><div className='desc'>{item.description}</div></Accordion.Body>
                     </Accordion.Item>
                     <Accordion.Item eventKey="1">
                         <Accordion.Header>Tech Specs</Accordion.Header>

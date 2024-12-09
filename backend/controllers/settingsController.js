@@ -120,6 +120,20 @@ const setDisplayExpenses = async (req, res) => {
     }
 }
 
+const getStoreAddress = async (req, res) => {
+    try {
+        const query = `
+            SELECT *
+            FROM settings
+            WHERE setting_key = 'store_address';
+        `
+        const { rows } = await pool.query(query);
+        res.status(200).json({ storeAddress : rows[0] });
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+}
+
 module.exports = {
     getSettings,
     getAdminSettings,
@@ -128,5 +142,6 @@ module.exports = {
     setDisplayStockLevelPOS,
     setDisplayExpenses,
     setNewStoreName,
-    setNewStoreAddress
+    setNewStoreAddress,
+    getStoreAddress
 }

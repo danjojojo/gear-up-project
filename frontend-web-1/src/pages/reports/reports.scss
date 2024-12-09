@@ -77,13 +77,14 @@ $button-fail: #dee2e6;
 
             p {
                 margin-bottom: 8px;
-                font-size: 14px;
+                // font-size: 0.9rem;
             }
-
+            
             table {
+                // font-size: 0.8rem;
                 width: 100%;
                 border-collapse: collapse;
-                table-layout: fixed;
+                // table-layout: fixed;
 
                 thead {
                     background-color: #2E2E2E;

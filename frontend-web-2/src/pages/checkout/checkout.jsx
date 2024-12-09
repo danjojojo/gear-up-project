@@ -2,7 +2,7 @@ import React, {useState, useEffect, useContext} from 'react'
 import './checkout.scss';
 import {useNavigate} from 'react-router-dom';
 import { useCartItems } from "../../utils/cartItems";
-import { createCheckoutSession, createOrder, getSettings } from "../../services/checkoutService";
+import { createCheckoutSession, createOrder, getStoreAddress } from "../../services/checkoutService";
 import {Tooltip} from 'react-tooltip';
 import 'react-tooltip/dist/react-tooltip.css'
 import compressBase64Image from '../../utils/compressImage';
@@ -25,8 +25,9 @@ const Checkout = () => {
 
     const getCurrentSettings = async () => {
         try {
-            const { settings } = await getSettings();
-            setStoreAddress(settings.find(setting => setting.setting_key === 'store_address').setting_value);
+            const { storeAddress } = await getStoreAddress();
+            let retrievedStoreAddress = storeAddress.setting_value;
+            setStoreAddress(retrievedStoreAddress);
         } catch (error) {
             console.error(error);
         }
@@ -382,7 +383,7 @@ const Checkout = () => {
                             <div className="right-item-content">
                                 <div className="top">
                                     <div className="top-nav">
-                                        <h5>Bike Build {part.id}</h5>
+                                        <h5>Bike Build</h5>
                                     </div>
                                     <p className="subtitle">{part.build_id}</p>
                                     <p>Qty: 1</p>

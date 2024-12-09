@@ -4,12 +4,25 @@ import { getGroupsetItems } from '../../../services/bikeBuilderService';
 import arrowUp from '../../../assets/icons/arrow-up.png';
 import arrowDown from '../../../assets/icons/arrow-down.png';
 import { useParams } from 'react-router-dom';
+import { Modal } from 'react-bootstrap';
 
 const Groupset = ({ onAddToBuild, selectedFrame, selectedFork }) => {
     const [items, setItems] = useState([]);
     const [sortOrder, setSortOrder] = useState("asc");
     const [loading, setLoading] = useState(true);
     const { typeTag } = useParams();
+    const [selectedItem, setSelectedItem] = useState(null);
+    const [showModal, setShowModal] = useState(false);
+
+    const openModal = (item) => {
+        setSelectedItem(item);
+        setShowModal(true);
+    };
+
+    const closeModal = () => {
+        setSelectedItem(null);
+        setShowModal(false);
+    };
 
     const fetchItems = useCallback(async () => {
         try {
@@ -70,23 +83,25 @@ const Groupset = ({ onAddToBuild, selectedFrame, selectedFork }) => {
                 </button>
             </div>
 
-            {loading && 
+            {loading &&
                 <div className='loading'>
                     <i className='fa-solid fa-gear fa-spin'></i>
                 </div>
             }
-            
+
             {!loading && <div className="parts-cards">
                 {items.map((item) => (
-                    <div className="parts-card" key={item.groupset_id}>
-                        <div className="item-image" onClick={() => onAddToBuild(item)}>
+                    <div className="parts-card" key={item.groupset_id} onClick={() => openModal(item)}>
+                        <div className="item-image" onClick={(e) => { e.stopPropagation(); onAddToBuild(item); }}>
                             {item.item_image ? (
                                 <img src={`data:image/png;base64,${item.item_image}`} alt="frame" />
                             ) : (
                                 <p>No Image Available</p>
                             )}
                         </div>
-                        <div className="item-name">{item.item_name}</div>
+                        <div className="item-name">{item.item_name}
+                            <div className="item-price-1">{PesoFormat.format(item.item_price)}</div>
+                        </div>
                         <div className="item-price">
                             {PesoFormat.format(item.item_price)}
                             <br />
@@ -97,12 +112,12 @@ const Groupset = ({ onAddToBuild, selectedFrame, selectedFork }) => {
 
                         <Accordion>
                             <Accordion.Item eventKey="0">
-                                <Accordion.Header>Details</Accordion.Header>
-                                <Accordion.Body>{item.description}</Accordion.Body>
+                                <Accordion.Header onClick={(e) => e.stopPropagation()}>Details</Accordion.Header>
+                                <Accordion.Body onClick={(e) => e.stopPropagation()}>{item.description}</Accordion.Body>
                             </Accordion.Item>
                             <Accordion.Item eventKey="1">
-                                <Accordion.Header>Tech Specs</Accordion.Header>
-                                <Accordion.Body>
+                                <Accordion.Header onClick={(e) => e.stopPropagation()}>Tech Specs</Accordion.Header>
+                                <Accordion.Body onClick={(e) => e.stopPropagation()}>
                                     <div className='specs-container'>Chainring Speed: {item.chainring_speed}</div>
                                     <div className='specs-container'>Crank Arm Length: {item.crank_arm_length}</div>
                                     <div className='specs-container'>Front Derailleur Speed: {item.front_derailleur_speed}</div>
@@ -120,7 +135,58 @@ const Groupset = ({ onAddToBuild, selectedFrame, selectedFork }) => {
                         </Accordion>
                     </div>
                 ))}
-            </div>}
+            </div>
+            }
+
+            {/* Modal Component */}
+            {
+                selectedItem && (
+                    <Modal show={showModal} onHide={closeModal}>
+                        <Modal.Header closeButton>
+                        </Modal.Header>
+                        <Modal.Body>
+                            <div className="modal-content">
+                                <div className="modal-image">
+                                    {selectedItem.item_image ? (
+                                        <img
+                                            src={`data:image/png;base64,${selectedItem.item_image}`}
+                                            alt="frame"
+                                            style={{
+                                                width: "100%",
+                                                height: "auto",
+                                                padding: "50px",
+                                                borderRadius: "10px",
+                                            }}
+                                        />
+                                    ) : (
+                                        <p>No Image Available</p>
+                                    )}
+                                </div>
+                                <div className="modal-details">
+                                    <h4 className='ps-3 fw-bold'>{selectedItem.item_name}</h4>
+                                    <h5 className='ps-3'>Price: {PesoFormat.format(selectedItem.item_price)}</h5>
+                                    <h6 className='p-3'>{selectedItem.description}</h6>
+                                    <h6 className='ps-3'>Technical Specifications:</h6>
+                                    <ul>
+                                        <li>Chainring Speed: {selectedItem.chainring_speed}</li>
+                                        <li>Crank Arm Length: {selectedItem.crank_arm_length}</li>
+                                        <li>Front Derailleur Speed: {selectedItem.front_derailleur_speed}</li>
+                                        <li>Rear Derailleur Speed: {selectedItem.rear_derailleur_speed}</li>
+                                        <li>Cassette Type: {selectedItem.cassette_type}</li>
+                                        <li>Cassette Speed: {selectedItem.cassette_speed}</li>
+                                        <li>Chain Speed: {selectedItem.chain_speed}</li>
+                                        <li>Bottom Bracket Type: {selectedItem.bottom_bracket_type}</li>
+                                        <li>Bottom Bracket Width: {selectedItem.bottom_bracket_width}</li>
+                                        <li>Brake Type: {selectedItem.brake_type}</li>
+                                        <li>Rotor Mount Type: {selectedItem.rotor_mount_type}</li>
+                                        <li>Rotor Size: {selectedItem.rotor_size}</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </Modal.Body>
+                    </Modal>
+                )
+            }
         </div>
     );
 };
