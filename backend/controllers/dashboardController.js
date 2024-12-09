@@ -54,7 +54,7 @@ const getDashboardData = async (req, res) => {
         // Query to get rendered_today from sales_mechanics
         const renderedTodayQuery = `
             SELECT 
-                COUNT(CASE WHEN DATE(sm.date_created AT TIME ZONE 'UTC' AT TIME ZONE 'Asia/Manila') = DATE(NOW() AT TIME ZONE 'Asia/Manila') = DATE(NOW()) THEN sm.sale_service_id ELSE NULL END) AS rendered_today
+                COUNT(CASE WHEN DATE(sm.date_created AT TIME ZONE 'UTC' AT TIME ZONE 'Asia/Manila') = DATE(NOW() AT TIME ZONE 'Asia/Manila') THEN sm.sale_service_id ELSE NULL END) AS rendered_today
             FROM sales_mechanics sm
             JOIN sales s ON sm.sale_id = s.sale_id
             WHERE s.status = true
