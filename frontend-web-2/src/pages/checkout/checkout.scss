@@ -404,7 +404,8 @@
 
 @media screen and (max-width: 768px) {
     .checkout{
-        flex-direction: column-reverse;
+        flex-direction: column;
+        height: 100%;
         gap: 20px;
 
         p, label, h5, button, input{
