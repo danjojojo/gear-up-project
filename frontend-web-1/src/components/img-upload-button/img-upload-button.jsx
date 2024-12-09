@@ -51,13 +51,11 @@ function ImageUploadButton({ onFileSelect, part }) {
     const [error, setError] = useState('');
 
     const handleFileChange = (event) => {
-        console.log(imgSrc);
         const file = event.target.files[0];
         if(!file) return;
 
         const reader = new FileReader();
         reader.addEventListener('load', () => {
-            console.log('Show modal');
             const imageElement = new Image();
             const imageUrl = reader.result.toString() || "";
             imageElement.src = imageUrl;
@@ -74,7 +72,6 @@ function ImageUploadButton({ onFileSelect, part }) {
             setImgSrc("");
             setTimeout(() => {
                 setShowCropModal(true);
-                // console.log(imageUrl);
                 setImgSrc(imageUrl);
             }, 0);
         });

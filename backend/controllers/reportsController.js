@@ -60,8 +60,7 @@ const getSalesReport = async (req, res) => {
             detailed: detailedResult.rows,
         });
     } catch (error) {
-        console.error('Error fetching sales report:', error);
-        res.status(500).json({ error: error.message });
+        res.status(500).json({ error: "Error" });
     }
 };
 
@@ -113,7 +112,6 @@ const getExpensesReport = async (req, res) => {
             detailed: detailedResult.rows,
         });
     } catch (error) {
-        console.error('Error fetching expenses report:', error);
         res.status(500).json({ error: 'Failed to fetch expenses report' });
     }
 };
@@ -172,7 +170,6 @@ const getLaborReport = async (req, res) => {
             mechanicPercentage,
         });
     } catch (error) {
-        console.error('Error fetching labor report:', error);
         res.status(500).json({ error: 'Failed to fetch labor report' });
     }
 };
@@ -230,7 +227,6 @@ const getOrderReport = async (req, res) => {
             detailed: detailedResult.rows,  // Multiple rows for detailed data
         });
     } catch (error) {
-        console.error('Error fetching order report:', error);
         res.status(500).json({ error: 'Failed to fetch order report' });
     }
 };

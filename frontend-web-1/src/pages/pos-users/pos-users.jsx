@@ -157,7 +157,6 @@ const POSUsers = () => {
             setTab(tab);
             setAllPosUsers(posUsers);
             setRetrievedPosUsers(posUsers);
-            console.log(posUsers);
             setTimeout(() => {
                 setLoading(false);
             }, 500);
@@ -239,7 +238,6 @@ const POSUsers = () => {
         const formData = new FormData();
         formData.append('password', posUserPassword);
         setModalState('edit-pass');
-        console.log(selectedPosUserID);
 
         try {
             await editPosUserPassword(selectedPosUserID, formData);
@@ -255,7 +253,6 @@ const POSUsers = () => {
 
     }
     const handleChangePosUserStatus = async () => {
-        console.log(selectedPosUserStatus);
         setModalState('edit-status');
         try {
             if (selectedPosUserStatus === 'active') {

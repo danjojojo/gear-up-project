@@ -6,8 +6,7 @@ const getSummaryRecords = async (req, res) => {
         if(!token) return res.status(401).json({message: "Unauthorized"});
 
         const { date } = req.query;
-        console.log( date);
-
+        
         const getMechanicPercentage = `
             SELECT 
                 setting_value
@@ -42,7 +41,7 @@ const getSummaryRecords = async (req, res) => {
         res.json({ records: rows, mechanicPercentage });
         
     } catch (error) {
-        res.status(500).json({message: error.message});
+        res.status(500).json({message: "Error"});
     }
 }
 
@@ -69,7 +68,7 @@ const getHighlightDates = async (req, res) => {
         const { rows } = await pool.query(query);
         res.json({ dates: rows })
     } catch (error) {
-        res.status(500).json({message: error.message});
+        res.status(500).json({message: "Error"});
     }
 }
 
@@ -97,7 +96,7 @@ const getReceiptDetails = async (req, res) => {
             change: receiptDetails.receipt_change,
         })
     } catch (error) {
-        res.status(500).json({message: error.message});
+        res.status(500).json({message: "Error"});
     }
 }
 
@@ -124,7 +123,7 @@ const getReceiptItems = async (req, res) => {
         const { rows } = await pool.query(query, values);
         res.json({ items: rows })
     } catch (error) {
-        res.status(500).json({message: error.message});
+        res.status(500).json({message: "Error"});
     }
 }
 
@@ -146,7 +145,7 @@ const getExpenseImage = async (req, res) => {
         const image = rows[0].expense_image;
         res.json({ image })
     } catch (error) {
-        res.status(500).json({message: error.message});
+        res.status(500).json({message: "Error"});
     }
 }
 

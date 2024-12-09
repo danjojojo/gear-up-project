@@ -46,7 +46,6 @@ const Frame = () => {
     const fetchItems = useCallback(async () => {
         try {
             const data = await getFrameItems(displayItem, type);
-            console.log(data);
             // Sort items based on selected sort criteria
             const sortedItems = data.sort((a, b) => {
                 let aValue, bValue;

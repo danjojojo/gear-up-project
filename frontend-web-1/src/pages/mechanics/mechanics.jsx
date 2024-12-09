@@ -307,10 +307,8 @@ const Mechanics = () => {
         setSortMechanicsRecent(!sortMechanicsRecent);
         let sortedMechanics;
         if(sortMechanicsRecent){
-            console.log('sort recent');
             sortedMechanics = mechanicsList.sort((a, b) => new Date(b.date_created) - new Date(a.date_created));
         } else {
-            console.log('sort oldest');
             sortedMechanics = mechanicsList.sort((a, b) => new Date(a.date_created) - new Date(b.date_created));
         }
         setRetrievedMechanicsList(sortedMechanics);

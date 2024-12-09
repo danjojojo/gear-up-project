@@ -35,7 +35,6 @@ function ReviewModal({
     const [reviewPreviewImage, setReviewPreviewImage] = useState(null);
 
     const handleRating = (value) => {
-        console.log('Rating:', value);
         setReviewRating(value);
     }
 
@@ -67,8 +66,6 @@ function ReviewModal({
             setReviewTextError('Please write a review.');
             return;
         }
-        
-        console.log(reviewImage);
         event.preventDefault();
         const formData = new FormData();
         formData.append('itemId', itemId);
@@ -92,7 +89,6 @@ function ReviewModal({
 		const image = e.target.files[0]
 		
 		if(image){
-			console.log(image)
 			if(!image.type.startsWith("image/")) {
 				e.target.value = "";
 				setError("Please upload an image file.");

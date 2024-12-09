@@ -32,7 +32,6 @@ const getWaitlistItems = async (req, res) => {
         const { rows } = await pool.query(query);
         res.status(200).json({ data: rows, role: role });
     } catch (error) {
-        console.error('Error fetching waitlist items:', error);
         res.status(500).json({ error: 'Internal Server Error' });
     }
 };
@@ -114,7 +113,6 @@ const addFrame = async (req, res) => {
 
         res.status(201).json(result.rows[0]);
     } catch (error) {
-        console.error('Error adding frame:', error);
         res.status(500).json({ error: 'Internal Server Error' });
     }
 };
@@ -192,7 +190,6 @@ const addFork = async (req, res) => {
 
         res.status(201).json(result.rows[0]);
     } catch (error) {
-        console.error('Error adding fork:', error);
         res.status(500).json({ error: 'Internal Server Error' });
     }
 };
@@ -271,7 +268,6 @@ const addGroupset = async (req, res) => {
 
         res.status(201).json(result.rows[0]);
     } catch (error) {
-        console.error('Error adding groupset:', error);
         res.status(500).json({ error: 'Internal Server Error' });
     }
 };
@@ -351,7 +347,6 @@ const addWheelset = async (req, res) => {
 
         res.status(201).json(result.rows[0]);
     } catch (error) {
-        console.error('Error adding wheelset:', error);
         res.status(500).json({ error: 'Internal Server Error' });
     }
 };
@@ -410,7 +405,6 @@ const addSeat = async (req, res) => {
 
         res.status(201).json(result.rows[0]);
     } catch (error) {
-        console.error('Error adding seat:', error);
         res.status(500).json({ error: 'Internal Server Error' });
     }
 };
@@ -487,7 +481,6 @@ const addCockpit = async (req, res) => {
 
         res.status(201).json(result.rows[0]);
     } catch (error) {
-        console.error('Error adding cockpit:', error);
         res.status(500).json({ error: 'Internal Server Error' });
     }
 };
@@ -527,7 +520,6 @@ const deleteWaitlistItem = async (req, res) => {
             updatedItem: updateResult.rows[0]
         });
     } catch (error) {
-        console.error('Error deleting waitlist item:', error);
         res.status(500).json({ error: 'Internal Server Error' });
     }
 };

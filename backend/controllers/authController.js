@@ -132,7 +132,7 @@ const getMyName = async (req, res) => {
       res.json({ name: rows[0].admin_name });
     }
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    res.status(500).json({ error: "Error" });
   }
 }
 
@@ -145,7 +145,7 @@ const logoutUser = (req, res) => {
 
       logUserLogout(logId);
     } catch (err) {
-      console.error("Failed to decode token:", err);
+      console.log("Failed to decode token");
     }
   }
 
@@ -218,7 +218,6 @@ const logUserLogout = async (log_id) => {
 
 const verifyOTP = async (req, res) => {
     const { otp } = req.body;
-    console.log(otp, req.user);
     const adminId = req.user.admin_id;
 
     try {
@@ -243,7 +242,6 @@ const verifyOTP = async (req, res) => {
             res.status(401).json({ error: 'Invalid OTP' });
         }
     } catch (error) {
-        console.error('Error verifying OTP:', error.message);
         res.status(500).json({ error: 'Failed to verify OTP' });
     }
 };
@@ -263,7 +261,6 @@ const loginUser = async (req, res) => {
     res.cookie('token', token, { httpOnly: true, sameSite:  process.env.NODE_ENV === 'production' ? 'None' : 'Strict'});
     return res.status(200).json({ message: 'Login successful' });
   } catch (error) {
-    console.error(error);
     res.status(500).json({ error: 'Failed to log in' });
   }
 };
@@ -317,7 +314,6 @@ const verifyAdminOTP = async (req, res) => {
         }
 
    } catch (error) {
-      console.error('Error verifying OTP:', error.message);
       res.status(500).json({ error: 'Failed to verify OTP' });
    }
 };
@@ -339,7 +335,7 @@ const forgotPassword = async (req, res) => {
 
     res.status(200).json({ message: 'Password reset link sent' });
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    res.status(500).json({ error: "Error" });
   }
 }
 
@@ -380,7 +376,7 @@ const resetPassword = async (req, res) => {
     await pool.query('DELETE FROM password_reset_tokens WHERE email = $1', [email]);
     res.status(200).json({ message: 'Password reset successful' });
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    res.status(500).json({ message: "Error" });
   }
 };
 
@@ -398,7 +394,7 @@ const changePassword = async (req, res) => {
 
     res.status(200).json({ message: 'Password change successful' });
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    res.status(500).json({ message: "Error" });
   }
 };
 

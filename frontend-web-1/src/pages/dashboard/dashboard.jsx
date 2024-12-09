@@ -75,7 +75,6 @@ const Dashboard = () => {
             }
             
             setCurrentMechanicPercentage(mechanicPercentage);
-            console.log(records);
             setSummaryData();
         } catch (error) {
             console.error('Error getting summary records: ', error);

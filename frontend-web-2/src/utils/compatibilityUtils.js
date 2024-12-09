@@ -21,8 +21,6 @@ const transformSpecsData = (data) => {
         // Add the attribute pair to the appropriate place in the object
         transformedSpecs[lowerCasePartTypeFrom][lowerCasePartTypeTo].push(attribute_from);
     });
-
-    console.log('transformedSpecs:', transformedSpecs);
     return transformedSpecs;
 };
 

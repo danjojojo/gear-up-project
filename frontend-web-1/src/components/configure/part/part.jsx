@@ -54,7 +54,7 @@ const Part = ({
 
             setDependentPart(prev => parts.filter(part => part.part_name !== partName)[0].part_name);
         } catch (error) {
-            console.log(error);
+            console.log("Error");
         }
     }
 
@@ -64,7 +64,7 @@ const Part = ({
             setIndependentSpecs(specs.filter(spec => spec.column_name));
             setIndependentSpec(prev => specs.filter(spec => spec.column_name)[0].column_name);
         } catch (error) {
-            console.log(error);
+            console.log("Error");
         }
     }
 
@@ -74,7 +74,7 @@ const Part = ({
             setDependentSpecs(specs.filter(spec => spec.column_name));
             setDependentSpec(prev => specs.filter(spec => spec.column_name)[0].column_name);
         } catch (error) {
-            console.log(error);
+            console.log("Error");
         }
     }
 
@@ -84,7 +84,6 @@ const Part = ({
 
     useEffect(() => {
         if(showPart) {
-            console.log('showPart:', showPart);
             handleGetOtherParts();
             getIndependentSpecs();
             getDependentSpecs();

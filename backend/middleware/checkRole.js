@@ -6,8 +6,6 @@ const checkRole = (...allowedRoles) => {
     if (!allowedRoles.includes(role)) {
       return res.status(403).json({ message: 'Forbidden: Insufficient privileges' });
     }
-
-    console.log("Role is correct");
     next();  // Proceed to the next middleware or route handler if role matches
   };
 };

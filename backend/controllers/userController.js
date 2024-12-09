@@ -6,7 +6,6 @@ require('dotenv').config();
 const loginUser = async (req, res) => {
     try {
         const { credential } = req.body;
-        console.log(credential);
 
         const response = await axios.get(`https://www.googleapis.com/oauth2/v1/userinfo?access_token=${credential.access_token}`, {
                             headers: {
@@ -15,15 +14,11 @@ const loginUser = async (req, res) => {
                             }
                         });
 
-        console.log(response.data);
-
         const { id, email, name, picture } = response.data;
 
         const userQuery = await pool.query('SELECT * FROM users WHERE google_id = $1', [id]);
 
         const token = jwt.sign({ id: id, email: email, name: name}, process.env.JWT_SECRET, { expiresIn: '1h' });
-
-        console.log(userQuery.rows);
 
         if(userQuery.rows.length === 0){
             const insertQuery = `
@@ -48,7 +43,7 @@ const loginUser = async (req, res) => {
             return res.status(200).json({ user: existingUser });
         }
     } catch (error) {
-        res.status(500).json({ message: error.message });
+        res.status(500).json({ message: "Error" });
     }
 }
 
@@ -66,7 +61,7 @@ const getProfile = async (req, res) => {
 
         return res.status(200).json({ user: userQuery.rows[0] });
     } catch (error) {
-        res.status(500).json({ message: error.message });
+        res.status(500).json({ message: "Error" });
     }
 }
 
@@ -79,7 +74,7 @@ const logoutUser = async (req, res) => {
         });
         res.status(200).json({ message: 'Logged out successfully' });
     } catch (error) {
-        res.status(500).json({ message: error.message });
+        res.status(500).json({ message: "Error" });
     }
 }
 
@@ -92,15 +87,12 @@ const getOrderHistory = async (req, res) => {
 
         res.status(200).json({ orders: orderQuery.rows });
     } catch (error) {
-        res.status(500).json({ message: error.message });
+        res.status(500).json({ message: "Error" });
     }
 }
 
 const submitReview = async (req, res) => {
-    try {
-        console.log("Request Body:", req.body); // This should show name, amount, and pos
-        console.log("Request File:", req.file); // This should show the image file if uploaded
-        
+    try {     
         const token = req.cookies.token;
         const decoded = jwt.verify(token, process.env.JWT_SECRET);
         const userId = decoded.id;
@@ -108,7 +100,6 @@ const submitReview = async (req, res) => {
         const { itemId, reviewRating, reviewText } = req.body;
         const reviewImage = req.file ? req.file.buffer : null;
 
-        console.log(itemId, reviewRating, reviewText, reviewImage);
         
         // INSERT TO REVIEWS
         const insertQuery = `
@@ -151,7 +142,7 @@ const submitReview = async (req, res) => {
 
         res.status(200).json({ message: 'Review submitted successfully' });
     } catch (error) {
-        res.status(500).json({ message: error.message });
+        res.status(500).json({ message: "Error" });
     }
 }
 

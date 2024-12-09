@@ -98,8 +98,6 @@ const CockpitForm = ({ waitlistItemID, itemID, itemName, itemPrice, onClose, ref
         }
         formData.append('type', bikeType);
 
-        console.log('Form data being sent:', [...formData]);
-
         try {
             await addCockpit(formData);
             setShowConfirmModal(false);
@@ -253,8 +251,7 @@ const CockpitForm = ({ waitlistItemID, itemID, itemName, itemPrice, onClose, ref
                         defaultValue=""
                         required
                         onChange={(e) => {
-                            setBikeType(e.target.value)
-                            console.log(e.target.value)
+                            setBikeType(e.target.value);
                         }}
                     >   
                         <option value="">Select Bike Type</option>

@@ -68,11 +68,6 @@ const BikeUpgrader = () => {
         });
     }
 
-    useEffect(() => {
-        console.log(formValues);
-        console.log(filterValues);
-    }, [formValues, filterValues]);
-
     const getFormFields = (ownedParts, desiredPart) => {
         if (ownedParts.length === 0 || desiredPart === '') return [];
         // set formFields as Set to avoid dupes sa fields na hahanapin below

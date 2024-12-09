@@ -99,8 +99,6 @@ const GroupsetForm = ({ waitlistItemID, itemID, itemName, itemPrice, onClose, re
         }
         formData.append('type', bikeType);
 
-        console.log('Form data being sent:', [...formData]);
-
         try {
             await addGroupset(formData);
             setShowConfirmModal(false);
@@ -252,7 +250,6 @@ const GroupsetForm = ({ waitlistItemID, itemID, itemName, itemPrice, onClose, re
                         required
                         onChange={(e) => {
                             setBikeType(e.target.value)
-                            console.log(e.target.value)
                         }}
                     >   
                         <option value="">Select Bike Type</option>

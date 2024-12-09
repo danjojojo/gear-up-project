@@ -51,8 +51,6 @@ const Order = () => {
             setOrderItems(items);
             setReviewItems(reviews);
             setCanUserReview(allowedToReview);
-            console.log("Items:", items);
-            console.log("Reviews:", reviews);
             setTimeout(() => {
                 setLoading(false);
             }, 500);

@@ -18,9 +18,7 @@ const Mechanics = () => {
     const handleGetMechanicPercentage = async () => {
         try {
             const { settings } = await getSettings();
-            console.log(settings);
             let retrievedMechanicPercentage = settings.filter(setting => setting.setting_key === 'mechanic_percentage');
-            console.log(retrievedMechanicPercentage[0]);
             setCurrentMechanicPercentage(Number(retrievedMechanicPercentage[0].setting_value));
         } catch (error) {
             console.error(error);
@@ -38,7 +36,6 @@ const Mechanics = () => {
             return;
         }
 
-        console.log(currentMechanicPercentage);
         try {
             await setMechanicPercentage(currentMechanicPercentage);
             setErrorMessage('');

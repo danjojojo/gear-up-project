@@ -30,7 +30,6 @@ const BuildSummary = ({ selectedParts, buildStatsPrice, finalBuildImage, goBackT
     const finalBuild = {image: finalBuildImage, build_id: build_id, build_price : buildStatsPrice, parts : selectedParts };
 
     const handleAddBuild = async (build) => {
-        console.log(build);
         const success = await addToBBCart(build);
         if (success) {
             console.log("Build added successfully!");

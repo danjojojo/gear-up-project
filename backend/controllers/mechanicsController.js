@@ -13,7 +13,7 @@ const getAllMechanics = async (req, res) => {
         const { rows } = await pool.query(query);
         res.json({ mechanics: rows });
     } catch (err) {
-        res.status(500).json({ error: err.message });
+        res.status(500).json({ error: "Server Error" });
     }
 }
 
@@ -31,7 +31,6 @@ const addMechanic = async (req, res) => {
         await pool.query(query, values);
         res.status(201).json({ message: 'Success' });
     } catch (error) {
-        console.error(err.message);
         res.status(500).send("Server Error");
     }
 }
@@ -50,14 +49,12 @@ const editMechanic = async (req, res) => {
         await pool.query(query, values);
         res.status(201).json({ message: 'Success' });
     } catch (error) {
-        console.error(err.message);
         res.status(500).send("Server Error");
     }
 }
 
 const changeMechanicStatus = async (req, res) => {
     try {
-        console.log('Archived');
         const { id } = req.params;
         const {status} = req.body;
         const query = `
@@ -69,13 +66,12 @@ const changeMechanicStatus = async (req, res) => {
         await pool.query(query, values);
         res.status(201).json({ message: 'Success' });
     } catch (error) {
-        res.status(500).json({error: error.message});
+        res.status(500).json({error: "Server Error"});
     }
 }
 
 const deleteMechanic = async(req,res) => {
     try {
-        console.log('Delete');
         const { id } = req.params;
         const query = `
             UPDATE mechanics
@@ -86,7 +82,7 @@ const deleteMechanic = async(req,res) => {
         await pool.query(query, values);
         res.status(201).json({ message: 'Success' });
     } catch (error) {
-        res.status(500).json({error: error.message});
+        res.status(500).json({error: "Server Error"});
     }
 }
 

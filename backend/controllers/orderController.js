@@ -6,7 +6,6 @@ const nodemailer = require('nodemailer');
 const getOrders = async (req, res) => {
     try {
         const { startDate } = req.params;
-        console.log(startDate);
         const query = `
             SELECT * 
             FROM orders
@@ -18,15 +17,13 @@ const getOrders = async (req, res) => {
         res.status(200).json({ orders : rows });
 
     } catch (error) {
-        console.error('Error getting orders:', error.message);
-        res.status(500).json({ error: error.message });
+        res.status(500).json({ error: "Error" });
     }
 }
 
 const getOrder = async (req, res) => {
     try {
         const { orderId } = req.params;
-        console.log(orderId);
         const orderQuery = `
             SELECT * 
             FROM orders
@@ -111,7 +108,6 @@ const getOrder = async (req, res) => {
                     LEFT JOIN cockpit c ON i.item_id = c.item_id AND i.bike_parts = 'Cockpit'
                     WHERE o.order_name = $1 AND o.order_status = 'completed' AND r.user_id = $2
                 `;
-                console.log('Got here ', userId);
                 const uResult = await pool.query(uniqueItems, [orderId, userId]);
                 return res.status(200).json({ order : oResult.rows[0], items: iResult.rows, reviews: uResult.rows, allowedToReview: true });
             }
@@ -120,7 +116,7 @@ const getOrder = async (req, res) => {
         }
         return res.status(200).json({ order : oResult.rows[0], items: iResult.rows });
     } catch (error) {
-        res.status(500).json({ error: error.message });
+        res.status(500).json({ error: "Error" });
     }
 }
 
@@ -134,8 +130,7 @@ const getOrderDates = async (req, res) => {
         const { rows } = await pool.query(query);
         res.status(200).json({ dates: rows });
     } catch (error) {
-        console.error('Error getting order dates:', error.message);
-        res.status(500).json({ error: error.message });
+        res.status(500).json({ error: "Error "});
     }
 }
 
@@ -172,7 +167,6 @@ const getOrdersItems = async (req, res) => {
         const { rows } = await pool.query(query, [orderId]);
         res.status(200).json({ items : rows });
     } catch (error) {
-        console.error('Error getting orders:', error.message);
         res.status(500).json({ error: 'Failed to get orders' });
     }
 
@@ -259,8 +253,7 @@ const updateOrderStatus = async (req, res) => {
         await sendEmail(email, orderName, link, statusMessage);
         res.status(200).json({ message: 'Order status updated' });
     } catch (error) {
-        console.error('Error updating order:', error.message);
-        res.status(500).json({ error: error.message });
+        res.status(500).json({ error: "Error" });
     }
 };
 
@@ -274,7 +267,6 @@ const deleteExpiredOrder = async (req, res) => {
         await pool.query(query, [orderId]);
         res.status(200).json({ message: 'Expired order deleted' });
     } catch (error) {
-        console.error('Error deleting expired order:', error.message);
         res.status(500).json({ error: 'Failed to delete expired order' });
     }
 }
@@ -294,7 +286,6 @@ const sendEmail = async (email, orderName, link, statusMessage) => {
   });
 
   try {
-    console.log(`Attempting to send email to: ${email}`);  // Log before sending
     await transporter.sendMail({
       from: process.env.EMAIL_USER,
       to: email,
@@ -304,9 +295,8 @@ const sendEmail = async (email, orderName, link, statusMessage) => {
           <p>Click <a href="${link}">here</a> to view your order status.</p>
       `
     });
-    console.log(`Email successfully sent to: ${email}`);  // Log success
   } catch (error) {
-    console.error(`Error sending email to ${email}:`, error.message);  // Log specific error
+    console.error(`Error sending email to ${email}`);  // Log specific error
   }
 };
 
@@ -324,7 +314,6 @@ const updateOrderShipping = async(req, res) => {
         await pool.query(query, [trackingNumber, courier, orderId]);
         res.status(200).json({ message: 'Order shipping updated' });
     } catch (error) {
-        console.error('Error updating order shipping:', error.message);
         res.status(500).json({ error: 'Failed to update order shipping' });
     }
 }
@@ -379,7 +368,6 @@ const deductStockForCompletedOrder = async (req, res) => {
         res.status(200).json({ message: 'Stock deducted and order marked as completed' });
     } catch (error) {
         await pool.query("ROLLBACK");
-        console.error("Error deducting stock or completing order:", error.message);
         res.status(500).json({ error: 'Failed to deduct stock or complete the order' });
     }
 };
@@ -399,7 +387,6 @@ const getOrderStatistics = async (req, res) => {
         const { rows } = await pool.query(query, [startDate]);
         res.status(200).json( { stats: rows[0] });
     } catch (error) {
-        console.error('Error retrieving order statistics:', error.message);
         res.status(500).json({ error: 'Failed to retrieve order statistics' });
     }
 };

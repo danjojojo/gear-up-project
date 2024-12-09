@@ -21,7 +21,7 @@ const Specifications = ({
             const { parts } = await getAllParts();
             setRetrievedParts(parts);
         } catch (error) {
-            console.log(error);
+            console.log("Error");
         }
     }
 
@@ -29,7 +29,7 @@ const Specifications = ({
         try {
             await getCompatibilitySpecs(type);
         } catch (error) {
-            console.error(error);
+            console.log("Error");
         }
     }
 

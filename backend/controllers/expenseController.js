@@ -33,16 +33,12 @@ const getExpenses = async (req, res) => {
 
         res.status(201).json({ expenses: rows });
     } catch (error) {
-        console.error(error.message);
         res.status(500).send("Server Error");
     }
 }
 
 const addExpense = async (req, res) => {
     try {
-        console.log("Request Body:", req.body); // This should show name, amount, and pos
-        console.log("Request File:", req.file); // This should show the image file if uploaded
-
         const { name, amount } = req.body;
         const image = req.file ? req.file.buffer : null;
 
@@ -71,7 +67,6 @@ const addExpense = async (req, res) => {
 
         res.status(201).json({ message: 'Success' });
     } catch (err) {
-        console.error(err.message);
         res.status(500).send("Server Error");
     }
 }
@@ -107,7 +102,6 @@ const editExpense = async (req, res) => {
 
         res.status(201).json({ message: 'Success' });
     } catch (error) {
-        console.error(err.message);
         res.status(500).send("Server Error");
     }
 }
@@ -136,7 +130,6 @@ const getExpensesDates = async (req, res) => {
         const { rows } = await pool.query(query, values);
         res.status(201).json({ dates: rows });
     } catch (error) {
-        console.error(error.message);
         res.status(500).send("Server Error");
     }
 }
@@ -167,7 +160,6 @@ const archiveExpense = async (req, res) => {
 
         res.status(201).json({ message: 'Success' });
     } catch (error) {
-        console.error(error.message);
         res.status(500).send("Server Error");
     }
 }

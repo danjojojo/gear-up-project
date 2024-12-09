@@ -14,7 +14,7 @@ const getBikeTypes = async (req, res) => {
         const { rows } = await pool.query(query);
         res.status(200).json({ bikeTypes: rows });
     } catch (error) {
-        res.status(500).json({ error: error.message });
+        res.status(500).json({ error: "Error" });
     }
 }
 
@@ -28,19 +28,16 @@ const getAllParts = async (req, res) => {
         const { rows } = await pool.query(query);
         res.status(200).json({ parts: rows });
     } catch (error) {
-        res.status(500).json({ error: error.message });
+        res.status(500).json({ error: "Error" });
     }
 }
 
 const addBikeType = async (req, res) => {
     try {
-        console.log(req.body);
-        console.log(req.file);
         const { name } = req.body;
         const image = req.file ? req.file.buffer : null;
 
         const bikeTypeTag = name.charAt(0).toLowerCase() + 'b';
-        console.log(bikeTypeTag);
         const query = `
             INSERT INTO bike_types (bike_type_name, bike_type_tag, bike_type_image) 
             VALUES ($1, $2, $3);
@@ -48,13 +45,12 @@ const addBikeType = async (req, res) => {
         await pool.query(query, [name, bikeTypeTag, image]);
         res.status(201).json({ message: 'Bike type added successfully' });
     } catch (error) {
-        res.status(500).json({ error: error.message });
+        res.status(500).json({ error: "Error" });
     }
 }
 
 const editBikeType = async (req, res) => {
     try {
-        console.log(req.body);
         const { bikeTypeId } = req.params;
         const image = req.file ? req.file.buffer : null;
 
@@ -66,7 +62,7 @@ const editBikeType = async (req, res) => {
         await pool.query(query, [image, bikeTypeId]);
         res.status(200).json({ message: 'Bike type updated successfully' });
     } catch (error) {
-        res.status(500).json({ error: error.message });
+        res.status(500).json({ error: "Error" });
     }
 }
 
@@ -99,7 +95,7 @@ const deleteBikeType = async (req, res) => {
         await pool.query(query, [bikeTypeId]);
         res.status(200).json({ message: 'Bike type deleted successfully' });
 } catch (error) {
-        res.status(500).json({ error: error.message });
+        res.status(500).json({ error: "Error" });
     }
 }
 
@@ -162,7 +158,6 @@ const getPartsCount = async (req, res) => {
 
         res.json({ count: parseInt(result.rows[0].count, 10) });
     } catch (error) {
-        console.error(`Error fetching count for ${partType}:`, error.message);
         res.status(500).json({ error: 'Internal server error' });
     }
 };
@@ -203,8 +198,7 @@ const getFrameItems = async (req, res) => {
         const { rows } = await pool.query(query, [archived === 'true', bikeType]);
         res.json(rows);
     } catch (error) {
-        console.error('Error fetching frame items:', error);
-        res.status(500).json({ error: error.message });
+        res.status(500).json({ error: "Error" });
     }
 };
 
@@ -244,7 +238,6 @@ const getForkItems = async (req, res) => {
         const { rows } = await pool.query(query, [archived === 'true', bikeType]);
         res.json(rows);
     } catch (error) {
-        console.error('Error fetching fork items:', error);
         res.status(500).json({ error: 'Internal Server Error' });
     }
 };
@@ -285,7 +278,6 @@ const getGroupsetItems = async (req, res) => {
         const { rows } = await pool.query(query, [archived === 'true', bikeType]);
         res.json(rows);
     } catch (error) {
-        console.error('Error fetching groupset items:', error);
         res.status(500).json({ error: 'Internal Server Error' });
     }
 };
@@ -326,7 +318,6 @@ const getWheelsetItems = async (req, res) => {
         const { rows } = await pool.query(query, [archived === 'true', bikeType]);
         res.json(rows);
     } catch (error) {
-        console.error('Error fetching wheelset items:', error);
         res.status(500).json({ error: 'Internal Server Error' });
     }
 };
@@ -367,7 +358,6 @@ const getSeatItems = async (req, res) => {
         const { rows } = await pool.query(query, [archived === 'true', bikeType]);
         res.json(rows);
     } catch (error) {
-        console.error('Error fetching seat items:', error);
         res.status(500).json({ error: 'Internal Server Error' });
     }
 };
@@ -408,7 +398,6 @@ const getCockpitItems = async (req, res) => {
         const { rows } = await pool.query(query, [archived === 'true', bikeType]);
         res.json(rows);
     } catch (error) {
-        console.error('Error fetching cockpit items:', error);
         res.status(500).json({ error: 'Internal Server Error' });
     }
 };
@@ -487,8 +476,7 @@ const updateFrameItem = async (req, res) => {
 
         res.status(200).json({ message: 'Item updated successfully', item: updatedItem.rows[0] });
     } catch (error) {
-        console.error(error);
-        res.status(500).json({ message: 'An error occurred while updating the item', error });
+        res.status(500).json({ message: 'An error occurred while updating the item' });
     }
 };
 
@@ -559,7 +547,6 @@ const updateForkItem = async (req, res) => {
 
         res.status(200).json({ message: 'Item updated successfully', item: updatedItem.rows[0] });
     } catch (error) {
-        console.error(error);
         res.status(500).json({ message: 'An error occurred while updating the item', error });
     }
 };
@@ -631,7 +618,6 @@ const updateGroupsetItem = async (req, res) => {
 
         res.status(200).json({ message: 'Item updated successfully', item: updatedItem.rows[0] });
     } catch (error) {
-        console.error(error);
         res.status(500).json({ message: 'An error occurred while updating the item', error });
     }
 };
@@ -706,7 +692,6 @@ const updateWheelsetItem = async (req, res) => {
 
         res.status(200).json({ message: 'Item updated successfully', item: updatedItem.rows[0] });
     } catch (error) {
-        console.error(error);
         res.status(500).json({ message: 'An error occurred while updating the item', error });
     }
 };
@@ -754,7 +739,6 @@ const updateSeatItem = async (req, res) => {
 
         res.status(200).json({ message: 'Item updated successfully', item: updatedItem.rows[0] });
     } catch (error) {
-        console.error(error);
         res.status(500).json({ message: 'An error occurred while updating the item', error });
     }
 };
@@ -823,7 +807,6 @@ const updateCockpitItem = async (req, res) => {
 
         res.status(200).json({ message: 'Item updated successfully', item: updatedItem.rows[0] });
     } catch (error) {
-        console.error(error);
         res.status(500).json({ message: 'An error occurred while updating the item', error });
     }
 };
@@ -850,7 +833,6 @@ const archiveFrameItem = async (req, res) => {
             item: result.rows[0],
         });
     } catch (error) {
-        console.error('Error archiving item:', error);
         res.status(500).json({ error: 'Internal Server Error' });
     }
 };
@@ -877,7 +859,6 @@ const archiveForkItem = async (req, res) => {
             item: result.rows[0],
         });
     } catch (error) {
-        console.error('Error archiving item:', error);
         res.status(500).json({ error: 'Internal Server Error' });
     }
 };
@@ -904,7 +885,6 @@ const archiveGroupsetItem = async (req, res) => {
             item: result.rows[0],
         });
     } catch (error) {
-        console.error('Error archiving item:', error);
         res.status(500).json({ error: 'Internal Server Error' });
     }
 };
@@ -931,7 +911,6 @@ const archiveWheelsetItem = async (req, res) => {
             item: result.rows[0],
         });
     } catch (error) {
-        console.error('Error archiving item:', error);
         res.status(500).json({ error: 'Internal Server Error' });
     }
 };
@@ -958,7 +937,6 @@ const archiveSeatItem = async (req, res) => {
             item: result.rows[0],
         });
     } catch (error) {
-        console.error('Error archiving item:', error);
         res.status(500).json({ error: 'Internal Server Error' });
     }
 };
@@ -985,7 +963,6 @@ const archiveCockpitItem = async (req, res) => {
             item: result.rows[0],
         });
     } catch (error) {
-        console.error('Error archiving item:', error);
         res.status(500).json({ error: 'Internal Server Error' });
     }
 };
@@ -1014,7 +991,6 @@ const restoreFrameItem = async (req, res) => {
             item: result.rows[0], // Return the restored item details
         });
     } catch (error) {
-        console.error('Error restoring item:', error);
         res.status(500).json({ error: 'Internal Server Error' });
     }
 };
@@ -1043,7 +1019,6 @@ const restoreForkItem = async (req, res) => {
             item: result.rows[0], // Return the restored item details
         });
     } catch (error) {
-        console.error('Error restoring item:', error);
         res.status(500).json({ error: 'Internal Server Error' });
     }
 };
@@ -1072,7 +1047,6 @@ const restoreGroupsetItem = async (req, res) => {
             item: result.rows[0], // Return the restored item details
         });
     } catch (error) {
-        console.error('Error restoring item:', error);
         res.status(500).json({ error: 'Internal Server Error' });
     }
 };
@@ -1101,7 +1075,6 @@ const restoreWheelsetItem = async (req, res) => {
             item: result.rows[0], // Return the restored item details
         });
     } catch (error) {
-        console.error('Error restoring item:', error);
         res.status(500).json({ error: 'Internal Server Error' });
     }
 };
@@ -1130,7 +1103,6 @@ const restoreSeatItem = async (req, res) => {
             item: result.rows[0], // Return the restored item details
         });
     } catch (error) {
-        console.error('Error restoring item:', error);
         res.status(500).json({ error: 'Internal Server Error' });
     }
 };
@@ -1159,7 +1131,6 @@ const restoreCockpitItem = async (req, res) => {
             item: result.rows[0], // Return the restored item details
         });
     } catch (error) {
-        console.error('Error restoring item:', error);
         res.status(500).json({ error: 'Internal Server Error' });
     }
 };
@@ -1199,7 +1170,6 @@ const deleteFrameItem = async (req, res) => {
             updatedItem: updateResult.rows[0]
         });
     } catch (error) {
-        console.error('Error deleting item:', error);
         res.status(500).json({ error: 'Internal Server Error' });
     }
 };
@@ -1239,7 +1209,6 @@ const deleteForkItem = async (req, res) => {
             updatedItem: updateResult.rows[0]
         });
     } catch (error) {
-        console.error('Error deleting item:', error);
         res.status(500).json({ error: 'Internal Server Error' });
     }
 };
@@ -1279,7 +1248,6 @@ const deleteGroupsetItem = async (req, res) => {
             updatedItem: updateResult.rows[0]
         });
     } catch (error) {
-        console.error('Error deleting item:', error);
         res.status(500).json({ error: 'Internal Server Error' });
     }
 };
@@ -1319,7 +1287,6 @@ const deleteWheelsetItem = async (req, res) => {
             updatedItem: updateResult.rows[0]
         });
     } catch (error) {
-        console.error('Error deleting item:', error);
         res.status(500).json({ error: 'Internal Server Error' });
     }
 };
@@ -1359,7 +1326,6 @@ const deleteSeatItem = async (req, res) => {
             updatedItem: updateResult.rows[0]
         });
     } catch (error) {
-        console.error('Error deleting item:', error);
         res.status(500).json({ error: 'Internal Server Error' });
     }
 };
@@ -1399,7 +1365,6 @@ const deleteCockpitItem = async (req, res) => {
             updatedItem: updateResult.rows[0]
         });
     } catch (error) {
-        console.error('Error deleting item:', error);
         res.status(500).json({ error: 'Internal Server Error' });
     }
 };
@@ -1407,11 +1372,9 @@ const deleteCockpitItem = async (req, res) => {
 const getPartSpecs = async (req, res) => {
     try {
         const { partName, specId } = req.params;
-        console.log(partName, specId);
         let query;
 
         if(specId === '0'){
-            console.log('no spec id');
             query = `
                 SELECT column_name
                 FROM information_schema.columns
@@ -1421,7 +1384,6 @@ const getPartSpecs = async (req, res) => {
             const { rows } = await pool.query(query, [partName.toLowerCase()]);
             return res.status(200).json({ specs: rows });
         } else {
-            console.log('with spec id');
             query = `
                 SELECT column_name
                 FROM information_schema.columns
@@ -1432,7 +1394,7 @@ const getPartSpecs = async (req, res) => {
             return res.status(200).json({ specs: rows });
         }
     } catch (error) {
-        res.status(500).json({ error: error.message });
+        res.status(500).json({ error: "Error" });
     }
 }
 
@@ -1444,7 +1406,6 @@ const getCompatibilitySpecs = async(req, res) => {
             bikeType = 'mtb';
         }
         
-        console.log(bikeType);
         const query = `
             SELECT cs.*, bt.bike_type_tag 
             FROM compatibility_specs cs
@@ -1455,7 +1416,7 @@ const getCompatibilitySpecs = async(req, res) => {
         const { rows } = await pool.query(query, [bikeType]);
         res.status(200).json({ specs: rows });
     } catch (error) {
-        res.status(500).json({ error: error.message });
+        res.status(500).json({ error: "Error" });
     }
 }
 
@@ -1488,7 +1449,7 @@ const addUpgraderSpecForm = async(req, res) => {
 
         res.status(200).json({ message: 'Upgrader spec added successfully' });
     } catch (error) {
-        res.status(500).json({ error: error.message });
+        res.status(500).json({ error: "Error" });
     }
 }
 
@@ -1515,7 +1476,7 @@ const updateUpgraderSpecForm = async (req, res) => {
         await pool.query(updateRefQuery, updateOgValues);
         res.status(200).json({ message: 'Upgrader spec updated successfully' });
     } catch (error) {
-        res.status(500).json({ error: error.message });
+        res.status(500).json({ error: "Error" });
     }
 }
 
@@ -1534,7 +1495,7 @@ const deleteUpgraderSpecForm = async (req, res) => {
         await pool.query(deleteRefQuery, [specId]);
         res.status(200).json({ message: 'Upgrader spec deleted successfully' });
     } catch (error) {
-        res.status(500).json({ error: error.message });
+        res.status(500).json({ error: "Error" });
     }
 
 }

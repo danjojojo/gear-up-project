@@ -70,7 +70,6 @@ const getDashboardData = async (req, res) => {
             renderedToday
         });
     } catch (error) {
-        console.error('Error fetching dashboard data:', error);
         res.status(500).json({ error: 'Internal Server Error' });
     }
 };
@@ -117,7 +116,6 @@ const getProductLeaderBoard = async (req, res) => {
         const { rows } = await pool.query(query, values);
         res.json({ leaderBoards: rows });
     } catch (error) {
-        console.error("Error fetching product leaderboard:", error);
         res.status(500).json({ error: "Error fetching product leaderboard" });
     }
 };
@@ -128,7 +126,6 @@ const getSummaryRecords = async (req, res) => {
         if(!token) return res.status(401).json({message: "Unauthorized"});
 
         const { date } = req.query;
-        console.log( date);
 
         const getMechanicPercentage = `
             SELECT 
@@ -164,7 +161,7 @@ const getSummaryRecords = async (req, res) => {
         res.json({ records: rows, mechanicPercentage });
         
     } catch (error) {
-        res.status(500).json({message: error.message});
+        res.status(500).json({message: "Error"});
     }
 }
 
@@ -202,7 +199,6 @@ const getReceiptOverview = async (req, res) => {
         const { rows } = await pool.query(query);
         res.json({ data: rows });
     } catch (error) {
-        console.error('Error fetching receipt overview:', error);
         res.status(500).json({ error: 'Failed to fetch receipt overview' });
     }
 };

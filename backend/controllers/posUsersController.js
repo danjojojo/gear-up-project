@@ -19,7 +19,7 @@ const getPosUsers = async (req, res) => {
         const { rows } = await pool.query(query);
         res.status(201).json({ posUsers: rows });
     } catch (error) {
-        res.status(500).json({ error: error.message });
+        res.status(500).json({ error: "Error" });
     }
 }
 
@@ -36,8 +36,6 @@ const addPosUser = async (req, res) => {
         const posPassword = password;
         const hashedPassword = await bcrypt.hash(posPassword, 10);
         const posStatus = "active"
-        console.log(name);
-        console.log(password);
 
         const query = `
             INSERT INTO pos_users (pos_id, pos_name, pos_password, pos_status)
@@ -48,7 +46,7 @@ const addPosUser = async (req, res) => {
         await pool.query(query, values);
         res.status(201).json({ message: 'User added successfully' });
     } catch (error) {
-        res.status(500).json({ error: error.message });
+        res.status(500).json({ error: "Error" });
     }
 }
 
@@ -57,9 +55,6 @@ const editPosUserName = async (req, res) => {
         const token = req.cookies.token;
         const { id } = req.params;
         const { name } = req.body;
-
-        console.log(id);
-        console.log(name);
 
         // Update the `pos_name` in `pos_users`
         const userUpdateQuery = `
@@ -81,7 +76,7 @@ const editPosUserName = async (req, res) => {
 
         res.status(201).json({ message: 'User name updated successfully in both pos_users and pos_logs' });
     } catch (error) {
-        res.status(500).json({ error: error.message });
+        res.status(500).json({ error: "Error" });
     }
 };
 
@@ -89,9 +84,9 @@ const editPosUserPassword = async (req, res) => {
     try {
         const token = req.cookies.token;
         const { id } = req.params
-        console.log(id)
+
         const { password } = req.body;
-        console.log(password);
+
         const hashedPassword = await bcrypt.hash(password, 10);
         const query = `
             UPDATE pos_users
@@ -102,7 +97,7 @@ const editPosUserPassword = async (req, res) => {
         await pool.query(query, values);
         res.status(201).json({ message: 'User edited successfully' });
     } catch (error) {
-        res.status(500).json({ error: error.message });
+        res.status(500).json({ error: "Error" });
     }
 }
 
@@ -111,7 +106,7 @@ const editPosUserStatus = async (req, res) => {
         const token = req.cookies.token;
         const { id } = req.params;
         const { status } = req.body;
-        console.log(status);
+
         const query = `
             UPDATE pos_users
             SET pos_status = $1, date_updated = NOW()
@@ -121,7 +116,7 @@ const editPosUserStatus = async (req, res) => {
         await pool.query(query, values);
         res.status(201).json({ message: 'User edited successfully' });
     } catch (error) {
-        res.status(500).json({ error: error.message });
+        res.status(500).json({ error: "Error" });
     }
 }
 
@@ -132,7 +127,7 @@ const deletePosUser = async (req, res) => {
         const email = verifedToken.email;
 
         const { id } = req.params;
-        console.log(id);
+        
         const { password } = req.body;
         let passwordError = false;
 
@@ -155,7 +150,7 @@ const deletePosUser = async (req, res) => {
             res.status(201).json({ message: 'User deleted successfully', passwordError: passwordError });
         }
     } catch (error) {
-        res.status(500).json({ error: error.message });
+        res.status(500).json({ error: "Error" });
     }
 }
 
@@ -181,8 +176,6 @@ const getPosUsersLogs = async (req, res) => {
         const { rows } = await pool.query(query, [selectedDate]); // Pass the selected date to the query
         res.json({ logs: rows }); // Send the result as JSON response
     } catch (error) {
-        console.error('Error fetching POS user logs:', error.message);
-        console.error(error.stack);
         res.status(500).json({ error: 'Failed to fetch POS user logs' });
     }
 };
@@ -201,8 +194,6 @@ const getPosLogsDates = async (req, res) => {
         const dates = rows.map(row => row.log_date);
         res.json({ dates }); // Send the result as JSON response with only dates
     } catch (error) {
-        console.error('Error fetching POS logs dates:', error.message);
-        console.error(error.stack);
         res.status(500).json({ error: 'Failed to fetch POS logs dates' });
     }
 };

@@ -9,12 +9,8 @@ const checkExpiredOrders = async () => {
             AND expires_at <= NOW()
             RETURNING *;
         `);
-
-        if (result.rowCount > 0) {
-            console.log(`${result.rowCount} orders have expired.`);
-        }
     } catch (error) {
-        console.error("Error expiring orders:", error);
+        console.error("Error expiring orders.");
     }
 };
 

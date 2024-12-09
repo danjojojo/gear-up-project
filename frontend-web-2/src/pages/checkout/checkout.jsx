@@ -104,8 +104,7 @@ const Checkout = () => {
     
     const proceedToPayment = async () => {
         const retrievedLineItems = getLineItems();
-        console.log(retrievedLineItems);
-
+        
         let sessionOrder = [{
             name: name,
             email: email,
@@ -141,7 +140,6 @@ const Checkout = () => {
         const orderBbDetails = await prepareOrderDetails(checkedBbItems);
 
         const orderItems = [...orderBuItems, ...orderBbItems];
-        console.log(sessionOrder, orderItems);
 
         const {checkoutUrl, checkoutSessionId } = await createCheckoutSession(name, email, phone, address, retrievedLineItems, sessionOrder, orderItems);
 

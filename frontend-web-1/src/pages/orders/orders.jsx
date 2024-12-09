@@ -224,7 +224,6 @@ const Orders = () => {
             setTimeout(()=> {
                 setLoading(false);
             }, 500); 
-            console.log(filteredOrders);
         } catch (error) {
             console.error('Error getting orders:', error.message);
         }
@@ -237,7 +236,6 @@ const Orders = () => {
 				moment(date.date_created).toDate()
 			);
             setOrderDates(formattedDates);
-            console.log(dates);
         } catch (error) {
             console.error('Error getting order dates:', error.message);
         }
@@ -320,7 +318,6 @@ const Orders = () => {
             setTotalBBPrice(combinedTotalBBPrice);
             setTotalBUPrice(combinedTotalBUPrice);
 
-            console.log(items);
         } catch (error) {
             console.error('Error getting order items:', error.message);
         }
@@ -391,7 +388,6 @@ const Orders = () => {
     }
 
     const handleSetShippingDetails = (status) => {
-        console.log(selectedOrder.bu_option);
         if(selectedOrder.bu_option === 'deliver-home' && (courier === '' || trackingNumber === '')){ 
             setShowMessage(true);
             setShowChangeStatusModal(false);

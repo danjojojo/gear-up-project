@@ -16,7 +16,7 @@ const getAllItems = async (req,res) => {
       const { rows } = await pool.query(query);
       res.json({ items: rows });
     } catch (err) {
-      res.status(500).json({ error: err.message });
+      res.status(500).json({ error: "Error" });
     }
 }
 
@@ -25,7 +25,7 @@ const getAllMechanics = async (req,res) => {
       const { rows } = await pool.query("SELECT * FROM mechanics WHERE status = true ORDER BY mechanic_name ASC");
       res.json({ mechanics: rows });
     } catch (err) {
-      res.status(500).json({ error: err.message });
+      res.status(500).json({ error: "Error" });
     }
 }
 
@@ -46,14 +46,6 @@ const confirmSale = async (req, res) => {
     const decodedToken = jwt.verify(token, process.env.JWT_SECRET);
     const posId = decodedToken.pos_id;
     const todayDate = new Date();
-
-    console.log("Request body:", req.body); // Log the entire request body
-    console.log("POS ID:", posId);
-    console.log("Items:", items);
-    console.log("Mechanics:", mechanics);
-    console.log("Total Price:", totalPrice);
-    console.log("Amount Received:", amountReceived);
-    console.log("Change:", change);
 
     const saleId = "sale-" + uuidv4();
     const receiptId = "receipt-" + uuidv4();
@@ -109,8 +101,6 @@ const confirmSale = async (req, res) => {
           updateItemsStockCount += `ELSE stock_count END ${updateItemsStockCountWhereClause}`;
         }
       }
-      console.log(updateItemsStockCount, updateItemsStockCountValues);
-      console.log(insertIntoSalesItems, insertIntoSalesItemsValues);
 
       await pool.query(updateItemsStockCount, updateItemsStockCountValues);
       await pool.query(insertIntoSalesItems, insertIntoSalesItemsValues);
@@ -137,8 +127,7 @@ const confirmSale = async (req, res) => {
           insertIntoSalesMechanics += ", ";
         }
       }
-      console.log(insertIntoSalesMechanics, insertIntoSalesMechanicsValues);
-
+     
       await pool.query(insertIntoSalesMechanics, insertIntoSalesMechanicsValues);
     }
 
@@ -146,7 +135,7 @@ const confirmSale = async (req, res) => {
     res.status(201).json({ saleId, receiptName, receiptDate, posId });
   } catch (err) {
     await pool.query("ROLLBACK;");
-    res.status(500).json({ error: err.message })
+    res.status(500).json({ error: "Error" })
   }
 }
 

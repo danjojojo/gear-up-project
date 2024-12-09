@@ -254,7 +254,6 @@ const Waitlist = () => {
         try {
             const { bikeTypes } = await getBikeTypes();
             setRetrievedBikeTypes(bikeTypes);
-            console.log(bikeTypes);
         } catch (error) {
             console.error(error);
         }

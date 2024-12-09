@@ -99,8 +99,6 @@ const ForkForm = ({ waitlistItemID, itemID, itemName, itemPrice, onClose, refres
         }
         formData.append('type', bikeType);
 
-        console.log('Form data being sent:', [...formData]);
-
         try {
             await addFork(formData);
             setShowConfirmModal(false);
@@ -246,7 +244,6 @@ const ForkForm = ({ waitlistItemID, itemID, itemName, itemPrice, onClose, refres
                         required
                         onChange={(e) => {
                             setBikeType(e.target.value)
-                            console.log(e.target.value)
                         }}
                     >   
                         <option value="">Select Bike Type</option>

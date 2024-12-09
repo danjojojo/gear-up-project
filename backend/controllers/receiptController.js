@@ -26,7 +26,7 @@ const getReceiptDates = async (req, res) => {
         }
     }
     catch(err) {
-        res.status(500).json({ error: err.message });
+        res.status(500).json({ error: "Error" });
     }
 }
 
@@ -35,7 +35,7 @@ const getPosReceipts = async (req, res) => {
         const { startDate } = req.params;
         const token = req.cookies.token;
         const role = req.cookies.role;
-        console.log(role);
+
         if (!token) {
           return res.status(401).json({ error: "No token provided " });
         }
@@ -84,7 +84,7 @@ const getPosReceipts = async (req, res) => {
             res.json({ receipts: rows });
         }
     } catch (err) {
-        res.status(500).json({ error: err.message });
+        res.status(500).json({ error: "Error" });
     }
 }
 
@@ -114,7 +114,7 @@ const getReceiptDetails = async(req, res) => {
         const { rows } = await pool.query(query, [receiptSaleId]);
         res.json({ receipt: rows[0] });
     } catch (error) {
-        res.status(500).json({ message: error.message });
+        res.status(500).json({ message: "Error" });
     }
 }
 
@@ -143,7 +143,7 @@ const getReceiptItems = async(req, res) => {
         res.json({ items: rows, receiptItems : rows });
     }
     catch(err) {
-        res.status(500).json({ error: err.message });
+        res.status(500).json({ error: "Error" });
     }
 }
 
@@ -164,8 +164,8 @@ const staffVoidReceipt = async(req, res) => {
 
         if (rows[0].count > 0) {
             return res.json({ status: "error" });
-        } 
-        console.log('Void Receipt');
+        }
+
         const query = `
             UPDATE receipts
             SET status = 'pending', date_updated = NOW()
@@ -176,7 +176,7 @@ const staffVoidReceipt = async(req, res) => {
         res.json({ status: "pending", dateRequested: new Date(Date.now()).toLocaleString("en-US", { timeZone: "Asia/Manila" }) });
         
     } catch (error) {
-        res.status(500).json({ message: error.message });
+        res.status(500).json({ message: "Error" });
     }
 }
 
@@ -184,7 +184,7 @@ const adminVoidReceipt = async(req, res) => {
     try {
         const { receiptId } = req.params;
         const { items } = req.body;
-        console.log(items);
+
         const token = req.cookies.token;
         if (!token) {
           return res.status(401).json({ error: "No token provided " });
@@ -223,8 +223,7 @@ const adminVoidReceipt = async(req, res) => {
                     updateItemsStockCount += `ELSE stock_count END ${updateItemsStockCountWhereClause}`;
                 }
             }
-            // console.log(updateItemsStockCount, updateItemsStockCountValues);
-
+            
             await pool.query(updateItemsStockCount, updateItemsStockCountValues);
         }
         const query = `
@@ -248,7 +247,7 @@ const adminVoidReceipt = async(req, res) => {
         res.json({ status: "voided", dateVoided: new Date(Date.now()).toLocaleString("en-US", { timeZone: "Asia/Manila" }) });
     } catch (error) {
         await pool.query("ROLLBACK;");
-        res.status(500).json({ message: error.message });
+        res.status(500).json({ message: "Error" });
     }
 }
  
@@ -271,7 +270,7 @@ const cancelVoidReceipt = async(req, res) => {
         res.json({ status: "active" });
         
     } catch (error) {
-        res.status(500).json({ message: error.message });
+        res.status(500).json({ message: "Error" });
     }
 }
 
@@ -370,10 +369,6 @@ const refundReceipt = async(req, res) => {
             }
         }
 
-        console.log(insertIntoSalesItems, insertIntoSalesItemsValues);
-        console.log(updateItemsStockCount, updateItemsStockCountValues);
-        console.log(updateSaleItemsRefundQty, updateSaleItemsRefundQtyValues);
-
         // INSERT INTO SALES
         // INSERT INTO RECEIPTS
         // INSERT INTO SALES_ITEMS
@@ -389,10 +384,10 @@ const refundReceipt = async(req, res) => {
         await pool.query("COMMIT;");
 
         res.json({ status: "Refund Successful" });
-        console.log('received Refund Data');
+        
     } catch (error) {
         await pool.query("ROLLBACK;");
-        res.status(500).json({ message: error.message });
+        res.status(500).json({ message: "Error" });
     }
 }
 
@@ -482,7 +477,7 @@ const returnItem = async(req, res) => {
         res.status(200).json({ message: "Return Successful" });
     } catch (error) {
         // await pool.query("ROLLBACK;");
-        res.status(500).json({ message: error.message });
+        res.status(500).json({ message: "Error" });
     }
 }
 
@@ -490,14 +485,11 @@ const adminCancelRefundReceipt = async(req, res) => {
     try {
         const { receiptId } = req.params;
         const { items, originalReceiptName } = req.body;
-        console.log(items);
+
         const token = req.cookies.token;
         if (!token) {
           return res.status(401).json({ error: "No token provided " });
         }
-        console.log('Cancel Refund Receipt');
-        console.log(receiptId);
-        console.log(originalReceiptName);
         
         const findOriginalReceiptSaleId = `
             SELECT sale_id
@@ -542,8 +534,7 @@ const adminCancelRefundReceipt = async(req, res) => {
                 updateSaleItemsRefundQtyValues.push(receiptSaleId);
             }
         }
-        console.log(updateItemsStockCount, updateItemsStockCountValues);
-        console.log(updateSaleItemsRefundQty, updateSaleItemsRefundQtyValues);
+  
         const updateSalesIDtoFalse = `
             UPDATE sales
             SET status = false
@@ -566,7 +557,7 @@ const adminCancelRefundReceipt = async(req, res) => {
         await pool.query("COMMIT;");
         res.json({ status: "voided", dateVoided: new Date(Date.now()).toLocaleString("en-US", { timeZone: "Asia/Manila" }) });
     } catch (error) {
-        res.status(500).json({ message: error.message });
+        res.status(500).json({ message: "Error" });
     }
 }
 
@@ -594,7 +585,7 @@ const getReceiptsDashboard = async (req, res) => {
         const { rows } = await pool.query(query, values);
         res.json({ dashboard: rows });
     } catch (error) {
-        res.status(500).json({ message: error.message });
+        res.status(500).json({ message: "Error" });
     }
 }
 

@@ -39,7 +39,7 @@ const LaborReport = () => {
             setStoreName(settings.find(setting => setting.setting_key === 'store_name').setting_value);
             setStoreAddress(settings.find(setting => setting.setting_key === 'store_address').setting_value);
             setMechPercentage(Number(data.mechanicPercentage));
-            console.log(Number(data.mechanicPercentage));
+            
         } catch (error) {
             console.error('Error fetching labor data:', error);
         }

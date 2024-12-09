@@ -75,8 +75,6 @@ const SeatForm = ({ waitlistItemID, itemID, itemName, itemPrice, onClose, refres
         }
         formData.append('type', bikeType);
 
-        console.log('Form data being sent:', [...formData]);
-
         try {
             await addSeat(formData);
             setShowConfirmModal(false);
@@ -184,7 +182,6 @@ const SeatForm = ({ waitlistItemID, itemID, itemName, itemPrice, onClose, refres
                         required
                         onChange={(e) => {
                             setBikeType(e.target.value)
-                            console.log(e.target.value)
                         }}
                     >   
                         <option value="">Select Bike Type</option>

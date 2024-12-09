@@ -452,7 +452,6 @@ const Inventory = () => {
             updatedData.append("itemImage", selectedFile);
         }
 
-        console.log(selectedItem.bike_parts);
 
         try {
             if(originalItem.stock_count !== selectedItem.stock_count) {

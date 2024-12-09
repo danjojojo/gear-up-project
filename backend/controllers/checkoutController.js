@@ -11,7 +11,6 @@ const PAYMONGO_SECRET_KEY = process.env.PAYMONGO_SECRET_KEY;
 const createCheckoutSession = async (req, res) => {
     try {
         const { name, email, phone, address, lineItems } = req.body;
-        console.log('Creating checkout session:', name, email, phone, address, lineItems);
         
         const response = await axios.post('https://api.paymongo.com/v1/checkout_sessions', {
             data: {
@@ -38,13 +37,11 @@ const createCheckoutSession = async (req, res) => {
             }
         });
 
-        console.log('Checkout session created:', response.data.data);
         const checkoutUrl = response.data.data.attributes.checkout_url;
         const checkoutSessionId = response.data.data.id;
         res.status(200).json({ checkoutUrl, checkoutSessionId });
     } catch (error) {
-        console.error('Error creating checkout session:', error.response?.data || error.message);
-        res.status(500).json({ error: error.response?.data || error.message });
+        res.status(500).json({ error: "Error" });
     }
 };
 
@@ -86,9 +83,6 @@ const createOrder = async (req, res) => {
             orderId, userId, paymentId, sessionID, orderName, orderAmount, custName, email, phone, custAddress, paymentStatus, orderStatus, bbOption, buOption, expiresAt
         ];
 
-        console.log('Creating order:', ordersInsert, ordersValues);
-
-        console.log('1');
         let ordersBBInsert = `INSERT INTO orders_bb (build_id, order_id, build_name, build_image, build_price) VALUES `
         let ordersBBValues = [];
         let ordersBBInsertColumns = 5;
@@ -110,7 +104,6 @@ const createOrder = async (req, res) => {
                 }
             }
         }
-        console.log(ordersBBInsert, ordersBBValues);
 
         let ordersItemsInsert = `INSERT INTO order_items (order_item_id, order_id, item_id, item_qty, item_price, build_id, part_type, part) VALUES `
         let ordersItemsValues = [];
@@ -136,21 +129,19 @@ const createOrder = async (req, res) => {
                 }
             }
         }
-        console.log(ordersItemsInsert, ordersItemsValues);
 
-        console.log('3');
         await pool.query("BEGIN;");
         await pool.query(ordersInsert, ordersValues);
-        console.log('4');
+
         // if(ordersBBValues.length) await pool.query(ordersBBInsert, ordersBBValues);
-        console.log('5');
+
         if (ordersItemsValues.length) await pool.query(ordersItemsInsert, ordersItemsValues);
         await pool.query("COMMIT;");
-        console.log('Order created', ordersInsert, ordersValues);
+
         res.status(200).json({ message: 'Order created' });
     } catch (error) {
         await pool.query("ROLLBACK;");
-        res.status(500).json({ error: 'Failed to create order', error: error.message });
+        res.status(500).json({ error: 'Failed to create order' });
     }
 }
 

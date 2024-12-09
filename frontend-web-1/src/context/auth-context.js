@@ -19,7 +19,6 @@ const AuthProvider = ({ children }) => {
     try {
       await refreshToken(); // Call to refresh the token
       const role = await getMyRole(); // Retry fetching the role after refresh
-      console.log('Token refreshed successfully');
       setUserRole(role);
       setAuthenticated(true);
       window.location.reload();  // Reload the page only on successful token refresh

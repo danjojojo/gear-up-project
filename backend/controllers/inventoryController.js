@@ -48,8 +48,7 @@ const getDashboardData = async (req, res) => {
             stockValue: stockValue
         });
     } catch (error) {
-        console.error('Error fetching dashboard data:', error);
-        res.status(500).json({ error:  error.message });
+        res.status(500).json({ error:  "Error" });
     }
 };
 
@@ -134,10 +133,9 @@ const addItem = async (req, res) => {
             ];
 
             try {
-                const waitlistResult = await pool.query(waitlistQuery, waitlistValues);
-                console.log('Inserted into waitlist:', waitlistResult.rows[0]);
+                await pool.query(waitlistQuery, waitlistValues);
             } catch (error) {
-                console.error('Error inserting into waitlist:', error);
+                console.error('Error inserting into waitlist');
             }
         }
 
@@ -147,8 +145,7 @@ const addItem = async (req, res) => {
 
         res.status(201).json({ items: itemsResult.rows, newItem: result.rows[0] });
     } catch (error) {
-        console.error('Error adding item:', error.message);
-        res.status(500).json({ error: error.message });
+        res.status(500).json({ error: "Error" });
     }
 };
 
@@ -174,7 +171,7 @@ const archiveItem = async (req, res) => {
             item: result.rows[0],
         });
     } catch (error) {
-        console.error('Error archiving item:', error);
+        console.error('Error archiving item');
         res.status(500).json({ error: 'Internal Server Error' });
     }
 };
@@ -203,7 +200,6 @@ const restoreItem = async (req, res) => {
             item: result.rows[0], // Return the restored item details
         });
     } catch (error) {
-        console.error('Error restoring item:', error);
         res.status(500).json({ error: 'Internal Server Error' });
     }
 };
@@ -226,7 +222,6 @@ const deleteItem = async (req, res) => {
 
         res.status(200).json({ message: 'Item deleted successfully', item: result.rows[0] });
     } catch (error) {
-        console.error('Error deleting item:', error);
         res.status(500).json({ error: 'Internal Server Error' });
     }
 };
@@ -267,7 +262,6 @@ const displayItem = async (req, res) => {
         const { rows } = await pool.query(query, [archived === 'true']);
         res.json(rows);
     } catch (err) {
-        console.error(err); // Log the error for debugging
         res.status(500).json({ error: err.message });
     }
 };
@@ -353,8 +347,7 @@ const updateItem = async (req, res) => {
         const { id } = req.params;
         const { itemName, itemPrice, stock, category, lowStockAlert, lowStockThreshold, addToBikeBuilder, bbBuStatus, bikeParts, itemCost } = req.body;
         const itemImage = req.file ? req.file.buffer : null;
-        console.log(itemName, itemPrice, stock, category, lowStockAlert, lowStockThreshold, addToBikeBuilder, bbBuStatus, bikeParts, itemCost)
-
+ 
         const categoryQuery = 'SELECT category_id FROM category WHERE category_name = $1';
         const categoryResult = await pool.query(categoryQuery, [category]);
 
@@ -367,11 +360,9 @@ const updateItem = async (req, res) => {
         const itemLowStockAlert = lowStockAlert === 'true';
         const itemLowStockThreshold = itemLowStockAlert ? (lowStockThreshold ? parseInt(lowStockThreshold, 10) : null) : null;
 
-        console.log('bbStatus: ', bbBuStatus);
         const itemAddToBikeBuilder = addToBikeBuilder === 'true';
         const itemBikeParts = itemAddToBikeBuilder || bbBuStatus ? bikeParts : null;
-        console.log(itemBikeParts);
-
+        
         const query = `
             UPDATE items SET
                 item_name = $1,
@@ -438,8 +429,7 @@ const updateItem = async (req, res) => {
 
         res.status(200).json({ items: itemsResult.rows, updatedItem: result.rows[0] });
     } catch (error) {
-        console.error('Error updating item:', error.message);
-        res.status(500).json({ error: error.message });
+        res.status(500).json({ error: "Error" });
     }
 };
 
@@ -447,8 +437,6 @@ const restockItem = async (req, res) => {
     try {
         const { item_id } = req.params;
         const { stockAdded, stockBefore } = req.body;
-        console.log('stockAdded:', stockAdded, 'stockBefore:', stockBefore);
-        console.log('item_id:', item_id);
         const query = `
             INSERT INTO restock_logs
                 (item_id, stock_added, stock_before)
@@ -459,7 +447,7 @@ const restockItem = async (req, res) => {
         await pool.query(query, values);
         res.status(200).json({ message: 'Stock updated successfully' });
     } catch (error) {
-        res.status(500).json({ error: error.message });
+        res.status(500).json({ error: "Error" });
     }
 }
 

@@ -38,7 +38,6 @@ const SetUpAccount = () => {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        console.log('1');
 
         if (!isFormValid) {
             setError("Please meet all password requirements.");
@@ -73,7 +72,6 @@ const SetUpAccount = () => {
         const passwordsMatch = password === confirmPassword;
 
         setIsFormValid(meetsRequirements && passwordsMatch);
-        console.log(meetsRequirements, passwordsMatch);
 
         // Clear error if requirements are met
         if (meetsRequirements && passwordsMatch) {

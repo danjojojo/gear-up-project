@@ -33,7 +33,6 @@ const CropModal = ({ show, onHide, imgSrc, error, crop, setCrop, minimumWidth, m
                     minHeight={minimumHeight}
                     onChange={(percentCrop) => {
                         setCrop(percentCrop)
-                        console.log(percentCrop)
                     }}
                 >
                     <img 

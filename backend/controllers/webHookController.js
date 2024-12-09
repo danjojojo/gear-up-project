@@ -12,7 +12,6 @@ const handlePaymongoWebhook = async (req, res) => {
     const rawBody = JSON.stringify(req.body);
 
     if (!signatureHeader) {
-        console.error('No signature header found');
         return res.status(400).send('No signature header found');
     }
 
@@ -30,13 +29,11 @@ const handlePaymongoWebhook = async (req, res) => {
     const computedSignature = hmac.digest('hex');
 
     if (computedSignature !== expectedSignature) {
-        console.error('Invalid signature');
         return res.status(400).send('Invalid signature');
     }
 
     const event = req.body;
 
-    console.log('Received Webhook Event:', JSON.stringify(event, null, 2));
 
     if (event.data.attributes.type === 'checkout_session.payment.paid') {
         const sessionId = event.data.attributes.data.id;
@@ -63,7 +60,6 @@ const handlePaymongoWebhook = async (req, res) => {
             const { rows } = await pool.query(getOrderIDandEmail, [sessionId]);
             
             if (!rows.length) {
-                console.error('Order not found for session ID:', sessionId);
                 return res.status(404).send('Order not found');
             }
 
@@ -74,11 +70,8 @@ const handlePaymongoWebhook = async (req, res) => {
 
             await pool.query(updateOrderStatus, [paymentId, paymentType, sessionId]);
             await sendEmail(email, orderName, link);
-
-            console.log('Order updated and email sent successfully');
             res.status(200).send('Webhook received');
         } catch (error) {
-            console.error('Error updating order or sending email:', error.message);
             res.status(500).send('Failed to process webhook');
         }
     } else {
@@ -102,7 +95,7 @@ const sendEmail = async (email, orderName, link) => {
   });
 
   try {
-    console.log(`Attempting to send email to: ${email}`);  // Log before sending
+    
     await transporter.sendMail({
       from: process.env.EMAIL_USER,
       to: email,
@@ -112,9 +105,8 @@ const sendEmail = async (email, orderName, link) => {
           <p>Click <a href="${link}">here</a> to view your order status.</p>
       `
     });
-    console.log(`Email successfully sent to: ${email}`);  // Log success
   } catch (error) {
-    console.error(`Error sending email to ${email}:`, error.message);  // Log specific error
+    console.error(`Error sending email to ${email}`);  // Log specific error
   }
 };
 

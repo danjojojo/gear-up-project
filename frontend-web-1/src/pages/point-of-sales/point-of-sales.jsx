@@ -389,7 +389,6 @@ const PointOfSales = () => {
       const { mechanics } = await getAllMechanics();
       setRetrievedMechanicsList(mechanics);
       setAllMechanicsList(mechanics)
-      console.log(mechanics);
     } catch (err) {
       setError("Something went wrong.");
     }
@@ -527,8 +526,6 @@ const PointOfSales = () => {
 
   const printReceipt = () => {
     window.print();
-    console.log(receiptDetails);
-    console.log(retrievedReceiptItems);
   }
 
   // DISPLAY LOADING
@@ -575,11 +572,9 @@ const PointOfSales = () => {
                     value={tab === "items" ? searchItem : searchMechanic}
                     onChange={(e) => {
                         if (tab === "items") {
-                          console.log(e.target.value);
                           setSearchItem(e.target.value);
                           searchForItem(e.target.value);
                         } else {
-                          console.log(e.target.value);
                           setSearchMechanic(e.target.value);
                           searchForMechanic(e.target.value);
                         }
@@ -879,7 +874,6 @@ const PointOfSales = () => {
                         value={amountReceived}
                         onValueChange={(values) => {
                           const { formattedValue, value } = values;
-                          console.log(formattedValue); // formatted value
                           setChange(value - totalPrice); // numeric value
                           setAmountReceived(Number(value));
                         }}
@@ -1008,8 +1002,6 @@ const PointOfSales = () => {
                       setChargeView(true);
                       setAmountReceived(Number(totalPrice));
                       setChange(0);
-                      console.log(items);
-                      console.log(mechanics);
                     }}
                   >
                     Charge {PesoFormat.format(totalPrice)}
@@ -1050,7 +1042,6 @@ const PointOfSales = () => {
                         value={mechanicSelected.price}
                         onValueChange={(values) => {
                           const { formattedValue, value } = values;
-                          console.log(formattedValue); // formatted value
                           setMechanicSelected((mechanicSelected) => ({
                             ...mechanicSelected,
                             price: Number(value),

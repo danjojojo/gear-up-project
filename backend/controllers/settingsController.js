@@ -9,7 +9,7 @@ const getSettings = async (req, res) => {
         const { rows } = await pool.query(query);
         res.status(200).json({ settings : rows });
     } catch (error) {
-        res.status(500).json({ message: error.message });
+        res.status(500).json({ message: "Error" });
     }
 }
 
@@ -25,7 +25,7 @@ const getAdminSettings = async (req, res) => {
         const { rows } = await pool.query(query);
         res.status(200).json({ admin : rows[0] });
     } catch (error) {
-        res.status(500).json({ message: error.message });
+        res.status(500).json({ message: "Error" });
     }
 }
 
@@ -43,7 +43,7 @@ const setNewAdminName = async (req, res) => {
         await pool.query(query, values);
         res.status(200).json({ message: 'Admin name updated successfully' }); 
     } catch (error) {
-        res.status(500).json({ message: error.message });
+        res.status(500).json({ message: "Error" });
     }
 }
 
@@ -59,7 +59,7 @@ const setNewStoreName = async (req, res) => {
         await pool.query(query, values);
         res.status(200).json({ message: 'Store name updated successfully' });
     } catch (error) {
-        res.status(500).json({ message: error.message });
+        res.status(500).json({ message: "Error" });
     }
 }
 
@@ -75,20 +75,19 @@ const setNewStoreAddress = async (req, res) => {
         await pool.query(query, values);
         res.status(200).json({ message: 'Store address updated successfully' });
     } catch (error) {
-        res.status(500).json({ message: error.message });
+        res.status(500).json({ message: "Error" });
     }
 }
 
 const setMechanicPercentage = async (req, res) => {
     try {
-        console.log(req.body);
         const { percentage } = req.body;
         const query = `UPDATE settings SET setting_value = $1 WHERE setting_key = 'mechanic_percentage'`;
         const values = [percentage];
         await pool.query(query, values);
         res.status(200).json({ message: 'Mechanic percentage updated successfully' });
     } catch (error) {
-        res.status(500).json({ message: error.message });
+        res.status(500).json({ message: "Error" });
     }
 }
 
@@ -100,7 +99,7 @@ const setDisplayStockLevelPOS = async (req, res) => {
         await pool.query(query, values);
         res.status(200).json({ message: 'Display stock level for POS items updated successfully' });
     } catch (error) {
-        res.status(500).json({ message: error.message });
+        res.status(500).json({ message: "Error" });
     }
 }
 
@@ -116,7 +115,7 @@ const setDisplayExpenses = async (req, res) => {
         await pool.query(query, values);
         res.status(200).json({ message: 'Display expenses updated successfully'})
     } catch (error) {
-        res.status(500).json({error: error.message});
+        res.status(500).json({error: "Error"});
     }
 }
 
@@ -130,7 +129,7 @@ const getStoreAddress = async (req, res) => {
         const { rows } = await pool.query(query);
         res.status(200).json({ storeAddress : rows[0] });
     } catch (error) {
-        res.status(500).json({ message: error.message });
+        res.status(500).json({ message: "Error" });
     }
 }
 

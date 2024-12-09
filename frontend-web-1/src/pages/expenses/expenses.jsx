@@ -132,7 +132,6 @@ const Expenses = () => {
 		const image = e.target.files[0]
 		
 		if(image){
-			console.log(image)
 			if(!image.type.startsWith("image/")) {
 				e.target.value = "";
 				setError("Please upload an image file.");
@@ -298,14 +297,11 @@ const Expenses = () => {
 		try{
 			const { expenses } = await getExpenses(startDate);
 			setAllExpenses(expenses);
-			console.log(expenses);
 		}catch (error){
 			console.error("Error getting expenses", error);
 		}	
 	}
 	const handleGetExpenseEntry = async (expense) => {
-		console.log(expense);
-
 		const fileExtension = expense.expense_image && expense.expense_image.startsWith("data:image/png")
             ? "png"
             : "jpg"; // Default to jpg if it's not a png
@@ -340,11 +336,7 @@ const Expenses = () => {
 		formData.append("amount", expenseAmount);
 		formData.append("date", startDate);
 		if(expenseImage) formData.append("image", expenseImage);
-		
-		// Log the form data values
-		console.log("Expense Name:", formData.get("name"));
-		console.log("Expense Amount:", formData.get("amount"));
-		console.log("Expense Image:", formData.get("image"));
+
 
 		try{
 			await addExpense(formData);
@@ -358,26 +350,18 @@ const Expenses = () => {
 			console.error("Error adding expense", error);
 			alert("An error occurred while adding the expense");
 		}
-		console.log(formData);
 	}
 	const handleEditExpense = async () => {
 
 		const formData = new FormData();
 		formData.append("id", editExpenseID);
 		if(othersExpense) {
-			console.log('others');
 			formData.append("name", 'Others - ' + othersExpenseName);
 		} else {
 			formData.append("name", editExpenseName);
 		}
 		formData.append("amount", editExpenseAmount);
 		if(editExpenseImage) formData.append("image", editExpenseImage);
-		
-		// Log the form data values
-		console.log("Expense ID:", editExpenseID);
-		console.log("Expense Name:", formData.get("name"));
-		console.log("Expense Amount:", formData.get("amount"));
-		console.log("Expense Image:", formData.get("image"));
 
 		try{
 			await editExpense(editExpenseID, formData);
@@ -391,8 +375,6 @@ const Expenses = () => {
 			console.error("Error adding expense", error);
 			alert("An error occurred while adding the expense");
 		}
-
-		console.log(formData);
 	}
 	const handleArchiveExpense = async () => {
 		try {
@@ -408,16 +390,12 @@ const Expenses = () => {
 		}
 	}
 	const functionKeyAction = () => {
-		console.log("Action confirmed!");
 		if(functionKey === 'edit'){
 			handleEditExpense();
 		} else if (functionKey === 'del'){
 			handleArchiveExpense();
 		}
 	};
-	useEffect(() => {
-		console.log("Others Expense Name: ", othersExpenseName);
-	}, [othersExpenseName]);
 
 	useEffect(() => {
 		handleGetExpenses(startDate);
@@ -582,7 +560,6 @@ const Expenses = () => {
 											editExpenseName === option || editExpenseName.substring(0,6) === option ? 'selected' : ''
 										}
 										onClick={() => {
-											console.log(option);
 											setEditExpenseName(option);
 											if(option === 'Others') {
 												setOthersExpense(true);
@@ -604,7 +581,6 @@ const Expenses = () => {
 										value={othersExpenseName}
 										onChange={(e) => {
 											setOthersExpenseName(e.target.value);
-											console.log(e.target.value);
 										}}
 									/>
 									{othersExpenseName === '' && (
@@ -623,7 +599,6 @@ const Expenses = () => {
 										value={editExpenseAmount}
 										onValueChange={(values) => {
 											const { formattedValue, value } = values;
-											console.log(formattedValue);
 											setEditExpenseAmount(Number(value))
 										}}
 									/>
@@ -749,7 +724,6 @@ const Expenses = () => {
 											key={index}
 											className={expenseName === option ? 'selected' : ''}
 											onClick={() => {
-												console.log(option);
 												setExpenseName(option);
 												if(option === 'Others') {
 													setOthersExpense(true);
@@ -788,7 +762,6 @@ const Expenses = () => {
 										value={expenseAmount}
 										onValueChange={(values, e) => {
 											const { formattedValue, value } = values;
-											console.log(formattedValue);
 											setExpenseAmount(Number(value))
 										}}
 									/>

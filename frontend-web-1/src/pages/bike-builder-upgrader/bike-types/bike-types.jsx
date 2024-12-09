@@ -37,7 +37,6 @@ const BikeType = () => {
         try {
             const { bikeTypes } = await getBikeTypes();
             let validBikeType = bikeTypes.find((bikeType) => bikeType.bike_type_tag === type) || false;
-            console.log(validBikeType);
             setIsValidBikeType(true);
             if(validBikeType){
                 setBikeTypeName(validBikeType.bike_type_name);

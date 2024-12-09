@@ -200,7 +200,6 @@ const Records = () => {
         } else{
             setFilteredRecordsByPOSUser(records);
         }
-        console.log(value)
     }
 
     function handleNoRecords(){
@@ -223,7 +222,6 @@ const Records = () => {
 
     function handleRecordModal(recordValue) {
         const selectRecord = selectedRecord;
-        console.log(selectRecord, recordValue.record_id);
         setModalShow(true);
         setModalName(recordValue.record_name);
         setModalDate(moment(recordValue.date_created).format("LL") + ' - ' + moment(recordValue.date_created).format("LT"));
@@ -271,7 +269,6 @@ const Records = () => {
 
     useEffect(() => {
         handleLeaderboard(selectedRecord, startLeaderboardDate, endLeaderboardDate);
-        console.log(startLeaderboardDate, endLeaderboardDate);
     }, [selectedRecord, startLeaderboardDate, endLeaderboardDate])
 
     const [modalShow, setModalShow] = useState(false);

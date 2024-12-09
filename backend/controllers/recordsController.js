@@ -8,7 +8,6 @@ const getDashboardData = async (req, res) => {
     
     // Extract query parameters
     const { reference, date } = req.query;
-    console.log(reference, date);
 
     switch (reference) {
         case 'sales':
@@ -58,7 +57,7 @@ const getDashboardData = async (req, res) => {
                     d4: dashboardData.total_sold
                 });
             } catch (error) {
-                res.status(500).json({ error: error.message });
+                res.status(500).json({ error: "Error" });
             }
             break;
         case 'labor':
@@ -93,7 +92,7 @@ const getDashboardData = async (req, res) => {
                     d4: dashboardData.total_rendered
                 });
             } catch (error) {
-                res.status(500).json({ error: error.message });
+                res.status(500).json({ error: "Error" });
             }
             break;
         case 'expenses':
@@ -118,7 +117,7 @@ const getDashboardData = async (req, res) => {
                     d4: dashboardData.total_entries
                 });
             } catch (error) {
-                res.status(500).json({ error: error.message });
+                res.status(500).json({ error: "Error" });
             }
             break;
         default:
@@ -135,7 +134,6 @@ const getRecords = async (req, res) => {
     
     // Extract query parameters
     const { reference, date } = req.query;
-    console.log(reference, date);
 
     switch (reference) {
         case 'sales':
@@ -167,7 +165,7 @@ const getRecords = async (req, res) => {
                     records: rows
                 });
             } catch (error) {
-                res.status(500).json({ error: error.message });
+                res.status(500).json({ error: "Error" });
             }
             break;
         case 'labor':
@@ -189,7 +187,7 @@ const getRecords = async (req, res) => {
                     records: rows
                 });
             } catch (error) {
-                res.status(500).json({ error: error.message });
+                res.status(500).json({ error: "Error" });
             }
             break;
         case 'expenses':
@@ -208,7 +206,7 @@ const getRecords = async (req, res) => {
                     records: rows
                 });
             } catch (error) {
-                res.status(500).json({ error: error.message });
+                res.status(500).json({ error: "Error" });
             }
             break;
         default:
@@ -225,7 +223,6 @@ const getHighlightDates = async (req, res) => {
     
     // Extract query parameters
     const { reference } = req.query;
-    console.log(reference);
 
     switch (reference) {
         case 'sales':
@@ -244,7 +241,7 @@ const getHighlightDates = async (req, res) => {
                     dates: rows
                 });
             } catch (error) {
-                res.status(500).json({ error: error.message });
+                res.status(500).json({ error: "Error" });
             }
             break;
         case 'labor':
@@ -263,7 +260,7 @@ const getHighlightDates = async (req, res) => {
                     dates: rows
                 });
             } catch (error) {
-                res.status(500).json({ error: error.message });
+                res.status(500).json({ error: "Error" });
             }
             break;
         case 'expenses':
@@ -279,7 +276,7 @@ const getHighlightDates = async (req, res) => {
                     dates: rows
                 });
             } catch (error) {
-                res.status(500).json({ error: error.message });
+                res.status(500).json({ error: "Error" });
             }
             break;
     
@@ -297,7 +294,6 @@ const getInnerRecords = async (req, res) => {
     
     // Extract query parameters
     const { reference, id } = req.query;
-    console.log(reference);
 
     switch (reference) {
         case 'sales':
@@ -315,7 +311,7 @@ const getInnerRecords = async (req, res) => {
                     inner: rows
                 });
             } catch (error) {
-                res.status(500).json({ error: error.message });
+                res.status(500).json({ error: "Error" });
             }
             break;
         case 'labor':
@@ -333,7 +329,7 @@ const getInnerRecords = async (req, res) => {
                     inner: rows
                 });
             } catch (error) {
-                res.status(500).json({ error: error.message });
+                res.status(500).json({ error: "Error" });
             }
             break;
         case 'expenses':
@@ -349,7 +345,7 @@ const getInnerRecords = async (req, res) => {
                     inner: rows[0]
                 });
             } catch (error) {
-                res.status(500).json({ error: error.message });
+                res.status(500).json({ error: "Error" });
             }
             break;
     
@@ -402,7 +398,7 @@ const getLeaderBoards = async (req, res) => {
                 const { rows } = await pool.query(query, values);
                 res.json({ leaderBoards: rows });
             } catch (error) {
-                res.status(500).json({ error: error.message });
+                res.status(500).json({ error: "Error" });
             }
             break;
         case 'labor':
@@ -431,7 +427,7 @@ const getLeaderBoards = async (req, res) => {
                 const { rows } = await pool.query(query, values);
                 res.json({ leaderBoards: rows, mechanicPercentage });
             } catch (error) {
-                res.status(500).json({ error: error.message });
+                res.status(500).json({ error: "Error" });
             }
             break;
         case 'expenses':
@@ -446,7 +442,7 @@ const getLeaderBoards = async (req, res) => {
                 const { rows } = await pool.query(query);
                 res.json({ leaderBoards: rows });
             } catch (error) {
-                res.status(500).json({ error: error.message });
+                res.status(500).json({ error: "Error" });
             }
             break;
         default:

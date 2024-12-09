@@ -126,7 +126,6 @@ const Receipts = () => {
       try{
         const { dashboard } = await getReceiptsDashboard(startDate);
         setDashboardData(dashboard[0]);
-        console.log(dashboard[0]);
       } catch (err) {
         console.error('Error retrieving receipts', err);
       }
@@ -146,7 +145,6 @@ const Receipts = () => {
         try {
             const { items } = await getReceiptItems(receiptSaleId);
             setRetrievedReceiptItems(items);
-            console.log(items);
         }
         catch(err) {
             console.error('Error retrieving items', err);
@@ -163,7 +161,6 @@ const Receipts = () => {
           } 
           setReceiptStatus(status);
           setReceiptVoidDate(moment(dateRequested).format("LLL"));
-          console.log("Receipt voided");
           setModalVoidShow(false);
           await getReceipts(startDate);
         } else if(userRole === 'admin'){
@@ -176,7 +173,6 @@ const Receipts = () => {
           }
           setReceiptStatus(status);
           setReceiptVoidDate(moment(dateVoided).format("LLL"));
-          console.log("Receipt voided");
           setModalVoidShow(false);
           await getReceipts(startDate);
         }
@@ -188,7 +184,6 @@ const Receipts = () => {
       try {
         const {status} = await cancelVoidReceipt(receiptIDValue);
         setReceiptStatus(status);
-        console.log("Receipt voided");
         await getReceipts(startDate);
       } catch (error) {
         console.error("Error voiding receipt", error);
@@ -200,7 +195,6 @@ const Receipts = () => {
       setRefundItems({});
       setRefundItemsDetails([]);
       setReceiptDetails([]);
-      console.log("Refund receipt");
       try {
         await refundReceipt(receiptDetails.receipt_id, receiptDetails.sale_id, refundItemsDetails);
         await getReceipts(startDate);
@@ -211,22 +205,16 @@ const Receipts = () => {
     const handleCancelRefundReceipt = async () => {
       try {
         if(userRole === 'admin'){
-          console.log("Cancel refund receipt");
-          console.log(receiptDetails.receipt_id);
           const retrievedItems = retrievedReceiptItems.filter((item) => item.record_type === 'item'); 
           const {status, dateVoided} = await adminCancelRefundReceipt(receiptID, receiptDetails.original_receipt_name, retrievedItems);
           setReceiptStatus(status);
           setReceiptVoidDate(moment(dateVoided).format("LLL"));
-          console.log("Receipt voided");
           setModalCancelRefundShow(false);
           await getReceipts(startDate);
         } else {
-          console.log("Cancel refund receipt");
-          console.log(receiptDetails.receipt_id);
           const {status, dateRequested} = await staffVoidReceipt(receiptID);
           setReceiptStatus(status);
           setReceiptVoidDate(moment(dateRequested).format("LLL"));
-          console.log("Receipt voided");
           setModalCancelRefundShow(false);
           await getReceipts(startDate);
         }
@@ -325,7 +313,6 @@ const Receipts = () => {
             setSelectedPosUser('all');
             setFilteredReceipts(allReceipts);
         }
-        console.log(value)
     }
   
     // GET RECEIPTS ON PAGE LOAD
@@ -357,7 +344,7 @@ const Receipts = () => {
         })
         setRefundItemsDetails(updatedRefundItemsDetails);
       } catch (error) {
-        console.log("Error updating refund qty", error);
+        console.log("Error updating refund qty");
       }
     }
 

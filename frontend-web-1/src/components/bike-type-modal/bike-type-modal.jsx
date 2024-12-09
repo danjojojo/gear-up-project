@@ -67,7 +67,6 @@ const BikeTypeModal = ({
 		const image = e.target.files[0]
 		
 		if(image){
-			console.log(image)
 			if(!image.type.startsWith("image/")) {
 				e.target.value = "";
 				setImageError("Please upload an image file.");

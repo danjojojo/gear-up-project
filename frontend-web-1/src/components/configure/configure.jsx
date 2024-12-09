@@ -35,7 +35,7 @@ const Configure = ({
             const { parts } = await getAllParts();
             setRetrievedParts(parts);
         } catch (error) {
-            console.log(error);
+            console.log("Error");
         }
     }
 
@@ -63,9 +63,8 @@ const Configure = ({
                 return groups;
             }, {});
             setGroupedSpecs(specsGrouped);
-            console.log(specsGrouped);
         } catch (error) {
-            console.log(error);
+            console.log("Error");
         }
     }
 

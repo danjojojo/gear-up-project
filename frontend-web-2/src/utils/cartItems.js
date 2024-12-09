@@ -13,7 +13,6 @@ export const useCartItems = () => {
 
     const fetchCartItems = async () => {
         let buItems = await getBUCartItems();
-        console.log(buItems.length);
         let buItemsLength = buItems.length;
         // alert(buItems.length);
         if (buItemsLength > 0) {

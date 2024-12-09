@@ -34,7 +34,7 @@ const getFrameItems = async (req, res) => {
         res.status(200).json(result.rows);
     } catch (error) {
         console.error('Error fetching frame items:', error);
-        res.status(500).json({ error: error.message });
+        res.status(500).json({ error: "Error" });
     }
 };
 
@@ -224,7 +224,7 @@ const getCockpitItems = async (req, res) => {
         res.status(200).json(result.rows);
     } catch (error) {
         console.error('Error fetching cockpit items:', error);
-        res.status(500).json({ error: error.message });
+        res.status(500).json({ error: "Error" });
     }
 };
 
@@ -274,13 +274,11 @@ const getAnyItems = async (req, res) => {
     try {
         const { reference } = req.params;
         const { filterValues } = req.query;
-        console.log(filterValues);
         const query = buildQuery(reference, filterValues);
-        console.log(query);
         const { rows } = await pool.query(query);
         res.status(200).json({ parts: rows });
     } catch (error) {
-        res.status(500).json({ message: error.message })
+        res.status(500).json({ message: "Error" })
     }
 }
 
@@ -331,7 +329,7 @@ const getItemReviews = async (req, res) => {
         const { rows } = await pool.query(query, [itemId]);
         res.status(200).json({ reviews: rows });
     } catch (error) {
-        res.status(500).json({ message: error.message });
+        res.status(500).json({ message: "Error" });
     }
 }
 
@@ -354,7 +352,7 @@ const saveBikeBuild = async (req, res) => {
         res.status(200).json({ message: 'Bike build saved successfully!' });
     } 
     catch (error) {
-        res.status(500).json({ message: error.message });
+        res.status(500).json({ message: "Error" });
     }
 }
 
