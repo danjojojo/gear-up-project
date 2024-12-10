@@ -57,7 +57,7 @@ const BikeBuilder = () => {
         groupset: { x: 270, y: 295, width: 136, height: 106, rotation: 0 },
         frontWheel: { x: 539, y: 217, width: 251, height: 235, rotation: 0 },
         rearWheel: { x: 183, y: 217, width: 251, height: 235, rotation: 0 },
-        seat: { x: 345, y: 149, width: 110, height: 127, rotation: -5 },
+        seat: { x: 340, y: 143, width: 125, height: 137, rotation: -5 },
         cockpit: { x: 563, y: 117, width: 52, height: 45, rotation: 0 }
     };
 
