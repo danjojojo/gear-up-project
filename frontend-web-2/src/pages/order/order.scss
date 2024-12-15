@@ -259,17 +259,24 @@
                     }
                 }
 
-                .rate{
+                .r{
                     display: flex;
-                    margin-left: auto;
-                    text-align: right;
-                    outline: none !important;
-                    background-color: #F9961F;
-                    border: none !important;
-                    color: white;
-                    padding: 0.2rem 1rem;
-                    border-radius: 5px;
+                    flex-direction: column;
+                    width: 100%;
+
+                    .rate{
+                        display: flex;
+                        margin-left: auto;
+                        text-align: right;
+                        outline: none !important;
+                        background-color: #F9961F;
+                        border: none !important;
+                        color: white;
+                        padding: 0.2rem 1rem;
+                        border-radius: 5px;
+                    }
                 }
+
             }
         }
     }
@@ -454,6 +461,18 @@
                         flex-direction: column;
                         width: 100%;
                     }  
+
+                    .rate {
+                        display: flex;
+                        margin-left: auto;
+                        text-align: right;
+                        outline: none !important;
+                        background-color: #F9961F;
+                        border: none !important;
+                        color: white;
+                        padding: 0.2rem 1rem;
+                        border-radius: 5px;
+                    }
                 }
             }
         }

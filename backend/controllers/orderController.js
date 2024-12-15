@@ -106,7 +106,7 @@ const getOrder = async (req, res) => {
                     LEFT JOIN wheelset w ON i.item_id = w.item_id AND i.bike_parts = 'Wheelset'
                     LEFT JOIN seat s ON i.item_id = s.item_id AND i.bike_parts = 'Seat'
                     LEFT JOIN cockpit c ON i.item_id = c.item_id AND i.bike_parts = 'Cockpit'
-                    WHERE o.order_name = $1 AND o.order_status = 'completed' AND r.user_id = $2
+                    WHERE o.order_name = $1 AND o.order_status = 'completed' AND o.user_id = $2
                 `;
                 const uResult = await pool.query(uniqueItems, [orderId, userId]);
                 return res.status(200).json({ order : oResult.rows[0], items: iResult.rows, reviews: uResult.rows, allowedToReview: true });
