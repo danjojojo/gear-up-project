@@ -1233,6 +1233,7 @@ const Inventory = () => {
                                                                     }))
                                                                 }
                                                                 disabled={!isEditing}
+                                                                required={selectedItem.add_part || selectedItem.bike_parts === ""}
                                                             >
                                                                 <option value="">Select a part</option>
                                                                 <option value="Frame">Frame</option>

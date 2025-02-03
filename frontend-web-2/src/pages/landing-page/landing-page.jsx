@@ -3,6 +3,10 @@ import React from "react";
 import { NavLink } from "react-router-dom";
 
 const LandingPage = () => {
+    
+    const date = new Date();
+    const year = date.getFullYear();
+
     return (
         <div className="landing-page">
             <div className="content">
@@ -26,7 +30,7 @@ const LandingPage = () => {
                 </div>
             </div>
             <div className="end">
-                <p>&copy; 2024 GearUp. All rights reserved.</p>
+                <p>&copy; {year} GearUp. All rights reserved.</p>
             </div>
         </div>
     );

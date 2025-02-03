@@ -23,6 +23,11 @@ const SalesReport = () => {
     const [storeName, setStoreName] = useState('');
     const [storeAddress, setStoreAddress] = useState('');
 
+    const [label, setLabel] = useState([
+        'January', 'February', 'March', 'April', 'May', 'June',
+        'July', 'August', 'September', 'October', 'November', 'December'
+    ]);
+
     useEffect(() => {
         registerCooperFont();
         registerRubikFont();
@@ -80,7 +85,7 @@ const SalesReport = () => {
         pdf.setFontSize(11);
         pdf.setFont('Rubik-SemiBold');
         yPosition += 7;
-        const reportSubtitle = `(${months[selectedDate.month - 1].label} ${selectedDate.year})`;
+        const reportSubtitle = `(${label[selectedDate.month - 1]} ${selectedDate.year})`;
         pdf.text(reportSubtitle, (pdfWidth - pdf.getTextWidth(reportSubtitle)) / 2, yPosition);
 
         pdf.setFontSize(9);
@@ -211,24 +216,8 @@ const SalesReport = () => {
 
         // Display PDF in a new window
         // pdf.output("dataurlnewwindow"); for debug
-        pdf.save(`${months[selectedDate.month - 1].label}_${selectedDate.year}_POS_Sales_Report.pdf`);
+        pdf.save(`${label[selectedDate.month - 1]}_${selectedDate.year}_POS_Sales_Report.pdf`);
     };
-
-
-    const months = [
-        { value: 0, label: 'January' },
-        { value: 1, label: 'February' },
-        { value: 2, label: 'March' },
-        { value: 3, label: 'April' },
-        { value: 4, label: 'May' },
-        { value: 5, label: 'June' },
-        { value: 6, label: 'July' },
-        { value: 7, label: 'August' },
-        { value: 8, label: 'September' },
-        { value: 9, label: 'October' },
-        { value: 10, label: 'November' },
-        { value: 11, label: 'December' }
-    ];
 
     const PesoFormat = new Intl.NumberFormat("en-US", {
         style: "currency",
@@ -282,7 +271,7 @@ const SalesReport = () => {
                     <h1>{storeName}</h1>
                     <p>{storeAddress}</p>
                     <h3>Monthly POS Items Sales Report</h3>
-                    <h6>({`${months[selectedDate.month - 1].label} ${selectedDate.year}`})</h6>
+                    <h6>({`${label[selectedDate.month - 1]} ${selectedDate.year}`})</h6>
                     <p>Sales performance across different products.</p>
                 </div>
 

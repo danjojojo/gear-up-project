@@ -389,7 +389,7 @@ const updateItem = async (req, res) => {
             itemAddToBikeBuilder,
             itemBikeParts,
             itemImage,
-            new Date(Date.now()).toLocaleString("en-US", { timeZone: "Asia/Manila" }), // date_updated
+            new Date(Date.now()), // date_updated
             itemCost,
             id
         ];
@@ -429,7 +429,7 @@ const updateItem = async (req, res) => {
 
         res.status(200).json({ items: itemsResult.rows, updatedItem: result.rows[0] });
     } catch (error) {
-        res.status(500).json({ error: "Error" });
+        res.status(500).json({ error: error.message });
     }
 };
 

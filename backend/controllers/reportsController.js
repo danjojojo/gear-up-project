@@ -19,8 +19,8 @@ const getSalesReport = async (req, res) => {
             JOIN receipts r ON si.sale_id = r.sale_id
             LEFT JOIN receipts r_refund ON r.sale_id = r_refund.sale_id AND r_refund.receipt_type = 'refund'
             WHERE 
-                EXTRACT(MONTH FROM r.date_created AT TIME ZONE 'UTC' AT TIME ZONE 'Asia/Manila') = $1 
-                AND EXTRACT(YEAR FROM r.date_created AT TIME ZONE 'UTC' AT TIME ZONE 'Asia/Manila') = $2
+                EXTRACT(MONTH FROM r.date_created) = $1 
+                AND EXTRACT(YEAR FROM r.date_created) = $2
                 AND s.status = true AND si.sale_item_type = 'sale'
                 AND si.item_qty > si.refund_qty AND si.item_qty > si.return_qty
             GROUP BY i.item_name
@@ -34,7 +34,7 @@ const getSalesReport = async (req, res) => {
         const detailedResult = await pool.query(
             `
             SELECT 
-                EXTRACT(DAY FROM r.date_created AT TIME ZONE 'UTC' AT TIME ZONE 'Asia/Manila') AS day,
+                EXTRACT(DAY FROM r.date_created) AS day,
                 i.item_name, 
                 SUM((si.item_qty - si.refund_qty - si.return_qty)) AS quantity, 
                 SUM((si.item_qty - si.refund_qty - si.return_qty) * si.item_unit_price) AS total_sales,
@@ -45,8 +45,8 @@ const getSalesReport = async (req, res) => {
             JOIN receipts r ON si.sale_id = r.sale_id
             LEFT JOIN receipts r_refund ON r.sale_id = r_refund.sale_id AND r_refund.receipt_type = 'refund'
             WHERE 
-                EXTRACT(MONTH FROM r.date_created AT TIME ZONE 'UTC' AT TIME ZONE 'Asia/Manila') = $1
-                AND EXTRACT(YEAR FROM r.date_created AT TIME ZONE 'UTC' AT TIME ZONE 'Asia/Manila') = $2
+                EXTRACT(MONTH FROM r.date_created) = $1
+                AND EXTRACT(YEAR FROM r.date_created) = $2
                 AND s.status = true AND si.sale_item_type = 'sale'
                 AND si.item_qty > si.refund_qty AND si.item_qty > si.return_qty
             GROUP BY day, i.item_name
@@ -81,8 +81,8 @@ const getExpensesReport = async (req, res) => {
                 END AS expense_name,
                 SUM(e.expense_amount) AS total_amount
             FROM expenses e
-            WHERE EXTRACT(MONTH FROM e.date_created AT TIME ZONE 'UTC' AT TIME ZONE 'Asia/Manila') = $1 
-            AND EXTRACT(YEAR FROM e.date_created AT TIME ZONE 'UTC' AT TIME ZONE 'Asia/Manila') = $2
+            WHERE EXTRACT(MONTH FROM e.date_created) = $1 
+            AND EXTRACT(YEAR FROM e.date_created) = $2
             AND e.status = 'active'
             GROUP BY expense_name
             ORDER BY total_amount DESC;
@@ -94,12 +94,12 @@ const getExpensesReport = async (req, res) => {
         const detailedResult = await pool.query(
             `
             SELECT 
-                EXTRACT(DAY FROM e.date_created AT TIME ZONE 'UTC' AT TIME ZONE 'Asia/Manila') AS day,
+                EXTRACT(DAY FROM e.date_created) AS day,
                 e.expense_name, 
                 SUM(e.expense_amount) AS expense_amount
             FROM expenses e
-            WHERE EXTRACT(MONTH FROM e.date_created AT TIME ZONE 'UTC' AT TIME ZONE 'Asia/Manila') = $1 
-            AND EXTRACT(YEAR FROM e.date_created AT TIME ZONE 'UTC' AT TIME ZONE 'Asia/Manila') = $2
+            WHERE EXTRACT(MONTH FROM e.date_created) = $1 
+            AND EXTRACT(YEAR FROM e.date_created) = $2
             AND e.status = 'active'
             GROUP BY day, e.expense_name
             ORDER BY day ASC, e.expense_name;
@@ -135,12 +135,12 @@ const getLaborReport = async (req, res) => {
             `
             SELECT 
                 m.mechanic_name,
-                COUNT(DISTINCT EXTRACT(DAY FROM sm.date_created AT TIME ZONE 'UTC' AT TIME ZONE 'Asia/Manila')) AS days_worked,
+                COUNT(DISTINCT EXTRACT(DAY FROM sm.date_created)) AS days_worked,
                 SUM(sm.service_price) AS total_service_amount
             FROM sales_mechanics sm
             JOIN mechanics m ON sm.mechanic_id = m.mechanic_id
-            WHERE EXTRACT(MONTH FROM sm.date_created AT TIME ZONE 'UTC' AT TIME ZONE 'Asia/Manila') = $1
-            AND EXTRACT(YEAR FROM sm.date_created AT TIME ZONE 'UTC' AT TIME ZONE 'Asia/Manila') = $2
+            WHERE EXTRACT(MONTH FROM sm.date_created) = $1
+            AND EXTRACT(YEAR FROM sm.date_created) = $2
             GROUP BY m.mechanic_name
             ORDER BY total_service_amount DESC;
             `,
@@ -151,13 +151,13 @@ const getLaborReport = async (req, res) => {
         const detailedResult = await pool.query(
             `
             SELECT 
-                EXTRACT(DAY FROM sm.date_created AT TIME ZONE 'UTC' AT TIME ZONE 'Asia/Manila') AS day,
+                EXTRACT(DAY FROM sm.date_created) AS day,
                 m.mechanic_name,
                 SUM(sm.service_price) AS service_price
             FROM sales_mechanics sm
             JOIN mechanics m ON sm.mechanic_id = m.mechanic_id
-            WHERE EXTRACT(MONTH FROM sm.date_created AT TIME ZONE 'UTC' AT TIME ZONE 'Asia/Manila') = $1 
-            AND EXTRACT(YEAR FROM sm.date_created AT TIME ZONE 'UTC' AT TIME ZONE 'Asia/Manila') = $2
+            WHERE EXTRACT(MONTH FROM sm.date_created) = $1 
+            AND EXTRACT(YEAR FROM sm.date_created) = $2
             GROUP BY day, m.mechanic_name
             ORDER BY day ASC, m.mechanic_name;
             `,
@@ -190,8 +190,8 @@ const getOrderReport = async (req, res) => {
             FROM orders o
             LEFT JOIN order_items oi ON o.order_id = oi.order_id
             WHERE 
-                EXTRACT(MONTH FROM o.date_created AT TIME ZONE 'UTC' AT TIME ZONE 'Asia/Manila') = $1 
-                AND EXTRACT(YEAR FROM o.date_created AT TIME ZONE 'UTC' AT TIME ZONE 'Asia/Manila') = $2;
+                EXTRACT(MONTH FROM o.date_created) = $1 
+                AND EXTRACT(YEAR FROM o.date_created) = $2;
             `,
             [month, year]
         );
@@ -200,7 +200,7 @@ const getOrderReport = async (req, res) => {
         const detailedResult = await pool.query(
             `
             SELECT 
-                EXTRACT(DAY FROM o.date_created AT TIME ZONE 'UTC' AT TIME ZONE 'Asia/Manila') AS day,
+                EXTRACT(DAY FROM o.date_created) AS day,
                 UPPER(SUBSTRING(o.order_name, 1, 5)) || SUBSTRING(o.order_name, 6) AS order_name, 
                 o.cust_name,
                 o.order_amount AS amount,
@@ -212,8 +212,8 @@ const getOrderReport = async (req, res) => {
             FROM orders o
             LEFT JOIN order_items oi ON o.order_id = oi.order_id
             WHERE 
-                EXTRACT(MONTH FROM o.date_created AT TIME ZONE 'UTC' AT TIME ZONE 'Asia/Manila') = $1 
-                AND EXTRACT(YEAR FROM o.date_created AT TIME ZONE 'UTC' AT TIME ZONE 'Asia/Manila') = $2
+                EXTRACT(MONTH FROM o.date_created) = $1 
+                AND EXTRACT(YEAR FROM o.date_created) = $2
                 AND o.payment_status = 'paid'
             GROUP BY day, o.order_name, o.cust_name, o.order_amount, o.processed_at, o.completed_at
             ORDER BY day ASC, o.order_name;
