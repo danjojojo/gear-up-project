@@ -34,6 +34,8 @@ const RevenueReport = () => {
     const [operationalExpenses, setOperationalExpenses] = useState(0);
     const [orderSales, setOrderSales] = useState(0);
 
+    const [mechPercentage, setMechPercentage] = useState(0);
+
     const fetchRevenueData = async (month, year) => {
         try {
             const salesData = await getSalesReport(month, year);
@@ -44,6 +46,7 @@ const RevenueReport = () => {
             const { settings } = await getSettings();
             setStoreName(settings.find(setting => setting.setting_key === 'store_name').setting_value);
             setStoreAddress(settings.find(setting => setting.setting_key === 'store_address').setting_value);
+            setMechPercentage(settings.find(setting => setting.setting_key === 'mechanic_percentage').setting_value);
 
             const totalSales = salesData.summary.reduce((acc, item) => acc + Number(item.total_sales || 0), 0);
             const totalLaborCosts = laborData.summary.reduce((acc, item) => acc + Number(item.total_service_amount || 0), 0);
@@ -51,7 +54,7 @@ const RevenueReport = () => {
             const totalOrderSales = Number(orderData.summary.total_revenue || 0); // Assuming total_revenue is part of the summary
 
             setSales(totalSales);
-            setLaborCosts(totalLaborCosts);
+            setLaborCosts(totalLaborCosts * (mechPercentage / 100));
             setOperationalExpenses(displayExpenses ? totalOperationalExpenses : 0);
             setOrderSales(totalOrderSales);
         } catch (error) {

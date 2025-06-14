@@ -17,11 +17,11 @@ const AuthProvider = ({ children }) => {
 
   const handleTokenRefresh = async () => {
     try {
-      await refreshToken(); // Call to refresh the token
-      const role = await getMyRole(); // Retry fetching the role after refresh
+      await refreshToken();
+      const role = await getMyRole(); 
       setUserRole(role);
       setAuthenticated(true);
-      window.location.reload();  // Reload the page only on successful token refresh
+      window.location.reload();
     } catch (error) {
       console.error('Failed to refresh token:', error);
     }
@@ -36,7 +36,6 @@ const AuthProvider = ({ children }) => {
       setAuthenticated(true);
     } catch (error) {
       if (error.response && error.response.status === 401) {
-        // If access token expired, attempt to refresh the token
         await handleTokenRefresh();
       } 
     } finally {
@@ -57,7 +56,6 @@ const AuthProvider = ({ children }) => {
   useEffect(() => {
     fetchRole();
     fetchSettings();
-    // Periodic token refresh (e.g., every 50 minutes)
     const interval = setInterval(() => handleTokenRefresh(), 60 * 1000 * 40);
     return () => clearInterval(interval); 
   }, []);
@@ -67,12 +65,12 @@ const AuthProvider = ({ children }) => {
       const { message } = await login(email, password);
       if (message === 'Login successful') {
         setOtpRequired(true);
-        setError(null);  // Clear previous errors
+        setError(null);  
       }
     } catch (error) {
       setUserRole(null);
       setAuthenticated(false);
-      throw error;  // Throw the error so it's caught and handled in the login component
+      throw error; 
     }
   };
 
@@ -87,7 +85,7 @@ const AuthProvider = ({ children }) => {
         const role = await getMyRole();
         setUserRole(role);
         setAuthenticated(true);
-        window.location.reload();  // Reload the page only on successful login
+        window.location.reload(); 
       } else {
         setOtpRequired(true);
       }
@@ -100,13 +98,13 @@ const AuthProvider = ({ children }) => {
     try {
       const { message } = await loginPOS(id, password);
       if (message === 'Login successful') {
-        setError(null);  // Clear previous errors
+        setError(null); 
         setLoading(true);
         setTimeout(() => setLoading(false), 1000);
         const role = await getMyRole();
         setUserRole(role);
         setAuthenticated(true);
-        window.location.reload();  // Reload the page only on successful login
+        window.location.reload();
       } else {
         setError('Login failed. Please check your credentials.');
       }

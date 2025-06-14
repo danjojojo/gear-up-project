@@ -72,7 +72,7 @@ const createOrder = async (req, res) => {
         const buOption = sessionOrderFirstItem.bikeUpgradeDelivery;
         const orderAmount = sessionOrderFirstItem.amount;
         // const expiresAt = new Date(Date.now() + 15 * 60 * 1000); // Expires in 15 minutes
-        const expiresAt = new Date(Date.now() + 15 * 60 * 1000).toLocaleString("en-US", { timeZone: "Asia/Manila" }); // Expires in 15 minutes
+        const expiresAt = new Date(Date.now() + 15 * 60 * 1000); // Expires in 15 minutes
 
 
         const ordersInsert = `
@@ -141,7 +141,7 @@ const createOrder = async (req, res) => {
         res.status(200).json({ message: 'Order created' });
     } catch (error) {
         await pool.query("ROLLBACK;");
-        res.status(500).json({ error: 'Failed to create order' });
+        res.status(500).json({ error: "Failed to create order" });
     }
 }
 

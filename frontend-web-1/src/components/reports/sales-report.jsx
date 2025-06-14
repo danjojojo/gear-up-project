@@ -107,8 +107,8 @@ const SalesReport = () => {
         pdf.setFontSize(9);
         pdf.setFont('Rubik-Regular');
         yPosition += 10;
-        const label = 'Total Sales:';
-        pdf.text(label, margin, yPosition);
+        const labell = 'Total Sales:';
+        pdf.text(labell, margin, yPosition);
         pdf.setFont('Rubik-SemiBold');  // Switch to bold font for the value
         const value = `P ${PesoFormat.format(salesData.summary.reduce((acc, item) => acc + Number(item.total_sales || 0), 0))}`;
         pdf.text(value, margin + pdf.getTextWidth(label), yPosition);
